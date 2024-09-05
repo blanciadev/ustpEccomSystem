@@ -1,7 +1,8 @@
-import logo from './logo.svg';
 import './App.css';
 
 import React, { useEffect, useState } from 'react';
+import Navigation from './components/Navigation';
+import Slideshow from './components/Slideshow';
 
 
 function App() {
@@ -17,7 +18,8 @@ function App() {
 
   return (
     <div className="App">
-      <h1>React + Express</h1>
+      <Navigation />
+      <Slideshow/>
       <p>{data}</p>
     </div>
   );
