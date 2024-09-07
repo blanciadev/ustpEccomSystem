@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import PropTypes from 'prop-types';
 
-const ProductCard = ({ product }) => {
+// ProductCard Component
+const ProductCard = ({ product, onAddToCart }) => {
     if (!product) {
         return <div>Product data is not available</div>;
     }
@@ -19,7 +21,7 @@ const ProductCard = ({ product }) => {
                 <div className='product-data'>
                     <p>{product.product_name || 'No product name'}</p>
                     <div className='order-options'>
-                        <button>Add to Cart</button>
+                        <button onClick={() => onAddToCart(product)}>Add to Cart</button>
                         <button>Buy Now</button>
                     </div>
                 </div>
@@ -28,28 +30,77 @@ const ProductCard = ({ product }) => {
     );
 };
 
+ProductCard.propTypes = {
+    product: PropTypes.shape({
+        image_url: PropTypes.string,
+        product_name: PropTypes.string,
+        product_id: PropTypes.number.isRequired
+    }).isRequired,
+    onAddToCart: PropTypes.func.isRequired
+};
 
+// ProductList Component
 const ProductList = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [customerId, setCustomerId] = useState(null);
 
     useEffect(() => {
+        // Fetch logged-in user's customer ID (user_id) from localStorage
+        const storedCustomerId = localStorage.getItem('user_id');
+        
+        if (storedCustomerId) {
+            setCustomerId(storedCustomerId);
+        } else {
+            console.log('Customer ID is not available in localStorage.');
+        }
+
+        // Fetch products from the backend
         const fetchProducts = async () => {
             setLoading(true);
             try {
                 const response = await axios.get('http://localhost:5000/products');
-                setProducts(response.data); // Directly set products from the response
+                setProducts(response.data);
             } catch (error) {
                 setError('Error fetching products: ' + (error.response ? error.response.data : error.message));
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         };
         fetchProducts();
-    }, []); 
+    }, []);
 
-    
-    
+    const handleAddToCart = async (product) => {
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            console.log('User not logged in');
+            return; // Optionally, redirect to login here
+        }
+
+        if (!customerId) {
+            console.log('Customer ID is missing. Please log in.');
+            return;
+        }
+
+        try {
+            const response = await axios.post('http://localhost:5000/add-to-cart', {
+                customer_id: customerId,
+                product_id: product.product_id,
+                quantity: 1
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (response.status === 200) {
+                console.log('Product added to cart:', product);
+                // Optionally, you can add a success message or notification here
+            }
+        } catch (error) {
+            console.error('Error adding product to cart:', error.response ? error.response.data : error.message);
+        }
+    };
 
     if (loading) {
         return <div>Loading...</div>;
@@ -65,8 +116,8 @@ const ProductList = () => {
 
     return (
         <div className='product-list' style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-            {products.slice(0, 4).map((product) => (
-                <ProductCard key={product.product_id} product={product} />
+            {products.map((product) => (
+                <ProductCard key={product.product_id} product={product} onAddToCart={handleAddToCart} />
             ))}
         </div>
     );

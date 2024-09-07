@@ -3,8 +3,11 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import './Signup.css';
 
 const Signup = () => {
-  const [username, setUsername] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [address, setAddress] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
@@ -15,7 +18,7 @@ const Signup = () => {
     e.preventDefault();
 
     // Basic validation
-    if (!username || !email || !password || !confirmPassword) {
+    if (!firstName || !lastName || !email || !address || !phoneNumber || !password || !confirmPassword) {
       setError('All fields are required');
       return;
     }
@@ -26,12 +29,12 @@ const Signup = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/admin-signup', {
+      const response = await fetch('http://localhost:5000/customer-signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ firstName, lastName, email, address, phoneNumber, password }),
       });
 
       const result = await response.json();
@@ -40,8 +43,11 @@ const Signup = () => {
         setError(result.message || 'Signup failed');
       } else {
         setSuccess(result.message);
-        setUsername('');
+        setFirstName('');
+        setLastName('');
         setEmail('');
+        setAddress('');
+        setPhoneNumber('');
         setPassword('');
         setConfirmPassword('');
 
@@ -60,11 +66,21 @@ const Signup = () => {
         <div className='signup-form'>
           <form onSubmit={handleSubmit}>
             <div className='input'>
-              <label>Username</label>
+              <label>First Name</label>
               <input
                 type='text'
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required
+              />
+            </div>
+            <div className='input'>
+              <label>Last Name</label>
+              <input
+                type='text'
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                required
               />
             </div>
             <div className='input'>
@@ -73,6 +89,25 @@ const Signup = () => {
                 type='email'
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className='input'>
+              <label>Address</label>
+              <input
+                type='text'
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                required
+              />
+            </div>
+            <div className='input'>
+              <label>Phone Number</label>
+              <input
+                type='text'
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                required
               />
             </div>
             <div className='input'>
@@ -81,6 +116,7 @@ const Signup = () => {
                 type='password'
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
             <div className='input'>
@@ -89,6 +125,7 @@ const Signup = () => {
                 type='password'
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                required
               />
             </div>
             <button type='submit'>Sign Up</button>

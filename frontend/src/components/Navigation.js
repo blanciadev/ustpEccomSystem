@@ -5,6 +5,7 @@ import axios from 'axios';
 const Navigation = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [username, setUsername] = useState('');
+    const [cartItemCount, setCartItemCount] = useState(0); // State to hold cart item count
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -12,19 +13,19 @@ const Navigation = () => {
             const token = localStorage.getItem('token');
             if (token) {
                 try {
-                    // Replace with your actual API endpoint
                     const response = await axios.get('http://localhost:5000/validate-token', {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     
                     if (response.status === 200) {
                         setIsLoggedIn(true);
-                        setUsername(response.data.username); // Update username from response
+                        setUsername(response.data.username); 
+                        await fetchCartItemCount(); // Fetch cart item count when user is logged in
                     } else {
-                        handleLogout(); // Token validation failed
+                        handleLogout(); 
                     }
                 } catch (error) {
-                    handleLogout(); // Handle token validation error
+                    handleLogout(); 
                 }
             } else {
                 setIsLoggedIn(false);
@@ -34,6 +35,21 @@ const Navigation = () => {
         checkToken();
     }, []);
 
+    const fetchCartItemCount = async () => {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await axios.get('http://localhost:5000/cart-item-count', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            
+            if (response.status === 200) {
+                setCartItemCount(response.data.itemCount); // Set the cart item count
+            }
+        } catch (error) {
+            console.error('Error fetching cart item count:', error.response ? error.response.data : error.message);
+        }
+    };
+
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('username');
@@ -41,16 +57,14 @@ const Navigation = () => {
         navigate('/login');
     };
 
-    // Common links for all users
     const commonLinks = [
         { id: 1, page: "Shop", link: "/" },
         { id: 2, page: "About Us", link: "/about-us" },
-        { id: 3, page: "Cart", link: "/cart" }
+        { id: 3, page: `Cart (${cartItemCount})`, link: "/cart" } // Display cart item count
     ];
 
-    // Links for logged-in users
     const loggedInLinks = [
-        { id: 4, page: username, link: "#" } // Display username
+        { id: 4, page: username, link: "#" } 
     ];
 
     return (
