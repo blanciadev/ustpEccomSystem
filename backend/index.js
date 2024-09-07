@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
-// token validation 
+// Token validation 
 app.get('/validate-token', async (req, res) => {
     const token = req.headers.authorization?.split(' ')[1]; // Extract token from 'Authorization' header
 
@@ -61,7 +61,7 @@ app.post('/login', async (req, res) => {
         }
 
         const user = rows[0];
-        console.log('debug', user);
+        // console.log('debug', user);
 
         // Direct password comparison (simplified for demonstration)
         if (password !== user.password) {
@@ -85,7 +85,6 @@ app.post('/login', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
-
 
 // Signup Route 
 app.post('/admin-signup', async (req, res) => {
@@ -118,6 +117,19 @@ app.post('/admin-signup', async (req, res) => {
     } catch (err) {
         console.error('Error during sign up:', err.message);
         res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+app.get('/products', async (req, res) => {
+    try {
+        // Modify the query to use DISTINCT based on the product_id column
+        const [rows] = await db.query('SELECT DISTINCT product_id, product_name, description, quantity FROM product');
+        
+        console.log('Fetched unique products:', rows);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        res.status(500).send('Error fetching products');
     }
 });
 
