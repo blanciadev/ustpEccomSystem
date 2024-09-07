@@ -1,30 +1,29 @@
 import React, { useState } from 'react';
-import axios from 'axios'; // Axios for HTTP requests
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-    const [username, setUsername] = useState(''); // Manage username state
+    const [email, setEmail] = useState(''); // Changed from username to email
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false); // Manage loading state
-    const [loginStatus, setLoginStatus] = useState(''); // Manage login status
-    const navigate = useNavigate(); // Initialize useNavigate
+    const [loading, setLoading] = useState(false);
+    const [loginStatus, setLoginStatus] = useState('');
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // Clear previous errors and set loading state
         setError('');
         setLoading(true);
 
         try {
-            // Make POST request to the /login endpoint
-            const response = await axios.post('http://localhost:5000/login', { username, password });
+            // Make the login request
+            const response = await axios.post('http://localhost:5000/customer-login', { email, password }); // Changed username to email
 
-            // Handle successful login
             if (response.status === 200) {
+                // If login is successful, store token and user_id
                 setLoginStatus('Login successful');
                 localStorage.setItem('token', response.data.token); // Store token
+                localStorage.setItem('user_id', response.data.user_id); // Store user_id
                 navigate('/'); // Redirect to homepage
             }
         } catch (err) {
@@ -37,7 +36,7 @@ const Login = () => {
                 setError('Error setting up the request: ' + err.message);
             }
         } finally {
-            setLoading(false); // Reset loading state
+            setLoading(false);
         }
     };
 
@@ -47,11 +46,12 @@ const Login = () => {
                 <h1>Log In</h1>
                 <form onSubmit={handleSubmit}>
                     <div className='input'>
-                        <label>Username</label>
+                        <label>Email</label> {/* Changed from Username to Email */}
                         <input
-                            type='text'
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            type='email'
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
                         />
                     </div>
                     <div className='input'>
@@ -60,6 +60,7 @@ const Login = () => {
                             type='password'
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
+                            required
                         />
                     </div>
                     <button type='submit' disabled={loading}>
