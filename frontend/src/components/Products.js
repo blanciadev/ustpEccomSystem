@@ -8,6 +8,7 @@ const Products = () => {
         <h2>OUR PRODUCTS</h2>
         <div className='products'>
             <Productcard/>
+            
         </div>
     </div>
     

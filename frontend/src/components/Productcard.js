@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
+import { cartEventEmitter } from './eventEmitter'; // Import the event emitter
 
 // ProductCard Component
 const ProductCard = ({ product, onAddToCart }) => {
@@ -95,7 +96,8 @@ const ProductList = () => {
 
             if (response.status === 200) {
                 console.log('Product added to cart:', product);
-                // Optionally, you can add a success message or notification here
+                // Emit the cartUpdated event to notify the Navigation component
+                cartEventEmitter.emit('cartUpdated');
             }
         } catch (error) {
             console.error('Error adding product to cart:', error.response ? error.response.data : error.message);

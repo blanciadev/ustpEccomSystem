@@ -24,6 +24,7 @@ async function authenticateToken(req, res, next) {
         res.status(500).json({ message: 'Internal server error' });
     }
 }
+
 // Route to add product to cart
 router.post('/add-to-cart', authenticateToken, async (req, res) => {
     const { product_id, quantity } = req.body;
@@ -40,7 +41,7 @@ router.post('/add-to-cart', authenticateToken, async (req, res) => {
     }
 
     try {
-        // Ensure that the cart exists and get the customer_id
+        // Ensure that the cart exists for the user
         const [[existingCart]] = await db.query('SELECT cart_id FROM cart WHERE customer_id = ?', [user_id]);
 
         if (!existingCart) {
@@ -48,45 +49,46 @@ router.post('/add-to-cart', authenticateToken, async (req, res) => {
             await db.query('INSERT INTO cart (customer_id) VALUES (?)', [user_id]);
         }
 
-        // Insert or update the product in cart_items
-        const insertQuery = `
+        // Insert the product into cart_items or update the quantity if it already exists
+        const insertOrUpdateQuery = `
             INSERT INTO cart_items (customer_id, product_id, quantity) 
-            VALUES (?, ?, ?) 
-            ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)
+            VALUES (?, ?, ?)
+            ON DUPLICATE KEY UPDATE 
+                quantity = quantity + VALUES(quantity)  -- Increment the quantity of the existing product
         `;
         const queryParams = [user_id, product_id, quantity];
 
-        console.log('Executing query:', insertQuery);
+        console.log('Executing query:', insertOrUpdateQuery);
         console.log('Query parameters:', queryParams);
 
-        await db.query(insertQuery, queryParams);
+        // Execute the query
+        await db.query(insertOrUpdateQuery, queryParams);
 
         console.log('Product added to cart successfully!'); // Log success message
         res.status(200).json({ message: 'Product added to cart successfully!' });
     } catch (err) {
         console.error('Error adding product to cart:', err.message); // Log the error
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
+
 // Route to get cart item count
 router.get('/cart-item-count', authenticateToken, async (req, res) => {
-    const { user_id } = req; // Extract user_id from request object
-
+    const { user_id } = req;
     try {
         // Query to count items in the cart for the user
         const [rows] = await db.query(`
-            SELECT COUNT(*) AS itemCount 
+            SELECT SUM(quantity) AS itemCount
             FROM cart_items 
             WHERE customer_id = ?
         `, [user_id]);
 
+        // Check if query result is valid and has rows
+        const itemCount = rows && rows[0] && rows[0].itemCount ? rows[0].itemCount : 0;
+
         // Respond with the count of items in the cart
-        if (rows.length > 0) {
-            res.json({ itemCount: rows[0].itemCount });
-        } else {
-            res.json({ itemCount: 0 });
-        }
+        res.status(200).json({ itemCount });
     } catch (err) {
         console.error('Error fetching cart item count:', err.message);
         res.status(500).json({ message: 'Internal server error' });

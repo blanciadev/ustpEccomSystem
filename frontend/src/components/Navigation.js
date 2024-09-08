@@ -1,12 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { cartEventEmitter } from './eventEmitter'; // Import the event emitter
 
 const Navigation = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [username, setUsername] = useState('');
     const [cartItemCount, setCartItemCount] = useState(0); // State to hold cart item count
     const navigate = useNavigate();
+
+    // Function to fetch the cart item count from the server
+    const fetchCartItemCount = async () => {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await axios.get('http://localhost:5000/cart-item-count', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.status === 200) {
+                setCartItemCount(response.data.itemCount); // Set the cart item count
+            }
+        } catch (error) {
+            console.error('Error fetching cart item count:', error.response ? error.response.data : error.message);
+        }
+    };
 
     useEffect(() => {
         const checkToken = async () => {
@@ -16,7 +32,7 @@ const Navigation = () => {
                     const response = await axios.get('http://localhost:5000/validate-token', {
                         headers: { Authorization: `Bearer ${token}` }
                     });
-                    
+
                     if (response.status === 200) {
                         setIsLoggedIn(true);
                         setUsername(response.data.username); 
@@ -33,22 +49,15 @@ const Navigation = () => {
         };
 
         checkToken();
-    }, []);
 
-    const fetchCartItemCount = async () => {
-        const token = localStorage.getItem('token');
-        try {
-            const response = await axios.get('http://localhost:5000/cart-item-count', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            
-            if (response.status === 200) {
-                setCartItemCount(response.data.itemCount); // Set the cart item count
-            }
-        } catch (error) {
-            console.error('Error fetching cart item count:', error.response ? error.response.data : error.message);
-        }
-    };
+        // Listen to the "cartUpdated" event from the EventEmitter
+        cartEventEmitter.on('cartUpdated', fetchCartItemCount);
+
+        // Cleanup listener on unmount
+        return () => {
+            cartEventEmitter.off('cartUpdated', fetchCartItemCount);
+        };
+    }, []);
 
     const handleLogout = () => {
         localStorage.removeItem('token');
