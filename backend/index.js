@@ -6,7 +6,7 @@ const cors = require('cors');
 
 // const crypto = require('crypto'); // For generating random tokens
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 
 const cartRoutes = require('./routes/cartRoutes');
@@ -28,7 +28,7 @@ app.use('/', customerLoginRoutes);
 
 
 // Token validation 
-app.get('/validate-token', async (req, res) => {
+app.get('/validate-token', async(req, res) => {
 
     // Extract token from 'Authorization' header
     const token = req.headers.authorization?.split(' ')[1];
