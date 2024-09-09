@@ -100,5 +100,62 @@ router.get('/cart-item-count', authenticateToken, async (req, res) => {
     }
 });
 
+// Route to get cart items with product details
+router.get('/cart', authenticateToken, async (req, res) => {
+    const { user_id } = req;
+
+    try {
+        // Query to get cart items with product details
+        const [rows] = await db.query(`
+            SELECT
+                ci.product_id, 
+                p.product_code, 
+                p.product_name AS product_name, 
+                p.description, 
+                p.brand, 
+                p.category, 
+                ci.quantity, 
+                p.price, 
+                p.size, 
+                p.expiration_date
+            FROM
+                cart_items AS ci
+                JOIN product AS p ON ci.product_id = p.product_id
+            WHERE
+                ci.customer_id =  ?
+        `, [user_id]);
+
+        // If there are no cart items
+        if (!rows || rows.length === 0) {
+            return res.status(200).json({ items: [], totalPrice: 0 });
+        }
+
+        // Calculate total price
+        const totalPrice = rows.reduce((total, item) => total + item.price * item.quantity, 0);
+
+        // Return the cart items and the total price
+        res.status(200).json({
+            items: rows.map(item => ({
+                product_id: item.product_id,
+                product_code: item.product_code,
+                product_name: item.product_name,
+                description: item.description,
+                brand: item.brand,
+                category: item.category,
+                price: item.price,
+                quantity: item.quantity,
+                size: item.size,
+                expiration_date: item.expiration_date,
+                sub_total: item.price * item.quantity
+            })),
+            totalPrice
+        });
+    } catch (err) {
+        console.error('Error fetching cart items:', err.message);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
 
 module.exports = router;

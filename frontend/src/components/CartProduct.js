@@ -1,20 +1,33 @@
-import React from 'react'
+import React from 'react';
 
-const CartProduct = () => {
+const CartProduct = ({
+  productName,
+  quantity,
+  price,
+  subTotal,
+  productCode,
+  description,
+  brand,
+  category,
+  size,
+  isSelected,
+  toggleItemSelection
+}) => {
   return (
-         <tr>
-            <td><form><input type='checkbox'/></form></td>
-            <td className='product'>
-              <img src='#'/>
-                <h3>Brand</h3>
-                <p>Product Description</p>
-            </td>
-            <td>1</td>
-            <td>1000</td>
-            <td>1000</td>
+    <tr>
+      <td>
+        <input
+          type="checkbox"
+          checked={isSelected}
+          onChange={() => toggleItemSelection(productCode)}
+        />
+      </td>
+      <td>{productName}</td>
+      <td>{quantity}</td>
+      <td>${price.toFixed(2)}</td>
+      <td>${subTotal.toFixed(2)}</td>
+    </tr>
+  );
+};
 
-        </tr>
-  )
-}
-
-export default CartProduct
+export default CartProduct;
