@@ -35,7 +35,7 @@ ProductCard.propTypes = {
     product: PropTypes.shape({
         image_url: PropTypes.string,
         product_name: PropTypes.string,
-        product_id: PropTypes.number.isRequired
+        product_code: PropTypes.string.isRequired // Now using product_code
     }).isRequired,
     onAddToCart: PropTypes.func.isRequired
 };
@@ -50,7 +50,7 @@ const ProductList = () => {
     useEffect(() => {
         // Fetch logged-in user's customer ID (user_id) from localStorage
         const storedCustomerId = localStorage.getItem('user_id');
-        
+
         if (storedCustomerId) {
             setCustomerId(storedCustomerId);
         } else {
@@ -88,7 +88,7 @@ const ProductList = () => {
         try {
             const response = await axios.post('http://localhost:5000/add-to-cart', {
                 customer_id: customerId,
-                product_id: product.product_id,
+                product_code: product.product_code, // Now using product_code
                 quantity: 1
             }, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -119,7 +119,7 @@ const ProductList = () => {
     return (
         <div className='product-list' style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
             {products.map((product) => (
-                <ProductCard key={product.product_id} product={product} onAddToCart={handleAddToCart} />
+                <ProductCard key={product.product_code} product={product} onAddToCart={handleAddToCart} />
             ))}
         </div>
     );

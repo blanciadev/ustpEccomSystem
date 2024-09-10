@@ -4,7 +4,7 @@ const mysql = require('mysql2/promise');
 const pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
-    port: '3308',
+    port: '3307',
     password: 'root',
     // password: 'Cookies1',// ako gi ilisan
     database: 'ustpecom',
@@ -18,7 +18,7 @@ const testConnection = async () => {
     try {
         const connection = await pool.getConnection();
         console.log('Connected to MySQL database');
-        connection.release(); 
+        connection.release();
     } catch (err) {
         console.error('Error connecting to MySQL:', err);
     }

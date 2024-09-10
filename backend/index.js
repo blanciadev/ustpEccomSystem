@@ -28,7 +28,7 @@ app.use('/', customerLoginRoutes);
 
 
 // Token validation 
-app.get('/validate-token', async(req, res) => {
+app.get('/validate-token', async (req, res) => {
 
     // Extract token from 'Authorization' header
     const token = req.headers.authorization?.split(' ')[1];
@@ -52,11 +52,14 @@ app.get('/validate-token', async(req, res) => {
     }
 });
 
-
 app.get('/products', async (req, res) => {
     try {
-
-        const [rows] = await db.query('SELECT DISTINCT product_id, product_name, description, quantity FROM product');
+        // Select product_code along with other product details
+        const [rows] = await db.query(`
+            SELECT DISTINCT product_id, product_code, product_name, description, quantity 
+            FROM product
+        `);
+        // Respond with product details including the product_code
         res.json(rows);
     } catch (error) {
         console.error('Error fetching products:', error);

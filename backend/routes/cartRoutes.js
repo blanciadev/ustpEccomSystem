@@ -27,19 +27,19 @@ async function authenticateToken(req, res, next) {
 
 // Route to add product to cart
 router.post('/add-to-cart', authenticateToken, async (req, res) => {
-    const { product_id, quantity } = req.body;
+    const { product_code, quantity } = req.body;
 
     // Extract user_id from request object
     const { user_id } = req;
 
     console.log('Received request to add product to cart:');
     console.log('User ID:', user_id);
-    console.log('Product ID:', product_id);
+    console.log('Product Code:', product_code);
     console.log('Quantity:', quantity);
 
     // Validate inputs
-    if (!user_id || !product_id || !quantity) {
-        return res.status(400).json({ error: 'User ID, Product ID, and Quantity are required' });
+    if (!user_id || !product_code || !quantity) {
+        return res.status(400).json({ error: 'User ID, Product Code, and Quantity are required' });
     }
 
     try {
@@ -52,14 +52,23 @@ router.post('/add-to-cart', authenticateToken, async (req, res) => {
             await db.query('INSERT INTO cart (customer_id) VALUES (?)', [user_id]);
         }
 
+        // Get the product_id based on product_code
+        const [[product]] = await db.query('SELECT product_id FROM product WHERE product_code = ?', [product_code]);
+
+        if (!product) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+
+        const product_id = product.product_id;
+
         // Insert the product into cart_items or update the quantity if it already exists
         const insertOrUpdateQuery = `
-            INSERT INTO cart_items (customer_id, product_id, quantity) 
+            INSERT INTO cart_items (customer_id, product_code, quantity) 
             VALUES (?, ?, ?)
             ON DUPLICATE KEY UPDATE 
                 quantity = quantity + VALUES(quantity)  -- Increment the quantity of the existing product
         `;
-        const queryParams = [user_id, product_id, quantity];
+        const queryParams = [user_id, product_code, quantity];
 
         console.log('Executing query:', insertOrUpdateQuery);
         console.log('Query parameters:', queryParams);
@@ -76,6 +85,7 @@ router.post('/add-to-cart', authenticateToken, async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
 
 
 // Route to get cart item count
@@ -99,17 +109,16 @@ router.get('/cart-item-count', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
-
 // Route to get cart items with product details
 router.get('/cart', authenticateToken, async (req, res) => {
     const { user_id } = req;
 
     try {
-        // Query to get cart items with product details
+        // Query to get cart items with product details, using product_code instead of product_id
         const [rows] = await db.query(`
             SELECT
-                ci.product_id, 
-                p.product_code, 
+                ci.id, 
+                ci.product_code, 
                 p.product_name AS product_name, 
                 p.description, 
                 p.brand, 
@@ -120,7 +129,7 @@ router.get('/cart', authenticateToken, async (req, res) => {
                 p.expiration_date
             FROM
                 cart_items AS ci
-                JOIN product AS p ON ci.product_id = p.product_id
+                JOIN product AS p ON ci.product_code = p.product_code
             WHERE
                 ci.customer_id =  ?
         `, [user_id]);
@@ -136,7 +145,6 @@ router.get('/cart', authenticateToken, async (req, res) => {
         // Return the cart items and the total price
         res.status(200).json({
             items: rows.map(item => ({
-                product_id: item.product_id,
                 product_code: item.product_code,
                 product_name: item.product_name,
                 description: item.description,
@@ -155,6 +163,7 @@ router.get('/cart', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
 
 
 
