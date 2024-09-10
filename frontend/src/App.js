@@ -1,9 +1,11 @@
 import './App.css';
 import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import Login from './pages/Login/Login';
 import Signup from './pages/Signup/Signup';
+import Cart from './pages/Cart/Cart';
+import Checkout from './pages/Transactions/Checkout'
 
 function App() {
   const [loginStatus, setLoginStatus] = useState('');  // Store login status
@@ -41,20 +43,21 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route index element={<Home />} />
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login handleLogin={handleLogin} />} />  {/* Pass login handler */}
-          <Route path="/signup" element={<Signup />} />
-        </Routes>
-      </BrowserRouter>
+    <BrowserRouter>
+      <Routes>
+        {/* Redirect any undefined route to Home */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route index element={<Home />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/cart" element={<Cart/>}/>
+        <Route path="/checkout" element={<Checkout/>}/>
+      </Routes>
+    </BrowserRouter>
+  
 
-      {/* Display login status message */}
-      {loginStatus && <p>{loginStatus}</p>}
-      {error && <p>{error}</p>}
-    </div>
+
   );
 }
 

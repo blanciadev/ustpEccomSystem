@@ -6,6 +6,7 @@ const pool = mysql.createPool({
     user: 'root',
     port: '3307',
     password: 'root',
+    // password: 'Cookies1',// ako gi ilisan
     database: 'ustpecom',
     waitForConnections: true,
     connectionLimit: 10,
@@ -17,7 +18,7 @@ const testConnection = async () => {
     try {
         const connection = await pool.getConnection();
         console.log('Connected to MySQL database');
-        connection.release(); // Release the connection back to the pool
+        connection.release();
     } catch (err) {
         console.error('Error connecting to MySQL:', err);
     }

@@ -4,9 +4,9 @@ import axios from 'axios';
 import { cartEventEmitter } from './eventEmitter'; // Import the event emitter
 
 const Navigation = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [username, setUsername] = useState('');
     const [cartItemCount, setCartItemCount] = useState(0); // State to hold cart item count
+    const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track if user is logged in
     const navigate = useNavigate();
 
     // Function to fetch the cart item count from the server
@@ -25,30 +25,20 @@ const Navigation = () => {
     };
 
     useEffect(() => {
-        const checkToken = async () => {
+        const checkAuthStatus = () => {
             const token = localStorage.getItem('token');
             if (token) {
-                try {
-                    const response = await axios.get('http://localhost:5000/validate-token', {
-                        headers: { Authorization: `Bearer ${token}` }
-                    });
-
-                    if (response.status === 200) {
-                        setIsLoggedIn(true);
-                        setUsername(response.data.username); 
-                        await fetchCartItemCount(); // Fetch cart item count when user is logged in
-                    } else {
-                        handleLogout(); 
-                    }
-                } catch (error) {
-                    handleLogout(); 
-                }
+                setIsLoggedIn(true);
+                const storedUsername = localStorage.getItem('username');
+                setUsername(storedUsername || '');
+                fetchCartItemCount();
             } else {
                 setIsLoggedIn(false);
             }
         };
 
-        checkToken();
+        // Check authentication status on mount
+        checkAuthStatus();
 
         // Listen to the "cartUpdated" event from the EventEmitter
         cartEventEmitter.on('cartUpdated', fetchCartItemCount);
@@ -62,18 +52,23 @@ const Navigation = () => {
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('username');
-        setIsLoggedIn(false);
+        setUsername(''); // Clear username
+        setIsLoggedIn(false); // Set logged in status to false
         navigate('/login');
+    };
+
+    const handleCartClick = () => {
+        if (isLoggedIn) {
+            navigate('/cart');
+        } else {
+            navigate('/login');
+        }
     };
 
     const commonLinks = [
         { id: 1, page: "Shop", link: "/" },
         { id: 2, page: "About Us", link: "/about-us" },
-        { id: 3, page: `Cart (${cartItemCount})`, link: "/cart" } // Display cart item count
-    ];
-
-    const loggedInLinks = [
-        { id: 4, page: username, link: "#" } 
+        { id: 3, page: `Cart (${cartItemCount})`, link: "#" } // Use "#" to trigger handleCartClick
     ];
 
     return (
@@ -98,7 +93,7 @@ const Navigation = () => {
                 <ul>
                     {commonLinks.map((data) => (
                         <li key={data.id}>
-                            <a href={data.link}>{data.page}</a>
+                            <a href={data.link} onClick={data.id === 3 ? handleCartClick : undefined}>{data.page}</a>
                         </li>
                     ))}
                     {!isLoggedIn ? (
@@ -112,11 +107,9 @@ const Navigation = () => {
                         </>
                     ) : (
                         <>
-                            {loggedInLinks.map((data) => (
-                                <li key={data.id}>
-                                    <span>{data.page}</span>
-                                </li>
-                            ))}
+                            <li>
+                                <span>Welcome, {username}</span> {/* Show username */}
+                            </li>
                             <li>
                                 <button onClick={handleLogout}>Logout</button>
                             </li>

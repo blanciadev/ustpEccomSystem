@@ -5,13 +5,13 @@ import Productcard from './Productcard'
 const Products = () => {
   return (
     <div className='products-con'>
-        <h2>OUR PRODUCTS</h2>
-        <div className='products'>
-            <Productcard/>
-            
-        </div>
+      <h2>RECOMMENDATIONS</h2>
+      <div className='products'>
+        <Productcard />
+
+      </div>
     </div>
-    
+
   )
 }
 

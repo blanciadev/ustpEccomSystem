@@ -25,6 +25,9 @@
     flex-direction: column;
     gap: 10px;
 }
+.login-box h1{
+    font-size: 2rem;
+}
 .login-image{
     width: 45%;
     height: 95%;
