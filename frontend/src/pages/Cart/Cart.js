@@ -3,7 +3,8 @@ import './Cart.css';
 import Navigation from '../../components/Navigation';
 import Footer from '../../components/Footer';
 import CartProduct from '../../components/CartProduct';
-import cartEventEmitter from '../../components/cartEventEmitter'; // Import the correct event emitter
+import cartEventEmitter from '../../components/cartEventEmitter'; 
+import { useNavigate } from 'react-router-dom';
 
 const CartContent = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -11,6 +12,8 @@ const CartContent = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate(); 
+
 
   // Fetch cart items from the backend
   useEffect(() => {
@@ -85,6 +88,11 @@ const CartContent = () => {
     };
   }, [cartItems]);
 
+  const handleCheckout = () => {
+    const selectedProducts = cartItems.filter(item => selectedItems[item.product_code]);
+    navigate('/checkout', { state: { selectedProducts, totalPrice } }); // Passing the selected products and total price
+  };
+
   const handleSelectAllChange = () => {
     const allSelected = Object.keys(selectedItems).length === cartItems.length;
     const newSelectAllState = !allSelected;
@@ -92,6 +100,8 @@ const CartContent = () => {
     handleSelectAll(newSelectAllState); // Update state immediately
   };
 
+ 
+  
   return (
     <div className='cart-con'>
       <Navigation />
@@ -149,7 +159,9 @@ const CartContent = () => {
               </tfoot>
             </table>
             <div className='checkout-btncon'>
-              <button className='checkout-btn'>Checkout</button>
+            <button className='checkout-btn' onClick={handleCheckout}>
+                Checkout
+              </button>
             </div>
           </div>
         )}

@@ -137,6 +137,7 @@ const ProductList = () => {
                     const storedCustomerId = localStorage.getItem('user_id');
 
                     if (storedCustomerId) {
+                        console.log(storedCustomerId)
                         // Update the URL to include the customerId as a query parameter
                         url = `http://localhost:5000/product-user?customerId=${storedCustomerId}`;
                     }
