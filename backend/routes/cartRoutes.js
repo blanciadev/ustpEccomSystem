@@ -124,7 +124,7 @@ router.get('/cart', authenticateToken, async (req, res) => {
                 p.product_name AS product_name, 
                 p.description, 
                 p.brand, 
-                p.category, 
+                p.category_id, 
                 ci.quantity, 
                 p.price, 
                 p.size, 
