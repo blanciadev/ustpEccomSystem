@@ -109,6 +109,8 @@ router.get('/cart-item-count', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+
 // Route to get cart items with product details
 router.get('/cart', authenticateToken, async (req, res) => {
     const { user_id } = req;
