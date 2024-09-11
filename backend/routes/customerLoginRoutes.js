@@ -9,19 +9,13 @@ const TOKEN_EXPIRATION_TIME = 3600000; // 1 hour
 router.post('/customer-login', async (req, res) => {
     const { email, password } = req.body;
 
-    // Logging result in console
-    console.log('Received login request');
-    console.log('Email:', email);
-    console.log('Password:', password);
-
     if (!email || !password) {
         return res.status(400).json({ message: 'Email and password are required' });
     }
 
     try {
-        // Fetch user data from database
+        // Fetch user data from the database
         const [rows] = await db.query('SELECT * FROM customer WHERE email = ?', [email]);
-        console.log('Database query result:', rows);
 
         if (rows.length === 0) {
             return res.status(401).json({ message: 'Invalid email or password' });
@@ -29,7 +23,7 @@ router.post('/customer-login', async (req, res) => {
 
         const user = rows[0];
 
-        // Direct password comparison
+        // Direct password comparison (assuming password is stored in plaintext, which is not recommended)
         if (password !== user.password) {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
@@ -44,11 +38,13 @@ router.post('/customer-login', async (req, res) => {
             new Date(Date.now() + TOKEN_EXPIRATION_TIME)
         ]);
 
-        // Respond with success message, token, and customer_id
+        // Respond with success message, token, user_id, username, and first_name
         res.json({
             message: 'Login successful',
             token: token,
-            user_id: user.customer_id
+            user_id: user.customer_id,
+            username: user.username, // Include username in the response
+            first_name: user.first_name // Include first_name in the response
         });
     } catch (err) {
         // Log only the message
@@ -56,6 +52,7 @@ router.post('/customer-login', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
 
 router.get('/cart-item-count/:customer_id', async (req, res) => {
     const customerId = req.params.customer_id;
@@ -68,6 +65,21 @@ router.get('/cart-item-count/:customer_id', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+
+router.get('/get-customer-details', async (req, res) => {
+    const customerId = req.params.customer_id;
+
+    try {
+        const [rows] = await db.query('SELECT COUNT(*) AS itemCount FROM cart WHERE customer_id = ?', [customerId]);
+        res.json({ itemCount: rows[0].itemCount });
+    } catch (error) {
+        console.error('Error fetching cart item count:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
 
 
 

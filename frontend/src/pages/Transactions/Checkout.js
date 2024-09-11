@@ -1,116 +1,221 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Transaction.css';
 import Navigation from '../../components/Navigation';
 import Footer from '../../components/Footer';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Checkout = () => {
   const location = useLocation();
-  const { selectedProducts = [], totalPrice = 0 } = location.state || {}; // Retrieve the passed state or default to empty values
+  const navigate = useNavigate();
+
+  const customerId = localStorage.getItem('customer_id');
+  console.log('Customer ID:', customerId);
+
+  const { selectedProducts = [], totalPrice = 0 } = location.state || {};
+
+  const [authToken, setAuthToken] = useState(localStorage.getItem('token'));
+  const [formData, setFormData] = useState({
+    fullName: '',
+    phoneNumber: '',
+    address: '',
+    region: '',
+    postalCode: '',
+    paymentMethod: '',
+  });
+  const [loading, setLoading] = useState(false); // Loading state
+  const [error, setError] = useState(''); // Error state
+  const [success, setSuccess] = useState(''); // Success state
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const handlePaymentChange = (e) => {
+    setFormData({
+      ...formData,
+      paymentMethod: e.target.value,
+    });
+  };
+
+  const validateForm = () => {
+    const { fullName, phoneNumber, address, region, postalCode, paymentMethod } = formData;
+    if (!fullName || !phoneNumber || !address || !region || !postalCode || !paymentMethod) {
+      return 'All fields are required.';
+    }
+    return '';
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setSuccess('');
+
+    const validationError = validateForm();
+    if (validationError) {
+      setLoading(false);
+      setError(validationError);
+      return;
+    }
+
+    try {
+      if (!customerId) {
+        setLoading(false);
+        setError('Customer ID is missing.');
+        return;
+      }
+
+      // Prepare order data
+      const orderData = {
+        customer_id: customerId,
+        order_date: new Date().toISOString(), // Current date-time
+        order_details: selectedProducts.map(product => ({
+          product_id: product.product_code,
+          quantity: product.quantity,
+        })),
+      };
+
+      const response = await axios.post(
+        'http://localhost:5000/insert-order',
+        orderData,
+        {
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (response.status === 201) {
+        setSuccess('Order placed successfully!');
+        navigate('/some-success-page'); // Navigate to a success page or order summary
+      }
+    } catch (error) {
+      console.error('Error placing order:', error.message);
+      setError('Failed to place order. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className='checkout-con'>
+    <div className='checkout-container'>
       <Navigation />
-      <div className='checkout-wrap'>
+      <div className='checkout-wrapper'>
         <h1>Checkout</h1>
-        <div className='checkout-box'>
-          <div className='checkout-set'>
-            <div>
-              <h3>Delivery Address</h3>
-              <button>Change</button>
-            </div>
-            <div className='checkout-form'>
-              <form>
-                <div>
-                  <label>Full Name</label>
-                  <input type='text' />
-                </div>
-                <div>
-                  <label>Phone Number</label>
-                  <input type='text' />
-                </div>
-                <div>
-                  <label>Street Name, Building, House Number</label>
-                  <input type='text' />
-                </div>
-                <div>
-                  <label>Region, Province, City, Barangay</label>
-                  <input type='text' />
-                </div>
-                <div>
-                  <label>Postal Code</label>
-                  <input type='text' />
-                </div>
-                <button type='submit'>Continue</button>
-              </form>
-            </div>
-          </div>
-          <br />
-          <hr />
-          <br />
-          <div className='checkout-products'>
-            <h3>Products Ordered</h3>
-            <div className='products-ordered'>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Products</th>
-                    <th>Quantity</th>
-                    <th>Price</th>
-                    <th>Sub-Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {selectedProducts.map(product => (
-                    <tr key={product.product_code}>
-                      <td>
-                        <img src='#' alt={product.product_name} />
-                        <div>
-                          <h5>{product.product_name}</h5>
-                          <p>{product.description}</p>
-                        </div>
-                      </td>
-                      <td>{product.quantity}</td>
-                      <td>{product.price}</td>
-                      <td>{product.sub_total}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div className='checkout-payment'>
-            <h3>Payment Method</h3>
-            <div className='payment-con'>
-              <div className='payment-method'>
-                <h5>Select Mode of Payment</h5>
-                <form>
-                  <input id="COD" type='radio' name='payment' />
-                  <label htmlFor='COD'>Cash On Delivery</label>
-                  <input id="GCASH" type='radio' name='payment' />
-                  <label htmlFor='GCASH'>Gcash</label>
-                  <button>Place Order</button>
-                </form>
+        <div className='checkout-content'>
+          <div className='checkout-address'>
+            <h3>Delivery Address</h3>
+            <button className='change-address-btn'>Change</button>
+            <form className='address-form' onSubmit={handleSubmit}>
+              {error && <p className='error-message'>{error}</p>}
+              {success && <p className='success-message'>{success}</p>}
+              <div className='form-group'>
+                <label htmlFor='fullName'>Full Name</label>
+                <input
+                  type='text'
+                  id='fullName'
+                  name='fullName'
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  required
+                />
               </div>
-              <div className='payment-total'>
-                <table>
-                  <tbody>
-                    <tr>
-                      <td>Total items: {selectedProducts.length}</td>
-                    </tr>
-                    <tr>
-                      <td>Order Total: ${totalPrice.toFixed(2)}</td>
-                    </tr>
-                    <tr>
-                      <td>Standard Shipping: 125</td>
-                    </tr>
-                    <tr>
-                      <th>Grand Total: ${(totalPrice + 125).toFixed(2)}</th>
-                    </tr>
-                  </tbody>
-                </table>
+              <div className='form-group'>
+                <label htmlFor='phoneNumber'>Phone Number</label>
+                <input
+                  type='text'
+                  id='phoneNumber'
+                  name='phoneNumber'
+                  value={formData.phoneNumber}
+                  onChange={handleInputChange}
+                  required
+                />
               </div>
-            </div>
+              <div className='form-group'>
+                <label htmlFor='address'>Street Name, Building, House Number</label>
+                <input
+                  type='text'
+                  id='address'
+                  name='address'
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div className='form-group'>
+                <label htmlFor='region'>Region, Province, City, Barangay</label>
+                <input
+                  type='text'
+                  id='region'
+                  name='region'
+                  value={formData.region}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div className='form-group'>
+                <label htmlFor='postalCode'>Postal Code</label>
+                <input
+                  type='text'
+                  id='postalCode'
+                  name='postalCode'
+                  value={formData.postalCode}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div className='form-group'>
+                <h3>Payment Method</h3>
+                <div className='payment-options'>
+                  <label>
+                    <input
+                      type='radio'
+                      name='paymentMethod'
+                      value='COD'
+                      checked={formData.paymentMethod === 'COD'}
+                      onChange={handlePaymentChange}
+                    />
+                    Cash On Delivery
+                  </label>
+                  <label>
+                    <input
+                      type='radio'
+                      name='paymentMethod'
+                      value='Credit/Debit Card'
+                      checked={formData.paymentMethod === 'Credit/Debit Card'}
+                      onChange={handlePaymentChange}
+                    />
+                    Credit/Debit Card
+                  </label>
+                </div>
+              </div>
+              <div className='form-group'>
+                <button type='submit' className='submit-btn' disabled={loading}>
+                  {loading ? 'Processing...' : 'Place Order'}
+                </button>
+              </div>
+            </form>
+          </div>
+          <div className='checkout-summary'>
+            <h3>Order Summary</h3>
+            <ul className='product-list'>
+              {selectedProducts.length > 0 ? (
+                selectedProducts.map((product) => (
+                  <li key={product.product_code}>
+                    {product.name} ({product.quantity}) - ₱{product.price * product.quantity}
+                  </li>
+                ))
+              ) : (
+                <p>No products selected.</p>
+              )}
+            </ul>
+            <h4>Total: ₱{totalPrice}</h4>
           </div>
         </div>
       </div>
