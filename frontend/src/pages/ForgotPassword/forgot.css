@@ -1,0 +1,79 @@
+.fp-con,.ver-con{
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(255, 188, 223);
+}
+.fp-box,.ver-box{
+    width: 70%;
+    height: 80%;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 6px 6px 27px #dea0c7,
+                -6px -6px 27px #dea0c7;
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+.fp-form,.ver-form{
+    /* background-color: aquamarine; */
+    width: 90%;
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+}
+.text-con{
+    display: flex;
+    justify-content: center;
+}
+.fp-form form{
+    /* background-color: cadetblue; */
+    width: 100%;
+    height: 30%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
+}
+.ver-form form{
+    /* background-color: cadetblue; */
+    width: 100%;
+    height: 30%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
+}
+.ver-form form input{
+    width: 7%;
+    height: 50%;
+    padding: 5px;
+    text-align: center;
+    background-color: rgb(224, 224, 224);
+    box-shadow:  20px 20px 60px #fcfcfc,
+    -20px -20px 60px #fcfcfc;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    font-size: 2rem;
+}
+.fp-form form input{
+    width: 50%;
+    height: 30%;
+    padding: 5px;
+    text-align: center;
+    background-color: rgb(224, 224, 224);
+    box-shadow:  20px 20px 60px #fcfcfc,
+    -20px -20px 60px #fcfcfc;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    font-size: 2rem;
+}

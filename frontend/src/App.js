@@ -7,6 +7,8 @@ import Signup from './pages/Signup/Signup';
 import Cart from './pages/Cart/Cart';
 import Checkout from './pages/Transactions/Checkout'
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
+import Verification from './pages/ForgotPassword/Verification';
+import ChangePassword from './pages/ForgotPassword/ChangePassword';
 
 function App() {
   const [loginStatus, setLoginStatus] = useState('');  // Store login status
@@ -55,6 +57,8 @@ function App() {
         <Route path="/cart" element={<Cart/>}/>
         <Route path="/checkout" element={<Checkout/>}/>
         <Route path="/forgot-password" element={<ForgotPassword/>}/>
+        <Route path="/verification" element={<Verification/>}/>
+        <Route path="/change-password" element={<ChangePassword/>}/>
       </Routes>
     </BrowserRouter>
   

@@ -138,7 +138,7 @@ const Signup = () => {
           {error && <p className='error'>{error}</p>}
           {success && <p className='success'>{success}</p>}
 
-          <p>Have an account? <a href='/signup'>Log In</a></p>
+          <p>Have an account? <a href='/login'>Log In</a></p>
         </div>
         <div className='signup-image'>
           <img src='https://res.cloudinary.com/urbanclap/image/upload/t_high_res_template/dpr_2,fl_progressive:steep,q_auto:low,f_auto,c_limit/images/growth/luminosity/1723441265778-917980.jpeg'/>
