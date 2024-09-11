@@ -5,11 +5,11 @@ import { cartEventEmitter } from './eventEmitter'; // Import the event emitter
 
 const Navigation = () => {
     const [username, setUsername] = useState('');
-    const [cartItemCount, setCartItemCount] = useState(0); // State to hold cart item count
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track if user is logged in
+    const [firstName, setFirstName] = useState('');
+    const [cartItemCount, setCartItemCount] = useState(0);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
 
-    // Function to fetch the cart item count from the server
     const fetchCartItemCount = async () => {
         const token = localStorage.getItem('token');
         try {
@@ -17,33 +17,36 @@ const Navigation = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (response.status === 200) {
-                setCartItemCount(response.data.itemCount); // Set the cart item count
+                setCartItemCount(response.data.itemCount);
             }
         } catch (error) {
             console.error('Error fetching cart item count:', error.response ? error.response.data : error.message);
         }
     };
 
-    useEffect(() => {
-        const checkAuthStatus = () => {
-            const token = localStorage.getItem('token');
-            if (token) {
+    const validateToken = async () => {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await axios.get('http://localhost:5000/validate-token', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.status === 200) {
                 setIsLoggedIn(true);
-                const storedUsername = localStorage.getItem('username');
-                setUsername(storedUsername || '');
+                setUsername(localStorage.getItem('username') || '');
+                setFirstName(localStorage.getItem('first_name') || ''); // Retrieve first_name
                 fetchCartItemCount();
             } else {
                 setIsLoggedIn(false);
             }
-        };
+        } catch (error) {
+            console.error('Error validating token:', error.response ? error.response.data : error.message);
+            setIsLoggedIn(false);
+        }
+    };
 
-        // Check authentication status on mount
-        checkAuthStatus();
-
-        // Listen to the "cartUpdated" event from the EventEmitter
+    useEffect(() => {
+        validateToken();
         cartEventEmitter.on('cartUpdated', fetchCartItemCount);
-
-        // Cleanup listener on unmount
         return () => {
             cartEventEmitter.off('cartUpdated', fetchCartItemCount);
         };
@@ -51,9 +54,12 @@ const Navigation = () => {
 
     const handleLogout = () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('user_id');
         localStorage.removeItem('username');
-        setUsername(''); // Clear username
-        setIsLoggedIn(false); // Set logged in status to false
+        localStorage.removeItem('first_name'); // Remove first_name
+        setUsername('');
+        setFirstName('');
+        setIsLoggedIn(false);
         navigate('/login');
     };
 
@@ -68,7 +74,7 @@ const Navigation = () => {
     const commonLinks = [
         { id: 1, page: "Shop", link: "/" },
         { id: 2, page: "About Us", link: "/about-us" },
-        { id: 3, page: `Cart (${cartItemCount})`, link: "#" } // Use "#" to trigger handleCartClick
+        { id: 3, page: `Cart (${cartItemCount})`, link: "#" }
     ];
 
     return (
@@ -98,21 +104,13 @@ const Navigation = () => {
                     ))}
                     {!isLoggedIn ? (
                         <>
-                            <li>
-                                <a href='/signup'>Sign Up</a>
-                            </li>
-                            <li>
-                                <a href='/login'>Login</a>
-                            </li>
+                            <li><a href='/signup'>Sign Up</a></li>
+                            <li><a href='/login'>Login</a></li>
                         </>
                     ) : (
                         <>
-                            <li>
-                                <span>Welcome, {username}</span> {/* Show username */}
-                            </li>
-                            <li>
-                                <button onClick={handleLogout}>Logout</button>
-                            </li>
+                            <li><span>Hi! {firstName}</span></li>
+                            <li><button onClick={handleLogout}>Logout</button></li>
                         </>
                     )}
                 </ul>

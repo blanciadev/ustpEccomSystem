@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import { cartEventEmitter } from './eventEmitter'; // Import the event emitter
-
+import { useNavigate } from 'react-router-dom';
 
 // ProductCard Component
 const ProductCard = ({ product, onAddToCart }) => {
@@ -91,14 +91,14 @@ const ProductCard = ({ product, onAddToCart }) => {
             </div>
         </div>
     );
-
 };
 
 ProductCard.propTypes = {
     product: PropTypes.shape({
         image_url: PropTypes.string,
         product_name: PropTypes.string,
-        product_code: PropTypes.string.isRequired // Now using product_code
+        product_code: PropTypes.string.isRequired,
+        description: PropTypes.string
     }).isRequired,
     onAddToCart: PropTypes.func.isRequired
 };
@@ -109,44 +109,34 @@ const ProductList = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [customerId, setCustomerId] = useState(null);
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // State to check if user is logged in
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        // Check if user is logged in
         const token = localStorage.getItem('token');
         const storedCustomerId = localStorage.getItem('user_id');
 
         if (token && storedCustomerId) {
             setCustomerId(storedCustomerId);
-            console.log('User is logged in');
             setIsLoggedIn(true);
         } else {
-            let storedCustomerId = '';
             setIsLoggedIn(false);
-            localStorage.removeItem('storedCustomerId');
-            console.log('User not logged in');
         }
 
         const fetchProducts = async () => {
             setLoading(true);
 
             try {
-                let url = 'http://localhost:5000/products'; // Default URL for public products
+                let url = 'http://localhost:5000/products';
 
-                if (isLoggedIn) { // Check if the user is logged in
-                    const storedCustomerId = localStorage.getItem('user_id');
-
-                    if (storedCustomerId) {
-                        console.log(storedCustomerId)
-                        // Update the URL to include the customerId as a query parameter
-                        url = `http://localhost:5000/product-user?customerId=${storedCustomerId}`;
+                if (isLoggedIn) {
+                    if (customerId) {
+                        url = `http://localhost:5000/product-user?customerId=${customerId}`;
                     }
                 }
 
-                // Fetch the products from the API
                 const response = await axios.get(url);
                 setProducts(response.data);
-
             } catch (error) {
                 setError('Error fetching products: ' + (error.response ? error.response.data : error.message));
             } finally {
@@ -154,16 +144,16 @@ const ProductList = () => {
             }
         };
 
-
         fetchProducts();
-    }, [isLoggedIn]); // Dependency on isLoggedIn
+    }, [isLoggedIn, customerId]);
 
     const handleAddToCart = async (product) => {
         const token = localStorage.getItem('token');
 
         if (!token) {
             console.log('User not logged in');
-            return; // Optionally, redirect to login here
+            navigate('/login');
+            return;
         }
 
         if (!customerId) {
@@ -174,7 +164,7 @@ const ProductList = () => {
         try {
             const response = await axios.post('http://localhost:5000/add-to-cart', {
                 customer_id: customerId,
-                product_code: product.product_code, // Now using product_code
+                product_code: product.product_code,
                 quantity: 1
             }, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -182,7 +172,6 @@ const ProductList = () => {
 
             if (response.status === 200) {
                 console.log('Product added to cart:', product);
-                // Emit the cartUpdated event to notify the Navigation component
                 cartEventEmitter.emit('cartUpdated');
             }
         } catch (error) {
