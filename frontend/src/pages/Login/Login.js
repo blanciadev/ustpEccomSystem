@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './Login.css'
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -41,35 +42,54 @@ const Login = () => {
     };
 
     return (
-        <div className='login-page'>
+        <div className='login-con'>
             <div className='login-box'>
-                <h1>Log In</h1>
-                <form onSubmit={handleSubmit}>
-                    <div className='input'>
-                        <label>Email</label> {/* Changed from Username to Email */}
-                        <input
-                            type='email'
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
+                
+                <div className='login-form'>
+                    <h1>Log In</h1>
+                    {error && <p className='error'>{error}</p>}
+                    <div className='login-google'>
+                        <form>
+                            <div>
+                                <button>Continue with Google</button>
+                                <div><p>Or Login with N&B</p></div>
+                            </div>
+                        </form>
                     </div>
-                    <div className='input'>
-                        <label>Password</label>
-                        <input
-                            type='password'
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <button type='submit' disabled={loading}>
-                        {loading ? 'Logging in...' : 'Log In'}
-                    </button>
-                </form>
-                {error && <p className='error'>{error}</p>}
-                {loginStatus && <p className='status'>{loginStatus}</p>}
-                <p>Don't have an account? <a href='/signup'>Sign Up</a></p>
+                    <form onSubmit={handleSubmit}>
+                        <div className='input'>
+                            <label>Email</label> {/* Changed from Username to Email */}
+                            <input
+                                type='email'
+                                placeholder='Enter your email'
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <div className='input'>
+                            <label>Password</label>
+                            <input
+                                type='password'
+                                placeholder='Enter your password'
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <a href='/forgot-password'>Forgot Password?</a>
+                        <button type='submit' disabled={loading}>
+                            {loading ? 'Logging in...' : 'Log In'}
+                        </button>
+                    </form>
+                    
+                    {loginStatus && <p className='status'>{loginStatus}</p>}
+                    <p>Don't have an account? <a href='/signup'>Sign Up</a></p>
+                </div>
+                <div className='login-image'>
+                    <img src='https://res.cloudinary.com/urbanclap/image/upload/t_high_res_template/dpr_2,fl_progressive:steep,q_auto:low,f_auto,c_limit/images/growth/luminosity/1723441265778-917980.jpeg'/>
+                </div>
+                
             </div>
         </div>
     );
