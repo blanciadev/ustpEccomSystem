@@ -76,6 +76,7 @@ router.post('/add-to-cart', authenticateToken, async (req, res) => {
 });
 
 
+
 // Route to get cart item count
 router.get('/cart-item-count', authenticateToken, async (req, res) => {
     const { user_id } = req;

@@ -9,6 +9,7 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const [loginStatus, setLoginStatus] = useState('');
     const navigate = useNavigate();
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -55,7 +56,6 @@ const Login = () => {
             console.log('Form submission ended, loading state:', loading);
         }
     };
-
 
     return (
         <div className='login-page'>

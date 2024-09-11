@@ -1,6 +1,3 @@
-
-
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
@@ -38,7 +35,7 @@ ProductCard.propTypes = {
     product: PropTypes.shape({
         image_url: PropTypes.string,
         product_name: PropTypes.string,
-        product_id: PropTypes.number.isRequired
+        product_code: PropTypes.string.isRequired // Updated to product_code
     }).isRequired,
     onAddToCart: PropTypes.func.isRequired
 };
@@ -52,7 +49,8 @@ const ProductList = () => {
 
     useEffect(() => {
         // Fetch logged-in user's customer ID (user_id) from localStorage
-        const storedCustomerId = localStorage.getItem('user_id');
+        const storedCustomerId = localStorage.getItem('customer_id'); // Updated to customer_id
+        console.log('Stored Customer ID:', storedCustomerId);
 
         if (storedCustomerId) {
             setCustomerId(storedCustomerId);
@@ -63,20 +61,26 @@ const ProductList = () => {
         // Fetch products from the backend
         const fetchProducts = async () => {
             setLoading(true);
+            console.log('Fetching products...');
             try {
                 const response = await axios.get('http://localhost:5000/products');
+                console.log('Products fetched successfully:', response.data);
                 setProducts(response.data);
             } catch (error) {
+                console.error('Error fetching products:', error.response ? error.response.data : error.message);
                 setError('Error fetching products: ' + (error.response ? error.response.data : error.message));
             } finally {
                 setLoading(false);
+                console.log('Finished fetching products.');
             }
         };
         fetchProducts();
     }, []);
 
     const handleAddToCart = async (product) => {
+        console.log('Adding product to cart:', product);
         const token = localStorage.getItem('token');
+        console.log('Token:', token);
 
         if (!token) {
             console.log('User not logged in');
@@ -91,11 +95,12 @@ const ProductList = () => {
         try {
             const response = await axios.post('http://localhost:5000/add-to-cart', {
                 customer_id: customerId,
-                product_code: product.product_code, // Send product_code instead of product_id
+                product_code: product.product_code, // Updated to product_code
                 quantity: 1
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
+            console.log('Response from add-to-cart API:', response);
 
             if (response.status === 200) {
                 console.log('Product added to cart:', product);
@@ -105,7 +110,6 @@ const ProductList = () => {
         } catch (error) {
             console.error('Error adding product to cart:', error.response ? error.response.data : error.message);
         }
-
     };
 
     if (loading) {
@@ -123,12 +127,10 @@ const ProductList = () => {
     return (
         <div className='product-list' style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
             {products.map((product) => (
-                <ProductCard key={product.product_id} product={product} onAddToCart={handleAddToCart} />
+                <ProductCard key={product.product_code} product={product} onAddToCart={handleAddToCart} />
             ))}
         </div>
     );
 };
 
 export default ProductList;
-
-
