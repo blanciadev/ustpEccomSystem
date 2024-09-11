@@ -1,0 +1,84 @@
+.checkout-container {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.checkout-wrapper {
+    padding: 20px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.checkout-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.checkout-address,
+.checkout-products,
+.checkout-payment {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.change-address-btn,
+.submit-btn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.submit-btn {
+    margin-top: 10px;
+}
+
+.address-form .form-group {
+    margin-bottom: 15px;
+}
+
+.address-form .form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.address-form .form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.payment-options label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.products-table,
+.payment-summary {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.products-table th,
+.products-table td,
+.payment-summary td {
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.product-details {
+    display: flex;
+    align-items: center;
+}
+
+.product-image {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
