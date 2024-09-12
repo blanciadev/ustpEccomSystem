@@ -24,7 +24,6 @@ async function authenticateToken(req, res, next) {
         res.status(500).json({ message: 'Internal server error' });
     }
 }
-
 // Route to add product to cart
 router.post('/add-to-cart', authenticateToken, async (req, res) => {
     const { product_code, quantity } = req.body;
@@ -34,7 +33,7 @@ router.post('/add-to-cart', authenticateToken, async (req, res) => {
 
     console.log('Received request to add product to cart:');
     console.log('User ID:', user_id);
-    console.log('Product Code:', product_code);
+    console.log('Product Code:', product_code); // Correctly log product_code
     console.log('Quantity:', quantity);
 
     // Validate inputs
@@ -43,7 +42,6 @@ router.post('/add-to-cart', authenticateToken, async (req, res) => {
     }
 
     try {
-
         // Ensure that the cart exists for the user
         const [[existingCart]] = await db.query('SELECT cart_id FROM cart WHERE customer_id = ?', [user_id]);
 
@@ -52,19 +50,10 @@ router.post('/add-to-cart', authenticateToken, async (req, res) => {
             await db.query('INSERT INTO cart (customer_id) VALUES (?)', [user_id]);
         }
 
-        // Get the product_id based on product_code
-        const [[product]] = await db.query('SELECT product_id FROM product WHERE product_code = ?', [product_code]);
-
-        if (!product) {
-            return res.status(404).json({ error: 'Product not found' });
-        }
-
-        const product_id = product.product_id;
-
         // Insert the product into cart_items or update the quantity if it already exists
         const insertOrUpdateQuery = `
-            INSERT INTO cart_items (customer_id, product_code, quantity) 
-            VALUES (?, ?, ?)
+            INSERT INTO cart_items (customer_id, product_code, quantity, status) 
+            VALUES (?, ?, ?, 'Order Pending')
             ON DUPLICATE KEY UPDATE 
                 quantity = quantity + VALUES(quantity)  -- Increment the quantity of the existing product
         `;
@@ -96,7 +85,7 @@ router.get('/cart-item-count', authenticateToken, async (req, res) => {
         const [rows] = await db.query(`
             SELECT SUM(quantity) AS itemCount
             FROM cart_items 
-            WHERE customer_id = ?
+            WHERE customer_id = ? AND status = 'Order Pending'
         `, [user_id]);
 
         // Check if query result is valid and has rows
@@ -109,49 +98,46 @@ router.get('/cart-item-count', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
-
-
-// Route to get cart items with product details
 router.get('/cart', authenticateToken, async (req, res) => {
     const { user_id } = req;
 
     try {
-        // Query to get cart items with product details, using product_code instead of product_id
         const [rows] = await db.query(`
             SELECT
-                ci.id, 
-                ci.product_code, 
-                p.product_name AS product_name, 
-                p.description, 
-                p.brand, 
-                p.category, 
-                ci.quantity, 
-                p.price, 
-                p.size, 
-                p.expiration_date
+                p.product_id,
+                p.product_code,
+                p.product_name,
+                p.description,
+                p.brand,
+                p.price,
+                p.size,
+                p.expiration_date,
+                c.category_name,
+                ci.quantity
             FROM
                 cart_items AS ci
-                JOIN product AS p ON ci.product_code = p.product_code
+            JOIN
+                product AS p ON ci.product_code = p.product_code
+            JOIN
+                category AS c ON p.category_id = c.category_id
             WHERE
-                ci.customer_id =  ?
+                ci.customer_id = ? AND ci.status = 'Order Pending'
         `, [user_id]);
 
-        // If there are no cart items
         if (!rows || rows.length === 0) {
             return res.status(200).json({ items: [], totalPrice: 0 });
         }
 
-        // Calculate total price
         const totalPrice = rows.reduce((total, item) => total + item.price * item.quantity, 0);
 
-        // Return the cart items and the total price
         res.status(200).json({
             items: rows.map(item => ({
+                product_id: item.product_id,
                 product_code: item.product_code,
-                product_name: item.product_name,
+                product_name: item.product_name, // Product name included
                 description: item.description,
                 brand: item.brand,
-                category: item.category,
+                category: item.category_name,
                 price: item.price,
                 quantity: item.quantity,
                 size: item.size,
@@ -170,3 +156,5 @@ router.get('/cart', authenticateToken, async (req, res) => {
 
 
 module.exports = router;
+
+

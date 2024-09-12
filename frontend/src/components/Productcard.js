@@ -3,7 +3,6 @@ import axios from 'axios';
 import PropTypes from 'prop-types';
 import { cartEventEmitter } from './eventEmitter'; // Import the event emitter
 
-
 // ProductCard Component
 const ProductCard = ({ product, onAddToCart }) => {
     if (!product) {
@@ -11,96 +10,48 @@ const ProductCard = ({ product, onAddToCart }) => {
     }
 
     return (
-        <div className='procard' style={{
-            width: '300px',
-            margin: '1%',
-            border: '1px solid #ddd',
-            borderRadius: '8px',
-            overflow: 'hidden',
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-            transition: 'transform 0.3s, box-shadow 0.3s'
-        }}>
-            <div className='productimg' style={{
-                width: '100%',
-                height: '200px',
-                overflow: 'hidden'
-            }}>
+        <div className='procard' style={{ width: '22%', margin: '1%' }}>
+            <div className='productimg' style={{ width: '100%', height: '65%' }}>
                 <img
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        transition: 'transform 0.3s'
-                    }}
-                    src={product.image_url || 'https://via.placeholder.com/300'}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    src={product.image_url || 'https://via.placeholder.com/150'}
                     alt={product.product_name || 'Product Image'}
                 />
             </div>
-            <div className='productdesc' style={{
-                padding: '16px'
-            }}>
-                <p style={{
-                    fontSize: '1.1em',
-                    fontWeight: 'bold',
-                    margin: '0 0 8px'
-                }}>
-                    {product.product_name || 'No product name'}
-                </p>
-                <div className='product-details' style={{
-                    marginBottom: '16px'
-                }}>
-                    <p style={{
-                        margin: '0',
-                        color: '#555'
-                    }}>
-                        {product.description || 'No description available'}
-                    </p>
-                </div>
-                <div className='order-options' style={{
-                    display: 'flex',
-                    justifyContent: 'space-between'
-                }}>
-                    <button
-                        onClick={() => onAddToCart(product)}
-                        style={{
-                            backgroundColor: '#007bff',
-                            color: '#fff',
-                            border: 'none',
-                            padding: '10px 20px',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            transition: 'background-color 0.3s'
-                        }}
-                    >
-                        Add to Cart
-                    </button>
-                    <button
-                        style={{
-                            backgroundColor: '#28a745',
-                            color: '#fff',
-                            border: 'none',
-                            padding: '10px 20px',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            transition: 'background-color 0.3s'
-                        }}
-                    >
-                        Buy Now
-                    </button>
+            <div className='productdesc' style={{ width: '100%', height: '35%' }}>
+                <div className='product-data'>
+                    <p>{product.product_name || 'No product name'}</p>
+                    <p>Quantity: {product.quantity}</p> {/* Display quantity */}
+                    <div className='order-options'>
+                        <button onClick={() => onAddToCart(product)}>Add to Cart</button>
+                        <button>Buy Now</button>
+                    </div>
                 </div>
             </div>
         </div>
     );
-
 };
 
 ProductCard.propTypes = {
     product: PropTypes.shape({
         image_url: PropTypes.string,
         product_name: PropTypes.string,
-        product_code: PropTypes.string.isRequired // Now using product_code
+        product_code: PropTypes.string.isRequired,
+        quantity: PropTypes.number // Ensure quantity is handled
     }).isRequired,
     onAddToCart: PropTypes.func.isRequired
+};
+
+// Group products by category
+const groupProductsByCategory = (products) => {
+    return products.reduce((categories, product) => {
+        const category = product.category_name || 'Uncategorized';
+        if (!categories[category]) {
+            categories[category] = [];
+        }
+        categories[category].push(product);
+        return categories;
+    }, {});
 };
 
 // ProductList Component
@@ -109,43 +60,18 @@ const ProductList = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [customerId, setCustomerId] = useState(null);
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // State to check if user is logged in
 
     useEffect(() => {
-        // Check if user is logged in
-        const token = localStorage.getItem('token');
-        const storedCustomerId = localStorage.getItem('user_id');
-
-        if (token && storedCustomerId) {
+        const storedCustomerId = localStorage.getItem('customer_id');
+        if (storedCustomerId) {
             setCustomerId(storedCustomerId);
-            console.log('User is logged in');
-            setIsLoggedIn(true);
-        } else {
-            let storedCustomerId = '';
-            setIsLoggedIn(false);
-            localStorage.removeItem('storedCustomerId');
-            console.log('User not logged in');
         }
 
         const fetchProducts = async () => {
             setLoading(true);
-
             try {
-                let url = 'http://localhost:5000/products'; // Default URL for public products
-
-                if (isLoggedIn) { // Check if the user is logged in
-                    const storedCustomerId = localStorage.getItem('user_id');
-
-                    if (storedCustomerId) {
-                        // Update the URL to include the customerId as a query parameter
-                        url = `http://localhost:5000/product-user?customerId=${storedCustomerId}`;
-                    }
-                }
-
-                // Fetch the products from the API
-                const response = await axios.get(url);
+                const response = await axios.get('http://localhost:5000/products');
                 setProducts(response.data);
-
             } catch (error) {
                 setError('Error fetching products: ' + (error.response ? error.response.data : error.message));
             } finally {
@@ -153,35 +79,26 @@ const ProductList = () => {
             }
         };
 
-
         fetchProducts();
-    }, [isLoggedIn]); // Dependency on isLoggedIn
+    }, []);
 
     const handleAddToCart = async (product) => {
         const token = localStorage.getItem('token');
-
-        if (!token) {
-            console.log('User not logged in');
-            return; // Optionally, redirect to login here
-        }
-
-        if (!customerId) {
-            console.log('Customer ID is missing. Please log in.');
+        if (!token || !customerId) {
+            console.log('User not logged in or customer ID missing');
             return;
         }
 
         try {
             const response = await axios.post('http://localhost:5000/add-to-cart', {
                 customer_id: customerId,
-                product_code: product.product_code, // Now using product_code
+                product_code: product.product_code,
                 quantity: 1
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
             if (response.status === 200) {
-                console.log('Product added to cart:', product);
-                // Emit the cartUpdated event to notify the Navigation component
                 cartEventEmitter.emit('cartUpdated');
             }
         } catch (error) {
@@ -197,14 +114,19 @@ const ProductList = () => {
         return <div>{error}</div>;
     }
 
-    if (products.length === 0) {
-        return <div>No products available</div>;
-    }
+    const groupedProducts = groupProductsByCategory(products);
 
     return (
-        <div className='product-list' style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-            {products.map((product) => (
-                <ProductCard key={product.product_code} product={product} onAddToCart={handleAddToCart} />
+        <div className='category-list'>
+            {Object.keys(groupedProducts).map((categoryName) => (
+                <div key={categoryName} className='category-section'>
+                    <h2>{categoryName}</h2> {/* Display category name */}
+                    <div className='product-list' style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                        {groupedProducts[categoryName].map((product) => (
+                            <ProductCard key={product.product_code} product={product} onAddToCart={handleAddToCart} />
+                        ))}
+                    </div>
+                </div>
             ))}
         </div>
     );
