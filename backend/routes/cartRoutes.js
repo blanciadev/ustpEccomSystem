@@ -98,12 +98,10 @@ router.get('/cart-item-count', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
-// Route to get cart items with product details
 router.get('/cart', authenticateToken, async (req, res) => {
     const { user_id } = req;
 
     try {
-        // Query to get cart items with product details
         const [rows] = await db.query(`
             SELECT
                 p.product_id,
@@ -126,23 +124,20 @@ router.get('/cart', authenticateToken, async (req, res) => {
                 ci.customer_id = ? AND ci.status = 'Order Pending'
         `, [user_id]);
 
-        // If there are no cart items
         if (!rows || rows.length === 0) {
             return res.status(200).json({ items: [], totalPrice: 0 });
         }
 
-        // Calculate total price
         const totalPrice = rows.reduce((total, item) => total + item.price * item.quantity, 0);
 
-        // Return the cart items and the total price
         res.status(200).json({
             items: rows.map(item => ({
                 product_id: item.product_id,
                 product_code: item.product_code,
-                product_name: item.product_name,
+                product_name: item.product_name, // Product name included
                 description: item.description,
                 brand: item.brand,
-                category: item.category_name, // Updated to use the category_name
+                category: item.category_name,
                 price: item.price,
                 quantity: item.quantity,
                 size: item.size,
@@ -156,6 +151,7 @@ router.get('/cart', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
 
 
 

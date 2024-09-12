@@ -58,19 +58,37 @@ WHERE
 
 
 // Route to get all products (public route without user filtering)
+// router.get('/products', async (req, res) => {
+//     try {
+//         // Select all products
+//         const [rows] = await db.query(`
+//             SELECT DISTINCT product_id, product_code, product_name, description, quantity 
+//             FROM product
+//         `);
+//         // Respond with product details
+//         res.json(rows);
+//     } catch (error) {
+//         console.error('Error fetching products:', error);
+//         res.status(500).send('Error fetching products');
+//     }
+// });
+
 router.get('/products', async (req, res) => {
     try {
-        // Select all products
+        // Fetch all products and their categories
         const [rows] = await db.query(`
-            SELECT DISTINCT product_id, product_code, product_name, description, quantity 
-            FROM product
+            SELECT p.product_id, p.product_code, p.product_name, p.description, p.quantity, c.category_name
+            FROM product p
+            INNER JOIN category c ON p.category_id = c.category_id
         `);
-        // Respond with product details
+        
+        // Respond with product details including categories
         res.json(rows);
     } catch (error) {
         console.error('Error fetching products:', error);
         res.status(500).send('Error fetching products');
     }
 });
+
 
 module.exports = router;

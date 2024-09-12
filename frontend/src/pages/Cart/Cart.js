@@ -12,13 +12,11 @@ const CartContent = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
-
-  // Fetch cart items from the backend
   useEffect(() => {
     const fetchCartItems = async () => {
-      setLoading(true); // Start loading
+      setLoading(true);
       try {
         const response = await fetch('http://localhost:5000/cart', {
           headers: {
@@ -29,21 +27,20 @@ const CartContent = () => {
         const data = await response.json();
 
         if (response.ok) {
-          setCartItems(data.items); // Update local state with fetched items
+          setCartItems(data.items);
         } else {
           setError(data.message || 'Failed to fetch cart items');
         }
       } catch (err) {
         setError('Error fetching cart items. Please try again later.');
       } finally {
-        setLoading(false); // Stop loading
+        setLoading(false);
       }
     };
 
     fetchCartItems();
   }, []);
 
-  // Compute total price based on selected items
   const computeTotalPrice = () => {
     return cartItems.reduce((total, item) => {
       if (selectedItems[item.product_code]) {
@@ -57,7 +54,6 @@ const CartContent = () => {
     setTotalPrice(computeTotalPrice());
   }, [selectedItems, cartItems]);
 
-  // Handle item selection
   const toggleItemSelection = (productCode) => {
     setSelectedItems(prevSelected => ({
       ...prevSelected,
@@ -65,7 +61,6 @@ const CartContent = () => {
     }));
   };
 
-  // Handle "Select All" functionality
   const handleSelectAll = (selectAll) => {
     const newSelection = {};
     cartItems.forEach(item => {
@@ -74,7 +69,6 @@ const CartContent = () => {
     setSelectedItems(newSelection);
   };
 
-  // Event handler for "Select All" checkbox
   useEffect(() => {
     const handleToggleSelectAll = (selectAll) => {
       handleSelectAll(selectAll);
@@ -82,7 +76,6 @@ const CartContent = () => {
 
     cartEventEmitter.on('toggleSelectAll', handleToggleSelectAll);
 
-    // Cleanup event listener on unmount
     return () => {
       cartEventEmitter.off('toggleSelectAll', handleToggleSelectAll);
     };
@@ -90,18 +83,16 @@ const CartContent = () => {
 
   const handleCheckout = () => {
     const selectedProducts = cartItems.filter(item => selectedItems[item.product_code]);
-    navigate('/checkout', { state: { selectedProducts, totalPrice } }); // Passing the selected products and total price
+    navigate('/checkout', { state: { selectedProducts, totalPrice } });
   };
 
   const handleSelectAllChange = () => {
     const allSelected = Object.keys(selectedItems).length === cartItems.length;
     const newSelectAllState = !allSelected;
     cartEventEmitter.emit('toggleSelectAll', newSelectAllState);
-    handleSelectAll(newSelectAllState); // Update state immediately
+    handleSelectAll(newSelectAllState);
   };
 
- 
-  
   return (
     <div className='cart-con'>
       <Navigation />
@@ -112,7 +103,7 @@ const CartContent = () => {
         ) : error ? (
           <p className="error-message">{error}</p>
         ) : cartItems.length === 0 ? (
-          <p>Your cart is empty!</p>
+          <p className="cart-empty">Your cart is empty!</p>
         ) : (
           <div className='cart-table'>
             <table>
@@ -159,7 +150,7 @@ const CartContent = () => {
               </tfoot>
             </table>
             <div className='checkout-btncon'>
-            <button className='checkout-btn' onClick={handleCheckout}>
+              <button className='checkout-btn' onClick={handleCheckout}>
                 Checkout
               </button>
             </div>

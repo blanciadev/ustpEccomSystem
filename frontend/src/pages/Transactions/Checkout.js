@@ -204,18 +204,25 @@ const Checkout = () => {
           </div>
           <div className='checkout-summary'>
             <h3>Order Summary</h3>
+            <div className='summary-header'>
+              <span>Item</span>
+              <span>Quantity</span>
+              <span>Total Price</span>
+            </div>
             <ul className='product-list'>
               {selectedProducts.length > 0 ? (
                 selectedProducts.map((product) => (
                   <li key={product.product_code}>
-                    {product.name} ({product.quantity}) - ₱{product.price * product.quantity}
+                    <span>{product.product_name}</span>
+                    <span className='quantity'>{product.quantity}</span>
+                    <span className='total-price'>₱{product.price * product.quantity}</span>
                   </li>
                 ))
               ) : (
                 <p>No products selected.</p>
               )}
-            </ul>
-            <h4>Total: ₱{totalPrice}</h4>
+            </ul><br></br>
+            <h4>Total: ₱ {totalPrice}</h4>
           </div>
         </div>
       </div>

@@ -5,7 +5,7 @@ import Productcard from './Productcard'
 const Products = () => {
   return (
     <div className='products-con'>
-      <h2>RECOMMENDATIONS</h2>
+      <h2>SHOP</h2>
       <div className='products'>
         <Productcard />
 
