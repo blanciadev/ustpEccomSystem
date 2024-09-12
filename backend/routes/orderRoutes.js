@@ -107,33 +107,51 @@ router.post('/insert-order', async (req, res) => {
         const order_id = orderResult.insertId;
         console.log('New order inserted with ID:', order_id);
 
-        // Prepare to insert order details
-        console.log('Inserting order details...');
-        const orderDetailsPromises = [];
+        // Validate and prepare batch insert for order details
+        const orderDetailsValues = [];
+        const productStatusUpdates = [];
 
         for (const detail of order_details) {
             if (!detail.product_id || !detail.quantity || isNaN(detail.quantity)) {
                 console.log('Invalid order detail:', detail);
                 throw new Error('Invalid order detail: ' + JSON.stringify(detail));
             }
-            console.log('Inserting order detail:', detail);
+            console.log('Preparing order detail for batch insert:', detail);
 
-            // Insert order detail
-            orderDetailsPromises.push(
-                db.query(`
-                    INSERT INTO \`order_details\` (order_id, product_id, quantity)
-                    VALUES (?, ?, ?)
-                `, [order_id, detail.product_id, detail.quantity])
-            );
+            // Collect values for batch insert
+            orderDetailsValues.push([order_id, detail.product_id, detail.quantity]);
 
-            // Add status update to queue
-            console.log('Adding product status update to queue...');
-            addToQueue(detail.product_id, 'Order Process');
+            // Collect product status updates for batch processing
+            productStatusUpdates.push([detail.product_id, 'Order Processing']);
         }
 
-        // Execute all order detail inserts
-        await Promise.all(orderDetailsPromises);
-        console.log('All order details inserted successfully.');
+        // Batch insert order details
+        console.log('Performing batch insert for order details...');
+        if (orderDetailsValues.length > 0) {
+            const placeholders = orderDetailsValues.map(() => '(?, ?, ?)').join(', ');
+            await db.query(`
+                INSERT INTO \`order_details\` (order_id, product_id, quantity)
+                VALUES ${placeholders}
+            `, orderDetailsValues.flat());
+            console.log('Batch insert for order details completed.');
+        }
+
+        // Perform batch status update for all products in the order
+        console.log('Performing batch product status update...');
+        if (productStatusUpdates.length > 0) {
+            const productUpdatePlaceholders = productStatusUpdates.map(() => 'WHEN ? THEN ?').join(' ');
+            const productUpdateIds = productStatusUpdates.map(([product_id]) => product_id);
+
+            const statusQuery = `
+                UPDATE \`cart_items\`
+                SET status = CASE product_code ${productUpdatePlaceholders} ELSE status END
+                WHERE product_code IN (${productUpdateIds.map(() => '?').join(', ')})
+            `;
+            const statusParams = productStatusUpdates.flat().concat(productUpdateIds);
+
+            await db.query(statusQuery, statusParams);
+            console.log('Batch product status update completed.');
+        }
 
         // Commit the transaction
         console.log('Committing transaction...');
@@ -149,6 +167,8 @@ router.post('/insert-order', async (req, res) => {
         res.status(500).json({ error: 'Error inserting order', details: error.message });
     }
 });
+
+
 
 
 

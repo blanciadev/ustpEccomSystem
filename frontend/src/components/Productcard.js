@@ -21,6 +21,7 @@ const ProductCard = ({ product, onAddToCart }) => {
             <div className='productdesc' style={{ width: '100%', height: '35%' }}>
                 <div className='product-data'>
                     <p>{product.product_name || 'No product name'}</p>
+                    <p>Quantity: {product.quantity}</p> {/* Display quantity */}
                     <div className='order-options'>
                         <button onClick={() => onAddToCart(product)}>Add to Cart</button>
                         <button>Buy Now</button>
@@ -35,9 +36,22 @@ ProductCard.propTypes = {
     product: PropTypes.shape({
         image_url: PropTypes.string,
         product_name: PropTypes.string,
-        product_code: PropTypes.string.isRequired // Updated to product_code
+        product_code: PropTypes.string.isRequired,
+        quantity: PropTypes.number // Ensure quantity is handled
     }).isRequired,
     onAddToCart: PropTypes.func.isRequired
+};
+
+// Group products by category
+const groupProductsByCategory = (products) => {
+    return products.reduce((categories, product) => {
+        const category = product.category_name || 'Uncategorized';
+        if (!categories[category]) {
+            categories[category] = [];
+        }
+        categories[category].push(product);
+        return categories;
+    }, {});
 };
 
 // ProductList Component
@@ -48,63 +62,43 @@ const ProductList = () => {
     const [customerId, setCustomerId] = useState(null);
 
     useEffect(() => {
-        // Fetch logged-in user's customer ID (user_id) from localStorage
-        const storedCustomerId = localStorage.getItem('customer_id'); // Updated to customer_id
-        console.log('Stored Customer ID:', storedCustomerId);
-
+        const storedCustomerId = localStorage.getItem('customer_id');
         if (storedCustomerId) {
             setCustomerId(storedCustomerId);
-        } else {
-            console.log('Customer ID is not available in localStorage.');
         }
 
-        // Fetch products from the backend
         const fetchProducts = async () => {
             setLoading(true);
-            console.log('Fetching products...');
             try {
                 const response = await axios.get('http://localhost:5000/products');
-                console.log('Products fetched successfully:', response.data);
                 setProducts(response.data);
             } catch (error) {
-                console.error('Error fetching products:', error.response ? error.response.data : error.message);
                 setError('Error fetching products: ' + (error.response ? error.response.data : error.message));
             } finally {
                 setLoading(false);
-                console.log('Finished fetching products.');
             }
         };
+
         fetchProducts();
     }, []);
 
     const handleAddToCart = async (product) => {
-        console.log('Adding product to cart:', product);
         const token = localStorage.getItem('token');
-        console.log('Token:', token);
-
-        if (!token) {
-            console.log('User not logged in');
-            return; // Optionally, redirect to login here
-        }
-
-        if (!customerId) {
-            console.log('Customer ID is missing. Please log in.');
+        if (!token || !customerId) {
+            console.log('User not logged in or customer ID missing');
             return;
         }
 
         try {
             const response = await axios.post('http://localhost:5000/add-to-cart', {
                 customer_id: customerId,
-                product_code: product.product_code, // Updated to product_code
+                product_code: product.product_code,
                 quantity: 1
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            console.log('Response from add-to-cart API:', response);
 
             if (response.status === 200) {
-                console.log('Product added to cart:', product);
-                // Emit the cartUpdated event to notify the Navigation component
                 cartEventEmitter.emit('cartUpdated');
             }
         } catch (error) {
@@ -120,14 +114,19 @@ const ProductList = () => {
         return <div>{error}</div>;
     }
 
-    if (products.length === 0) {
-        return <div>No products available</div>;
-    }
+    const groupedProducts = groupProductsByCategory(products);
 
     return (
-        <div className='product-list' style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-            {products.map((product) => (
-                <ProductCard key={product.product_code} product={product} onAddToCart={handleAddToCart} />
+        <div className='category-list'>
+            {Object.keys(groupedProducts).map((categoryName) => (
+                <div key={categoryName} className='category-section'>
+                    <h2>{categoryName}</h2> {/* Display category name */}
+                    <div className='product-list' style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                        {groupedProducts[categoryName].map((product) => (
+                            <ProductCard key={product.product_code} product={product} onAddToCart={handleAddToCart} />
+                        ))}
+                    </div>
+                </div>
             ))}
         </div>
     );
