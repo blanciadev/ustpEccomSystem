@@ -42,24 +42,31 @@ ProductCard.propTypes = {
     onAddToCart: PropTypes.func.isRequired
 };
 
-// Group products by category
-const groupProductsByCategory = (products) => {
-    return products.reduce((categories, product) => {
-        const category = product.category_name || 'Uncategorized';
-        if (!categories[category]) {
-            categories[category] = [];
-        }
-        categories[category].push(product);
-        return categories;
-    }, {});
+// Shuffle array function
+const shuffleArray = (array) => {
+    let currentIndex = array.length, randomIndex;
+
+    // While there remain elements to shuffle...
+    while (currentIndex !== 0) {
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+
+        // And swap it with the current element.
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    }
+
+    return array;
 };
 
-// ProductList Component
+const PAGE_SIZE = 4; // Number of products per page (e.g., 4 products per row)
+
 const ProductList = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [customerId, setCustomerId] = useState(null);
+    const [currentPage, setCurrentPage] = useState(0);
 
     useEffect(() => {
         const storedCustomerId = localStorage.getItem('customer_id');
@@ -71,7 +78,8 @@ const ProductList = () => {
             setLoading(true);
             try {
                 const response = await axios.get('http://localhost:5000/products');
-                setProducts(response.data);
+                const shuffledProducts = shuffleArray(response.data); // Shuffle products
+                setProducts(shuffledProducts);
             } catch (error) {
                 setError('Error fetching products: ' + (error.response ? error.response.data : error.message));
             } finally {
@@ -106,6 +114,15 @@ const ProductList = () => {
         }
     };
 
+    const handlePageChange = (direction) => {
+        setCurrentPage((prevPage) => {
+            const newPage = prevPage + direction;
+            // Ensure new page is within bounds
+            const maxPage = Math.ceil(products.length / PAGE_SIZE) - 1;
+            return Math.max(0, Math.min(newPage, maxPage));
+        });
+    };
+
     if (loading) {
         return <div>Loading...</div>;
     }
@@ -114,20 +131,30 @@ const ProductList = () => {
         return <div>{error}</div>;
     }
 
-    const groupedProducts = groupProductsByCategory(products);
+    const paginatedProducts = products.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
 
     return (
-        <div className='category-list'>
-            {Object.keys(groupedProducts).map((categoryName) => (
-                <div key={categoryName} className='category-section'>
-                    <h2>{categoryName}</h2> {/* Display category name */}
-                    <div className='product-list' style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-                        {groupedProducts[categoryName].map((product) => (
-                            <ProductCard key={product.product_code} product={product} onAddToCart={handleAddToCart} />
-                        ))}
-                    </div>
-                </div>
-            ))}
+        <div className='product-list'>
+            <div className='product-list' style={{ display: 'flex', flexWrap: 'nowrap', overflowX: 'auto' }}>
+                {paginatedProducts.map((product) => (
+                    <ProductCard key={product.product_code} product={product} onAddToCart={handleAddToCart} />
+                ))}
+            </div>
+            <div className='pagination-controls' style={{ marginTop: '20px', textAlign: 'center' }}>
+                <button
+                    onClick={() => handlePageChange(-1)}
+                    disabled={currentPage === 0}
+                >
+                    Previous
+                </button>
+                <span> Page {currentPage + 1} </span>
+                <button
+                    onClick={() => handlePageChange(1)}
+                    disabled={(currentPage + 1) * PAGE_SIZE >= products.length}
+                >
+                    Next
+                </button>
+            </div>
         </div>
     );
 };

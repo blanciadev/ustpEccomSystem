@@ -72,7 +72,7 @@ const Navigation = () => {
     };
 
     const commonLinks = [
-        { id: 1, page: "Shop", link: "/" },
+        { id: 1, page: "Shop", link: "/shop" },
         { id: 2, page: "About Us", link: "/about-us" },
         { id: 3, page: `Cart (${cartItemCount})`, link: "#" }
     ];

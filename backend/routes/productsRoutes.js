@@ -77,11 +77,11 @@ router.get('/products', async (req, res) => {
     try {
         // Fetch all products and their categories
         const [rows] = await db.query(`
-            SELECT p.product_id, p.product_code, p.product_name, p.description, p.quantity, c.category_name
+            SELECT p.product_id, p.product_code, p.product_name, p.price ,p.description, p.quantity, c.category_name
             FROM product p
             INNER JOIN category c ON p.category_id = c.category_id
         `);
-        
+
         // Respond with product details including categories
         res.json(rows);
     } catch (error) {

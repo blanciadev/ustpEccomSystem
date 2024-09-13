@@ -111,7 +111,7 @@ router.post('/insert-order', async (req, res) => {
 
             await db.query(`
                 INSERT INTO \`order_details\` (order_id, product_id, quantity, total_price, payment_date, payment_method, payment_status)
-                VALUES (?, ?, ?, ?, 'NULL', ?, ?)
+                VALUES (?, ?, ?, ?, null, ?, ?)
             `, [order_id, product_id, quantity, totalprice, convertToMySQLDateTime(payment_date), payment_method, payment_status]);
 
             productUpdateIds.push(product_id); // Add to product update list
