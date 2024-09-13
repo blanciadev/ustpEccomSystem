@@ -5,6 +5,7 @@ import Products from '../components/Products';
 import Footer from '../components/Footer';
 
 const Home = () => {
+
   return (
     <div className='home-con'>
         <Navigation />

@@ -6,7 +6,7 @@ const cors = require('cors');
 
 // const crypto = require('crypto'); // For generating random tokens
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 
 const cartRoutes = require('./routes/cartRoutes');
