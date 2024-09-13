@@ -6,6 +6,10 @@ import Login from './pages/Login/Login';
 import Signup from './pages/Signup/Signup';
 import Cart from './pages/Cart/Cart';
 import Checkout from './pages/Transactions/Checkout'
+import OrderHistory from './pages/Transactions/OrderHistory';
+import Dashboard from './admin/Dashboard';
+import Shop from './pages/Cart/shop';
+
 
 function App() {
   const [loginStatus, setLoginStatus] = useState('');  // Store login status
@@ -51,11 +55,14 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/cart" element={<Cart/>}/>
-        <Route path="/checkout" element={<Checkout/>}/>
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/user/purchase" element={<OrderHistory />} />
+        <Route path='/admin/dashboard' element={<Dashboard />}></Route>
+        <Route path='/shop' element={<Shop />}></Route>
       </Routes>
     </BrowserRouter>
-  
+
 
 
   );

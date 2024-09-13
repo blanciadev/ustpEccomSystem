@@ -4,9 +4,14 @@ const mysql = require('mysql2/promise');
 const pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
+    // port: '3006',//3308
+    // password: 'root',
+
+    //PORT KURT 
     port: '3307',
     password: 'root',
-    // password: 'Cookies1',// ako gi ilisan
+
+    // password: '',
     database: 'ustpecom',
     waitForConnections: true,
     connectionLimit: 10,

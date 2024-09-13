@@ -21,6 +21,7 @@ const ProductCard = ({ product, onAddToCart }) => {
             <div className='productdesc' style={{ width: '100%', height: '35%' }}>
                 <div className='product-data'>
                     <p>{product.product_name || 'No product name'}</p>
+                    <p>Quantity: {product.quantity}</p> {/* Display quantity */}
                     <div className='order-options'>
                         <button onClick={() => onAddToCart(product)}>Add to Cart</button>
                         <button>Buy Now</button>
@@ -35,81 +36,91 @@ ProductCard.propTypes = {
     product: PropTypes.shape({
         image_url: PropTypes.string,
         product_name: PropTypes.string,
-        product_code: PropTypes.string.isRequired // Updated to product_code
+        product_code: PropTypes.string.isRequired,
+        quantity: PropTypes.number // Ensure quantity is handled
     }).isRequired,
     onAddToCart: PropTypes.func.isRequired
 };
 
-// ProductList Component
+// Shuffle array function
+const shuffleArray = (array) => {
+    let currentIndex = array.length, randomIndex;
+
+    // While there remain elements to shuffle...
+    while (currentIndex !== 0) {
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+
+        // And swap it with the current element.
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    }
+
+    return array;
+};
+
+const PAGE_SIZE = 4; // Number of products per page (e.g., 4 products per row)
+
 const ProductList = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [customerId, setCustomerId] = useState(null);
+    const [currentPage, setCurrentPage] = useState(0);
 
     useEffect(() => {
-        // Fetch logged-in user's customer ID (user_id) from localStorage
-        const storedCustomerId = localStorage.getItem('customer_id'); // Updated to customer_id
-        console.log('Stored Customer ID:', storedCustomerId);
-
+        const storedCustomerId = localStorage.getItem('customer_id');
         if (storedCustomerId) {
             setCustomerId(storedCustomerId);
-        } else {
-            console.log('Customer ID is not available in localStorage.');
         }
 
-        // Fetch products from the backend
         const fetchProducts = async () => {
             setLoading(true);
-            console.log('Fetching products...');
             try {
                 const response = await axios.get('http://localhost:5000/products');
-                console.log('Products fetched successfully:', response.data);
-                setProducts(response.data);
+                const shuffledProducts = shuffleArray(response.data); // Shuffle products
+                setProducts(shuffledProducts);
             } catch (error) {
-                console.error('Error fetching products:', error.response ? error.response.data : error.message);
                 setError('Error fetching products: ' + (error.response ? error.response.data : error.message));
             } finally {
                 setLoading(false);
-                console.log('Finished fetching products.');
             }
         };
+
         fetchProducts();
     }, []);
 
     const handleAddToCart = async (product) => {
-        console.log('Adding product to cart:', product);
         const token = localStorage.getItem('token');
-        console.log('Token:', token);
-
-        if (!token) {
-            console.log('User not logged in');
-            return; // Optionally, redirect to login here
-        }
-
-        if (!customerId) {
-            console.log('Customer ID is missing. Please log in.');
+        if (!token || !customerId) {
+            console.log('User not logged in or customer ID missing');
             return;
         }
 
         try {
             const response = await axios.post('http://localhost:5000/add-to-cart', {
                 customer_id: customerId,
-                product_code: product.product_code, // Updated to product_code
+                product_code: product.product_code,
                 quantity: 1
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            console.log('Response from add-to-cart API:', response);
 
             if (response.status === 200) {
-                console.log('Product added to cart:', product);
-                // Emit the cartUpdated event to notify the Navigation component
                 cartEventEmitter.emit('cartUpdated');
             }
         } catch (error) {
             console.error('Error adding product to cart:', error.response ? error.response.data : error.message);
         }
+    };
+
+    const handlePageChange = (direction) => {
+        setCurrentPage((prevPage) => {
+            const newPage = prevPage + direction;
+            // Ensure new page is within bounds
+            const maxPage = Math.ceil(products.length / PAGE_SIZE) - 1;
+            return Math.max(0, Math.min(newPage, maxPage));
+        });
     };
 
     if (loading) {
@@ -120,15 +131,30 @@ const ProductList = () => {
         return <div>{error}</div>;
     }
 
-    if (products.length === 0) {
-        return <div>No products available</div>;
-    }
+    const paginatedProducts = products.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
 
     return (
-        <div className='product-list' style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-            {products.map((product) => (
-                <ProductCard key={product.product_code} product={product} onAddToCart={handleAddToCart} />
-            ))}
+        <div className='product-list'>
+            <div className='product-list' style={{ display: 'flex', flexWrap: 'nowrap', overflowX: 'auto' }}>
+                {paginatedProducts.map((product) => (
+                    <ProductCard key={product.product_code} product={product} onAddToCart={handleAddToCart} />
+                ))}
+            </div>
+            <div className='pagination-controls' style={{ marginTop: '20px', textAlign: 'center' }}>
+                <button
+                    onClick={() => handlePageChange(-1)}
+                    disabled={currentPage === 0}
+                >
+                    Previous
+                </button>
+                <span> Page {currentPage + 1} </span>
+                <button
+                    onClick={() => handlePageChange(1)}
+                    disabled={(currentPage + 1) * PAGE_SIZE >= products.length}
+                >
+                    Next
+                </button>
+            </div>
         </div>
     );
 };
