@@ -7,6 +7,7 @@ import cartEventEmitter from '../../components/cartEventEmitter'; // Adjust the 
 const Shop = () => {
     const [products, setProducts] = useState([]);
     const [recommendedProducts, setRecommendedProducts] = useState([]);
+    const [topPickedProducts, setTopPickedProducts] = useState([]); // State for top picked products
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showRecommendations, setShowRecommendations] = useState(false);
@@ -15,6 +16,7 @@ const Shop = () => {
     const [productsPerPage] = useState(4); // Number of products per page
     const [recommendationsPerPage] = useState(4); // Number of recommendations per page
 
+    // Fetch all products
     useEffect(() => {
         const fetchProducts = async () => {
             try {
@@ -30,9 +32,10 @@ const Shop = () => {
         fetchProducts();
     }, []);
 
+    // Fetch recommended products
     useEffect(() => {
         const token = localStorage.getItem('token');
-        const userId = localStorage.getItem('customer_id'); // Ensure this key matches
+        const userId = localStorage.getItem('customer_id');
 
         if (token && userId) {
             const fetchRecommendedProducts = async () => {
@@ -63,9 +66,38 @@ const Shop = () => {
         };
     }, []);
 
+    // Fetch top user-picked products
+    useEffect(() => {
+        const fetchTopPickedProducts = async () => {
+            try {
+                const response = await axios.get('http://localhost:5000/products-top-picks');
+                setTopPickedProducts(response.data);
+            } catch (error) {
+                console.error('Error fetching top-picked products:', error.response ? error.response.data : error.message);
+            }
+        };
+
+        fetchTopPickedProducts();
+    }, []);
+
+    // Handle product interaction
+    const handleProductInteraction = async (product_code) => {
+        console.log('Product interacted with, Code:', product_code);
+
+        try {
+            await axios.get('http://localhost:5000/products-interaction', {
+                params: { product_code }
+            });
+
+            console.log('Product interaction updated');
+        } catch (error) {
+            console.error('Error updating product interaction:', error.response ? error.response.data : error.message);
+        }
+    };
+
     const handleAddToCart = async (product) => {
         const token = localStorage.getItem('token');
-        const userId = localStorage.getItem('customer_id'); // Ensure this key matches
+        const userId = localStorage.getItem('customer_id');
 
         if (!token || !userId) {
             console.log('User not logged in or user ID missing');
@@ -73,7 +105,7 @@ const Shop = () => {
         }
 
         try {
-            const response = await axios.post(
+            await axios.post(
                 'http://localhost:5000/add-to-cart',
                 {
                     product_code: product.product_code,
@@ -84,13 +116,11 @@ const Shop = () => {
                 }
             );
 
-            if (response.status === 200) {
-                console.log('Product added to cart');
-                cartEventEmitter.emit('cartUpdated', {
-                    product_code: product.product_code,
-                    quantity: 1
-                });
-            }
+            console.log('Product added to cart');
+            cartEventEmitter.emit('cartUpdated', {
+                product_code: product.product_code,
+                quantity: 1
+            });
         } catch (error) {
             console.error('Error adding product to cart:', error.response ? error.response.data : error.message);
         }
@@ -109,7 +139,6 @@ const Shop = () => {
 
     const groupedProducts = groupProductsByCategory(products);
 
-    // Pagination logic for each category
     const paginate = (items, pageNumber, itemsPerPage) => {
         const startIndex = (pageNumber - 1) * itemsPerPage;
         return items.slice(startIndex, startIndex + itemsPerPage);
@@ -118,7 +147,6 @@ const Shop = () => {
     const handleCategoryPageChange = (category, direction) => {
         setCurrentCategoryPages(prev => {
             const newPage = Math.max(1, (prev[category] || 1) + direction);
-            console.log(`Changing page for ${category}: ${newPage}`); // Debug log
             return {
                 ...prev,
                 [category]: newPage
@@ -129,7 +157,6 @@ const Shop = () => {
     const handleRecommendationsPageChange = (direction) => {
         setCurrentRecommendationsPage(prev => {
             const newPage = Math.max(1, prev + direction);
-            console.log(`Changing recommendations page: ${newPage}`); // Debug log
             return newPage;
         });
     };
@@ -148,12 +175,51 @@ const Shop = () => {
         <div className='shop-container'>
             <Navigation />
 
+            {/* Top Picks Section */}
+            <div className='top-picks-section'>
+                <h2>Top Picks</h2>
+                <div className='product-list'>
+                    {topPickedProducts.map((product) => (
+                        <div
+                            key={product.product_code}
+                            className='product-item'
+                            onMouseEnter={() => handleProductInteraction(product.product_code)}
+                        >
+                            <div className='product-img'>
+                                <img
+                                    src={product.image_url || 'https://via.placeholder.com/150'}
+                                    alt={product.product_name || 'Product Image'}
+                                />
+                            </div>
+                            <div className='product-desc'>
+                                <p className='product-name'>{product.product_name || 'No product name'}</p>
+                                <p className='product-quantity'>Quantity: {product.quantity}</p>
+                                <p className='product-price'>Price: ${product.price}</p>
+                                <p className='product-brand'>Brand: {product.brand}</p>
+                                <button
+                                    className='add-to-cart-button'
+                                    onClick={() => handleAddToCart(product)}
+                                >
+                                    Add to Cart
+                                </button>
+                                <button className='buy-now-button'>Buy Now</button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Recommended and General Products Sections */}
             {showRecommendations && (
                 <div className='recommendations-section'>
                     <h2>Recommended for You</h2>
                     <div className='product-list'>
                         {paginate(recommendedProducts, currentRecommendationsPage, recommendationsPerPage).map((product) => (
-                            <div key={product.product_code} className='product-item'>
+                            <div
+                                key={product.product_code}
+                                className='product-item'
+                                onMouseEnter={() => handleProductInteraction(product.product_code)}
+                            >
                                 <div className='product-img'>
                                     <img
                                         src={product.image_url || 'https://via.placeholder.com/150'}
@@ -199,14 +265,17 @@ const Shop = () => {
                 {Object.keys(groupedProducts).map((categoryName) => {
                     const categoryProducts = groupedProducts[categoryName];
                     const currentPage = currentCategoryPages[categoryName] || 1;
-                    const paginatedProducts = paginate(categoryProducts, currentPage, productsPerPage);
 
                     return (
                         <div key={categoryName} className='category-section'>
-                            <h2 className='category-title'>{categoryName}</h2>
+                            <h3>{categoryName}</h3>
                             <div className='product-list'>
-                                {paginatedProducts.map((product) => (
-                                    <div key={product.product_code} className='product-item'>
+                                {paginate(categoryProducts, currentPage, productsPerPage).map((product) => (
+                                    <div
+                                        key={product.product_code}
+                                        className='product-item'
+                                        onMouseEnter={() => handleProductInteraction(product.product_code)}
+                                    >
                                         <div className='product-img'>
                                             <img
                                                 src={product.image_url || 'https://via.placeholder.com/150'}
