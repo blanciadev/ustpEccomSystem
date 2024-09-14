@@ -25,6 +25,15 @@ const OrderSummary = () => {
                 <p>+8% from yesterday</p>{/* % comparison from yesterday */}
             </div>
 
+            <div className='pending'>
+                <div>
+                    <i class='bx bx-time'></i>
+                </div>
+                <h6>321</h6>{/* number of PENDING orders */}
+                <p><strong>Pending</strong></p>
+                <p>+8% from yesterday</p>{/* % comparison from yesterday */}
+            </div>
+
             <div className='intransit'>
                 <div>
                     <i class='bx bxs-truck' ></i>
