@@ -2,7 +2,7 @@
     width: 100vw;
     height: 100vh;
     display: flex;
-    background: rgb(255,235, 235);
+    background: rgb(255, 255, 255);
 
 }
 
@@ -10,7 +10,8 @@
 .nav-con{
     width: 20%;
     height: 100%;
-    background: rgb(255, 235, 235);
+    background: rgb(255, 255, 255);
+    background: linear-gradient(0deg, rgba(255,158,227,1) 0%, rgba(255,255,255,1) 57%, rgba(255,255,255,1) 100%);
     display: flex;
     flex-direction: column;align-items: center;
 
@@ -65,7 +66,7 @@
 .dash-header{
     width: 100%;
     height: 10%;
-    background: rgb(255,235, 235);
+    background: rgb(255, 255, 255);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -89,6 +90,23 @@
     width: 25%;
     height: 100%;
     /* background-color: rgb(52, 103, 103); */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.noti .bell-con{
+    width: 80%;
+    height: 80%;
+    color: hotpink;
+    font-size: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    transition: ease-in 1s;
+}
+.noti .bell-con:hover{
+    background-color: #ff60b2ca;
 }
 .admin-profile{
     width: 75%;
@@ -108,7 +126,7 @@
 .dash-body{
     width: 100%;
     height: 90%;
-    background-color: rgb(240,241,243);
+    background-color: rgba(225, 225, 225, 0.877);
     border-radius: 10px;
     display: flex;
     justify-content: space-evenly;
@@ -125,14 +143,153 @@
     gap: 15px;
 }
 
-.col-one div{
+
+/* Order Summary */
+.todays-order{
     width: 95%;
     height: 32%;
     background: #ffffff;
     box-shadow:  2px 2px 5px #f1f1f1,
                  -2px -2px 5px #c2c2c2;
     border-radius: 10px;
+    padding: 10px;
 }
-.col-two div{
+.header{
+    width: 100%;
+    height: 25%;
+    /* background-color: brown; */
+    display: flex;
+    justify-content: space-between;
+}
+.header .title{
+    display: flex;
+    flex-direction: column;
+    line-height: 0.5;
+}
+.header .see-all{
+    width: 20%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.see-all button{
+    width: 90%;
+    height: 85%;
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 7px;
+
+}
+.title p{
+    color: #535353;
+}
+.summ{
+    width: 100%;
+    height: 75%;
+    /* background-color: burlywood; */
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.summ p{
+    color: #535353;
+    font-size: 0.6rem;
+}
+.delivered{
+    width: 24%;
+    height: 95%;
+    background-color: rgb(127, 255, 150);
+    padding: 5px;
+    border-radius: 10px;
+    line-height: 0.5;
+}
+.delivered div{
+    width: 30%;
+    height: 45%;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+.delivered div i{
+    padding: 5px;
+    background-color: rgb(101, 232, 125);
+    color: rgb(17, 89, 30);
+    border-radius: 50%;
+    font-size: 18pt;
+}
+
+.intransit{
+    width: 24%;
+    height: 95%;
+    padding: 5px;
+    border-radius: 10px;
+    line-height: 0.5;
+    background-color: rgb(127, 189, 255);
+}
+.intransit div{
+    width: 30%;
+    height: 45%;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+.intransit div i{
+    padding: 5px;
+    background-color: rgb(101, 166, 232);
+    color: rgb(17, 43, 89);
+    border-radius: 50%;
+    font-size: 18pt;
+}
+
+.cancelled{
+    width: 24%;
+    height: 95%;
+    padding: 5px;
+    border-radius: 10px;
+    line-height: 0.5;
+    background-color: rgb(255, 127, 127);
+}
+.cancelled div{
+    width: 30%;
+    height: 45%;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+.cancelled div i{
+    padding: 5px;
+    background-color: rgb(232, 105, 101);
+    color: rgb(89, 17, 17);
+    border-radius: 50%;
+    font-size: 18pt;
+}
+
+.returned{
+    width: 24%;
+    height: 95%;
+    padding: 5px;
+    border-radius: 10px;
+    line-height: 0.5;
+    background-color: rgb(255, 249, 127);
+}
+.returned div{
+    width: 30%;
+    height: 45%;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+.returned div i{
+    padding: 5px;
+    background-color: rgb(232, 219, 101);
+    color: rgb(89, 89, 17);
+    border-radius: 50%;
+    font-size: 18pt;
+}
+
+/* Customer Insight */
+
+.col-two {
     
 }

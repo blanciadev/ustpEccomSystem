@@ -1,6 +1,9 @@
 import React from 'react'
 import './admin.css'
 import AdminNav from './components/AdminNav'
+import OrderSummary from './components/OrderSummary'
+import CustomerInsight from './components/CustomerInsight'
+import SalesOrders from './components/SalesOrders'
 
 const Dashboard = () => {
   return (
@@ -14,7 +17,7 @@ const Dashboard = () => {
                 <div className='header-user'>
                     <div className='noti'>
                         <div className='bell-con'>
-
+                        <i class='bx bxs-bell-ring'></i>
                         </div>
                     </div>
                     <div className='admin-profile'>
@@ -25,14 +28,18 @@ const Dashboard = () => {
                 </div>
             </div>
             <div className='dash-body'>
+
                 <div className='col-one'>
-                    <div></div>
-                    <div></div>
-                    <div></div>
+                    <OrderSummary/>
+                    <CustomerInsight/>
+                    <SalesOrders/>
                 </div>
                 <div className='col-two'>
-                    <div></div>
-                    <div></div>
+                    <div className='payment-insight'></div>
+                    <div className='two-col'>
+                        <div className='avg-orders'></div>
+                        <div className='order-processing'></div>
+                    </div>
                     <div></div>
                 </div>
             </div>
