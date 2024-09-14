@@ -1,20 +1,10 @@
 import React from 'react'
-import { Dropdown } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import '../admin.css'
-import AdminNav from '../components/AdminNav'
+import { Dropdown } from 'react-bootstrap';
 
-const Reports = () => {
+const AdminHeader = () => {
   return (
-    <div className='dash-con'>
-        <AdminNav/>
-        <div className='dash-board'>
-            <div className='dash-header'>
-                <div className='header-title'>
-                    <i class='bx bxs-dashboard' ></i>
-                    <h1>Dashboard</h1>
-                </div>
-                <div className='header-user'>
+    <div className='header-user'>
                     <div className='noti'>
                         <div className='bell-con'>
                             <i class='bx bxs-bell-ring'></i>
@@ -25,7 +15,7 @@ const Reports = () => {
                         
                         <Dropdown>
                         <Dropdown.Toggle as="p" variant='link' className='admin-text'>
-                                Ma. Leonille Therese D. Silfavan {/* Admin Name */}
+                                Ma. Leonille  D. Silfavan {/* Admin Name */}
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu style={{marginTop: '22px'}}>
@@ -37,13 +27,7 @@ const Reports = () => {
                         
                     </div>
                 </div>
-            </div>
-            <div className='dash-body'>
-
-            </div>
-        </div>
-    </div>
   )
 }
 
-export default Reports
+export default AdminHeader
