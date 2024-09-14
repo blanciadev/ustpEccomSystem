@@ -1,7 +1,7 @@
 import React from 'react'
+import '../admin.css'
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
-import '../admin.css'
 
 // Register the components needed for Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -10,17 +10,17 @@ const data = {
   labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], // X-axis labels
   datasets: [
     {
-      label: 'Purchases',
-      data: [30, 45, 55, 60, 70, 65, 75, 80, 85, 90, 100, 110], // Data points for Purchases
-      backgroundColor: 'rgba(75, 192, 192, 0.6)', // Bar color
-      borderColor: 'rgba(75, 192, 192, 1)', // Border color of bars
+      label: 'GCash',
+      data: [50, 70, 65, 80, 85, 90, 95, 100, 105, 110, 120, 130], // Data points for GCash/Online Payment
+      backgroundColor: 'rgba(54, 162, 235, 0.6)', // Bar color
+      borderColor: 'rgba(54, 162, 235, 1)', // Border color of bars
       borderWidth: 1, // Border width
     },
     {
-      label: 'Sales',
-      data: [40, 50, 65, 70, 80, 75, 85, 90, 100, 110, 120, 130], // Data points for Sales
-      backgroundColor: 'rgba(153, 102, 255, 0.6)', // Bar color
-      borderColor: 'rgba(153, 102, 255, 1)', // Border color of bars
+      label: 'Cash on Delivery',
+      data: [30, 50, 45, 55, 60, 65, 70, 75, 80, 85, 90, 95], // Data points for COD/Cash on Delivery
+      backgroundColor: 'rgba(255, 99, 132, 0.6)', // Bar color
+      borderColor: 'rgba(255, 99, 132, 1)', // Border color of bars
       borderWidth: 1, // Border width
     },
   ],
@@ -36,7 +36,7 @@ const options = {
         boxWidth: 10,
         boxHeight: 10,
         padding: 10,
-        color: '#333',
+        color: '#333', // Color of the legend text
       },
     },
     tooltip: {
@@ -69,18 +69,16 @@ const options = {
   },
 };
 
-const SalesOrders =  () => {
+
+const PaymentInsight = () => {
   return (
-    <div className='sales-orders'>
+    <div className='payment-insight'>
         <div className='header'>
             <div className='title'>
-                <h5>Sales Orders</h5>
+                <h5>Payment Insight</h5>
             </div> 
-            <div className='see-all'>
-                <button>See all</button>
-            </div>
+            <div className='see-all'></div>
         </div>
-       
         <div className='bar-chart'>
         <Bar data={data} options={options} />
         </div>
@@ -88,4 +86,4 @@ const SalesOrders =  () => {
   )
 }
 
-export default SalesOrders
+export default PaymentInsight
