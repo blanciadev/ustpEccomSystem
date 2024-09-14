@@ -1,6 +1,15 @@
 import React from 'react'
+import { Dropdown } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './admin.css'
 import AdminNav from './components/AdminNav'
+import OrderSummary from './components/OrderSummary'
+import CustomerInsight from './components/CustomerInsight'
+import SalesOrders from './components/SalesOrders'
+import PaymentInsight from './components/PaymentInsight';
+import AverageOrders from './components/AverageOrders';
+import OrderProcessing from './components/OrderProcessing';
+import TopProduct from './components/TopProduct';
 
 const Dashboard = () => {
   return (
@@ -14,26 +23,41 @@ const Dashboard = () => {
                 <div className='header-user'>
                     <div className='noti'>
                         <div className='bell-con'>
-
+                            <i class='bx bxs-bell-ring'></i>
                         </div>
                     </div>
                     <div className='admin-profile'>
                         <img src='https://t3.ftcdn.net/jpg/06/17/13/26/360_F_617132669_YptvM7fIuczaUbYYpMe3VTLimwZwzlWf.jpg'/>
-                        <p>Admin</p>
+                        
+                        <Dropdown>
+                        <Dropdown.Toggle as="p" variant='link' className='admin-text'>
+                                Ma. Leonille Therese D. Silfavan {/* Admin Name */}
+                        </Dropdown.Toggle>
 
+                        <Dropdown.Menu style={{marginTop: '22px'}}>
+                        <Dropdown.Item href='#/profile'>Profile</Dropdown.Item>
+                        <Dropdown.Item href='#/settings'>Settings</Dropdown.Item>
+                        <Dropdown.Item href='#/logout'>Logout</Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
+                        
                     </div>
                 </div>
             </div>
             <div className='dash-body'>
+
                 <div className='col-one'>
-                    <div></div>
-                    <div></div>
-                    <div></div>
+                    <OrderSummary/>
+                    <CustomerInsight/>
+                    <SalesOrders/>
                 </div>
                 <div className='col-two'>
-                    <div></div>
-                    <div></div>
-                    <div></div>
+                    <PaymentInsight/>
+                    <div className='two-col'>
+                        <AverageOrders/>
+                        <OrderProcessing/>
+                    </div>
+                    <TopProduct/>
                 </div>
             </div>
         </div>

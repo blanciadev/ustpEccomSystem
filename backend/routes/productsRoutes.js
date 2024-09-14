@@ -56,22 +56,51 @@ WHERE
     }
 });
 
+// Route to update product interaction count
+router.get('/products-interaction', async (req, res) => {
+    const { product_code } = req.query; // Get product_code from the query params
+    if (!product_code) {
+        return res.status(400).json({ error: 'Product code is required' });
+    }
 
-// Route to get all products (public route without user filtering)
-// router.get('/products', async (req, res) => {
-//     try {
-//         // Select all products
-//         const [rows] = await db.query(`
-//             SELECT DISTINCT product_id, product_code, product_name, description, quantity 
-//             FROM product
-//         `);
-//         // Respond with product details
-//         res.json(rows);
-//     } catch (error) {
-//         console.error('Error fetching products:', error);
-//         res.status(500).send('Error fetching products');
-//     }
-// });
+    try {
+        // Increment interaction count for the clicked product
+        await db.query(`
+            UPDATE product
+            SET interaction_count = interaction_count + 1
+            WHERE product_code = ?
+        `, [product_code]);
+
+        // Respond with a success message
+        res.json({ success: true, message: 'Product interaction updated' });
+    } catch (error) {
+        console.error('Error updating product interaction:', error);
+        res.status(500).json({ error: 'Error updating product interaction' });
+    }
+});
+
+// Route to get top 4 user-picked products
+router.get('/products-top-picks', async (req, res) => {
+    try {
+        // Fetch the top 4 products based on the highest interaction count
+        const [rows] = await db.query(`
+            SELECT product_id, product_code, product_name, price, description, quantity, interaction_count
+            FROM product
+            ORDER BY interaction_count DESC
+            LIMIT 4
+        `);
+
+        // Respond with top picked products
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching top user picks:', error);
+        res.status(500).send('Error fetching top user picks');
+    }
+});
+
+
+
+
 
 router.get('/products', async (req, res) => {
     try {

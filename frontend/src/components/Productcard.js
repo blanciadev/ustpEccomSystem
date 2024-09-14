@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import { cartEventEmitter } from './eventEmitter'; // Import the event emitter
@@ -9,6 +9,18 @@ const ProductCard = ({ product, onAddToCart }) => {
         return <div>Product data is not available</div>;
     }
 
+    // Function to update product interaction
+    const handleProductInteraction = async (productCode) => {
+        try {
+            await axios.get('http://localhost:5000/products-interaction', {
+                params: { product_code: productCode } // Send product_code as a query parameter
+            });
+            console.log('Product interaction updated');
+        } catch (error) {
+            console.error('Error updating product interaction:', error.response ? error.response.data : error.message);
+        }
+    };
+
     return (
         <div className='procard' style={{ width: '22%', margin: '1%' }}>
             <div className='productimg' style={{ width: '100%', height: '65%' }}>
@@ -16,6 +28,7 @@ const ProductCard = ({ product, onAddToCart }) => {
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     src={product.image_url || 'https://via.placeholder.com/150'}
                     alt={product.product_name || 'Product Image'}
+                    onClick={() => handleProductInteraction(product.product_code)} // Trigger interaction on image click
                 />
             </div>
             <div className='productdesc' style={{ width: '100%', height: '35%' }}>
@@ -23,8 +36,10 @@ const ProductCard = ({ product, onAddToCart }) => {
                     <p>{product.product_name || 'No product name'}</p>
                     <p>Quantity: {product.quantity}</p> {/* Display quantity */}
                     <div className='order-options'>
-                        <button onClick={() => onAddToCart(product)}>Add to Cart</button>
-                        <button>Buy Now</button>
+                        <button onClick={() => { handleProductInteraction(product.product_code); onAddToCart(product); }}>
+                            Add to Cart
+                        </button>
+                        <button onClick={() => handleProductInteraction(product.product_code)}>Buy Now</button>
                     </div>
                 </div>
             </div>
@@ -62,13 +77,13 @@ const shuffleArray = (array) => {
 const PAGE_SIZE = 4; // Number of products per page (e.g., 4 products per row)
 
 const ProductList = () => {
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [customerId, setCustomerId] = useState(null);
-    const [currentPage, setCurrentPage] = useState(0);
+    const [products, setProducts] = React.useState([]);
+    const [loading, setLoading] = React.useState(true);
+    const [error, setError] = React.useState(null);
+    const [customerId, setCustomerId] = React.useState(null);
+    const [currentPage, setCurrentPage] = React.useState(0);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const storedCustomerId = localStorage.getItem('customer_id');
         if (storedCustomerId) {
             setCustomerId(storedCustomerId);
