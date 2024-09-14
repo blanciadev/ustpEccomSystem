@@ -9,6 +9,18 @@ const ProductCard = ({ product, onAddToCart }) => {
         return <div>Product data is not available</div>;
     }
 
+    // Function to update product interaction
+    const handleProductInteraction = async (productId) => {
+        try {
+            await axios.get(`http://localhost:5000/products-interaction`, {
+                params: { product_id: productId }
+            });
+            console.log('Product interaction updated');
+        } catch (error) {
+            console.error('Error updating product interaction:', error.response ? error.response.data : error.message);
+        }
+    };
+
     return (
         <div className='procard' style={{ width: '22%', margin: '1%' }}>
             <div className='productimg' style={{ width: '100%', height: '65%' }}>
@@ -16,6 +28,7 @@ const ProductCard = ({ product, onAddToCart }) => {
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     src={product.image_url || 'https://via.placeholder.com/150'}
                     alt={product.product_name || 'Product Image'}
+                    onClick={() => handleProductInteraction(product.product_code)} // Trigger interaction on image click
                 />
             </div>
             <div className='productdesc' style={{ width: '100%', height: '35%' }}>
@@ -23,8 +36,10 @@ const ProductCard = ({ product, onAddToCart }) => {
                     <p>{product.product_name || 'No product name'}</p>
                     <p>Quantity: {product.quantity}</p> {/* Display quantity */}
                     <div className='order-options'>
-                        <button onClick={() => onAddToCart(product)}>Add to Cart</button>
-                        <button>Buy Now</button>
+                        <button onClick={() => { handleProductInteraction(product.product_code); onAddToCart(product); }}>
+                            Add to Cart
+                        </button>
+                        <button onClick={() => handleProductInteraction(product.product_code)}>Buy Now</button>
                     </div>
                 </div>
             </div>
