@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import { cartEventEmitter } from './eventEmitter'; // Import the event emitter
@@ -10,10 +10,10 @@ const ProductCard = ({ product, onAddToCart }) => {
     }
 
     // Function to update product interaction
-    const handleProductInteraction = async (productId) => {
+    const handleProductInteraction = async (productCode) => {
         try {
-            await axios.get(`http://localhost:5000/products-interaction`, {
-                params: { product_id: productId }
+            await axios.get('http://localhost:5000/products-interaction', {
+                params: { product_code: productCode } // Send product_code as a query parameter
             });
             console.log('Product interaction updated');
         } catch (error) {
@@ -77,13 +77,13 @@ const shuffleArray = (array) => {
 const PAGE_SIZE = 4; // Number of products per page (e.g., 4 products per row)
 
 const ProductList = () => {
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [customerId, setCustomerId] = useState(null);
-    const [currentPage, setCurrentPage] = useState(0);
+    const [products, setProducts] = React.useState([]);
+    const [loading, setLoading] = React.useState(true);
+    const [error, setError] = React.useState(null);
+    const [customerId, setCustomerId] = React.useState(null);
+    const [currentPage, setCurrentPage] = React.useState(0);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const storedCustomerId = localStorage.getItem('customer_id');
         if (storedCustomerId) {
             setCustomerId(storedCustomerId);

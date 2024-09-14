@@ -56,12 +56,11 @@ WHERE
     }
 });
 
-
 // Route to update product interaction count
 router.get('/products-interaction', async (req, res) => {
-    const { product_id } = req.query; // Get product_id from the query params
-    if (!product_id) {
-        return res.status(400).json({ error: 'Product ID is required' });
+    const { product_code } = req.query; // Get product_code from the query params
+    if (!product_code) {
+        return res.status(400).json({ error: 'Product code is required' });
     }
 
     try {
@@ -70,7 +69,7 @@ router.get('/products-interaction', async (req, res) => {
             UPDATE product
             SET interaction_count = interaction_count + 1
             WHERE product_code = ?
-        `, [product_id]);
+        `, [product_code]);
 
         // Respond with a success message
         res.json({ success: true, message: 'Product interaction updated' });
@@ -79,6 +78,28 @@ router.get('/products-interaction', async (req, res) => {
         res.status(500).json({ error: 'Error updating product interaction' });
     }
 });
+
+// Route to get top 4 user-picked products
+router.get('/products-top-picks', async (req, res) => {
+    try {
+        // Fetch the top 4 products based on the highest interaction count
+        const [rows] = await db.query(`
+            SELECT product_id, product_code, product_name, price, description, quantity, interaction_count
+            FROM product
+            ORDER BY interaction_count DESC
+            LIMIT 4
+        `);
+
+        // Respond with top picked products
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching top user picks:', error);
+        res.status(500).send('Error fetching top user picks');
+    }
+});
+
+
+
 
 
 router.get('/products', async (req, res) => {
