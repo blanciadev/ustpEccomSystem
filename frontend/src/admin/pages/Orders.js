@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import { Dropdown, Pagination } from 'react-bootstrap';
+import Pagination from 'react-bootstrap/Pagination';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../admin.css'
 import AdminNav from '../components/AdminNav'
@@ -23,7 +23,7 @@ const Orders = () => {
         <div className='dash-board'>
             <div className='dash-header'>
                 <div className='header-title'>
-                    <i class='bx bx-notepad' ></i>
+                    <i class='bx bxs-package' ></i>
                     <h1>Orders</h1>
                 </div>
                 <AdminHeader/>
@@ -43,7 +43,7 @@ const Orders = () => {
                       <button>Print Order Summary</button>
                     </div>
                     <div className='order-sort'>
-                      <label for="cars">Sort By</label>
+                      <label for="sort">Sort By</label>
 
                       <select name="sort" id="sort">
                         <option value="date">Date</option>

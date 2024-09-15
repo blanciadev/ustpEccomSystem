@@ -1,6 +1,6 @@
 import React from 'react'
 import '../admin.css'
-import { Dropdown } from 'react-bootstrap';
+import Dropdown from 'react-bootstrap/Dropdown';
 
 const AdminHeader = () => {
   return (

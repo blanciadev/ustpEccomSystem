@@ -58,6 +58,8 @@ const options = {
         display: false,
         text: 'Month',
       },
+      barPercentage: 0.1,
+      categoryPercentage: 0.7
     },
     y: {
       title: {

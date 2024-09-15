@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {Pagination } from 'react-bootstrap';
+import Pagination from 'react-bootstrap/Pagination';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../admin.css'
 import AdminNav from '../components/AdminNav'
@@ -23,7 +23,7 @@ const Payments = () => {
         <div className='dash-board'>
             <div className='dash-header'>
                 <div className='header-title'>
-                    <i class='bx bx-notepad' ></i>
+                    <i class='bx bxs-wallet' ></i>
                     <h1>Payments</h1>
                 </div>
                 <AdminHeader/>
