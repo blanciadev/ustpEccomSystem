@@ -221,4 +221,29 @@ router.post('/update-customer-details/:customer_id', authenticateToken, async (r
     }
 });
 
+
+// Route to get order history for a user
+router.get('/order-history', authenticateToken, async (req, res) => {
+    try {
+        const { customer_id } = req.user; // Get customer_id from authenticated user
+        
+        // Query to fetch order history
+        const [orders] = await db.query(`
+            SELECT o.order_id, o.order_date, o.total_price, od.product_id, od.quantity, od.total_price AS item_total
+            FROM \`order\` o
+            JOIN \`order_details\` od ON o.order_id = od.order_id
+            WHERE o.customer_id = ?
+            ORDER BY o.order_date DESC
+        `, [customer_id]);
+
+        // Format the data if necessary
+        res.json(orders);
+    } catch (error) {
+        console.error('Error fetching order history:', error.message);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+
+
 module.exports = router;
