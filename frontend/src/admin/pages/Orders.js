@@ -32,35 +32,6 @@ const Orders = () => {
     fetchOrders();
   }, [status]);
 
-  useEffect(() => {
-    // Establish SSE connection
-    const eventSource = new EventSource('http://localhost:5000/events');
-
-    eventSource.onmessage = (event) => {
-      const { orderId, newStatus } = JSON.parse(event.data);
-      console.log('Order update received:', orderId, newStatus);
-
-      // Update the orders state with the new status
-      setOrders(prevOrders =>
-        prevOrders.map(order =>
-          order.order_id === orderId
-            ? { ...order, order_status: newStatus }
-            : order
-        )
-      );
-    };
-
-    eventSource.onerror = (error) => {
-      console.error('SSE Error:', error);
-      eventSource.close();
-    };
-
-    // Clean up SSE connection on component unmount
-    return () => {
-      eventSource.close();
-    };
-  }, []);
-
   const handleOpenModal = (order) => {
     setSelectedOrder(order);
     setModalShow(true);
