@@ -10,8 +10,11 @@ const Navigation = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
 
+    // Fetch cart item count
     const fetchCartItemCount = async () => {
         const token = localStorage.getItem('token');
+        if (!token) return;
+
         try {
             const response = await axios.get('http://localhost:5000/cart-item-count', {
                 headers: { Authorization: `Bearer ${token}` }
@@ -24,8 +27,14 @@ const Navigation = () => {
         }
     };
 
+    // Validate token and user session
     const validateToken = async () => {
         const token = localStorage.getItem('token');
+        if (!token) {
+            setIsLoggedIn(false);
+            return;
+        }
+
         try {
             const response = await axios.get('http://localhost:5000/validate-token', {
                 headers: { Authorization: `Bearer ${token}` }
@@ -34,7 +43,7 @@ const Navigation = () => {
                 setIsLoggedIn(true);
                 setUsername(localStorage.getItem('username') || '');
                 setFirstName(localStorage.getItem('first_name') || ''); // Retrieve first_name
-                fetchCartItemCount();
+                fetchCartItemCount(); // Fetch cart count on valid session
             } else {
                 setIsLoggedIn(false);
             }
@@ -44,14 +53,20 @@ const Navigation = () => {
         }
     };
 
+    // Set up event listener for cart updates
     useEffect(() => {
         validateToken();
+
+        // Subscribe to cart updates
         cartEventEmitter.on('cartUpdated', fetchCartItemCount);
+
+        // Cleanup event listener on component unmount
         return () => {
             cartEventEmitter.off('cartUpdated', fetchCartItemCount);
         };
     }, []);
 
+    // Handle user logout
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user_id');
@@ -63,6 +78,7 @@ const Navigation = () => {
         navigate('/login');
     };
 
+    // Navigate to cart or login if not logged in
     const handleCartClick = () => {
         if (isLoggedIn) {
             navigate('/cart');
@@ -71,8 +87,14 @@ const Navigation = () => {
         }
     };
 
+    // Handle profile click to navigate to transaction page
+    const handleProfileClick = () => {
+        navigate('/user/purchase');
+    };
+
+    // Define navigation links
     const commonLinks = [
-        { id: 1, page: "Shop", link: "/" },
+        { id: 1, page: "Shop", link: "/shop" },
         { id: 2, page: "About Us", link: "/about-us" },
         { id: 3, page: `Cart (${cartItemCount})`, link: "#" }
     ];
@@ -109,7 +131,7 @@ const Navigation = () => {
                         </>
                     ) : (
                         <>
-                            <li><span>Hi! {firstName}</span></li>
+                            <li><span onClick={handleProfileClick}>Hi! {firstName}</span></li>
                             <li><button onClick={handleLogout}>Logout</button></li>
                         </>
                     )}

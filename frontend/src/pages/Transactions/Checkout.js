@@ -23,9 +23,9 @@ const Checkout = () => {
     postalCode: '',
     paymentMethod: '',
   });
-  const [loading, setLoading] = useState(false); // Loading state
-  const [error, setError] = useState(''); // Error state
-  const [success, setSuccess] = useState(''); // Success state
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -70,14 +70,18 @@ const Checkout = () => {
         return;
       }
 
-      // Prepare order data
       const orderData = {
         customer_id: customerId,
-        order_date: new Date().toISOString(), // Current date-time
+        order_date: new Date().toISOString(),
         order_details: selectedProducts.map(product => ({
           product_id: product.product_code,
           quantity: product.quantity,
+          totalprice: product.price * product.quantity, // Add total price here
+          payment_date: new Date().toISOString(), // Set payment_date to current date
+          payment_method: formData.paymentMethod, // Use payment method from form
+          payment_status: 'Pending', // Default payment status
         })),
+        total_price: totalPrice // Include total price for order summary
       };
 
       const response = await axios.post(
@@ -93,7 +97,7 @@ const Checkout = () => {
 
       if (response.status === 201) {
         setSuccess('Order placed successfully!');
-        navigate('/some-success-page'); // Navigate to a success page or order summary
+        navigate('/order-success'); // Navigate to a success page or order summary
       }
     } catch (error) {
       console.error('Error placing order:', error.message);
@@ -221,7 +225,8 @@ const Checkout = () => {
               ) : (
                 <p>No products selected.</p>
               )}
-            </ul><br></br>
+            </ul>
+            <br />
             <h4>Total: ₱ {totalPrice}</h4>
           </div>
         </div>

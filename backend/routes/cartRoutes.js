@@ -24,6 +24,7 @@ async function authenticateToken(req, res, next) {
         res.status(500).json({ message: 'Internal server error' });
     }
 }
+
 // Route to add product to cart
 router.post('/add-to-cart', authenticateToken, async (req, res) => {
     const { product_code, quantity } = req.body;
@@ -98,6 +99,8 @@ router.get('/cart-item-count', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+
 router.get('/cart', authenticateToken, async (req, res) => {
     const { user_id } = req;
 

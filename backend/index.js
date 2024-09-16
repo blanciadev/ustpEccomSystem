@@ -6,15 +6,18 @@ const cors = require('cors');
 
 // const crypto = require('crypto'); // For generating random tokens
 
-const PORT = process.env.PORT || 5001;
+// Angela Port
+// const PORT = process.env.PORT || 5001;
 
+//Kurt Port
+const PORT = process.env.PORT || 5000;
 
 const cartRoutes = require('./routes/cartRoutes');
 const customerSignUpRoutes = require('./routes/customerSignUpRoutes');
 const customerLoginRoutes = require('./routes/customerLoginRoutes');
 const productRoutes = require('./routes/productsRoutes.js');
 const OrderRoutes = require('./routes/orderRoutes.js');
-
+const viewTransactionsRoute = require('./routes/viewTransactionsRoute.js');
 
 app.use(cors());
 
@@ -29,6 +32,9 @@ app.use('/', customerSignUpRoutes);
 app.use('/', customerLoginRoutes);
 app.use('/', productRoutes);
 app.use('/', OrderRoutes);
+app.use('/', viewTransactionsRoute);
+
+
 
 // Token validation 
 app.get('/validate-token', async (req, res) => {
