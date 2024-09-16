@@ -18,6 +18,8 @@ const customerLoginRoutes = require('./routes/customerLoginRoutes');
 const productRoutes = require('./routes/productsRoutes.js');
 const OrderRoutes = require('./routes/orderRoutes.js');
 const viewTransactionsRoute = require('./routes/viewTransactionsRoute.js');
+const adminOrderHistory = require('./routes/adminOrderHistory.js');
+const adminOrderUpdates = require('./routes/adminOrderUpdates.js');
 
 app.use(cors());
 
@@ -34,6 +36,9 @@ app.use('/', productRoutes);
 app.use('/', OrderRoutes);
 app.use('/', viewTransactionsRoute);
 
+
+app.use('/', adminOrderHistory);
+app.use('/', adminOrderUpdates);
 
 
 // Token validation 
@@ -52,7 +57,6 @@ app.get('/validate-token', async (req, res) => {
         if (rows.length === 0) {
             return res.status(401).json({ message: 'Invalid or expired token' });
         }
-
         const user = rows[0];
         res.json({ username: user.username });
     } catch (err) {
@@ -60,6 +64,7 @@ app.get('/validate-token', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
 
 
 app.listen(PORT, () => {
