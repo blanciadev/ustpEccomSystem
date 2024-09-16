@@ -1,5 +1,4 @@
-import React, {useState} from 'react'
-import Pagination from 'react-bootstrap/Pagination';
+import React, { useState, useEffect } from 'react'; // Include useEffect here
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../admin.css';
 import AdminNav from '../components/AdminNav';
