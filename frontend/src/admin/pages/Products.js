@@ -111,81 +111,83 @@ const Products = () => {
                         </div>
                         <TopProduct/>
                     </div>
+
                     <div className='product-two'>
                         {/* table */}
                         <div className='order-header'>
-                  <div className='order-search'>
-                    <form>
-                      <input type='search'/>
-                      <button>Search</button>
-                    </form>
-                  </div>
+                            <div className='order-search'>
+                                <form>
+                                <input type='search'/>
+                                <button>Search</button>
+                                </form>
+                            </div>
 
-                  <div className='order-options'>
-                    <div className='order-print'>
-                      <button>Print Order Summary</button>
-                    </div>
-                    <div className='order-sort'>
-                      <label for="sort">Sort By</label>
+                            <div className='order-options'>
+                                <div className='order-print'>
+                                <button>Add New Product</button>
+                                </div>
+                                <div className='order-sort'>
+                                <label for="sort">Sort By</label>
 
-                      <select name="sort" id="sort">
-                        <option value="date">Date</option>
-                        <option value="status">Status</option>
-                        <option value="id">ID</option>
-                        <option value="customer-id">customer</option>
-                      </select>
-                    </div>
-                    
-                  </div>
+                                <select name="sort" id="sort">
+                                    <option value="date">Date</option>
+                                    <option value="status">Status</option>
+                                    <option value="id">ID</option>
+                                    <option value="customer-id">customer</option>
+                                </select>
+                                </div>
+                                
+                            </div>
+                            </div>
+                            <div className='order-table'>
+                            <table>
+                            <thead>
+                                <tr>
+                                <th><input type='checkbox'/></th>
+                                <th>Product Code</th>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td><input type='checkbox'/></td>
+                                <td>Product Code</td>
+                                <td>Product</td>
+                                <td>Category</td>
+                                <td>Quantity</td>
+                                <td>Price</td>
+                                <td>Status</td>
+                                <td><button>Update</button></td>
+                                </tr>
+                                
+                            </tbody>
+                            </table>
+
+                            </div>
+                            <div className='pagination-container'>
+                            <Pagination>
+                                <Pagination.First onClick={() => handlePageChange(1)} disabled={currentPage === 1} />
+                                <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
+                                {[...Array(totalPages).keys()].map(pageNumber => (
+                                <Pagination.Item
+                                    key={pageNumber + 1}
+                                    active={pageNumber + 1 === currentPage}
+                                    onClick={() => handlePageChange(pageNumber + 1)}
+                                >
+                                    {pageNumber + 1}
+                                </Pagination.Item>
+                                ))}
+                                <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
+                                <Pagination.Last onClick={() => handlePageChange(totalPages)} disabled={currentPage === totalPages} />
+                            </Pagination>
+                            </div>
+                        </div>
                 </div>
-                <div className='order-table'>
-                <table>
-                  <thead>
-                    <tr>
-                      <th><input type='checkbox'/></th>
-                      <th>Order ID</th>
-                      <th>Customer ID</th>
-                      <th>Order Date</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  <tr>
-                      <td><input type='checkbox'/></td>
-                      <td>Order ID</td>
-                      <td>Customer ID</td>
-                      <td>Order Date</td>
-                      <td>Status</td>
-                      <td><button>View</button></td>
-                    </tr>
-                    
-                  </tbody>
-                </table>
-
-                </div>
-                <div className='pagination-container'>
-                  <Pagination>
-                    <Pagination.First onClick={() => handlePageChange(1)} disabled={currentPage === 1} />
-                    <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
-                    {[...Array(totalPages).keys()].map(pageNumber => (
-                      <Pagination.Item
-                        key={pageNumber + 1}
-                        active={pageNumber + 1 === currentPage}
-                        onClick={() => handlePageChange(pageNumber + 1)}
-                      >
-                        {pageNumber + 1}
-                      </Pagination.Item>
-                    ))}
-                    <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
-                    <Pagination.Last onClick={() => handlePageChange(totalPages)} disabled={currentPage === totalPages} />
-                  </Pagination>
-                </div>
-              </div>
-
-
-                </div>
-
             </div>
         </div>
     </div>

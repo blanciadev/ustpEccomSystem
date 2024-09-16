@@ -25,9 +25,6 @@ const TopProduct = () => {
             <div className='title'>
                 <h5>Top Products</h5>
             </div> 
-            <div className='see-all'>
-                <button>See all</button>
-            </div>
         </div>
         <div className='product-table'>
           <table>

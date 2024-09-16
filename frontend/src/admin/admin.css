@@ -464,7 +464,7 @@
   }
   
 .product-table th, .product-table td {
-    padding: 7px;
+    padding: 3px;
     text-align: left;
     border-bottom: 1px solid #2828287e;
   }
@@ -498,7 +498,7 @@
 
 .top-products  .header{
     width: 100%;
-    height: 15%;
+    height: 10%;
     /* background-color: brown; */
     display: flex;
     justify-content: space-between;
@@ -519,14 +519,14 @@
     align-items: center;
     justify-content: center;
 }
-.top-products .see-all button{
+/* .top-products .see-all button{
     width: 90%;
     height: 85%;
     background-color: white;
     border: 1px solid black;
     border-radius: 7px;
 
-}
+} */
 .top-products .title p{
     color: #535353;
 }
