@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './Shop.css'; // Import CSS file
 import Navigation from '../../components/Navigation';
-import { cartEventEmitter } from '../../components/eventEmitter'; 
+import { cartEventEmitter } from '../../components/eventEmitter';
 
 const Shop = () => {
     const [products, setProducts] = useState([]);
@@ -96,37 +96,37 @@ const Shop = () => {
     };
 
     const handleAddToCart = async (product) => {
-    const token = localStorage.getItem('token');
-    const userId = localStorage.getItem('customer_id');
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('customer_id');
 
-    if (!token || !userId) {
-        console.log('User not logged in or user ID missing');
-        return;
-    }
+        if (!token || !userId) {
+            console.log('User not logged in or user ID missing');
+            return;
+        }
 
-    try {
-        await axios.post(
-            'http://localhost:5000/add-to-cart',
-            {
+        try {
+            await axios.post(
+                'http://localhost:5000/add-to-cart',
+                {
+                    product_code: product.product_code,
+                    quantity: 1 // Adjust quantity as needed
+                },
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+
+            console.log('Product added to cart');
+
+            // Emit cart updated event with product info and quantity
+            cartEventEmitter.emit('cartUpdated', {
                 product_code: product.product_code,
-                quantity: 1 // Adjust quantity as needed
-            },
-            {
-                headers: { Authorization: `Bearer ${token}` }
-            }
-        );
-
-        console.log('Product added to cart');
-        
-        // Emit cart updated event with product info and quantity
-        cartEventEmitter.emit('cartUpdated', {
-            product_code: product.product_code,
-            quantity: 1
-        });
-    } catch (error) {
-        console.error('Error adding product to cart:', error.response ? error.response.data : error.message);
-    }
-};
+                quantity: 1
+            });
+        } catch (error) {
+            console.error('Error adding product to cart:', error.response ? error.response.data : error.message);
+        }
+    };
 
 
     const groupProductsByCategory = (products) => {
