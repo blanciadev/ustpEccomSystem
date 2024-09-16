@@ -3,8 +3,6 @@ const router = express.Router();
 const db = require('../db');
 
 
-
-
 // Route to update order status and subtract quantity if status is 'To Ship'
 router.put('/update-order-status/:orderId', async (req, res) => {
     const { orderId } = req.params;
@@ -93,6 +91,7 @@ router.get('/admin-order-history', async (req, res) => {
                 order_details.payment_method, 
                 order_details.total_price, 
                 order_details.quantity, 
+                order_details.payment_status, 
                 product.price, 
                 customer.customer_id,   
                 customer.first_name, 
@@ -133,6 +132,8 @@ router.get('/admin-order-history', async (req, res) => {
                     order_date: order.order_date,
                     order_total: order.order_total,
                     order_status: order.order_status,
+                    payment_status: order.payment_status,
+                    payment_method: order.payment_method,
                     customer_id: order.customer_id,
                     customer_first_name: order.first_name,
                     customer_last_name: order.last_name,
@@ -140,11 +141,13 @@ router.get('/admin-order-history', async (req, res) => {
                 };
             }
             acc[order.order_id].products.push({
-                product_id: order.product_id,  // Include product_id
+                product_id: order.product_id,  
                 product_name: order.product_name,
                 price: order.price,
                 quantity: order.quantity,
-                item_total: order.total_price
+                item_total: order.total_price,
+                payment_status: order.payment_status,
+                payment_method: order.payment_method,
             });
             return acc;
         }, {});
