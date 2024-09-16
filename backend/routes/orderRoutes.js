@@ -222,24 +222,94 @@ router.post('/update-customer-details/:customer_id', authenticateToken, async (r
 });
 
 
-// Route to get order history for a user
+// Route to get order history for a user with optional status filter
 router.get('/order-history', authenticateToken, async (req, res) => {
     try {
         const { customer_id } = req.user; // Get customer_id from authenticated user
-        
-        // Query to fetch order history
-        const [orders] = await db.query(`
-            SELECT o.order_id, o.order_date, o.total_price, od.product_id, od.quantity, od.total_price AS item_total
-            FROM \`order\` o
-            JOIN \`order_details\` od ON o.order_id = od.order_id
-            WHERE o.customer_id = ?
-            ORDER BY o.order_date DESC
-        `, [customer_id]);
+        const { status } = req.query; // Get the order status from query parameter
 
-        // Format the data if necessary
-        res.json(orders);
+        // Base query to fetch order history along with product details
+        let query = `
+            SELECT
+                o.order_id, 
+                o.order_date, 
+                o.total_price AS order_total, 
+                od.product_id, 
+                p.product_name, 
+                p.price,
+                od.quantity, 
+                od.order_status,
+                od.total_price AS item_total, 
+                od.payment_method
+            FROM
+                \`order\` o
+            INNER JOIN
+                \`order_details\` od
+            ON 
+                o.order_id = od.order_id
+            INNER JOIN
+                \`product\` p
+            ON 
+                od.product_id = p.product_code
+            WHERE
+                o.customer_id = ?
+        `;
+
+        // Append filter condition if status is provided
+        if (status) {
+            query += ` AND od.order_status = ?`;
+        }
+
+        query += ` ORDER BY o.order_date DESC`;
+
+        // Execute query
+        const [orders] = await db.query(query, status ? [customer_id, status] : [customer_id]);
+
+        // Process the results to group products by order_id
+        const groupedOrders = orders.reduce((acc, order) => {
+            if (!acc[order.order_id]) {
+                acc[order.order_id] = {
+                    order_id: order.order_id,
+                    order_date: order.order_date,
+                    order_total: order.order_total,
+                    order_status: order.order_status, // Include order_status here
+                    products: []
+                };
+            }
+            acc[order.order_id].products.push({
+                product_name: order.product_name,
+                price: order.price,
+                quantity: order.quantity,
+                item_total: order.item_total
+            });
+            return acc;
+        }, {});
+
+
+        res.json(Object.values(groupedOrders));
+
     } catch (error) {
         console.error('Error fetching order history:', error.message);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+
+// Route to cancel an order
+router.post('/cancel-order', authenticateToken, async (req, res) => {
+    try {
+        const { order_id } = req.body; // Get order_id from request body
+
+        // Update order status to 'Cancelled'
+        await db.query(`
+            UPDATE \`order_details\`
+            SET order_status = 'Cancelled'
+            WHERE order_id = ?
+        `, [order_id]);
+
+        res.json({ message: 'Order has been cancelled' });
+    } catch (error) {
+        console.error('Error cancelling order:', error.message);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
