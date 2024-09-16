@@ -1,4 +1,5 @@
 import React from 'react'
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../admin.css'
 import AdminNav from '../components/AdminNav'
@@ -21,7 +22,6 @@ const Reports = () => {
             </div>
         </div>
     </div>
-  )
-}
+
 
 export default Reports

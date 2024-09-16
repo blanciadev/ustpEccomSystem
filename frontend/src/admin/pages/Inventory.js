@@ -21,7 +21,6 @@ const Inventory = () => {
             </div>
         </div>
     </div>
-  )
-}
+
 
 export default Inventory

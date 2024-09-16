@@ -1,3 +1,4 @@
+
 import React, {useState} from 'react'
 import Pagination from 'react-bootstrap/Pagination';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -103,7 +104,6 @@ const Orders = () => {
             </div>
         </div>
     </div>
-  )
-}
+
 
 export default Orders
