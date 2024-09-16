@@ -10,6 +10,8 @@ import PaymentInsight from './components/PaymentInsight';
 import AverageOrders from './components/AverageOrders';
 import OrderProcessing from './components/OrderProcessing';
 import TopProduct from './components/TopProduct';
+import AdminHeader from './components/AdminHeader';
+
 
 const Dashboard = () => {
   return (
@@ -18,8 +20,12 @@ const Dashboard = () => {
         <div className='dash-board'>
             <div className='dash-header'>
                 <div className='header-title'>
+                    <i class='bx bxs-dashboard' ></i>
                     <h1>Dashboard</h1>
                 </div>
+
+                <AdminHeader/>
+
                 <div className='header-user'>
                     <div className='noti'>
                         <div className='bell-con'>
@@ -43,6 +49,7 @@ const Dashboard = () => {
                         
                     </div>
                 </div>
+
             </div>
             <div className='dash-body'>
 

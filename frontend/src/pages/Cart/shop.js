@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './Shop.css'; // Import CSS file
 import Navigation from '../../components/Navigation';
-import cartEventEmitter from '../../components/cartEventEmitter'; // Adjust the path as needed
+import { cartEventEmitter } from '../../components/eventEmitter';
 
 const Shop = () => {
     const [products, setProducts] = useState([]);
@@ -117,6 +117,8 @@ const Shop = () => {
             );
 
             console.log('Product added to cart');
+
+            // Emit cart updated event with product info and quantity
             cartEventEmitter.emit('cartUpdated', {
                 product_code: product.product_code,
                 quantity: 1
@@ -125,6 +127,7 @@ const Shop = () => {
             console.error('Error adding product to cart:', error.response ? error.response.data : error.message);
         }
     };
+
 
     const groupProductsByCategory = (products) => {
         return products.reduce((categories, product) => {
