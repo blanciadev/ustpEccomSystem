@@ -3,13 +3,29 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 
 const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
-    const [status, setStatus] = useState(order ? order.order_status : '');
+    const [status, setStatus] = useState(order ? order.order_status : ''); // Initialize with current status
     const [loading, setLoading] = useState(false);
 
     const handleUpdate = async () => {
         setLoading(true);
         try {
-            await axios.put(`http://localhost:5000/update-order-status/${order.order_id}`, { status });
+            const products = order.products.map((product) => ({
+                product_id: product.product_id, // Make sure this is defined
+                quantity: product.quantity,
+            }));
+        
+            // Ensure status is not empty
+            if (!status) {
+                alert('Please select a valid status');
+                setLoading(false);
+                return;
+            }
+        
+            await axios.put(`http://localhost:5000/update-order-status/${order.order_id}`, {
+                status,
+                products
+            });
+            
             alert('Order status updated successfully');
             refreshOrders(); // Call refreshOrders to update the orders list
             handleClose();
@@ -19,6 +35,7 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
             setLoading(false);
         }
     };
+    
 
     return (
         <div className={`modal fade ${show ? 'show' : ''}`} tabIndex="-1" role="dialog" style={{ display: show ? 'block' : 'none' }}>
@@ -35,6 +52,7 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                             <div>
                                 <p><strong>Order ID:</strong> {order.order_id}</p>
                                 <p><strong>Customer ID:</strong> {order.customer_id}</p>
+                                <p><strong>Product ID:</strong> {order.product_id}</p>
                                 <p><strong>Customer Name:</strong> {`${order.customer_first_name} ${order.customer_last_name}`}</p>
                                 <p><strong>Order Date:</strong> {new Date(order.order_date).toLocaleDateString()}</p>
                                 <p><strong>Current Status:</strong> {order.order_status}</p>
@@ -42,6 +60,7 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                                 <div>
                                     <label htmlFor="status">Update Status:</label>
                                     <select id="status" value={status} onChange={(e) => setStatus(e.target.value)}>
+                                        <option value="">Select a status</option>
                                         <option value="To Ship">To Ship</option>
                                         <option value="To Receive">To Receive</option>
                                         <option value="Completed">Completed</option>
@@ -64,10 +83,11 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                                     <tbody>
                                         {order.products.map((product, index) => (
                                             <tr key={index}>
+                                                
                                                 <td>{product.product_name}</td>
-                                                <td>${product.price ? product.price.toFixed(2) : 'N/A'}</td>
+                                                <td>P{product.price ? product.price.toFixed(2) : 'N/A'}</td>
                                                 <td>{product.quantity}</td>
-                                                <td>${(product.price && product.quantity ? (product.price * product.quantity).toFixed(2) : 'N/A')}</td>
+                                                <td>P{(product.price && product.quantity ? (product.price * product.quantity).toFixed(2) : 'N/A')}</td>
                                             </tr>
                                         ))}
                                     </tbody>
