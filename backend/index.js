@@ -20,6 +20,7 @@ const OrderRoutes = require('./routes/orderRoutes.js');
 const viewTransactionsRoute = require('./routes/viewTransactionsRoute.js');
 const adminOrderHistory = require('./routes/adminOrderHistory.js');
 const adminOrderUpdates = require('./routes/adminOrderUpdates.js');
+const adminProduct = require('./routes/adminProduct.js');
 
 app.use(cors());
 
@@ -39,7 +40,7 @@ app.use('/', viewTransactionsRoute);
 
 app.use('/', adminOrderHistory);
 app.use('/', adminOrderUpdates);
-
+app.use('/', adminProduct);
 
 // Token validation 
 app.get('/validate-token', async (req, res) => {

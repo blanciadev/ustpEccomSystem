@@ -32,49 +32,71 @@ router.post('/add-to-cart', authenticateToken, async (req, res) => {
     // Extract user_id from request object
     const { user_id } = req;
 
-    console.log('Received request to add product to cart:');
-    console.log('User ID:', user_id);
-    console.log('Product Code:', product_code); // Correctly log product_code
-    console.log('Quantity:', quantity);
+    console.log('--- New request to add product to cart ---');
+    console.log(`User ID: ${user_id}`);
+    console.log(`Product Code: ${product_code}`);
+    console.log(`Quantity: ${quantity}`);
 
     // Validate inputs
     if (!user_id || !product_code || !quantity) {
+        console.error('Validation failed: Missing user_id, product_code, or quantity.');
         return res.status(400).json({ error: 'User ID, Product Code, and Quantity are required' });
     }
 
     try {
         // Ensure that the cart exists for the user
         const [[existingCart]] = await db.query('SELECT cart_id FROM cart WHERE customer_id = ?', [user_id]);
+        console.log('Existing cart found:', existingCart);
 
         if (!existingCart) {
             // Create a new cart if it doesn't exist
+            console.log('No existing cart found, creating a new one for user:', user_id);
             await db.query('INSERT INTO cart (customer_id) VALUES (?)', [user_id]);
+        } else {
+            console.log('Cart already exists for user:', user_id);
         }
 
-        // Insert the product into cart_items or update the quantity if it already exists
+        // Insert or update the product in the cart_items
         const insertOrUpdateQuery = `
             INSERT INTO cart_items (customer_id, product_code, quantity, status) 
             VALUES (?, ?, ?, 'Order Pending')
             ON DUPLICATE KEY UPDATE 
-                quantity = quantity + VALUES(quantity)  -- Increment the quantity of the existing product
+                quantity = quantity + VALUES(quantity)
         `;
         const queryParams = [user_id, product_code, quantity];
 
-        console.log('Executing query:', insertOrUpdateQuery);
+        console.log('Executing query to add/update cart items:', insertOrUpdateQuery);
         console.log('Query parameters:', queryParams);
 
         // Execute the query
         await db.query(insertOrUpdateQuery, queryParams);
+        console.log(`Successfully added/updated product ${product_code} in cart.`);
 
-        // Log success message
-        console.log('Product added to cart successfully!');
-        res.status(200).json({ message: 'Product added to cart successfully!' });
+        // Update the product's interaction_cart in the product table
+        const updateInteractionQuery = `
+            UPDATE product
+            SET interaction_cart = interaction_cart + 1
+            WHERE product_code = ?
+        `;
+        const interactionParams = [product_code];
+
+        console.log('Executing query to update interaction_cart for product:', product_code);
+        console.log('Query parameters:', interactionParams);
+
+        // Execute the interaction_cart increment query
+        await db.query(updateInteractionQuery, interactionParams);
+        console.log(`Successfully incremented interaction_cart for product ${product_code}.`);
+
+        // Success response
+        res.status(200).json({ message: 'Product added to cart and interaction count updated successfully!' });
+        console.log('--- Request successfully completed ---');
     } catch (err) {
         // Log the error
-        console.error('Error adding product to cart:', err.message);
+        console.error('Error during add-to-cart process:', err.message);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
 
 
 
