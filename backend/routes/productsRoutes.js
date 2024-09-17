@@ -18,7 +18,7 @@ router.get('/product-user', async (req, res) => {
     p.product_code,
     p.product_name,
     p.description,
-    p.brand,
+
     p.price,
     p.size,
     p.expiration_date,

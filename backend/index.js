@@ -44,7 +44,6 @@ app.use('/', adminProduct);
 
 // Token validation 
 app.get('/validate-token', async (req, res) => {
-
     // Extract token from 'Authorization' header
     const token = req.headers.authorization?.split(' ')[1];
 
