@@ -397,7 +397,7 @@
 }
 
 .two-col {
-    width: 96%;
+    width: 95%;
     height: 25%;
    
     display: flex;
@@ -468,7 +468,7 @@
     text-align: left;
     border-bottom: 1px solid #2828287e;
   }
-  
+
   .product-table th {
     background-color: #ffffff;
     color: #535353;
