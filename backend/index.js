@@ -24,6 +24,7 @@ const userInteraction = require('./routes/userInteraction.js');
 const adminOrderHistory = require('./routes/adminOrderHistory.js');
 const adminOrderUpdates = require('./routes/adminOrderUpdates.js');
 const adminProduct = require('./routes/adminProduct.js');
+const adminProductUpdate = require('./routes/adminProductUpdates.js');
 
 app.use(cors());
 
@@ -45,6 +46,13 @@ app.use('/', userInteraction);
 app.use('/', adminOrderHistory);
 app.use('/', adminOrderUpdates);
 app.use('/', adminProduct);
+app.use('/', adminProductUpdate);
+
+
+
+
+
+
 
 // Token validation
 app.get('/validate-token', async (req, res) => {

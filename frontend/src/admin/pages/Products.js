@@ -6,6 +6,8 @@ import AdminNav from '../components/AdminNav';
 import AdminHeader from '../components/AdminHeader';
 import TopProduct from '../components/TopProduct';
 import axios from 'axios';
+import { Button } from 'react-bootstrap';
+import AddProductModal from '../components/AddProductModal';  // Import the AddProductModal
 
 const Products = () => {
   const [bestSellingCount, setBestSellingCount] = useState(0);
@@ -19,45 +21,54 @@ const Products = () => {
   const [discontinuedCount, setDiscontinuedCount] = useState(0);
   const [discontinuedQuantity, setDiscontinuedQuantity] = useState(0);
 
+  const [showModal, setShowModal] = useState(false);  // State to manage modal visibility
 
+  const handleShowModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
 
+  const handleAddProduct = async (productData) => {
+    try {
+      // Post the product data to your API
+      await axios.post('http://localhost:5000/add-product', productData);
+      // Refresh product data or update state as needed
+      fetchProductData();
+    } catch (error) {
+      console.error('Error adding product:', error);
+    }
+  };
 
+  const fetchProductData = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/admin-products-with-interaction');
+      const {
+        total,
+        totalQuantity,
+        products,
+        lowStockCount,
+        lowStockQuantity,
+        unpopularProducts,
+        outOfStockCount,
+        outOfStockQuantity,
+        discontinuedCount,
+        discontinuedQuantity
+      } = response.data;
 
-
+      setBestSellingCount(total);
+      setTotalQuantity(totalQuantity);
+      setLowStockCount(lowStockCount);
+      setLowStockQuantity(lowStockQuantity);
+      setProductNames(products);
+      setUnpopularProducts(unpopularProducts || []);
+      setOutOfStockCount(outOfStockCount);
+      setOutOfStockQuantity(outOfStockQuantity);
+      setDiscontinuedCount(discontinuedCount);
+      setDiscontinuedQuantity(discontinuedQuantity);
+    } catch (error) {
+      console.error('Error fetching product data:', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchProductData = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/admin-products-with-interaction');
-        const {
-          total,
-          totalQuantity,
-          products,
-          lowStockCount,
-          lowStockQuantity,
-          unpopularProducts,
-          outOfStockCount,
-          outOfStockQuantity,
-          discontinuedCount,
-          discontinuedQuantity
-        } = response.data;
-
-        setBestSellingCount(total);
-        setTotalQuantity(totalQuantity);
-        setLowStockCount(lowStockCount);
-        setLowStockQuantity(lowStockQuantity);
-        setProductNames(products);
-        setUnpopularProducts(unpopularProducts || []);
-        setOutOfStockCount(outOfStockCount);
-        setOutOfStockQuantity(outOfStockQuantity);
-        setDiscontinuedCount(discontinuedCount);
-        setDiscontinuedQuantity(discontinuedQuantity);
-      } catch (error) {
-        console.error('Error fetching product data:', error);
-      }
-    };
-
-
     fetchProductData();
   }, []);
 
@@ -84,7 +95,6 @@ const Products = () => {
                   </div>
                   <div>
                     <h6>Best Selling</h6>
-
                   </div>
                 </div>
 
@@ -95,7 +105,6 @@ const Products = () => {
                   </div>
                   <div>
                     <h6>Total Stock</h6>
-
                   </div>
                 </div>
 
@@ -106,7 +115,6 @@ const Products = () => {
                   </div>
                   <div>
                     <h6>Low Stock</h6>
-
                   </div>
                 </div>
 
@@ -117,15 +125,13 @@ const Products = () => {
                   </div>
                   <div>
                     <h6>Unpopular</h6>
-
                     <ul>
-                      {/* {unpopularProducts.map((product, index) => (
+                      {unpopularProducts.map((product, index) => (
                         <li key={index}>{product}</li>
-                      ))} */}
+                      ))}
                     </ul>
                   </div>
                 </div>
-
 
                 <div className='out-of-stock'>
                   <div className='qty'>
@@ -134,7 +140,6 @@ const Products = () => {
                   </div>
                   <div>
                     <h6>Out of Stock</h6>
-
                   </div>
                 </div>
 
@@ -145,16 +150,14 @@ const Products = () => {
                   </div>
                   <div>
                     <h6>Discontinued</h6>
-
                   </div>
                 </div>
-
               </div>
               <TopProduct />
             </div>
 
             <div className='product-two'>
-              {/* table */}
+              {/* Add Product Button */}
               <div className='order-header'>
                 <div className='order-search'>
                   <form>
@@ -168,16 +171,19 @@ const Products = () => {
                     <button>Print Order Summary</button>
                   </div>
                   <div className='order-sort'>
-                    <label for="sort">Sort By</label>
-
+                    <label htmlFor="sort">Sort By</label>
                     <select name="sort" id="sort">
                       <option value="date">Date</option>
                       <option value="status">Status</option>
                       <option value="id">ID</option>
-                      <option value="customer-id">customer</option>
+                      <option value="customer-id">Customer</option>
                     </select>
                   </div>
-
+                  <div className='order-add'>
+                    <Button variant="primary" onClick={handleShowModal}>
+                      Add Product
+                    </Button>
+                  </div>
                 </div>
               </div>
               <div className='order-table'>
@@ -201,20 +207,18 @@ const Products = () => {
                       <td>Status</td>
                       <td><button>View</button></td>
                     </tr>
-
                   </tbody>
                 </table>
-
               </div>
-
             </div>
-
-
           </div>
-
         </div>
       </div>
+
+      {/* Render the AddProductModal component */}
+      <AddProductModal show={showModal} handleClose={handleCloseModal} handleSubmit={handleAddProduct} />
     </div>
   );
 };
-export default Products
+
+export default Products;
