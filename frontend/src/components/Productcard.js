@@ -2,8 +2,9 @@ import React from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import { cartEventEmitter } from './eventEmitter';
+import ProductModal from './ProductModal';  // Import the modal
+import './modal.css';
 
-// Shuffle array function
 const shuffleArray = (array) => {
     let currentIndex = array.length, randomIndex;
 
@@ -16,10 +17,10 @@ const shuffleArray = (array) => {
     return array;
 };
 
-const PAGE_SIZE = 4; // Number of products per page 
+const PAGE_SIZE = 4;
 
 // ProductCard Component
-const ProductCard = React.memo(({ product, onAddToCart, onProductInteraction }) => {
+const ProductCard = React.memo(({ product, onAddToCart, onProductInteraction, onProductClick }) => {
     if (!product) {
         return <div>Product data is not available</div>;
     }
@@ -31,13 +32,13 @@ const ProductCard = React.memo(({ product, onAddToCart, onProductInteraction }) 
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     src={product.image_url || 'https://via.placeholder.com/150'}
                     alt={product.product_name || 'Product Image'}
-                    onClick={() => onProductInteraction(product.product_code, 'view')} // Trigger interaction on image click
+                    onClick={() => onProductClick(product)}  // Trigger modal on click
                 />
             </div>
             <div className='productdesc' style={{ width: '100%', height: '35%' }}>
                 <div className='product-data'>
                     <p>{product.product_name || 'No product name'}</p>
-                    <p>Quantity: {product.quantity}</p> {/* Display quantity */}
+                    <p>Quantity: {product.quantity}</p>
                     <div className='order-options'>
                         <button onClick={() => onAddToCart(product)}>Add to Cart</button>
                         <button onClick={() => onProductInteraction(product.product_code, 'view')}>Buy Now</button>
@@ -56,7 +57,8 @@ ProductCard.propTypes = {
         quantity: PropTypes.number
     }).isRequired,
     onAddToCart: PropTypes.func.isRequired,
-    onProductInteraction: PropTypes.func.isRequired
+    onProductInteraction: PropTypes.func.isRequired,
+    onProductClick: PropTypes.func.isRequired
 };
 
 // ProductList Component
@@ -67,6 +69,8 @@ const ProductList = () => {
     const [error, setError] = React.useState(null);
     const [customerId, setCustomerId] = React.useState(null);
     const [currentPage, setCurrentPage] = React.useState(0);
+    const [selectedProduct, setSelectedProduct] = React.useState(null); // Modal product state
+    const [isModalOpen, setIsModalOpen] = React.useState(false); // Modal visibility state
 
     React.useEffect(() => {
         const storedCustomerId = localStorage.getItem('customer_id');
@@ -164,6 +168,16 @@ const ProductList = () => {
         });
     };
 
+    const handleProductClick = (product) => {
+        setSelectedProduct(product); // Set product to be displayed in modal
+        setIsModalOpen(true); // Open modal
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false); // Close modal
+        setSelectedProduct(null); // Clear selected product
+    };
+
     if (loading) {
         return <div>Loading...</div>;
     }
@@ -184,39 +198,21 @@ const ProductList = () => {
                         product={product}
                         onAddToCart={handleAddToCart}
                         onProductInteraction={handleProductInteraction}
+                        onProductClick={handleProductClick}  // Pass down the click handler for modal
                     />
                 ))}
             </div>
-            <div className='pagination-controls' style={{ marginTop: '20px', textAlign: 'center' }}>
-                <button
-                    onClick={() => handlePageChange(-1)}
-                    disabled={currentPage === 0}
-                >
-                    Previous
-                </button>
-                <span> Page {currentPage + 1} </span>
-                <button
-                    onClick={() => handlePageChange(1)}
-                    disabled={(currentPage + 1) * PAGE_SIZE >= products.length}
-                >
-                    Next
-                </button>
-            </div><br></br>
-            {recommendedProducts.length > 0 && (
-                <>
-                    <h2>Recommended Products</h2>
-                    <div className='recommended-products' style={{ display: 'flex', flexWrap: 'nowrap', overflowX: 'auto' }}>
-                        {recommendedProducts.map((product) => (
-                            <ProductCard
-                                key={product.product_code}
-                                product={product}
-                                onAddToCart={handleAddToCart}
-                                onProductInteraction={handleProductInteraction}
-                            />
-                        ))}
-                    </div>
-                </>
-            )}
+            <div className='pagination-controls'>
+                <button onClick={() => handlePageChange(-1)} disabled={currentPage === 0}>Previous</button>
+                <button onClick={() => handlePageChange(1)} disabled={(currentPage + 1) * PAGE_SIZE >= products.length}>Next</button>
+            </div>
+
+            {/* Render the modal for selected product */}
+            <ProductModal
+                isOpen={isModalOpen}
+                product={selectedProduct}
+                onClose={closeModal}
+            />
         </div>
     );
 };
