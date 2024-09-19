@@ -1,5 +1,4 @@
 import React from 'react'
-import { Dropdown } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './admin.css'
 import AdminNav from './components/AdminNav'

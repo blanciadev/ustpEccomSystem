@@ -29,9 +29,12 @@ const TopProduct = () => {
 
   return (
     <div className='top-products'>
-      <div className='header'>
-        <div className='title'>
-          <h5>Top Products</h5>
+
+        <div className='header'>
+            <div className='title'>
+                <h5>Top Products</h5>
+            </div> 
+
         </div>
         <div className='see-all'>
           <button>See all</button>
