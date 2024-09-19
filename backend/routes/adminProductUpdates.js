@@ -18,6 +18,7 @@ const generateProductCode = async () => {
 
     return newCode;
 };
+
 // Route to add a product
 router.post('/add-product', upload.single('image'), async (req, res) => {
     try {
@@ -89,5 +90,68 @@ router.get('/product-category', async (req, res) => {
         res.status(500).send('Error fetching product categories');
     }
 });
+
+router.put('/admin-update-products/:product_code', async (req, res) => {
+    const { product_code } = req.params; // Extract product_code from the URL parameters
+    const updateData = req.body; // Get the updated data from the request body
+
+    console.log(`Received request to update product with code: ${product_code}`); // Log the incoming request
+
+    // SQL query with parameter placeholders
+    const query = `
+        UPDATE products
+        SET
+            product_name = COALESCE(NULLIF($1, ''), product_name),
+            description = COALESCE(NULLIF($2, ''), description),
+            category_id = COALESCE(NULLIF($3, ''), category_id),
+            price = COALESCE(NULLIF($4, ''), price),
+            quantity = COALESCE(NULLIF($5, ''), quantity)
+        WHERE product_code = $6;
+    `;
+
+    // Extract values from the updateData object
+    const values = [
+        updateData.product_name,
+        updateData.description,
+        updateData.category_id,
+        updateData.price,
+        updateData.quantity,
+        product_code // The last parameter is the WHERE clause value
+    ];
+
+    try {
+        const result = await pool.query(query, values);
+
+        if (result.rowCount === 0) {
+            console.log(`Product with code: ${product_code} not found for update`);
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        console.log(`Product with code: ${product_code} updated successfully`);
+        res.json({ message: 'Product updated successfully' });
+    } catch (error) {
+        console.error(`Error updating product details for code: ${product_code}`, error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+
+router.get('/admin-products', async (req, res) => {
+    try {
+        // Fetch all products and their categories
+        const [rows] = await db.query(`
+            SELECT p.product_id, p.product_code, p.product_name, p.price ,p.description, p.quantity, c.category_name, p.product_image
+            FROM product p
+            INNER JOIN category c ON p.category_id = c.category_id
+        `);
+
+        // Respond with product details including categories
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        res.status(500).send('Error fetching products');
+    }
+});
+
 
 module.exports = router;

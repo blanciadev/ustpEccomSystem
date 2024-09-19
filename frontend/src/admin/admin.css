@@ -792,3 +792,31 @@
     display: flex;
     flex-direction: column;
 }
+
+.table-responsive {
+    width: 100%;
+    max-height: 400px;
+    /* You can adjust the max height as needed */
+    overflow-y: auto;
+    overflow-x: auto;
+    /* For horizontal scrolling */
+}
+
+.order-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.order-table th,
+.order-table td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+    /* Optional: Add border for clarity */
+}
+
+.order-table img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
