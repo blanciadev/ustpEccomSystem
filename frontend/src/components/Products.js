@@ -1,6 +1,6 @@
 import React from 'react'
 import axios from 'axios';
-import Productcard from './Productcard'
+import Productcard from './Productcard';
 
 const Products = () => {
   return (
