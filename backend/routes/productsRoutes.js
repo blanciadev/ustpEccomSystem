@@ -56,28 +56,6 @@ WHERE
     }
 });
 
-// Route to update product interaction count
-router.get('/products-interaction', async (req, res) => {
-    const { product_code } = req.query; // Get product_code from the query params
-    if (!product_code) {
-        return res.status(400).json({ error: 'Product code is required' });
-    }
-
-    try {
-        // Increment interaction count for the clicked product
-        await db.query(`
-            UPDATE product
-            SET interaction_count = interaction_count + 1
-            WHERE product_code = ?
-        `, [product_code]);
-
-        // Respond with a success message
-        res.json({ success: true, message: 'Product interaction updated' });
-    } catch (error) {
-        console.error('Error updating product interaction:', error);
-        res.status(500).json({ error: 'Error updating product interaction' });
-    }
-});
 
 // Route to get top 4 user-picked products
 router.get('/products-top-picks', async (req, res) => {
@@ -118,6 +96,124 @@ router.get('/products', async (req, res) => {
         res.status(500).send('Error fetching products');
     }
 });
+
+
+// Route to get top products from different categories
+router.get('/products-top-mix-picks', async (req, res) => {
+    try {
+        // Fetch top products from different categories
+        const [rows] = await db.query(`
+        SELECT product_id, product_code, product_name, price, description, quantity, interaction_orders, category_name
+FROM (
+    SELECT p.product_id, p.product_code, p.product_name, p.price, p.description, p.quantity, p.interaction_orders, c.category_name,
+           @ranking := IF(@category = p.category_id, @ranking + 1, 1) AS ranking,
+           @category := p.category_id
+    FROM product p
+    JOIN category c ON p.category_id = c.category_id
+    CROSS JOIN (SELECT @ranking := 0, @category := 0) AS vars
+    ORDER BY p.category_id, p.interaction_orders DESC
+) AS ranked_products
+WHERE ranking = 1;
+
+        `);
+
+        // Respond with top picked products by category
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching top user picks by category:', error);
+        res.status(500).send('Error fetching top user picks by category');
+    }
+});
+
+
+router.get('/recommend-products', async (req, res) => {
+    try {
+        // Fetch the top 4 cart interactions per product code
+        const [rankedInteractions] = await db.query(`
+            WITH RankedInteractions AS (
+    SELECT
+        p.product_code,
+        p.product_name,
+        p.price,
+        p.quantity,
+        ui.interaction_count,
+        ui.interaction_type,
+        ROW_NUMBER() OVER (
+            PARTITION BY p.product_code
+            ORDER BY ui.interaction_count DESC
+        ) AS rn
+    FROM
+        user_product_interactions ui
+    INNER JOIN
+        product p ON ui.product_code = p.product_code
+    WHERE
+        ui.interaction_type = 'cart'
+)
+SELECT
+    product_code,
+    product_name,
+    quantity,
+    price,
+    interaction_count,
+    interaction_type
+FROM
+    RankedInteractions
+WHERE
+    rn <= 4
+ORDER BY
+    interaction_count DESC
+LIMIT 4;
+
+        `);
+
+        res.json(rankedInteractions);
+    } catch (error) {
+        console.error('Error recommending products:', error);
+        res.status(500).send('Error recommending products');
+    }
+});
+
+router.post('/products/recommendations', async (req, res) => {
+    const { product_code } = req.body;
+
+    console.log('Received request to fetch recommendations for product_code:', product_code);
+
+    try {
+        // Fetch the category_id of the product based on product_code
+        console.log(`Querying for product with product_code: ${product_code}`);
+        const [selectedProductRows] = await db.query(
+            `SELECT category_id, product_id FROM product WHERE product_code = ?`,
+            [product_code]
+        );
+
+        if (selectedProductRows.length === 0) {
+            console.log('No product found for the provided product_code:', product_code);
+            return res.status(404).json({ error: 'Product not found' });
+        }
+
+        const { category_id, product_id } = selectedProductRows[0];
+        console.log(`Product found. Category ID: ${category_id}, Product ID: ${product_id}`);
+
+        // Fetch products from the same category, excluding the selected product
+        console.log(`Querying for recommended products in category: ${category_id} excluding product_id: ${product_id}`);
+        const [recommendedProducts] = await db.query(`
+            SELECT p.product_id, p.category_id, p.product_code, p.product_name, p.price, p.description, p.quantity
+            FROM product p
+            WHERE p.category_id = ? AND p.product_id != ?
+        `, [category_id, product_id]);
+
+        console.log(`Found ${recommendedProducts.length} recommended products`);
+
+        // Respond with recommended products
+        res.json(recommendedProducts);
+    } catch (error) {
+        console.error('Error fetching recommended products:', error);
+        res.status(500).send('Error fetching recommendations');
+    }
+});
+
+
+
 
 
 module.exports = router;

@@ -18,6 +18,9 @@ const customerLoginRoutes = require('./routes/customerLoginRoutes');
 const productRoutes = require('./routes/productsRoutes.js');
 const OrderRoutes = require('./routes/orderRoutes.js');
 const viewTransactionsRoute = require('./routes/viewTransactionsRoute.js');
+const userInteraction = require('./routes/userInteraction.js');
+
+
 const adminOrderHistory = require('./routes/adminOrderHistory.js');
 const adminOrderUpdates = require('./routes/adminOrderUpdates.js');
 const adminProduct = require('./routes/adminProduct.js');
@@ -36,13 +39,14 @@ app.use('/', customerLoginRoutes);
 app.use('/', productRoutes);
 app.use('/', OrderRoutes);
 app.use('/', viewTransactionsRoute);
+app.use('/', userInteraction);
 
 
 app.use('/', adminOrderHistory);
 app.use('/', adminOrderUpdates);
 app.use('/', adminProduct);
 
-// Token validation 
+// Token validation
 app.get('/validate-token', async (req, res) => {
     // Extract token from 'Authorization' header
     const token = req.headers.authorization?.split(' ')[1];
@@ -52,19 +56,30 @@ app.get('/validate-token', async (req, res) => {
     }
 
     try {
-        const [rows] = await db.query('SELECT u.username FROM tokens t JOIN user u ON t.user_id = u.user_id WHERE t.token = ? AND t.expires_at > NOW()', [token]);
+        // Validate token and fetch associated customer information
+        const [rows] = await db.query(`
+            SELECT c.first_name, c.last_name, c.email
+            FROM tokens t
+            JOIN customer c ON t.user_id = c.customer_id
+            WHERE t.token = ?
+              AND t.expires_at > NOW()
+        `, [token]);
 
         if (rows.length === 0) {
             return res.status(401).json({ message: 'Invalid or expired token' });
         }
-        const user = rows[0];
-        res.json({ username: user.username });
+
+        const customer = rows[0];
+        res.json({
+            first_name: customer.first_name,
+            last_name: customer.last_name,
+            email: customer.email
+        });
     } catch (err) {
         console.error('Error during token validation:', err.message);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
-
 
 
 app.listen(PORT, () => {

@@ -44,26 +44,30 @@ router.post('/add-to-cart', authenticateToken, async (req, res) => {
     }
 
     try {
-        // Ensure that the cart exists for the user
+        // Ensure that the cart exists for the user and retrieve the cart_id
         const [[existingCart]] = await db.query('SELECT cart_id FROM cart WHERE customer_id = ?', [user_id]);
         console.log('Existing cart found:', existingCart);
 
+        let cart_id;
         if (!existingCart) {
             // Create a new cart if it doesn't exist
             console.log('No existing cart found, creating a new one for user:', user_id);
-            await db.query('INSERT INTO cart (customer_id) VALUES (?)', [user_id]);
+            const [result] = await db.query('INSERT INTO cart (customer_id) VALUES (?)', [user_id]);
+            cart_id = result.insertId; // Get the newly created cart_id
+            console.log('New cart created with ID:', cart_id);
         } else {
-            console.log('Cart already exists for user:', user_id);
+            cart_id = existingCart.cart_id; // Use existing cart_id
+            console.log('Using existing cart with ID:', cart_id);
         }
 
         // Insert or update the product in the cart_items
         const insertOrUpdateQuery = `
-            INSERT INTO cart_items (customer_id, product_code, quantity, status) 
-            VALUES (?, ?, ?, 'Order Pending')
+            INSERT INTO cart_items (cart_id, customer_id, product_code, quantity, status) 
+            VALUES (?, ?, ?, ?, 'Order Pending')
             ON DUPLICATE KEY UPDATE 
                 quantity = quantity + VALUES(quantity)
         `;
-        const queryParams = [user_id, product_code, quantity];
+        const queryParams = [cart_id, user_id, product_code, quantity];
 
         console.log('Executing query to add/update cart items:', insertOrUpdateQuery);
         console.log('Query parameters:', queryParams);
@@ -96,7 +100,6 @@ router.post('/add-to-cart', authenticateToken, async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-
 
 
 
@@ -159,7 +162,7 @@ router.get('/cart', authenticateToken, async (req, res) => {
             items: rows.map(item => ({
                 product_id: item.product_id,
                 product_code: item.product_code,
-                product_name: item.product_name, // Product name included
+                product_name: item.product_name,
                 description: item.description,
                 brand: item.brand,
                 category: item.category_name,
