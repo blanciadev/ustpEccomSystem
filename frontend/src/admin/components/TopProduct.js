@@ -28,49 +28,48 @@ const TopProduct = () => {
   });
 
   return (
-    <div className='top-products'>
-
+    <>
+      <div className='top-products'>
         <div className='header'>
-            <div className='title'>
-                <h5>Top Products</h5>
-            </div> 
-
+          <div className='title'>
+            <h5>Top Products</h5>
+          </div>
         </div>
         <div className='see-all'>
           <button>See all</button>
         </div>
-      </div>
-      <div className='product-table'>
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Product</th>
-              <th>Progress</th>
-              <th>Quantity</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedData.map((item, index) => (
-              <tr key={item.id}>
-                <td>{index + 1}</td> {/* Ranking starts from 1 */}
-                <td>{item.product}</td>
-                <td>
-                  <div className='progress-bar'>
-                    <div
-                      className='progress'
-                      style={{ width: `${item.interaction_count}%` }}
-                    />
-                    {item.interaction_count}% {/* Inventory progress percentage */}
-                  </div>
-                </td>
-                <td>{item.available_quantity}</td> {/* Display the interaction_orders */}
+        <div className='product-table'>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Product</th>
+                <th>Progress</th>
+                <th>Quantity</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {sortedData.map((item, index) => (
+                <tr key={item.id}>
+                  <td>{index + 1}</td> {/* Ranking starts from 1 */}
+                  <td>{item.product}</td>
+                  <td>
+                    <div className='progress-bar'>
+                      <div
+                        className='progress'
+                        style={{ width: `${item.interaction_count}%` }}
+                      />
+                      {item.interaction_count}% {/* Inventory progress percentage */}
+                    </div>
+                  </td>
+                  <td>{item.available_quantity}</td> {/* Display the interaction_orders */}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
