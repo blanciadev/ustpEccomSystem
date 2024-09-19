@@ -39,40 +39,41 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-
+    
         if (!productName || !description || !category || !price || !quantity) {
             setError('Please fill out all required fields.');
             return;
         }
-
+    
         // Validate custom size if 'Other' is selected
         if (size === 'Other' && !customSize) {
             setError('Please provide a custom size.');
             return;
         }
-
-        const formData = new FormData();
-        formData.append('productName', productName);
-        formData.append('description', description);
-        formData.append('category', category);
-        formData.append('price', price);
-        formData.append('quantity', quantity);
-        formData.append('expirationDate', expirationDate);
-        formData.append('size', size === 'Other' ? customSize : size);
-        if (image) {
-            formData.append('image', image);
-        }
-
+    
+        const productData = {
+            productName,
+            description,
+            category,
+            price,
+            quantity,
+            expirationDate,
+            size: size === 'Other' ? customSize : size
+        };
+    
         try {
             const response = await fetch('http://localhost:5000/add-product', {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(productData)
             });
-
+    
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-
+    
             const result = await response.text();
             console.log(result); // Log or handle the result
             handleClose();
@@ -81,6 +82,7 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
             setError('Failed to add product.');
         }
     };
+    
 
     return (
         <Modal show={show} onHide={handleClose}>

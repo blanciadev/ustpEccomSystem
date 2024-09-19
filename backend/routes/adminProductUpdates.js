@@ -19,22 +19,13 @@ const generateProductCode = async () => {
     return newCode;
 };
 
+
 // Route to add a product
-router.post('/add-product', upload.single('image'), async (req, res) => {
+router.post('/add-product', async (req, res) => {
     try {
         console.log('Request body:', req.body);
-        console.log('Uploaded file info:', req.file);
 
         const { productName, description, category, price, quantity, expirationDate, size } = req.body;
-
-        let compressedImage = null;
-        if (req.file) {
-            // Compress the image using sharp
-            compressedImage = await sharp(req.file.buffer)
-                .resize(800) // Resize to 800px wide (adjust as needed)
-                .jpeg({ quality: 80 }) // Compress the image with 80% quality (adjust as needed)
-                .toBuffer();
-        }
 
         console.log('Product details:');
         console.log('Name:', productName);
@@ -44,17 +35,16 @@ router.post('/add-product', upload.single('image'), async (req, res) => {
         console.log('Quantity:', quantity);
         console.log('Expiration Date:', expirationDate);
         console.log('Size:', size);
-        console.log('Image data size:', compressedImage ? compressedImage.length : 'No image');
 
         // Generate unique product code
         const productCode = await generateProductCode();
         console.log('Generated product code:', productCode);
 
         const query = `
-            INSERT INTO product (product_name, description, category_id, price, quantity, expiration_date, product_image, product_code, size)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO product (product_name, description, category_id, price, quantity, expiration_date, product_code, size)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `;
-        const values = [productName, description, category, price, quantity, expirationDate, compressedImage, productCode, size];
+        const values = [productName, description, category, price, quantity, expirationDate, productCode, size];
 
         console.log('Executing query:', query);
         console.log('With values:', values);
@@ -92,10 +82,10 @@ router.get('/product-category', async (req, res) => {
 });
 
 router.put('/admin-update-products/:product_code', async (req, res) => {
-    const { product_code } = req.params; // Extract product_code from the URL parameters
-    const updateData = req.body; // Get the updated data from the request body
+    const { product_code } = req.params; 
+    const updateData = req.body; 
 
-    console.log(`Received request to update product with code: ${product_code}`); // Log the incoming request
+    console.log(`Received request to update product with code: ${product_code}`); 
 
     // SQL query with parameter placeholders
     const query = `
@@ -116,7 +106,7 @@ router.put('/admin-update-products/:product_code', async (req, res) => {
         updateData.category_id,
         updateData.price,
         updateData.quantity,
-        product_code // The last parameter is the WHERE clause value
+        product_code 
     ];
 
     try {

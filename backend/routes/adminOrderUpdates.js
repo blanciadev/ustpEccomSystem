@@ -7,7 +7,7 @@ const db = require('../db');
 // Route to update order status and subtract quantity if status is 'To Ship'
 router.put('/update-order-status/:orderId', async (req, res) => {
     const { orderId } = req.params;
-    const { status, products } = req.body; // Get status and products from request body
+    const { status, products } = req.body; 
 
     // Check if status is provided
     if (!status) {

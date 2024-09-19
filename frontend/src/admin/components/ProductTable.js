@@ -12,7 +12,7 @@ const ProductTable = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/admin-products'); // Ensure correct endpoint
+                const response = await axios.get('http://localhost:5000/admin-products'); 
                 setProducts(response.data);
             } catch (error) {
                 console.error('Error fetching product data:', error);
@@ -34,7 +34,7 @@ const ProductTable = () => {
 
     const handleUpdateProduct = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/admin-products'); // Refresh the product list
+            const response = await axios.get('http://localhost:5000/admin-products'); 
             setProducts(response.data);
         } catch (error) {
             console.error('Error fetching updated product data:', error);

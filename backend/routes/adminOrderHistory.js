@@ -3,81 +3,69 @@ const router = express.Router();
 const db = require('../db');
 
 
-// Route to update order status and subtract quantity if status is 'To Ship'
-router.put('/update-order-status/:orderId', async (req, res) => {
-    const { orderId } = req.params;
-    const { status, products } = req.body; // Get status and products from request body
-
-    // Check if status is provided
-    if (!status) {
-        return res.status(400).json({ message: 'Status is required' });
-    }
-
+router.get('/categories', async (req, res) => {
     try {
-        // Begin transaction to ensure consistency
-        await db.query('START TRANSACTION');
-
-        // Update the order status in the order_details table
-        const result = await db.query(
-            'UPDATE order_details SET order_status = ? WHERE order_id = ?',
-            [status, orderId]
-        );
-
-        // Check if the order was found and updated
-        if (result.affectedRows === 0) {
-            await db.query('ROLLBACK');
-            return res.status(404).json({ message: 'Order not found' });
-        }
-
-        // If the status is 'To Ship', subtract the quantity from the product table
-        if (status === 'To Ship') {
-            for (const product of products) {
-                const { product_id, quantity } = product;
-
-                // Check if the product has sufficient stock
-                const [productResult] = await db.query(
-                    'SELECT quantity FROM product WHERE product_code = ?',
-                    [product_id]
-                );
-
-                if (productResult.length === 0) {
-                    await db.query('ROLLBACK');
-                    return res.status(404).json({ message: `Product ID ${product_id} not found` });
-                }
-
-                if (productResult[0].quantity < quantity) {
-                    await db.query('ROLLBACK');
-                    return res.status(400).json({
-                        message: `Not enough stock for product ID ${product_id}. Available: ${productResult[0].quantity}`,
-                    });
-                }
-
-                // Subtract the quantity from the product table
-                const updateResult = await db.query(
-                    'UPDATE product SET quantity = quantity - ? WHERE product_code = ?',
-                    [quantity, product_id]
-                );
-
-                if (updateResult.affectedRows === 0) {
-                    await db.query('ROLLBACK');
-                    return res.status(404).json({ message: `Failed to update stock for product ID ${product_id}` });
-                }
-            }
-        }
-
-        // Commit the transaction after all updates
-        await db.query('COMMIT');
-
-        // Respond with success
-        res.status(200).json({ message: 'Order status and product quantities updated successfully' });
+        const [rows] = await db.query('SELECT category_id, category_name FROM category');
+        res.json({ categories: rows });
     } catch (error) {
-        // Rollback transaction in case of error
-        await db.query('ROLLBACK');
-        console.error('Error updating order status:', error.message);
-        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+        console.error('Error fetching categories:', error);
+        res.status(500).send('Error fetching categories');
     }
 });
 
+
+// Update Product Route
+router.put('/admin-update-products/:product_code', async (req, res) => {
+    const { product_code } = req.params;
+    const { product_name, description, category_id, price, quantity, size, expiration_date, product_status, product_image } = req.body;
+
+ 
+
+    // SQL query to update product details
+    const query = `
+        UPDATE product
+        SET
+            product_name = ?,
+            description = ?,
+            category_id = ?,
+            price = ?,
+            quantity = ?,
+            size = ?,
+            expiration_date = ?,
+            product_status = ?,
+            product_image = ?,
+            product_update = NOW()
+        WHERE product_code = ?;
+    `;
+
+    try {
+        // Execute the query
+        const [result] = await db.query(query, [
+            product_name,
+            description,
+            category_id,
+            price,
+            quantity,
+            size,
+            expiration_date,
+            product_status,
+            product_image,
+            product_code
+        ]);
+
+        // Check if the update was successful
+        if (result.affectedRows > 0) {
+            console.log('Product updated successfully', { product_code });
+            res.json({ message: 'Product updated successfully' });
+        } else {
+            console.warn('Product not found', { product_code });
+            res.status(404).json({ message: 'Product not found' });
+        }
+    } catch (error) {
+        console.error('Error updating product details', { product_code, error: error.message });
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+});
 
 router.get('/admin-order-history', async (req, res) => {
     try {
