@@ -148,11 +148,12 @@ router.get('/admin-order-history', async (req, res) => {
     }
 });
 
+
 router.get('/admin-order-history-component', async (req, res) => {
     try {
         const { status } = req.query;
 
-        // Base query for fetching order details
+        // Base query for fetching order details for today's date using order_date
         let query = `
             SELECT 
                 order_details.order_status,
@@ -161,12 +162,14 @@ router.get('/admin-order-history-component', async (req, res) => {
                 \`order\`
             INNER JOIN 
                 order_details ON \`order\`.order_id = order_details.order_id
+            WHERE 
+                DATE(\`order\`.order_date) = CURDATE()  -- Filter orders by today's date from the order_date column
             GROUP BY 
-                order_details.order_status;
+                order_details.order_status
         `;
 
         if (status) {
-            query += ` WHERE order_details.order_status = ?`;
+            query += ` AND order_details.order_status = ?`;  // Add status filter if provided
         }
 
         const queryParams = status ? [status] : [];
@@ -197,6 +200,85 @@ router.get('/admin-order-history-component', async (req, res) => {
     } catch (error) {
         console.error('Error fetching order history:', error.message);
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+});
+
+
+router.get('/admin-order-history-total-component', async (req, res) => {
+    try {
+        const { status } = req.query;
+
+        // Base query for fetching total order details without filtering by date
+        let query = `
+            SELECT 
+                order_details.order_status,
+                COUNT(*) AS order_count
+            FROM 
+                \`order\`
+            INNER JOIN 
+                order_details ON \`order\`.order_id = order_details.order_id
+            GROUP BY 
+                order_details.order_status
+        `;
+
+        if (status) {
+            query += ` WHERE order_details.order_status = ?`;  // Add status filter if provided
+        }
+
+        const queryParams = status ? [status] : [];
+
+        const [orders] = await db.query(query, queryParams);
+
+        console.log('Fetched orders:', orders);
+
+        // Construct response object with only counts
+        const statusCounts = orders.reduce((acc, order) => {
+            acc[order.order_status] = (acc[order.order_status] || 0) + order.order_count;
+            return acc;
+        }, {});
+
+        res.json({
+            statusCounts: {
+                Completed: statusCounts['Completed'] || 0,
+                Pending: statusCounts['Pending'] || 0,
+                'To Ship': statusCounts['To Ship'] || 0,
+                'To Receive': statusCounts['To Receive'] || 0,
+                Cancelled: statusCounts['Cancelled'] || 0,
+                'Return/Refund': statusCounts['Return/Refund'] || 0,
+                'In Transit': statusCounts['In Transit'] || 0,
+                Returned: statusCounts['Returned'] || 0,
+            }
+        });
+
+    } catch (error) {
+        console.error('Error fetching order history:', error.message);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+});
+
+
+router.get('/sales', async (req, res) => {
+    try {
+        // Query the order_details table for completed orders, grouped by the month of the order_date
+        const [rows] = await db.query(`
+            SELECT 
+                MONTH(order_date) AS month,       -- Extract the month from the order_date
+                COUNT(*) AS completed_sales,      -- Count the number of completed orders
+                SUM(total_price) AS total_sales_amount  -- Sum the total price for the completed sales
+            FROM 
+                order_details
+            WHERE 
+                order_status = 'Completed'        -- Only count completed orders
+            GROUP BY 
+                MONTH(order_date)                 -- Group by month of the order_date
+            ORDER BY 
+                MONTH(order_date)                 -- Sort by the month
+        `);
+
+        res.json({ insights: rows });  // Send the result back to the frontend
+    } catch (error) {
+        console.error('Error fetching sales data:', error.message);
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
