@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import './modal.css';
 
-// Modal Component
-const ProductModal = ({ isOpen, product, onClose }) => {
+const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
     const [recommendedProducts, setRecommendedProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -13,7 +12,6 @@ const ProductModal = ({ isOpen, product, onClose }) => {
             setLoading(true);
             setError(null);
 
-            // Send POST request to fetch recommended products based on the selected product's category
             fetch('http://localhost:5000/products/recommendations', {
                 method: 'POST',
                 headers: {
@@ -56,6 +54,9 @@ const ProductModal = ({ isOpen, product, onClose }) => {
                     <p>Price: ${product.price}</p>
                     <p>Available Quantity: {product.quantity}</p>
 
+                    {/* Add to Cart Button */}
+                    <button onClick={() => onAddToCart(product)}>Add to Cart</button>
+
                     <button onClick={onClose}>Close</button>
 
                     {/* Recommendations Section */}
@@ -66,18 +67,29 @@ const ProductModal = ({ isOpen, product, onClose }) => {
                         ) : error ? (
                             <p>{error}</p>
                         ) : recommendedProducts.length > 0 ? (
-                            <ul>
+                            <div className="recommended-products-grid">
                                 {recommendedProducts.map((recProduct) => (
-                                    <li key={recProduct.product_id}>
+                                    <div key={recProduct.product_id} className="product-card">
                                         <img
                                             src={recProduct.image_url || 'https://via.placeholder.com/150'}
                                             alt={recProduct.product_name}
-                                            style={{ width: '50px', marginRight: '10px' }}
+                                            className="product-image"
                                         />
-                                        <span>{recProduct.product_name}</span>
-                                    </li>
+                                        <div className="product-details">
+                                            <span className="product-name">{recProduct.product_name}</span>
+                                            <span className="product-price">${recProduct.price}</span>
+
+                                            {/* Add to Cart Button for Recommended Product */}
+                                            <button
+                                                className="add-to-cart-btn"
+                                                onClick={() => onAddToCart(recProduct)}
+                                            >
+                                                Add to Cart
+                                            </button>
+                                        </div>
+                                    </div>
                                 ))}
-                            </ul>
+                            </div>
                         ) : (
                             <p>No recommendations available.</p>
                         )}
@@ -99,6 +111,7 @@ ProductModal.propTypes = {
         price: PropTypes.number,
         quantity: PropTypes.number
     }),
+    onAddToCart: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired
 };
 

@@ -8,7 +8,7 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
     const [price, setPrice] = useState('');
     const [quantity, setQuantity] = useState('');
     const [expirationDate, setExpirationDate] = useState('');
-    const [image, setImage] = useState(null);
+    const [imageURL, setImageURL] = useState(''); // Changed from file to URL
     const [categories, setCategories] = useState([]);
     const [error, setError] = useState('');
     const [size, setSize] = useState('500'); // Default size
@@ -39,18 +39,23 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-    
-        if (!productName || !description || !category || !price || !quantity) {
+
+        // Check if all required fields are filled
+        if (!productName || !description || !category || !price || !quantity || !imageURL) {
             setError('Please fill out all required fields.');
             return;
         }
-    
+
         // Validate custom size if 'Other' is selected
         if (size === 'Other' && !customSize) {
             setError('Please provide a custom size.');
             return;
         }
-    
+
+        // Log the image URL for debugging
+        console.log('Image URL before submission:', imageURL);
+
+        // Construct the product data object
         const productData = {
             productName,
             description,
@@ -58,22 +63,23 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
             price,
             quantity,
             expirationDate,
+            imageURL, // Should not be undefined
             size: size === 'Other' ? customSize : size
         };
-    
+
         try {
             const response = await fetch('http://localhost:5000/add-product', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(productData)
+                body: JSON.stringify(productData), // Ensure imageURL is included
             });
-    
+
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-    
+
             const result = await response.text();
             console.log(result); // Log or handle the result
             handleClose();
@@ -82,7 +88,7 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
             setError('Failed to add product.');
         }
     };
-    
+
 
     return (
         <Modal show={show} onHide={handleClose}>
@@ -197,12 +203,14 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
                         )}
                     </Form.Group>
 
-                    <Form.Group controlId="formImage">
-                        <Form.Label>Product Image</Form.Label>
+                    <Form.Group controlId="formImageURL">
+                        <Form.Label>Product Image URL</Form.Label>
                         <Form.Control
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => setImage(e.target.files[0])}
+                            type="url"
+                            placeholder="Enter product image URL"
+                            value={imageURL}
+                            onChange={(e) => setImageURL(e.target.value)}
+                            required
                         />
                     </Form.Group>
 
