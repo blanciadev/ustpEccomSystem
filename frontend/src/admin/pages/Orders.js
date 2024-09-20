@@ -10,7 +10,7 @@ const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [status, setStatus] = useState('');
   const [statusOptions, setStatusOptions] = useState([
-    'To Ship', 'To Receive', 'Completed', 'Cancelled', 'Return/Refund', 'To Process'
+    'To Ship', 'To Receive', 'Completed', 'Cancelled', 'Return/Refund', 'Pending'
   ]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalShow, setModalShow] = useState(false);

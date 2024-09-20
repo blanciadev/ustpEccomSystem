@@ -19,7 +19,7 @@ router.put('/admin-update-products/:product_code', async (req, res) => {
     const { product_code } = req.params;
     const { product_name, description, category_id, price, quantity, size, expiration_date, product_status, product_image } = req.body;
 
- 
+
 
     // SQL query to update product details
     const query = `
@@ -129,7 +129,7 @@ router.get('/admin-order-history', async (req, res) => {
                 };
             }
             acc[order.order_id].products.push({
-                product_id: order.product_id,  
+                product_id: order.product_id,
                 product_name: order.product_name,
                 price: order.price,
                 quantity: order.quantity,
@@ -147,5 +147,58 @@ router.get('/admin-order-history', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 });
+
+router.get('/admin-order-history-component', async (req, res) => {
+    try {
+        const { status } = req.query;
+
+        // Base query for fetching order details
+        let query = `
+            SELECT 
+                order_details.order_status,
+                COUNT(*) AS order_count
+            FROM 
+                \`order\`
+            INNER JOIN 
+                order_details ON \`order\`.order_id = order_details.order_id
+            GROUP BY 
+                order_details.order_status;
+        `;
+
+        if (status) {
+            query += ` WHERE order_details.order_status = ?`;
+        }
+
+        const queryParams = status ? [status] : [];
+
+        const [orders] = await db.query(query, queryParams);
+
+        console.log('Fetched orders:', orders);
+
+        // Construct response object with only counts
+        const statusCounts = orders.reduce((acc, order) => {
+            acc[order.order_status] = (acc[order.order_status] || 0) + order.order_count;
+            return acc;
+        }, {});
+
+        res.json({
+            statusCounts: {
+                Completed: statusCounts['Completed'] || 0,
+                'To Process': statusCounts['Pending'] || 0,
+                'To Ship': statusCounts['To Ship'] || 0,
+                'To Receive': statusCounts['To Receive'] || 0,
+                Cancelled: statusCounts['Cancelled'] || 0,
+                'Return/Refund': statusCounts['Return/Refund'] || 0,
+                'In Transit': statusCounts['In Transit'] || 0,
+                Returned: statusCounts['Returned'] || 0,
+            }
+        });
+
+    } catch (error) {
+        console.error('Error fetching order history:', error.message);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+});
+
 
 module.exports = router;

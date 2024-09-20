@@ -13,19 +13,19 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                 product_id: product.product_id, // Make sure this is defined
                 quantity: product.quantity,
             }));
-        
+
             // Ensure status is not empty
             if (!status) {
                 alert('Please select a valid status');
                 setLoading(false);
                 return;
             }
-        
+
             await axios.put(`http://localhost:5000/update-order-status/${order.order_id}`, {
                 status,
                 products
             });
-            
+
             alert('Order status updated successfully');
             refreshOrders(); // Call refreshOrders to update the orders list
             handleClose();
@@ -35,7 +35,7 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
             setLoading(false);
         }
     };
-    
+
 
     return (
         <div className={`modal fade ${show ? 'show' : ''}`} tabIndex="-1" role="dialog" style={{ display: show ? 'block' : 'none' }}>
@@ -66,7 +66,7 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                                         <option value="Completed">Completed</option>
                                         <option value="Cancelled">Cancelled</option>
                                         <option value="Return/Refund">Return/Refund</option>
-                                        <option value="To Process">To Process</option>
+                                        <option value="Pending">Pending</option>
                                     </select>
                                 </div>
 
@@ -83,7 +83,7 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                                     <tbody>
                                         {order.products.map((product, index) => (
                                             <tr key={index}>
-                                                
+
                                                 <td>{product.product_name}</td>
                                                 <td>P{product.price ? product.price.toFixed(2) : 'N/A'}</td>
                                                 <td>{product.quantity}</td>

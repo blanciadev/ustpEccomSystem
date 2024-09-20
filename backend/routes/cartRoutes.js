@@ -181,6 +181,31 @@ router.get('/cart', authenticateToken, async (req, res) => {
 });
 
 
+router.get('/cart-item-count/:customer_id', async (req, res) => {
+    const customerId = req.params.customer_id;
+
+    try {
+        const [rows] = await db.query('SELECT COUNT(*) AS itemCount FROM cart WHERE customer_id = ?', [customerId]);
+        res.json({ itemCount: rows[0].itemCount });
+    } catch (error) {
+        console.error('Error fetching cart item count:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+router.get('/get-customer-details', async (req, res) => {
+    const customerId = req.params.customer_id;
+
+    try {
+        const [rows] = await db.query('SELECT COUNT(*) AS itemCount FROM cart WHERE customer_id = ?', [customerId]);
+        res.json({ itemCount: rows[0].itemCount });
+    } catch (error) {
+        console.error('Error fetching cart item count:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 
 
 module.exports = router;

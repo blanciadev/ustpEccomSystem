@@ -29,7 +29,7 @@ router.post('/customer-login', async (req, res) => {
         }
 
         // Check if a token already exists for the user
-        const [existingTokenRows] = await db.query('SELECT * FROM tokens WHERE user_id = ?', [user.customer_id]);
+        const [existingTokenRows] = await db.query('SELECT * FROM tokens WHERE user_id = ? AND token_status = ?', [user.customer_id, 'Active']);
 
         if (existingTokenRows.length > 0) {
             return res.status(400).json({ message: 'User already logged in' });
@@ -60,32 +60,20 @@ router.post('/customer-login', async (req, res) => {
     }
 });
 
-router.get('/cart-item-count/:customer_id', async (req, res) => {
-    const customerId = req.params.customer_id;
 
-    try {
-        const [rows] = await db.query('SELECT COUNT(*) AS itemCount FROM cart WHERE customer_id = ?', [customerId]);
-        res.json({ itemCount: rows[0].itemCount });
-    } catch (error) {
-        console.error('Error fetching cart item count:', error);
-        res.status(500).json({ message: 'Internal server error' });
-    }
-});
+// // Logout endpoint
+// router.post('/logout', (req, res) => {
+//     const token = req.headers['authorization']?.split(' ')[1]; // Extract token from headers
 
+//     if (!token) {
+//         return res.status(400).json({ message: 'No token provided.' });
+//     }
 
-router.get('/get-customer-details', async (req, res) => {
-    const customerId = req.params.customer_id;
+//     // Add token to blacklist (you could also store it in a DB)
+//     blacklistToken(token); // This function should handle adding the token to a blacklist
 
-    try {
-        const [rows] = await db.query('SELECT COUNT(*) AS itemCount FROM cart WHERE customer_id = ?', [customerId]);
-        res.json({ itemCount: rows[0].itemCount });
-    } catch (error) {
-        console.error('Error fetching cart item count:', error);
-        res.status(500).json({ message: 'Internal server error' });
-    }
-});
-
-
+//     res.status(200).json({ message: 'Logged out successfully.' });
+// });
 
 
 
