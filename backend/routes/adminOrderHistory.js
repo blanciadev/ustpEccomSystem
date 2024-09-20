@@ -282,5 +282,44 @@ router.get('/sales', async (req, res) => {
     }
 });
 
+router.get('/payment-insight', async (req, res) => {
+    try {
+        const query = `
+            SELECT 
+                MONTH(order_date) AS order_month,
+                COUNT(*) AS completed_orders_count
+            FROM 
+                order_details
+            WHERE 
+                order_status = 'Completed' 
+                AND payment_status = 'Order Paid'
+            GROUP BY 
+                MONTH(order_date)
+            ORDER BY 
+                order_month;
+        `;
+        
+        const result = await db.query(query);
+        console.log(result); // Check the structure of the result
+
+        // Check if result is nested and extract data accordingly
+        const monthlyCounts = Array.isArray(result) && result.length > 0 
+            ? result[0].map(row => ({
+                month: row.order_month,
+                count: row.completed_orders_count,
+            })) 
+            : [];
+
+        console.log(monthlyCounts); // Log the final monthly counts
+
+        res.json({ monthlyCounts });
+    } catch (error) {
+        console.error('Error fetching payment insights:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+
 
 module.exports = router;
