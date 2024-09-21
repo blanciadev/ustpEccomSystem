@@ -25,6 +25,8 @@ const adminOrderHistory = require('./routes/adminOrderHistory.js');
 const adminOrderUpdates = require('./routes/adminOrderUpdates.js');
 const adminProduct = require('./routes/adminProduct.js');
 const adminProductUpdate = require('./routes/adminProductUpdates.js');
+const customerData = require('./routes/customerData.js');
+const handleLogout = require('./routes/handlelogout.js');
 
 app.use(cors());
 
@@ -47,7 +49,9 @@ app.use('/', adminOrderHistory);
 app.use('/', adminOrderUpdates);
 app.use('/', adminProduct);
 app.use('/', adminProductUpdate);
+app.use('/', customerData);
 
+app.use('/', handleLogout);
 
 
 

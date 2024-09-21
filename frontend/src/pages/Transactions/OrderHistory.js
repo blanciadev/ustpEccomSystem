@@ -102,8 +102,8 @@ const OrderHistory = () => {
                       </div>
                       <button
                         onClick={() => handleCancelOrder(order.order_id)}
-                        className={`cancel-button ${order.order_status === 'To Process' ? '' : 'disabled'}`}
-                        disabled={order.order_status !== 'To Process'}
+                        className={`cancel-button ${order.order_status === 'Pending' ? '' : 'disabled'}`}
+                        disabled={order.order_status !== 'Pending'}
                       >
                         Cancel Order
                       </button>

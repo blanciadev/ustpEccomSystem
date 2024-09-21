@@ -19,7 +19,7 @@ router.put('/admin-update-products/:product_code', async (req, res) => {
     const { product_code } = req.params;
     const { product_name, description, category_id, price, quantity, size, expiration_date, product_status, product_image } = req.body;
 
- 
+
 
     // SQL query to update product details
     const query = `
@@ -129,7 +129,7 @@ router.get('/admin-order-history', async (req, res) => {
                 };
             }
             acc[order.order_id].products.push({
-                product_id: order.product_id,  
+                product_id: order.product_id,
                 product_name: order.product_name,
                 price: order.price,
                 quantity: order.quantity,
@@ -147,5 +147,179 @@ router.get('/admin-order-history', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 });
+
+
+router.get('/admin-order-history-component', async (req, res) => {
+    try {
+        const { status } = req.query;
+
+        // Base query for fetching order details for today's date using order_date
+        let query = `
+            SELECT 
+                order_details.order_status,
+                COUNT(*) AS order_count
+            FROM 
+                \`order\`
+            INNER JOIN 
+                order_details ON \`order\`.order_id = order_details.order_id
+            WHERE 
+                DATE(\`order\`.order_date) = CURDATE()  -- Filter orders by today's date from the order_date column
+            GROUP BY 
+                order_details.order_status
+        `;
+
+        if (status) {
+            query += ` AND order_details.order_status = ?`;  // Add status filter if provided
+        }
+
+        const queryParams = status ? [status] : [];
+
+        const [orders] = await db.query(query, queryParams);
+
+        console.log('Fetched orders:', orders);
+
+        // Construct response object with only counts
+        const statusCounts = orders.reduce((acc, order) => {
+            acc[order.order_status] = (acc[order.order_status] || 0) + order.order_count;
+            return acc;
+        }, {});
+
+        res.json({
+            statusCounts: {
+                Completed: statusCounts['Completed'] || 0,
+                'To Process': statusCounts['Pending'] || 0,
+                'To Ship': statusCounts['To Ship'] || 0,
+                'To Receive': statusCounts['To Receive'] || 0,
+                Cancelled: statusCounts['Cancelled'] || 0,
+                'Return/Refund': statusCounts['Return/Refund'] || 0,
+                'In Transit': statusCounts['In Transit'] || 0,
+                Returned: statusCounts['Returned'] || 0,
+            }
+        });
+
+    } catch (error) {
+        console.error('Error fetching order history:', error.message);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+});
+
+
+router.get('/admin-order-history-total-component', async (req, res) => {
+    try {
+        const { status } = req.query;
+
+        // Base query for fetching total order details without filtering by date
+        let query = `
+            SELECT 
+                order_details.order_status,
+                COUNT(*) AS order_count
+            FROM 
+                \`order\`
+            INNER JOIN 
+                order_details ON \`order\`.order_id = order_details.order_id
+            GROUP BY 
+                order_details.order_status
+        `;
+
+        if (status) {
+            query += ` WHERE order_details.order_status = ?`;  // Add status filter if provided
+        }
+
+        const queryParams = status ? [status] : [];
+
+        const [orders] = await db.query(query, queryParams);
+
+        console.log('Fetched orders:', orders);
+
+        // Construct response object with only counts
+        const statusCounts = orders.reduce((acc, order) => {
+            acc[order.order_status] = (acc[order.order_status] || 0) + order.order_count;
+            return acc;
+        }, {});
+
+        res.json({
+            statusCounts: {
+                Completed: statusCounts['Completed'] || 0,
+                Pending: statusCounts['Pending'] || 0,
+                'To Ship': statusCounts['To Ship'] || 0,
+                'To Receive': statusCounts['To Receive'] || 0,
+                Cancelled: statusCounts['Cancelled'] || 0,
+                'Return/Refund': statusCounts['Return/Refund'] || 0,
+                'In Transit': statusCounts['In Transit'] || 0,
+                Returned: statusCounts['Returned'] || 0,
+            }
+        });
+
+    } catch (error) {
+        console.error('Error fetching order history:', error.message);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+});
+
+
+router.get('/sales', async (req, res) => {
+    try {
+        // Query the order_details table for completed orders, grouped by the month of the order_date
+        const [rows] = await db.query(`
+            SELECT 
+                MONTH(order_date) AS month,       -- Extract the month from the order_date
+                COUNT(*) AS completed_sales,      -- Count the number of completed orders
+                SUM(total_price) AS total_sales_amount  -- Sum the total price for the completed sales
+            FROM 
+                order_details
+            WHERE 
+                order_status = 'Completed'        -- Only count completed orders
+            GROUP BY 
+                MONTH(order_date)                 -- Group by month of the order_date
+            ORDER BY 
+                MONTH(order_date)                 -- Sort by the month
+        `);
+
+        res.json({ insights: rows });  // Send the result back to the frontend
+    } catch (error) {
+        console.error('Error fetching sales data:', error.message);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+router.get('/payment-insight', async (req, res) => {
+    try {
+        const query = `
+            SELECT 
+                MONTH(order_date) AS order_month,
+                COUNT(*) AS completed_orders_count
+            FROM 
+                order_details
+            WHERE 
+                order_status = 'Completed' 
+                AND payment_status = 'Order Paid'
+            GROUP BY 
+                MONTH(order_date)
+            ORDER BY 
+                order_month;
+        `;
+        
+        const result = await db.query(query);
+        console.log(result); // Check the structure of the result
+
+        // Check if result is nested and extract data accordingly
+        const monthlyCounts = Array.isArray(result) && result.length > 0 
+            ? result[0].map(row => ({
+                month: row.order_month,
+                count: row.completed_orders_count,
+            })) 
+            : [];
+
+        console.log(monthlyCounts); // Log the final monthly counts
+
+        res.json({ monthlyCounts });
+    } catch (error) {
+        console.error('Error fetching payment insights:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+
 
 module.exports = router;
