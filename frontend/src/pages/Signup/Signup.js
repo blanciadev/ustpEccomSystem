@@ -65,6 +65,9 @@ const Signup = () => {
       <div className='signup-box'>
         <div className='signup-form'>
           <h1>Sign Up</h1>
+          {error && <p className='error'>{error}</p>}
+          {success && <p className='success'>{success}</p>}
+
           <form onSubmit={handleSubmit}>
             <div className='two-column'>
               <div className='input'>
@@ -135,9 +138,7 @@ const Signup = () => {
             </div>
             <button type='submit'>Sign Up</button>
           </form>
-          {error && <p className='error'>{error}</p>}
-          {success && <p className='success'>{success}</p>}
-
+          
           <p>Have an account? <a href='/login'>Log In</a></p>
         </div>
         <div className='signup-image'>

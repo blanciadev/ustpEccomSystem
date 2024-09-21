@@ -18,13 +18,12 @@
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-    font-size: 10pt;
     
 }
 .login-form{
     /* background-color: aquamarine; */
     width: 45%;
-    height: 80%;
+    height: 90%;
     display: flex;
     justify-content: flex-start;
 

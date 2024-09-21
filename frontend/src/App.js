@@ -19,6 +19,10 @@ import Products from './admin/pages/Products';
 import Inventory from './admin/pages/Inventory';
 import Reports from './admin/pages/Reports';
 
+import ForgotPassword from './pages/ForgotPassword/ForgotPassword'
+import Verification from './pages/ForgotPassword/Verification'
+import ChangePassword from './pages/ForgotPassword/ChangePassword'
+
 
 function App() {
   const [loginStatus, setLoginStatus] = useState('');  // Store login status
@@ -51,6 +55,12 @@ function App() {
         <Route path='/admin/products' element={<Products/>}></Route>
         <Route path='/admin/inventory' element={<Inventory/>}></Route>
         <Route path='/admin/reports' element={<Reports/>}></Route>
+
+        
+        <Route path='/forgot-password' element={<ForgotPassword/>}></Route>
+        <Route path='/verify' element={<Verification/>}></Route>
+        <Route path='/change-password' element={<ChangePassword/>}></Route>
+
 
       </Routes>
     </BrowserRouter>
