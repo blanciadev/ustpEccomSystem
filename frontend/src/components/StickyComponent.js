@@ -95,8 +95,8 @@ const StickyComponent = () => {
                   <label for='medium' >medium</label>
                 </div>
                 <div className='input'>
-                  <input type='radio' id='curly' value='curly' name='hair-density'/>
-                  <label for='curly' >Curly</label>
+                  <input type='radio' id='thick' value='thick' name='hair-density'/>
+                  <label for='thick' >thick</label>
                 </div>
                 
             </form>
