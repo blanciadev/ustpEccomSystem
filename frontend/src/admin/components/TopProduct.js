@@ -35,9 +35,8 @@ const TopProduct = () => {
             <h5>Top Products</h5>
           </div>
         </div>
-        <div className='see-all'>
-          <button>See all</button>
-        </div>
+
+
         <div className='product-table'>
           <table>
             <thead>

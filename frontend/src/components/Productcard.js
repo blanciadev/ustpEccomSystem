@@ -140,7 +140,7 @@ const ProductList = () => {
     })();
 
     const handleProductInteraction = async (productCode, interactionType) => {
-        const customerId = localStorage.getItem('customer_id'); // Retrieve customer ID from local storage
+        const customerId = localStorage.getItem('customer_id');
         if (!customerId) {
             console.log('Customer ID is not available');
             return;
@@ -169,13 +169,14 @@ const ProductList = () => {
     };
 
     const handleProductClick = (product) => {
-        setSelectedProduct(product); // Set product to be displayed in modal
+        setSelectedProduct(product);
         setIsModalOpen(true); // Open modal
+        handleProductInteraction(product.product_code, 'view');
     };
 
     const closeModal = () => {
-        setIsModalOpen(false); // Close modal
-        setSelectedProduct(null); // Clear selected product
+        setIsModalOpen(false);
+        setSelectedProduct(null);
     };
 
     if (loading) {
@@ -211,8 +212,10 @@ const ProductList = () => {
             <ProductModal
                 isOpen={isModalOpen}
                 product={selectedProduct}
+                onAddToCart={handleAddToCart}
                 onClose={closeModal}
             />
+
         </div>
     );
 };

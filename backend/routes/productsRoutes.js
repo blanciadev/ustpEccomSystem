@@ -84,7 +84,7 @@ router.get('/products', async (req, res) => {
     try {
         // Fetch all products and their categories
         const [rows] = await db.query(`
-            SELECT p.product_id, p.product_code, p.product_name, p.price ,p.description, p.quantity, c.category_name
+            SELECT p.product_id, p.product_code, p.product_name, p.price ,p.description, p.quantity, c.category_name, p.product_image
             FROM product p
             INNER JOIN category c ON p.category_id = c.category_id
         `);
@@ -130,40 +130,24 @@ router.get('/recommend-products', async (req, res) => {
     try {
         // Fetch the top 4 cart interactions per product code
         const [rankedInteractions] = await db.query(`
-            WITH RankedInteractions AS (
-    SELECT
-        p.product_code,
-        p.product_name,
-        p.price,
-        p.quantity,
-        ui.interaction_count,
-        ui.interaction_type,
-        ROW_NUMBER() OVER (
-            PARTITION BY p.product_code
-            ORDER BY ui.interaction_count DESC
-        ) AS rn
-    FROM
-        user_product_interactions ui
-    INNER JOIN
-        product p ON ui.product_code = p.product_code
-    WHERE
-        ui.interaction_type = 'cart'
-)
-SELECT
-    product_code,
-    product_name,
-    quantity,
-    price,
-    interaction_count,
-    interaction_type
-FROM
-    RankedInteractions
-WHERE
-    rn <= 4
-ORDER BY
-    interaction_count DESC
-LIMIT 4;
-
+            SELECT
+                p.product_code,
+                p.product_name,
+                p.price,
+                p.quantity,
+                MAX(ui.interaction_count) AS interaction_count, -- use MAX() to avoid ONLY_FULL_GROUP_BY issues
+                ui.interaction_type
+            FROM
+                user_product_interactions ui
+            INNER JOIN
+                product p ON ui.product_code = p.product_code
+            WHERE
+                ui.interaction_type = 'cart'
+            GROUP BY
+                p.product_code, p.product_name, p.price, p.quantity, ui.interaction_type
+            ORDER BY
+                interaction_count DESC
+            LIMIT 4;
         `);
 
         res.json(rankedInteractions);
@@ -172,6 +156,8 @@ LIMIT 4;
         res.status(500).send('Error recommending products');
     }
 });
+
+
 
 router.post('/products/recommendations', async (req, res) => {
     const { product_code } = req.body;
