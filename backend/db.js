@@ -8,7 +8,11 @@ const pool = mysql.createPool({
     password: 'root',
 
     //PORT KURT 
-    port: '3308',
+    // port: '3308',
+    // password: 'root',
+
+    //other Laptop 
+    port: '3307',
     password: 'root',
 
     // password: '',

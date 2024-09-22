@@ -27,7 +27,7 @@ const ProductStatistics = ({
                     <h6>{totalQuantity}</h6> {/* Displaying the total quantity */}
                 </div>
                 <div>
-                    <h6>Total Stock</h6>
+                    <h6>Total Stocks</h6>
                 </div>
             </div>
 
@@ -48,11 +48,7 @@ const ProductStatistics = ({
                 </div>
                 <div>
                     <h6>Unpopular</h6>
-                    <ul>
-                        {unpopularProducts.map((product, index) => (
-                            <li key={index}>{product}</li>
-                        ))}
-                    </ul>
+
                 </div>
             </div>
 

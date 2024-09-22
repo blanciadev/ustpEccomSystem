@@ -104,24 +104,30 @@ router.get('/top-products', async (req, res) => {
         // Query to get the products with their available quantity and cart interaction quantity
         const [topProducts] = await db.query(`
             SELECT
-                p.product_code AS id, 
-                p.product_name AS product, 
-                p.quantity AS available_quantity, 
-                COALESCE(SUM(od.quantity), 0) AS cart_quantity, 
-                p.interaction_cart, 
-                p.interaction_orders
-            FROM
-                product AS p
-            LEFT JOIN
-                order_details AS od
-            ON 
-                p.product_code = od.product_id
-            GROUP BY
-                p.product_code, 
-                p.product_name, 
-                p.quantity, 
-                p.interaction_cart, 
-                p.interaction_orders
+    p.product_code AS id, 
+    p.product_name AS product, 
+    p.quantity AS available_quantity, 
+    COALESCE(SUM(od.quantity), 0) AS cart_quantity, 
+    p.product_image, 
+FROM
+    product AS p
+LEFT JOIN
+    order_details AS od
+ON 
+    p.product_code = od.product_id
+INNER JOIN
+    user_product_interactions
+ON 
+    p.product_code = user_product_interactions.product_code
+WHERE
+    user_product_interactions.interaction_type = 'Cart'
+GROUP BY
+    p.product_code, 
+    p.product_name, 
+    p.quantity, 
+    p.product_image, 
+   
+
         `);
 
         // Send response with top products data
