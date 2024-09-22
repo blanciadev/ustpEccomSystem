@@ -58,7 +58,6 @@ router.get('/get-customer-id', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-
 // Route to insert a new order
 router.post('/insert-order', async (req, res) => {
     const { customer_id, order_date, order_details, total_price } = req.body;
@@ -121,6 +120,12 @@ router.post('/insert-order', async (req, res) => {
 
             // Add product_id to productUpdateIds for status update
             productUpdateIds.push(product_id);
+
+            // Insert the order interaction (no need to check if it exists)
+            await db.query(`
+                INSERT INTO user_product_interactions (customer_id, product_code, interaction_type)
+                VALUES (?, ?, 'order')
+            `, [customer_id, product_id]);
         }
 
         // Fetch cart items with status 'Order In Process' for the customer
@@ -161,8 +166,6 @@ router.post('/insert-order', async (req, res) => {
         res.status(500).json({ error: 'Failed to place order. Please try again.' });
     }
 });
-
-
 
 
 

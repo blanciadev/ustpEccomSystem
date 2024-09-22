@@ -56,30 +56,6 @@ WHERE
     }
 });
 
-
-// Route to get top 4 user-picked products
-router.get('/products-top-picks', async (req, res) => {
-    try {
-        // Fetch the top 4 products based on the highest interaction count
-        const [rows] = await db.query(`
-            SELECT product_id, product_code, product_name, price, description, quantity, interaction_count
-            FROM product
-            ORDER BY interaction_count DESC
-            LIMIT 4
-        `);
-
-        // Respond with top picked products
-        res.json(rows);
-    } catch (error) {
-        console.error('Error fetching top user picks:', error);
-        res.status(500).send('Error fetching top user picks');
-    }
-});
-
-
-
-
-
 router.get('/products', async (req, res) => {
     try {
         // Fetch all products and their categories
@@ -103,17 +79,38 @@ router.get('/products-top-mix-picks', async (req, res) => {
     try {
         // Fetch top products from different categories
         const [rows] = await db.query(`
-        SELECT product_id, product_code, product_name, price, description, quantity, interaction_orders, category_name
-FROM (
-    SELECT p.product_id, p.product_code, p.product_name, p.price, p.description, p.quantity, p.interaction_orders, c.category_name,
-           @ranking := IF(@category = p.category_id, @ranking + 1, 1) AS ranking,
-           @category := p.category_id
-    FROM product p
-    JOIN category c ON p.category_id = c.category_id
-    CROSS JOIN (SELECT @ranking := 0, @category := 0) AS vars
-    ORDER BY p.category_id, p.interaction_orders DESC
-) AS ranked_products
-WHERE ranking = 1;
+     SELECT
+	p.product_id, 
+	p.product_code, 
+	p.product_name, 
+	p.price, 
+	p.description, 
+	p.quantity, 
+	c.category_name, 
+	COUNT(DISTINCT user_product_interactions.product_code) AS interaction_count
+FROM
+	product AS p
+	JOIN
+	category AS c
+	ON 
+		p.category_id = c.category_id
+	JOIN
+	user_product_interactions
+	ON 
+		p.product_code = user_product_interactions.product_code
+WHERE
+	user_product_interactions.interaction_type = 'view'
+GROUP BY
+	p.product_id, 
+	p.product_code, 
+	p.product_name, 
+	p.price, 
+	p.description, 
+	p.quantity, 
+	c.category_name
+ORDER BY
+	interaction_count DESC;
+
 
         `);
 
@@ -126,28 +123,89 @@ WHERE ranking = 1;
 });
 
 
+
+// Route to get top 4 user-picked products for interaction view
+router.get('/products-top-picks', async (req, res) => {
+    try {
+        // Fetch the top 4 products based on the highest interaction count
+        const [rows] = await db.query(`
+         SELECT
+	p.product_id, 
+	p.product_code, 
+	p.product_name, 
+	p.price, 
+	p.description, 
+	p.quantity, 
+	c.category_name, 
+	COUNT(DISTINCT user_product_interactions.product_code) AS interaction_count
+FROM
+	product AS p
+	JOIN
+	category AS c
+	ON 
+		p.category_id = c.category_id
+	JOIN
+	user_product_interactions
+	ON 
+		p.product_code = user_product_interactions.product_code
+WHERE
+	user_product_interactions.interaction_type = 'view'
+GROUP BY
+	p.product_id, 
+	p.product_code, 
+	p.product_name, 
+	p.price, 
+	p.description, 
+	p.quantity, 
+	c.category_name
+ORDER BY
+	interaction_count DESC
+    LIMIT 4;`);
+
+        // Respond with top picked products
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching top user picks:', error);
+        res.status(500).send('Error fetching top user picks');
+    }
+});
+
+// for cart recommended
 router.get('/recommend-products', async (req, res) => {
     try {
         // Fetch the top 4 cart interactions per product code
         const [rankedInteractions] = await db.query(`
-            SELECT
-                p.product_code,
-                p.product_name,
-                p.price,
-                p.quantity,
-                MAX(ui.interaction_count) AS interaction_count, -- use MAX() to avoid ONLY_FULL_GROUP_BY issues
-                ui.interaction_type
-            FROM
-                user_product_interactions ui
-            INNER JOIN
-                product p ON ui.product_code = p.product_code
-            WHERE
-                ui.interaction_type = 'cart'
-            GROUP BY
-                p.product_code, p.product_name, p.price, p.quantity, ui.interaction_type
-            ORDER BY
-                interaction_count DESC
-            LIMIT 4;
+           SELECT
+	p.product_id, 
+	p.product_code, 
+	p.product_name, 
+	p.price, 
+	p.description, 
+	p.quantity, 
+	c.category_name, 
+	COUNT(DISTINCT user_product_interactions.product_code) AS interaction_count
+FROM
+	product AS p
+	JOIN
+	category AS c
+	ON 
+		p.category_id = c.category_id
+	JOIN
+	user_product_interactions
+	ON 
+		p.product_code = user_product_interactions.product_code
+WHERE
+	user_product_interactions.interaction_type = 'order'
+GROUP BY
+	p.product_id, 
+	p.product_code, 
+	p.product_name, 
+	p.price, 
+	p.description, 
+	p.quantity, 
+	c.category_name
+ORDER BY
+	interaction_count DESC;
         `);
 
         res.json(rankedInteractions);
@@ -158,8 +216,7 @@ router.get('/recommend-products', async (req, res) => {
 });
 
 
-
-router.post('/products/recommendations', async (req, res) => {
+router.post('/products-recommendations', async (req, res) => {
     const { product_code } = req.body;
 
     console.log('Received request to fetch recommendations for product_code:', product_code);

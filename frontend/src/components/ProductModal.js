@@ -7,12 +7,16 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [productsPerPage] = useState(3); // Set number of products per page
+
     useEffect(() => {
         if (product) {
             setLoading(true);
             setError(null);
 
-            fetch('http://localhost:5000/products/recommendations', {
+            fetch('http://localhost:5000/products-recommendations', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -37,6 +41,18 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         }
     }, [product]);
 
+    // Get current products for pagination
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    const currentRecommendedProducts = recommendedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+
+    // Pagination controls
+    const totalPages = Math.ceil(recommendedProducts.length / productsPerPage);
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
     if (!isOpen || !product) return null;
 
     return (
@@ -56,7 +72,6 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
 
                     {/* Add to Cart Button */}
                     <button onClick={() => onAddToCart(product)}>Add to Cart</button>
-
                     <button onClick={onClose}>Close</button>
 
                     {/* Recommendations Section */}
@@ -66,9 +81,9 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                             <p>Loading recommendations...</p>
                         ) : error ? (
                             <p>{error}</p>
-                        ) : recommendedProducts.length > 0 ? (
+                        ) : currentRecommendedProducts.length > 0 ? (
                             <div className="recommended-products-grid">
-                                {recommendedProducts.map((recProduct) => (
+                                {currentRecommendedProducts.map((recProduct) => (
                                     <div key={recProduct.product_id} className="product-card">
                                         <img
                                             src={recProduct.image_url || 'https://via.placeholder.com/150'}
@@ -92,6 +107,21 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                             </div>
                         ) : (
                             <p>No recommendations available.</p>
+                        )}
+
+                        {/* Pagination Controls */}
+                        {totalPages > 1 && (
+                            <div className="pagination">
+                                {[...Array(totalPages).keys()].map(number => (
+                                    <button
+                                        key={number + 1}
+                                        onClick={() => handlePageChange(number + 1)}
+                                        className={number + 1 === currentPage ? 'active' : ''}
+                                    >
+                                        {number + 1}
+                                    </button>
+                                ))}
+                            </div>
                         )}
                     </div>
                 </div>
