@@ -151,8 +151,8 @@ const Shop = () => {
                         <div key={product.product_code} className='product-item' onClick={() => openModal(product)}>
                             <div className='product-img'>
                                 <img
-                                    src={product.product_image || 'https://via.placeholder.com/150'}
-                                    alt={product.product_name || 'Product Image'}
+                                    src={product.product_image}
+                                    alt={product.product_name }
                                 />
                             </div>
                             <div className='product-desc'>
@@ -194,7 +194,7 @@ const Shop = () => {
                             <div key={product.product_code} className='product-item' onClick={() => openModal(product)}>
                                 <div className='product-img'>
                                     <img
-                                        src={product.product_image || 'https://via.placeholder.com/150'}
+                                        src={product.product_image }
                                         alt={product.product_name || 'Product Image'}
                                     />
                                 </div>
@@ -246,7 +246,7 @@ const Shop = () => {
                     <div key={product.product_code} className='product-item' onClick={() => openModal(product)}>
                         <div className='product-img'>
                             <img
-                                src={product.product_image || 'https://via.placeholder.com/150'}
+                                src={product.product_image }
                                 alt={product.product_name || 'Product Image'}
                             />
                         </div>

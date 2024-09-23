@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import { cartEventEmitter } from './eventEmitter';
-import ProductModal from './ProductModal';  // Import the modal
+import ProductModal from './ProductModal'; // Import the modal
 import './modal.css';
 
 const shuffleArray = (array) => {
@@ -20,7 +20,7 @@ const shuffleArray = (array) => {
 const PAGE_SIZE = 4;
 
 // ProductCard Component
-const ProductCard = React.memo(({ product, onAddToCart, onProductInteraction, onProductClick }) => {
+const ProductCard = React.memo(({ product, onAddToCart, onBuyNow, onProductClick }) => {
     if (!product) {
         return <div>Product data is not available</div>;
     }
@@ -30,9 +30,11 @@ const ProductCard = React.memo(({ product, onAddToCart, onProductInteraction, on
             <img src={product.product_image} alt={product.product_name} />
             <h3>{product.product_name}</h3>
             <p>{product.product_code}</p>
-            {/* Add stopPropagation in the button click handler */}
             <button onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}>
                 Add to Cart
+            </button>
+            <button onClick={(e) => { e.stopPropagation(); onBuyNow(product); }}>
+                Buy Now
             </button>
         </div>
     );
@@ -46,7 +48,7 @@ ProductCard.propTypes = {
         quantity: PropTypes.number
     }).isRequired,
     onAddToCart: PropTypes.func.isRequired,
-    onProductInteraction: PropTypes.func.isRequired,
+    onBuyNow: PropTypes.func.isRequired,
     onProductClick: PropTypes.func.isRequired
 };
 
@@ -87,7 +89,7 @@ const ProductList = () => {
     // Fetch recommended products for a given customer
     const fetchRecommendations = async (customerId) => {
         try {
-            const response = await axios.get(`http://localhost:5000/recommend-products`);
+            const response = await axios.get(`http://localhost:5000/recommend-products?customer_id=${customerId}`);
             const recShuffledProducts = shuffleArray(response.data);
             setRecommendedProducts(recShuffledProducts);
         } catch (error) {
@@ -95,58 +97,51 @@ const ProductList = () => {
         }
     };
 
-    // Debounce for add to cart
-    const handleAddToCart = (() => {
-        let timeout;
-        return async (product) => {
-            if (timeout) clearTimeout(timeout);
-            timeout = setTimeout(async () => {
-                const token = localStorage.getItem('token');
-                if (!token || !customerId) {
-                    console.log('User not logged in or customer ID missing');
-                    return;
-                }
-
-                try {
-                    const response = await axios.post('http://localhost:5000/add-to-cart', {
-                        customer_id: customerId,
-                        product_code: product.product_code,
-                        quantity: 1
-                    }, {
-                        headers: { Authorization: `Bearer ${token}` }
-                    });
-
-                    if (response.status === 200) {
-                        cartEventEmitter.emit('cartUpdated');
-                        await handleProductInteraction(product.product_code, 'cart');
-                    }
-                } catch (error) {
-                    console.error('Error adding product to cart:', error.response ? error.response.data : error.message);
-                }
-            }, 300); // Debounce delay
-        };
-    })();
-
-    const handleProductInteraction = async (productCode, interactionType) => {
-        const customerId = localStorage.getItem('customer_id');
-        if (!customerId) {
-            console.log('Customer ID is not available');
+    const handleAddToCart = async (product) => {
+        const token = localStorage.getItem('token');
+        if (!token || !customerId) {
+            console.log('User not logged in or customer ID missing');
             return;
         }
 
         try {
-            await axios.get('http://localhost:5000/products-interaction', {
-                params: {
-                    product_code: productCode,
-                    customerId: customerId,
-                    interaction_type: interactionType
-                }
+            const response = await axios.post('http://localhost:5000/add-to-cart', {
+                customer_id: customerId,
+                product_code: product.product_code,
+                quantity: 1
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
             });
-            console.log('Product interaction updated');
+
+            if (response.status === 200) {
+                cartEventEmitter.emit('cartUpdated');
+                // await handleProductInteraction(product.product_code, 'cart');
+            }
         } catch (error) {
-            console.error('Error updating product interaction:', error.response ? error.response.data : error.message);
+            console.error('Error adding product to cart:', error.response ? error.response.data : error.message);
         }
     };
+
+    // const handleProductInteraction = async (productCode, interactionType) => {
+    //     const customerId = localStorage.getItem('customer_id');
+    //     if (!customerId) {
+    //         console.log('Customer ID is not available');
+    //         return;
+    //     }
+
+    //     try {
+    //         await axios.get('http://localhost:5000/products-interaction', {
+    //             params: {
+    //                 product_code: productCode,
+    //                 customerId: customerId,
+    //                 interaction_type: interactionType
+    //             }
+    //         });
+    //         console.log('Product interaction updated');
+    //     } catch (error) {
+    //         console.error('Error updating product interaction:', error.response ? error.response.data : error.message);
+    //     }
+    // };
 
     const handlePageChange = (direction) => {
         setCurrentPage((prevPage) => {
@@ -159,13 +154,46 @@ const ProductList = () => {
     const handleProductClick = (product) => {
         setSelectedProduct(product);
         setIsModalOpen(true); // Open modal
-        handleProductInteraction(product.product_code, 'view');
+        // handleProductInteraction(product.product_code, 'view');
     };
 
     const closeModal = () => {
         setIsModalOpen(false);
         setSelectedProduct(null);
     };
+
+    const handleBuyNow = async (product) => {
+        const token = localStorage.getItem('token');
+        const customerId = localStorage.getItem('customer_id');
+    
+        if (!token || !customerId) {
+            console.log('User not logged in or customer ID missing');
+            return;
+        }
+    
+        try {
+            // Add product to cart
+            const response = await axios.post('http://localhost:5000/add-to-cart', {
+                customer_id: customerId,
+                product_code: product.product_code,
+                quantity: 1
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+    
+            if (response.status === 200) {
+                // Save selected product in localStorage
+                localStorage.setItem('selectedProducts', JSON.stringify([product]));
+    
+                // Redirect to checkout details
+                window.location.href = '\checkout';
+            }
+        } catch (error) {
+            console.error('Error adding product to cart:', error.response ? error.response.data : error.message);
+        }
+    };
+    
+
 
     if (loading) {
         return <div>Loading...</div>;
@@ -182,13 +210,13 @@ const ProductList = () => {
             <h2>Top Products</h2>
             <div className='product-list' style={{ display: 'flex', flexWrap: 'nowrap', overflowX: 'auto' }}>
                 {paginatedProducts.map((product) => (
-                    <ProductCard
-                        key={product.product_code}
-                        product={product}
-                        onAddToCart={handleAddToCart}
-                        onProductInteraction={handleProductInteraction}
-                        onProductClick={handleProductClick}  // Pass down the click handler for modal
-                    />
+                <ProductCard
+                key={product.product_code}
+                product={product}
+                onAddToCart={handleAddToCart}
+                onBuyNow={handleBuyNow} // Pass down the buy now handler
+                onProductClick={handleProductClick} // Pass down the click handler for modal
+            />
                 ))}
             </div>
             <div className='pagination-controls'>

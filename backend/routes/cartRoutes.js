@@ -208,6 +208,58 @@ router.get('/cart-item-count/:customer_id', async (req, res) => {
 });
 
 
+router.post('/checkout-details', async (req, res) => {
+    const { selectedProducts, customerId } = req.body; // Extract customerId from the request body
+
+    // Validate the selected products and customerId
+    if (!selectedProducts || selectedProducts.length === 0) {
+        return res.status(400).json({ message: 'No products selected.' });
+    }
+
+    if (!customerId) {
+        return res.status(400).json({ message: 'Customer ID is required.' });
+    }
+
+    try {
+        // Construct a parameterized query for the selected products
+        const placeholders = selectedProducts.map(() => '?').join(','); // Create a list of placeholders (e.g., ?, ?, ?)
+        const query = `
+            SELECT
+                p.product_id,
+                p.product_code,
+                p.product_name,
+                p.description,
+                p.price,
+                p.size,
+                p.expiration_date,
+                c.category_name,
+                ci.quantity
+            FROM
+                cart_items AS ci
+            JOIN
+                product AS p ON ci.product_code = p.product_code
+            JOIN
+                category AS c ON p.category_id = c.category_id
+            WHERE
+                ci.customer_id = ? AND p.product_code IN (${placeholders})
+        `;
+
+        // Query the database using the customer ID and selected product codes
+        const [rows] = await db.query(query, [customerId, ...selectedProducts]);
+
+        if (!rows || rows.length === 0) {
+            return res.status(404).json({ message: 'No matching products found in your cart.' });
+        }
+
+        // Return the fetched product details
+        res.status(200).json({ items: rows });
+    } catch (err) {
+        console.error('Error fetching product details:', err.message);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
 
 
 

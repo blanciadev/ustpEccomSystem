@@ -127,7 +127,7 @@ FROM
 	ON 
 		p.product_code = user_product_interactions.product_code
 WHERE
-	user_product_interactions.interaction_type = 'Order'
+	user_product_interactions.interaction_type = 'cart'
 GROUP BY
 	p.product_id, 
 	p.product_code, 
@@ -138,7 +138,6 @@ GROUP BY
 	c.category_name
 ORDER BY
 	interaction_count DESC;
-
 
         `);
 
