@@ -58,6 +58,7 @@ router.get('/get-customer-id', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+
 // Route to insert a new order
 router.post('/insert-order', async (req, res) => {
     const { customer_id, order_date, order_details, total_price } = req.body;
