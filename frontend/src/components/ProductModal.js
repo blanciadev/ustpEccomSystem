@@ -61,7 +61,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                 <button className="modal-close" onClick={onClose}>X</button>
                 <div className="modal-body">
                     <img
-                        src={product.image_url || 'https://via.placeholder.com/150'}
+                        src={product.product_image}
                         alt={product.product_name}
                         style={{ width: '100%' }}
                     />
@@ -86,7 +86,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                                 {currentRecommendedProducts.map((recProduct) => (
                                     <div key={recProduct.product_id} className="product-card">
                                         <img
-                                            src={recProduct.image_url || 'https://via.placeholder.com/150'}
+                                            src={recProduct.product_image}
                                             alt={recProduct.product_name}
                                             className="product-image"
                                         />
@@ -134,8 +134,8 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
 ProductModal.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     product: PropTypes.shape({
-        product_code: PropTypes.string.isRequired,
-        image_url: PropTypes.string,
+        product_image: PropTypes.string.isRequired,
+        product_code: PropTypes.string,
         product_name: PropTypes.string,
         description: PropTypes.string,
         price: PropTypes.number,

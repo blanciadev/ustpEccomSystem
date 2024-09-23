@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import { cartEventEmitter } from './eventEmitter';
@@ -26,32 +26,21 @@ const ProductCard = React.memo(({ product, onAddToCart, onProductInteraction, on
     }
 
     return (
-        <div className='procard' style={{ width: '22%', margin: '1%' }}>
-            <div className='productimg' style={{ width: '100%', height: '65%' }}>
-                <img
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    src={product.image_url || 'https://via.placeholder.com/150'}
-                    alt={product.product_name || 'Product Image'}
-                    onClick={() => onProductClick(product)}  // Trigger modal on click
-                />
-            </div>
-            <div className='productdesc' style={{ width: '100%', height: '35%' }}>
-                <div className='product-data'>
-                    <p>{product.product_name || 'No product name'}</p>
-                    <p>Quantity: {product.quantity}</p>
-                    <div className='order-options'>
-                        <button onClick={() => onAddToCart(product)}>Add to Cart</button>
-                        <button onClick={() => onProductInteraction(product.product_code, 'view')}>Buy Now</button>
-                    </div>
-                </div>
-            </div>
+        <div className="product-card" onClick={() => onProductClick(product)}>
+            <img src={product.product_image} alt={product.product_name} />
+            <h3>{product.product_name}</h3>
+            <p>{product.product_code}</p>
+            {/* Add stopPropagation in the button click handler */}
+            <button onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}>
+                Add to Cart
+            </button>
         </div>
     );
 });
 
 ProductCard.propTypes = {
     product: PropTypes.shape({
-        image_url: PropTypes.string,
+        product_image: PropTypes.string,
         product_name: PropTypes.string,
         product_code: PropTypes.string.isRequired,
         quantity: PropTypes.number
@@ -63,16 +52,16 @@ ProductCard.propTypes = {
 
 // ProductList Component
 const ProductList = () => {
-    const [products, setProducts] = React.useState([]);
-    const [recommendedProducts, setRecommendedProducts] = React.useState([]);
-    const [loading, setLoading] = React.useState(true);
-    const [error, setError] = React.useState(null);
-    const [customerId, setCustomerId] = React.useState(null);
-    const [currentPage, setCurrentPage] = React.useState(0);
-    const [selectedProduct, setSelectedProduct] = React.useState(null); // Modal product state
-    const [isModalOpen, setIsModalOpen] = React.useState(false); // Modal visibility state
+    const [products, setProducts] = useState([]);
+    const [recommendedProducts, setRecommendedProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [customerId, setCustomerId] = useState(null);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [selectedProduct, setSelectedProduct] = useState(null); // Modal product state
+    const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
 
-    React.useEffect(() => {
+    useEffect(() => {
         const storedCustomerId = localStorage.getItem('customer_id');
         if (storedCustomerId) {
             setCustomerId(storedCustomerId);
@@ -83,7 +72,6 @@ const ProductList = () => {
             setLoading(true);
             try {
                 const response = await axios.get('http://localhost:5000/products-top-mix-picks');
-
                 const shuffledProducts = shuffleArray(response.data);
                 setProducts(shuffledProducts);
             } catch (error) {
@@ -215,7 +203,6 @@ const ProductList = () => {
                 onAddToCart={handleAddToCart}
                 onClose={closeModal}
             />
-
         </div>
     );
 };

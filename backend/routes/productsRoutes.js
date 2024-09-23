@@ -79,7 +79,7 @@ router.get('/products-top-mix-picks', async (req, res) => {
     try {
         // Fetch top products from different categories
         const [rows] = await db.query(`
-     SELECT
+       SELECT
 	p.product_id, 
 	p.product_code, 
 	p.product_name, 
@@ -87,7 +87,8 @@ router.get('/products-top-mix-picks', async (req, res) => {
 	p.description, 
 	p.quantity, 
 	c.category_name, 
-	COUNT(DISTINCT user_product_interactions.product_code) AS interaction_count
+	COUNT(DISTINCT user_product_interactions.product_code) AS interaction_count, 
+	p.product_image
 FROM
 	product AS p
 	JOIN
@@ -99,7 +100,7 @@ FROM
 	ON 
 		p.product_code = user_product_interactions.product_code
 WHERE
-	user_product_interactions.interaction_type = 'view'
+	user_product_interactions.interaction_type = 'Order'
 GROUP BY
 	p.product_id, 
 	p.product_code, 
@@ -137,7 +138,8 @@ router.get('/products-top-picks', async (req, res) => {
 	p.description, 
 	p.quantity, 
 	c.category_name, 
-	COUNT(DISTINCT user_product_interactions.product_code) AS interaction_count
+	COUNT(DISTINCT user_product_interactions.product_code) AS interaction_count, 
+	p.product_image
 FROM
 	product AS p
 	JOIN
@@ -160,7 +162,7 @@ GROUP BY
 	c.category_name
 ORDER BY
 	interaction_count DESC
-    LIMIT 4;`);
+LIMIT 4;`);
 
         // Respond with top picked products
         res.json(rows);
@@ -183,7 +185,8 @@ router.get('/recommend-products', async (req, res) => {
 	p.description, 
 	p.quantity, 
 	c.category_name, 
-	COUNT(DISTINCT user_product_interactions.product_code) AS interaction_count
+	COUNT(DISTINCT user_product_interactions.product_code) AS interaction_count, 
+	p.product_image
 FROM
 	product AS p
 	JOIN
@@ -205,7 +208,8 @@ GROUP BY
 	p.quantity, 
 	c.category_name
 ORDER BY
-	interaction_count DESC;
+	interaction_count DESC
+    ;
         `);
 
         res.json(rankedInteractions);
@@ -240,8 +244,17 @@ router.post('/products-recommendations', async (req, res) => {
         // Fetch products from the same category, excluding the selected product
         console.log(`Querying for recommended products in category: ${category_id} excluding product_id: ${product_id}`);
         const [recommendedProducts] = await db.query(`
-            SELECT p.product_id, p.category_id, p.product_code, p.product_name, p.price, p.description, p.quantity
-            FROM product p
+            SELECT
+	p.product_id, 
+	p.category_id, 
+	p.product_code, 
+	p.product_name, 
+	p.price, 
+	p.description, 
+	p.quantity, 
+	p.product_image
+FROM
+	product AS p
             WHERE p.category_id = ? AND p.product_id != ?
         `, [category_id, product_id]);
 

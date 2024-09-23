@@ -3,7 +3,7 @@ import './Cart.css';
 import Navigation from '../../components/Navigation';
 import Footer from '../../components/Footer';
 import CartProduct from '../../components/CartProduct';
-import cartEventEmitter from '../../components/cartEventEmitter'; 
+import cartEventEmitter from '../../components/cartEventEmitter';
 import { useNavigate } from 'react-router-dom';
 
 const CartContent = () => {
@@ -83,8 +83,18 @@ const CartContent = () => {
 
   const handleCheckout = () => {
     const selectedProducts = cartItems.filter(item => selectedItems[item.product_code]);
+
+    if (selectedProducts.length === 0) {
+      alert("Please select at least one product to proceed to checkout.");
+      return;
+    }
+
+    // Save selected products in localStorage before navigating
+    localStorage.setItem('selectedProducts', JSON.stringify(selectedProducts));
+
     navigate('/checkout', { state: { selectedProducts, totalPrice } });
   };
+
 
   const handleSelectAllChange = () => {
     const allSelected = Object.keys(selectedItems).length === cartItems.length;

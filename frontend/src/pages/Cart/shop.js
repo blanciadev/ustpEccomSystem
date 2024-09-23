@@ -69,6 +69,29 @@ const Shop = () => {
         setCurrentPage(1);
     };
 
+    const handleBuyNow = (product) => {
+        // Create an object that includes the product details and quantity
+        const productData = {
+            ...product,
+            quantity: product.quantity = 1,
+        };
+
+        // Retrieve existing selected products or create a new array
+        const existingProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
+
+        // Add the new product to the array
+        existingProducts.push(productData);
+
+        // Store the updated array in localStorage
+        localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
+
+        // Redirect to the checkout page
+        window.location.href = '/checkout';
+        console.log(productData);
+    };
+
+
+
     const handleAddToCart = async (product) => {
         const token = localStorage.getItem('token');
         const userId = localStorage.getItem('customer_id');
@@ -128,7 +151,7 @@ const Shop = () => {
                         <div key={product.product_code} className='product-item' onClick={() => openModal(product)}>
                             <div className='product-img'>
                                 <img
-                                    src={product.image_url || 'https://via.placeholder.com/150'}
+                                    src={product.product_image || 'https://via.placeholder.com/150'}
                                     alt={product.product_name || 'Product Image'}
                                 />
                             </div>
@@ -146,6 +169,16 @@ const Shop = () => {
                                 >
                                     Add to Cart
                                 </button>
+                                <button
+                                    className='buy-now-button'
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleBuyNow(product, product.quantity);
+                                    }}
+                                >
+                                    Buy Now
+                                </button>
+
                             </div>
                         </div>
                     ))}
@@ -161,7 +194,7 @@ const Shop = () => {
                             <div key={product.product_code} className='product-item' onClick={() => openModal(product)}>
                                 <div className='product-img'>
                                     <img
-                                        src={product.image_url || 'https://via.placeholder.com/150'}
+                                        src={product.product_image || 'https://via.placeholder.com/150'}
                                         alt={product.product_name || 'Product Image'}
                                     />
                                 </div>
@@ -179,6 +212,16 @@ const Shop = () => {
                                     >
                                         Add to Cart
                                     </button>
+                                    <button
+                                        className='buy-now-button'
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleBuyNow(product, product.quantity);
+                                        }}
+                                    >
+                                        Buy Now
+                                    </button>
+
                                 </div>
                             </div>
                         ))}
@@ -203,7 +246,7 @@ const Shop = () => {
                     <div key={product.product_code} className='product-item' onClick={() => openModal(product)}>
                         <div className='product-img'>
                             <img
-                                src={product.image_url || 'https://via.placeholder.com/150'}
+                                src={product.product_image || 'https://via.placeholder.com/150'}
                                 alt={product.product_name || 'Product Image'}
                             />
                         </div>
@@ -221,6 +264,16 @@ const Shop = () => {
                             >
                                 Add to Cart
                             </button>
+                            <button
+                                className='buy-now-button'
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleBuyNow(product, product.quantity);
+                                }}
+                            >
+                                Buy Now
+                            </button>
+
                         </div>
                     </div>
                 ))}
