@@ -41,6 +41,23 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         }
     }, [product]);
 
+    // Handle Buy Now action
+    const handleBuyNow = (product) => {
+        const productData = {
+            ...product,
+            quantity: 1, // Set default quantity to 1 for immediate purchase
+        };
+
+        const existingProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
+
+        existingProducts.push(productData);
+
+        localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
+
+        // Redirect to checkout
+        window.location.href = '/checkout';
+    };
+
     // Get current products for pagination
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
@@ -72,7 +89,13 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
 
                     {/* Add to Cart Button */}
                     <button onClick={() => onAddToCart(product)}>Add to Cart</button>
-                    <button onClick={onClose}>Close</button>
+
+                    {/* Buy Now Button */}
+                    <button onClick={() => handleBuyNow(product)} style={{ marginLeft: '10px' }}>
+                        Buy Now
+                    </button>
+
+                    <button onClick={onClose} style={{ marginLeft: '10px' }}>Close</button>
 
                     {/* Recommendations Section */}
                     <div className="recommendations">
@@ -100,6 +123,15 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                                                 onClick={() => onAddToCart(recProduct)}
                                             >
                                                 Add to Cart
+                                            </button>
+
+                                            {/* Buy Now Button for Recommended Product */}
+                                            <button
+                                                className="buy-now-btn"
+                                                onClick={() => handleBuyNow(recProduct)}
+                                                style={{ marginLeft: '10px' }}
+                                            >
+                                                Buy Now
                                             </button>
                                         </div>
                                     </div>
@@ -142,7 +174,7 @@ ProductModal.propTypes = {
         quantity: PropTypes.number
     }),
     onAddToCart: PropTypes.func.isRequired,
-    onClose: PropTypes.func.isRequired
+    onClose: PropTypes.func.isRequired,
 };
 
 export default ProductModal;

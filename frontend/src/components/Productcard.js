@@ -20,7 +20,7 @@ const shuffleArray = (array) => {
 const PAGE_SIZE = 4;
 
 // ProductCard Component
-const ProductCard = React.memo(({ product, onAddToCart, onProductInteraction, onProductClick }) => {
+const ProductCard = React.memo(({ product, onAddToCart, onProductInteraction, onProductClick, onBuyNow }) => {
     if (!product) {
         return <div>Product data is not available</div>;
     }
@@ -34,6 +34,8 @@ const ProductCard = React.memo(({ product, onAddToCart, onProductInteraction, on
             <button onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}>
                 Add to Cart
             </button>
+            <button onClick={(e) => { e.stopPropagation(); onBuyNow(product); }}>Buy Now</button>
+
         </div>
     );
 });
@@ -62,6 +64,7 @@ const ProductList = () => {
     const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
 
     useEffect(() => {
+        localStorage.removeItem('selectedProducts');
         const storedCustomerId = localStorage.getItem('customer_id');
         if (storedCustomerId) {
             setCustomerId(storedCustomerId);
@@ -175,6 +178,29 @@ const ProductList = () => {
         return <div>{error}</div>;
     }
 
+    const handleBuyNow = (product) => {
+        // Create an object that includes the product details and quantity
+        const productData = {
+            ...product,
+            quantity: 1,
+        };
+
+        // Retrieve existing selected products or create a new array
+        const existingProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
+
+        // Add the new product to the array
+        existingProducts.push(productData);
+
+        // Store the updated array in localStorage
+        localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
+
+        // Redirect to the checkout page
+        window.location.href = '/checkout';
+
+
+    };
+
+
     const paginatedProducts = products.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
 
     return (
@@ -187,7 +213,8 @@ const ProductList = () => {
                         product={product}
                         onAddToCart={handleAddToCart}
                         onProductInteraction={handleProductInteraction}
-                        onProductClick={handleProductClick}  // Pass down the click handler for modal
+                        onProductClick={handleProductClick}
+                        onBuyNow={handleBuyNow}
                     />
                 ))}
             </div>

@@ -40,6 +40,19 @@ const Checkout = () => {
       setOriginalQuantities(quantities);
     };
     fetchOriginalQuantities();
+
+    // Listen for page refresh or navigation away from the page
+    const handleBeforeUnload = () => {
+      localStorage.removeItem('selectedProducts');
+    };
+
+    // Attach event listener
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    // Clean up event listener on component unmount
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
   }, [savedProducts]);
 
   const handleInputChange = (e) => {
@@ -193,7 +206,6 @@ const Checkout = () => {
                 savedProducts.map((product, index) => (
                   <li key={product.product_code}>
                     <span>{product.product_name}</span>
-                    <span>{product.originalQuantities}</span>
                     <input
                       type="number"
                       min="1"
