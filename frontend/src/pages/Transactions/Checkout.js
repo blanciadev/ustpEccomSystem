@@ -41,15 +41,12 @@ const Checkout = () => {
     };
     fetchOriginalQuantities();
 
-    // Listen for page refresh or navigation away from the page
     const handleBeforeUnload = () => {
       localStorage.removeItem('selectedProducts');
     };
 
-    // Attach event listener
     window.addEventListener('beforeunload', handleBeforeUnload);
 
-    // Clean up event listener on component unmount
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
@@ -71,7 +68,7 @@ const Checkout = () => {
   };
 
   const handleQuantityChange = (index, e) => {
-    const newQuantity = Math.max(1, Number(e.target.value)); // Ensure new quantity is at least 1
+    const newQuantity = Math.max(1, Number(e.target.value));
 
     if (newQuantity > originalQuantities[index]) {
       setError(`Quantity exceeds available stock for\n ${savedProducts[index].product_name}. Available: ${originalQuantities[index]}`);
@@ -79,14 +76,29 @@ const Checkout = () => {
     }
 
     const newQuantities = [...quantities];
-    newQuantities[index] = newQuantity; // Update the quantity
+    newQuantities[index] = newQuantity;
     setQuantities(newQuantities);
-    setError(''); // Clear any error if the quantity is valid
+    setError('');
   };
 
   const validateForm = () => {
     const { fullName, phoneNumber, address, region, postalCode, paymentMethod } = formData;
     return fullName && phoneNumber && address && region && postalCode && paymentMethod;
+  };
+
+  const handleRemoveProduct = (index) => {
+    // Remove the product from savedProducts and quantities
+    const updatedProducts = [...savedProducts];
+    const updatedQuantities = [...quantities];
+    
+    updatedProducts.splice(index, 1); // Remove the product at the given index
+    updatedQuantities.splice(index, 1); // Remove corresponding quantity
+
+    setQuantities(updatedQuantities);
+
+    // Update localStorage with the new list of selected products
+    localStorage.setItem('selectedProducts', JSON.stringify(updatedProducts));
+    window.location.reload(); // Reload to refresh the component
   };
 
   const handleSubmit = async (e) => {
@@ -200,6 +212,7 @@ const Checkout = () => {
               <span>Item</span>
               <span>Quantity</span>
               <span>Total Price</span>
+              <span>Remove</span>
             </div>
             <ul className="product-list">
               {savedProducts.length > 0 ? (
@@ -214,6 +227,7 @@ const Checkout = () => {
                       onChange={(e) => handleQuantityChange(index, e)}
                     />
                     <span>₱{(product.price * quantities[index]).toFixed(2)}</span>
+                    <button className='remove-btn' onClick={() => handleRemoveProduct(index)}>Remove</button>
                   </li>
                 ))
               ) : (
