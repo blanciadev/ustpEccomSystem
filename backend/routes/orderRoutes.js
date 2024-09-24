@@ -58,13 +58,13 @@ router.get('/get-customer-id', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-
 // Route to insert a new order
 router.post('/insert-order', async (req, res) => {
     const { customer_id, order_date, order_details, total_price } = req.body;
 
     console.log('Received order data:', { customer_id, order_date, order_details, total_price });
 
+    // Validate incoming request data
     if (!customer_id || !order_date || !order_details || !Array.isArray(order_details) || !total_price) {
         const missingFields = [];
         if (!customer_id) missingFields.push('customer_id');
@@ -82,6 +82,7 @@ router.post('/insert-order', async (req, res) => {
         const formattedOrderDate = convertToMySQLDateTime(order_date);
         console.log('Formatted order_date:', formattedOrderDate);
 
+        // Start transaction
         await db.query('START TRANSACTION');
 
         // Check if customer exists
@@ -104,25 +105,30 @@ router.post('/insert-order', async (req, res) => {
         const productUpdateIds = []; // Array to collect product IDs for status update
         const productIdsInProcess = []; // Array to collect products already in process
 
+        // Loop through order_details
         for (const detail of order_details) {
             const { product_id, quantity, totalprice, payment_date, payment_method, payment_status } = detail;
 
-            if (!product_id || !quantity || totalprice == null || !payment_date || !payment_method || !payment_status) {
+            // Validate fields, making payment_date optional if necessary
+            if (!product_id || !quantity || totalprice == null || !payment_method || !payment_status) {
                 console.log('Invalid order detail:', detail);
                 await db.query('ROLLBACK');
                 return res.status(400).json({ error: 'Invalid order detail' });
             }
 
+            // If payment_date is optional, handle it conditionally
+            const formattedPaymentDate = payment_date ? convertToMySQLDateTime(payment_date) : null;
+
             // Insert into order details table
             await db.query(`
                 INSERT INTO \`order_details\` (order_id, product_id, quantity, total_price, payment_date, payment_method, payment_status, order_status, order_date) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending', NOW())
-            `, [order_id, product_id, quantity, totalprice, convertToMySQLDateTime(payment_date), payment_method, payment_status]);
+            `, [order_id, product_id, quantity, totalprice, formattedPaymentDate, payment_method, payment_status]);
 
             // Add product_id to productUpdateIds for status update
             productUpdateIds.push(product_id);
 
-            // Insert the order interaction (no need to check if it exists)
+            // Insert user product interaction
             await db.query(`
                 INSERT INTO user_product_interactions (customer_id, product_code, interaction_type)
                 VALUES (?, ?, 'order')
@@ -130,19 +136,22 @@ router.post('/insert-order', async (req, res) => {
         }
 
         // Fetch cart items with status 'Order In Process' for the customer
-        const [cartItemsInProcess] = await db.query(`
-            SELECT product_code
-            FROM \`cart_items\`
-            WHERE customer_id = ? AND product_code IN (${productUpdateIds.map(() => '?').join(', ')})
-            AND status = 'Order In Process'
-        `, [customer_id, ...productUpdateIds]);
+        if (productUpdateIds.length > 0) {
+            const [cartItemsInProcess] = await db.query(`
+                SELECT product_code
+                FROM \`cart_items\`
+                WHERE customer_id = ? 
+                AND product_code IN (${productUpdateIds.map(() => '?').join(', ')})
+                AND status = 'Order In Process'
+            `, [customer_id, ...productUpdateIds]);
 
-        // Extract product_codes that are already in process
-        if (cartItemsInProcess.length > 0) {
-            productIdsInProcess.push(...cartItemsInProcess.map(item => item.product_code));
+            // Extract product_codes that are already in process
+            if (cartItemsInProcess.length > 0) {
+                productIdsInProcess.push(...cartItemsInProcess.map(item => item.product_code));
+            }
         }
 
-        // Filter out products that are already in process from productUpdateIds
+        // Filter out products that are already in process
         const productIdsToUpdate = productUpdateIds.filter(product_id => !productIdsInProcess.includes(product_id));
 
         // Update status for products not already in process
@@ -157,6 +166,7 @@ router.post('/insert-order', async (req, res) => {
             console.log('Updated product status for items not already in process.');
         }
 
+        // Commit transaction
         await db.query('COMMIT');
         console.log('Transaction committed successfully');
 

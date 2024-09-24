@@ -61,7 +61,7 @@ const Checkout = () => {
     const newQuantity = Math.max(1, Number(e.target.value)); // Ensure new quantity is at least 1
 
     if (newQuantity > originalQuantities[index]) {
-      setError(`Quantity exceeds available stock for ${savedProducts[index].product_name}. Available: ${originalQuantities[index]}`);
+      setError(`Quantity exceeds available stock for\n ${savedProducts[index].product_name}. Available: ${originalQuantities[index]}`);
       return;
     }
 
@@ -193,6 +193,7 @@ const Checkout = () => {
                 savedProducts.map((product, index) => (
                   <li key={product.product_code}>
                     <span>{product.product_name}</span>
+                    <span>{product.originalQuantities}</span>
                     <input
                       type="number"
                       min="1"
