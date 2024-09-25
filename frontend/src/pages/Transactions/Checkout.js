@@ -110,6 +110,8 @@ const Checkout = () => {
     setOriginalQuantities(updatedQuantities);
   };
 
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -131,17 +133,27 @@ const Checkout = () => {
 
       const orderData = {
         customer_id: customerId,
+        fullName: formData.fullName,
         order_details: savedProducts.map((product, index) => ({
           product_id: product.product_code,
           quantity: quantities[index],
           totalprice: product.price * quantities[index],
-          payment_method: formData.paymentMethod,
+          payment_method: 'COD',
           payment_status: 'Pending',
         })),
         total_price: quantities.reduce((total, qty, index) => total + (savedProducts[index].price * qty), 0),
         order_date: new Date().toISOString(),
+        shipment_date: new Date().toISOString(),
+        address: formData.address,
+        region: formData.region,
+        shipment_status: 'Pending',
+        paymentMethod: formData.paymentMethod,
+        phoneNumber: formData.phoneNumber,
+        postalCode: formData.postalCode,
+
       };
 
+      console.log(orderData);
       const response = await axios.post('http://localhost:5000/insert-order', orderData, {
         headers: { Authorization: `Bearer ${authToken}`, 'Content-Type': 'application/json' },
       });
@@ -200,16 +212,6 @@ const Checkout = () => {
                   />
                   Cash On Delivery
                 </label>
-                <label>
-                  <input
-                    type='radio'
-                    name='paymentMethod'
-                    value='Credit/Debit Card'
-                    checked={formData.paymentMethod === 'Credit/Debit Card'}
-                    onChange={handlePaymentChange}
-                  />
-                  Credit/Debit Card
-                </label>
               </div>
               <div className='form-group'>
                 <button type='submit' className='submit-btn' disabled={loading}>
@@ -253,6 +255,7 @@ const Checkout = () => {
       <Footer />
     </div>
   );
+
 };
 
 export default Checkout;

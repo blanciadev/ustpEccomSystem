@@ -75,7 +75,9 @@ router.get('/admin-order-history', async (req, res) => {
             SELECT
                 \`order\`.*, 
                 product.product_name, 
+                order_details.order_details_id, 
                 order_details.product_id, 
+                   order_details.payment_date, 
                 order_details.payment_method, 
                 order_details.total_price, 
                 order_details.quantity, 
@@ -112,23 +114,35 @@ router.get('/admin-order-history', async (req, res) => {
 
         console.log('Fetched orders:', orders);
 
+        // Group orders by order_id
         const groupedOrders = orders.reduce((acc, order) => {
             if (!acc[order.order_id]) {
                 acc[order.order_id] = {
                     order_id: order.order_id,
-                    product_id: order.product_id,
                     order_date: order.order_date,
                     order_total: order.order_total,
                     order_status: order.order_status,
+                    payment_date: order.payment_date,
                     payment_status: order.payment_status,
                     payment_method: order.payment_method,
                     customer_id: order.customer_id,
                     customer_first_name: order.first_name,
                     customer_last_name: order.last_name,
+                    customer_email: order.email,
+                    customer_phone: order.phone_number,
+                    customer_address: {
+                        street_name: order.street_name,
+                        region: order.region,
+                        postal_code: order.postal_code,
+                    },
                     products: []
                 };
             }
+
+            // Add the current product to the products array
             acc[order.order_id].products.push({
+                order_details_id: order.order_details_id,
+                payment_date: order.payment_date,
                 product_id: order.product_id,
                 product_name: order.product_name,
                 price: order.price,
@@ -137,6 +151,7 @@ router.get('/admin-order-history', async (req, res) => {
                 payment_status: order.payment_status,
                 payment_method: order.payment_method,
             });
+
             return acc;
         }, {});
 
@@ -147,6 +162,7 @@ router.get('/admin-order-history', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 });
+
 
 
 router.get('/admin-order-history-component', async (req, res) => {
@@ -298,16 +314,16 @@ router.get('/payment-insight', async (req, res) => {
             ORDER BY 
                 order_month;
         `;
-        
+
         const result = await db.query(query);
         console.log(result); // Check the structure of the result
 
         // Check if result is nested and extract data accordingly
-        const monthlyCounts = Array.isArray(result) && result.length > 0 
+        const monthlyCounts = Array.isArray(result) && result.length > 0
             ? result[0].map(row => ({
                 month: row.order_month,
                 count: row.completed_orders_count,
-            })) 
+            }))
             : [];
 
         console.log(monthlyCounts); // Log the final monthly counts

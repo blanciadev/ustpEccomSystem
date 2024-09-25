@@ -75,20 +75,31 @@ const Payments = () => {
     if (!acc[order.order_id]) {
       acc[order.order_id] = {
         order_id: order.order_id,
-        product_id: order.product_id,
         order_date: order.order_date,
         order_total: order.order_total,
         order_status: order.order_status,
+        payment_date: order.payment_date,
         payment_status: order.payment_status,
         payment_method: order.payment_method,
         customer_id: order.customer_id,
         customer_first_name: order.first_name,
         customer_last_name: order.last_name,
-        products: []
+        customer_email: order.email,
+        customer_phone: order.phone_number,
+        customer_address: {
+          street_name: order.street_name,
+          region: order.region,
+          postal_code: order.postal_code,
+        },
+        products: [],
       };
     }
+
+    // Add the current product to the products array
     acc[order.order_id].products.push({
-      product_id: order.product_id,  
+      order_details_id: order.order_details_id,
+      payment_date: order.payment_date,
+      product_id: order.product_id,
       product_name: order.product_name,
       price: order.price,
       quantity: order.quantity,
@@ -96,6 +107,7 @@ const Payments = () => {
       payment_status: order.payment_status,
       payment_method: order.payment_method,
     });
+
     return acc;
   }, {});
 
@@ -145,10 +157,11 @@ const Payments = () => {
                   <thead>
                     <tr>
                       <th><input type='checkbox' /></th>
-                      <th>Payment ID</th>
                       <th>Order ID</th>
+                      <th>Customer ID</th>
                       <th>Payment Date</th>
                       <th>Payment Method</th>
+                      <th>Shipment Status</th>
                       <th>Payment Status</th>
                       <th>Action</th>
                     </tr>
@@ -158,9 +171,10 @@ const Payments = () => {
                       <tr key={index}>
                         <td><input type='checkbox' /></td>
                         <td>{order.order_id}</td>
-                        <td>{order.product_id}</td>
-                        <td>{new Date(order.order_date).toLocaleDateString()}</td>
+                        <td>{order.customer_id}</td>
+                        <td>{new Date(order.payment_date).toLocaleDateString()}</td> {/* Displaying payment_date */}
                         <td>{order.payment_method}</td>
+                        <td>{order.order_status}</td>
                         <td>{order.payment_status}</td>
                         <td>
                           <button onClick={() => handleUpdateClick(order)}>Update</button>
@@ -168,6 +182,7 @@ const Payments = () => {
                       </tr>
                     ))}
                   </tbody>
+
                 </table>
               )}
             </div>
