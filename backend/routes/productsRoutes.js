@@ -73,6 +73,33 @@ router.get('/products', async (req, res) => {
     }
 });
 
+// Add this new route to your router
+router.get('/products/:productCode', async (req, res) => {
+    const { productCode } = req.params; // Get the product code from the request parameters
+
+    try {
+        // Query to fetch the product based on the product code
+        const [rows] = await db.query(`
+            SELECT p.product_id, p.product_code, p.product_name, p.price, p.description, p.quantity, c.category_name, p.product_image
+            FROM product p
+            INNER JOIN category c ON p.category_id = c.category_id
+            WHERE p.product_code = ?
+        `, [productCode]);
+
+        // Check if product exists
+        if (rows.length === 0) {
+            return res.status(404).send('Product not found');
+        }
+
+        // Respond with the product details
+        res.json(rows[0]);
+    } catch (error) {
+        console.error('Error fetching product:', error);
+        res.status(500).send('Error fetching product');
+    }
+});
+
+
 
 // Route to get top products from different categories
 router.get('/products-top-mix-picks', async (req, res) => {

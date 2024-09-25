@@ -10,13 +10,12 @@ const Checkout = () => {
   const navigate = useNavigate();
 
   const customerId = localStorage.getItem('customer_id');
-  console.log('Customer ID:', customerId);
+  const authToken = localStorage.getItem('token');
 
-  // Retrieve from local storage
   const savedProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
-  const totalPrice = location.state?.totalPrice || JSON.parse(localStorage.getItem('totalPrice')) || 0;
+  const [quantities, setQuantities] = useState(savedProducts.map(product => product.quantity || 1));
+  const [originalQuantities, setOriginalQuantities] = useState([]);
 
-  const [authToken, setAuthToken] = useState(localStorage.getItem('token'));
   const [formData, setFormData] = useState({
     fullName: '',
     phoneNumber: '',
@@ -30,23 +29,30 @@ const Checkout = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // Manage quantities of saved products
-  const [quantities, setQuantities] = useState(savedProducts.map(product => product.quantity));
-
-  // Clear local storage data on page close
   useEffect(() => {
+    if (savedProducts.length > 0) {
+      const fetchOriginalQuantities = async () => {
+        const quantities = await Promise.all(
+          savedProducts.map(product =>
+            axios.get(`http://localhost:5000/products/${product.product_code}`)
+              .then(response => response.data.quantity)
+          )
+        );
+        setOriginalQuantities(quantities);
+      };
+      fetchOriginalQuantities();
+    }
+
     const handleBeforeUnload = () => {
       localStorage.removeItem('selectedProducts');
-      localStorage.removeItem('totalPrice');
-      localStorage.removeItem('checkoutFormData');
-      localStorage.removeItem('checkoutOrderData');
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
+
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, []);
+  }, [savedProducts]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -64,20 +70,44 @@ const Checkout = () => {
   };
 
   const handleQuantityChange = (index, e) => {
-    const newQuantity = Number(e.target.value);
-    if (newQuantity <= savedProducts[index].quantity) {
-      const newQuantities = [...quantities];
-      newQuantities[index] = newQuantity;
-      setQuantities(newQuantities);
+    const newQuantity = Math.max(1, Number(e.target.value));
+
+    if (newQuantity > originalQuantities[index]) {
+      setError(`Quantity exceeds available stock for ${savedProducts[index].product_name}. Available: ${originalQuantities[index]}`);
+      return;
     }
+
+    const newQuantities = [...quantities];
+    newQuantities[index] = newQuantity;
+    setQuantities(newQuantities);
+    setError('');
   };
 
   const validateForm = () => {
     const { fullName, phoneNumber, address, region, postalCode, paymentMethod } = formData;
-    if (!fullName || !phoneNumber || !address || !region || !postalCode || !paymentMethod) {
-      return 'All fields are required.';
+    return fullName && phoneNumber && address && region && postalCode && paymentMethod;
+  };
+
+  const handleRemoveProduct = (index) => {
+    // Remove the product from savedProducts and quantities
+    const updatedProducts = [...savedProducts];
+    const updatedQuantities = [...quantities];
+
+    updatedProducts.splice(index, 1);
+    updatedQuantities.splice(index, 1);
+
+    setQuantities(updatedQuantities);
+
+    // Update localStorage with the new list of selected products
+    localStorage.setItem('selectedProducts', JSON.stringify(updatedProducts));
+
+    // Remove from localStorage if no products are left
+    if (updatedProducts.length === 0) {
+      localStorage.removeItem('selectedProducts');
     }
-    return '';
+
+    // Update savedProducts state so the component re-renders with the updated list
+    setOriginalQuantities(updatedQuantities);
   };
 
   const handleSubmit = async (e) => {
@@ -86,69 +116,53 @@ const Checkout = () => {
     setError('');
     setSuccess('');
 
-    const validationError = validateForm();
-    if (validationError) {
+    if (!validateForm()) {
       setLoading(false);
-      setError(validationError);
+      setError('All fields are required.');
       return;
     }
 
     try {
-      if (!customerId) {
+      if (!customerId || savedProducts.length === 0) {
         setLoading(false);
-        setError('Customer ID is missing.');
+        setError('Missing customer ID or no products selected.');
         return;
       }
-
-      // Check if selectedProducts and totalPrice are available
-      if (savedProducts.length === 0 || totalPrice <= 0) {
-        setLoading(false);
-        setError('No products selected or total price is invalid.');
-        return;
-      }
-
-      // Save formData to localStorage
-      localStorage.setItem('checkoutFormData', JSON.stringify(formData));
 
       const orderData = {
         customer_id: customerId,
-        order_date: new Date().toISOString(),
         order_details: savedProducts.map((product, index) => ({
           product_id: product.product_code,
           quantity: quantities[index],
           totalprice: product.price * quantities[index],
-          payment_date: new Date().toISOString(),
           payment_method: formData.paymentMethod,
           payment_status: 'Pending',
         })),
         total_price: quantities.reduce((total, qty, index) => total + (savedProducts[index].price * qty), 0),
+        order_date: new Date().toISOString(),
       };
 
-      // Save orderData to localStorage (if needed)
-      localStorage.setItem('checkoutOrderData', JSON.stringify(orderData));
-
-      const response = await axios.post(
-        'http://localhost:5000/insert-order',
-        orderData,
-        {
-          headers: {
-            'Authorization': `Bearer ${authToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const response = await axios.post('http://localhost:5000/insert-order', orderData, {
+        headers: { Authorization: `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+      });
 
       if (response.status === 201) {
         setSuccess('Order placed successfully!');
+        localStorage.removeItem('selectedProducts');
         navigate('/order-success');
       }
     } catch (error) {
-      console.error('Error placing order:', error.message);
+      console.error('Error placing order:', error);
       setError('Failed to place order. Please try again.');
     } finally {
       setLoading(false);
     }
   };
+
+  // Calculate total price only if there are products, otherwise set to 0
+  const totalPrice = savedProducts.length > 0
+    ? quantities.reduce((total, qty, index) => total + (savedProducts[index]?.price * qty), 0)
+    : 0;
 
   return (
     <div className='checkout-container'>
@@ -158,89 +172,44 @@ const Checkout = () => {
         <div className='checkout-content'>
           <div className='checkout-address'>
             <h3>Delivery Address</h3>
-            <button className='change-address-btn'>Change</button>
             <form className='address-form' onSubmit={handleSubmit}>
               {error && <p className='error-message'>{error}</p>}
               {success && <p className='success-message'>{success}</p>}
-              <div className='form-group'>
-                <label htmlFor='fullName'>Full Name</label>
-                <input
-                  type='text'
-                  id='fullName'
-                  name='fullName'
-                  value={formData.fullName}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className='form-group'>
-                <label htmlFor='phoneNumber'>Phone Number</label>
-                <input
-                  type='text'
-                  id='phoneNumber'
-                  name='phoneNumber'
-                  value={formData.phoneNumber}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className='form-group'>
-                <label htmlFor='address'>Street Name, Building, House Number</label>
-                <input
-                  type='text'
-                  id='address'
-                  name='address'
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className='form-group'>
-                <label htmlFor='region'>Region, Province, City, Barangay</label>
-                <input
-                  type='text'
-                  id='region'
-                  name='region'
-                  value={formData.region}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className='form-group'>
-                <label htmlFor='postalCode'>Postal Code</label>
-                <input
-                  type='text'
-                  id='postalCode'
-                  name='postalCode'
-                  value={formData.postalCode}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
+              {['fullName', 'phoneNumber', 'address', 'region', 'postalCode'].map(field => (
+                <div className='form-group' key={field}>
+                  <label htmlFor={field}>{field.replace(/([A-Z])/g, ' $1').toUpperCase()}</label>
+                  <input
+                    type='text'
+                    id={field}
+                    name={field}
+                    value={formData[field]}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+              ))}
               <div className='form-group'>
                 <h3>Payment Method</h3>
-                <div className='payment-options'>
-                  <label>
-                    <input
-                      type='radio'
-                      name='paymentMethod'
-                      value='COD'
-                      checked={formData.paymentMethod === 'COD'}
-                      onChange={handlePaymentChange}
-                    />
-                    Cash On Delivery
-                  </label>
-                  <label>
-                    <input
-                      type='radio'
-                      name='paymentMethod'
-                      value='Credit/Debit Card'
-                      checked={formData.paymentMethod === 'Credit/Debit Card'}
-                      onChange={handlePaymentChange}
-                    />
-                    Credit/Debit Card
-                  </label>
-                </div>
+                <label>
+                  <input
+                    type='radio'
+                    name='paymentMethod'
+                    value='COD'
+                    checked={formData.paymentMethod === 'COD'}
+                    onChange={handlePaymentChange}
+                  />
+                  Cash On Delivery
+                </label>
+                <label>
+                  <input
+                    type='radio'
+                    name='paymentMethod'
+                    value='Credit/Debit Card'
+                    checked={formData.paymentMethod === 'Credit/Debit Card'}
+                    onChange={handlePaymentChange}
+                  />
+                  Credit/Debit Card
+                </label>
               </div>
               <div className='form-group'>
                 <button type='submit' className='submit-btn' disabled={loading}>
@@ -255,28 +224,29 @@ const Checkout = () => {
               <span>Item</span>
               <span>Quantity</span>
               <span>Total Price</span>
+              <span>Remove</span>
             </div>
-            <ul className='product-list'>
+            <ul className="product-list">
               {savedProducts.length > 0 ? (
                 savedProducts.map((product, index) => (
                   <li key={product.product_code}>
                     <span>{product.product_name}</span>
                     <input
-                      type='number'
-                      min='1'
-                      max={product.quantity}
+                      type="number"
+                      min="1"
+                      max={originalQuantities[index]}
                       value={quantities[index]}
                       onChange={(e) => handleQuantityChange(index, e)}
                     />
-                    <span className='total-price'>₱{product.price * quantities[index]}</span>
+                    <span>₱{(product.price * quantities[index]).toFixed(2)}</span>
+                    <button className='remove-btn' onClick={() => handleRemoveProduct(index)}>Remove</button>
                   </li>
                 ))
               ) : (
                 <p>No products selected.</p>
               )}
             </ul>
-            <br />
-            <h4>Total: ₱ {quantities.reduce((total, qty, index) => total + (savedProducts[index].price * qty), 0)}</h4>
+            <h4>Total Price: ₱{totalPrice.toFixed(2)}</h4>
           </div>
         </div>
       </div>
