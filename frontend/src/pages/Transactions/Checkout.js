@@ -30,16 +30,18 @@ const Checkout = () => {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    const fetchOriginalQuantities = async () => {
-      const quantities = await Promise.all(
-        savedProducts.map(product =>
-          axios.get(`http://localhost:5000/products/${product.product_code}`)
-            .then(response => response.data.quantity)
-        )
-      );
-      setOriginalQuantities(quantities);
-    };
-    fetchOriginalQuantities();
+    if (savedProducts.length > 0) {
+      const fetchOriginalQuantities = async () => {
+        const quantities = await Promise.all(
+          savedProducts.map(product =>
+            axios.get(`http://localhost:5000/products/${product.product_code}`)
+              .then(response => response.data.quantity)
+          )
+        );
+        setOriginalQuantities(quantities);
+      };
+      fetchOriginalQuantities();
+    }
 
     const handleBeforeUnload = () => {
       localStorage.removeItem('selectedProducts');
@@ -71,7 +73,7 @@ const Checkout = () => {
     const newQuantity = Math.max(1, Number(e.target.value));
 
     if (newQuantity > originalQuantities[index]) {
-      setError(`Quantity exceeds available stock for\n ${savedProducts[index].product_name}. Available: ${originalQuantities[index]}`);
+      setError(`Quantity exceeds available stock for ${savedProducts[index].product_name}. Available: ${originalQuantities[index]}`);
       return;
     }
 
@@ -90,15 +92,22 @@ const Checkout = () => {
     // Remove the product from savedProducts and quantities
     const updatedProducts = [...savedProducts];
     const updatedQuantities = [...quantities];
-    
-    updatedProducts.splice(index, 1); // Remove the product at the given index
-    updatedQuantities.splice(index, 1); // Remove corresponding quantity
+
+    updatedProducts.splice(index, 1);
+    updatedQuantities.splice(index, 1);
 
     setQuantities(updatedQuantities);
 
     // Update localStorage with the new list of selected products
     localStorage.setItem('selectedProducts', JSON.stringify(updatedProducts));
-    window.location.reload(); // Reload to refresh the component
+
+    // Remove from localStorage if no products are left
+    if (updatedProducts.length === 0) {
+      localStorage.removeItem('selectedProducts');
+    }
+
+    // Update savedProducts state so the component re-renders with the updated list
+    setOriginalQuantities(updatedQuantities);
   };
 
   const handleSubmit = async (e) => {
@@ -150,7 +159,10 @@ const Checkout = () => {
     }
   };
 
-  const totalPrice = quantities.reduce((total, qty, index) => total + (savedProducts[index]?.price * qty), 0);
+  // Calculate total price only if there are products, otherwise set to 0
+  const totalPrice = savedProducts.length > 0
+    ? quantities.reduce((total, qty, index) => total + (savedProducts[index]?.price * qty), 0)
+    : 0;
 
   return (
     <div className='checkout-container'>
