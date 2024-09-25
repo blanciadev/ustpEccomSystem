@@ -58,23 +58,50 @@ router.get('/get-customer-id', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+
+
+// Function to generate a unique 6-digit order ID
+const generateOrderId = async () => {
+    let orderId;
+    let isUnique = false;
+
+    while (!isUnique) {
+        // Generate a random 6-digit number
+        orderId = Math.floor(100000 + Math.random() * 900000);
+
+        // Check if the order ID already exists
+        const [result] = await db.query('SELECT COUNT(*) AS count FROM `order` WHERE `order_id` = ?', [orderId]);
+        isUnique = result[0].count === 0; // If count is 0, the ID is unique
+    }
+
+    return orderId;
+};
+
+
 // Route to insert a new order
 router.post('/insert-order', async (req, res) => {
-    const { customer_id, order_date, order_details, total_price } = req.body;
+    const { customer_id, order_date, order_details, total_price, fullName, phoneNumber, address, region, postalCode, paymentMethod } = req.body;
 
-    console.log('Received order data:', { customer_id, order_date, order_details, total_price });
+    console.log('Received order data:', { customer_id, order_date, order_details, total_price, fullName, phoneNumber, address, region, postalCode, paymentMethod });
 
     // Validate incoming request data
-    if (!customer_id || !order_date || !order_details || !Array.isArray(order_details) || !total_price) {
+    if (!customer_id || !order_date || !order_details || !Array.isArray(order_details) || !total_price || !fullName || !phoneNumber || !address || !region || !postalCode || !paymentMethod) {
         const missingFields = [];
         if (!customer_id) missingFields.push('customer_id');
         if (!order_date) missingFields.push('order_date');
         if (!order_details) missingFields.push('order_details');
         if (!Array.isArray(order_details)) missingFields.push('order_details (should be an array)');
         if (!total_price) missingFields.push('total_price');
+        if (!fullName) missingFields.push('fullName');
+        if (!phoneNumber) missingFields.push('phoneNumber');
+        if (!address) missingFields.push('address');
+        if (!region) missingFields.push('region');
+        if (!postalCode) missingFields.push('postalCode');
+        if (!paymentMethod) missingFields.push('paymentMethod');
 
         const errorMessage = 'Invalid request data: ' + missingFields.join(', ');
-        console.log(errorMessage);
+        console.log('Error:', errorMessage);
+        console.log('Missing fields:', missingFields);
         return res.status(400).json({ error: errorMessage });
     }
 
@@ -83,33 +110,37 @@ router.post('/insert-order', async (req, res) => {
         console.log('Formatted order_date:', formattedOrderDate);
 
         // Start transaction
+        console.log('Starting transaction...');
         await db.query('START TRANSACTION');
 
         // Check if customer exists
         const [customerResult] = await db.query('SELECT COUNT(*) AS count FROM `customer` WHERE `customer_id` = ?', [customer_id]);
+        console.log('Customer check result:', customerResult);
         if (customerResult[0].count === 0) {
             console.log('Customer does not exist:', customer_id);
             await db.query('ROLLBACK');
             return res.status(400).json({ error: 'Customer does not exist' });
         }
 
+        // Generate a unique order ID
+        const order_id = await generateOrderId();
+        console.log('New order ID generated:', order_id);
+
         // Insert new order
         const [orderResult] = await db.query(`
-            INSERT INTO \`order\` (customer_id, order_date, total_price)
-            VALUES (?, ?, ?)
-        `, [customer_id, formattedOrderDate, total_price]);
+            INSERT INTO \`order\` (order_id, customer_id, order_date, total_price)
+            VALUES (?, ?, ?, ?)
+        `, [order_id, customer_id, formattedOrderDate, total_price]);
+        console.log('Order inserted with result:', orderResult);
 
-        const order_id = orderResult.insertId;
-        console.log('New order inserted with ID:', order_id);
-
-        const productUpdateIds = []; // Array to collect product IDs for status update
-        const productIdsInProcess = []; // Array to collect products already in process
+        const productUpdateIds = [];
+        const productIdsInProcess = [];
 
         // Loop through order_details
         for (const detail of order_details) {
             const { product_id, quantity, totalprice, payment_date, payment_method, payment_status } = detail;
 
-            // Validate fields, making payment_date optional if necessary
+            // Validate fields
             if (!product_id || !quantity || totalprice == null || !payment_method || !payment_status) {
                 console.log('Invalid order detail:', detail);
                 await db.query('ROLLBACK');
@@ -125,6 +156,9 @@ router.post('/insert-order', async (req, res) => {
                 VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending', NOW())
             `, [order_id, product_id, quantity, totalprice, formattedPaymentDate, payment_method, payment_status]);
 
+
+            console.log('Inserted order detail:', { order_id, product_id, quantity, totalprice, formattedPaymentDate, payment_method, payment_status });
+
             // Add product_id to productUpdateIds for status update
             productUpdateIds.push(product_id);
 
@@ -133,6 +167,7 @@ router.post('/insert-order', async (req, res) => {
                 INSERT INTO user_product_interactions (customer_id, product_code, interaction_type)
                 VALUES (?, ?, 'order')
             `, [customer_id, product_id]);
+            console.log('Inserted user product interaction:', { customer_id, product_id });
         }
 
         // Fetch cart items with status 'Order In Process' for the customer
@@ -144,6 +179,7 @@ router.post('/insert-order', async (req, res) => {
                 AND product_code IN (${productUpdateIds.map(() => '?').join(', ')})
                 AND status = 'Order In Process'
             `, [customer_id, ...productUpdateIds]);
+            console.log('Fetched cart items in process:', cartItemsInProcess);
 
             // Extract product_codes that are already in process
             if (cartItemsInProcess.length > 0) {
@@ -153,6 +189,7 @@ router.post('/insert-order', async (req, res) => {
 
         // Filter out products that are already in process
         const productIdsToUpdate = productUpdateIds.filter(product_id => !productIdsInProcess.includes(product_id));
+        console.log('Product IDs to update:', productIdsToUpdate);
 
         // Update status for products not already in process
         if (productIdsToUpdate.length > 0) {
@@ -166,6 +203,13 @@ router.post('/insert-order', async (req, res) => {
             console.log('Updated product status for items not already in process.');
         }
 
+        // Insert into shipment table
+        await db.query(`
+            INSERT INTO shipment (order_id, customer_id, shipment_date, address, city, shipment_status, phoneNumber, postalCode)
+            VALUES (?, ?, NOW(), ?, ?, 'Pending', ?, ?)
+        `, [order_id, customer_id, address, region, phoneNumber, postalCode]);
+        console.log('Inserted shipment details for order ID:', order_id);
+
         // Commit transaction
         await db.query('COMMIT');
         console.log('Transaction committed successfully');
@@ -177,6 +221,10 @@ router.post('/insert-order', async (req, res) => {
         res.status(500).json({ error: 'Failed to place order. Please try again.' });
     }
 });
+
+
+
+
 
 
 

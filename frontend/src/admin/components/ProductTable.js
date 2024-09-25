@@ -12,7 +12,7 @@ const ProductTable = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/admin-products'); 
+                const response = await axios.get('http://localhost:5000/admin-products');
                 setProducts(response.data);
             } catch (error) {
                 console.error('Error fetching product data:', error);
@@ -34,7 +34,7 @@ const ProductTable = () => {
 
     const handleUpdateProduct = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/admin-products'); 
+            const response = await axios.get('http://localhost:5000/admin-products');
             setProducts(response.data);
         } catch (error) {
             console.error('Error fetching updated product data:', error);
@@ -54,7 +54,6 @@ const ProductTable = () => {
                             <th>Category</th>
                             <th>Quantity</th>
                             <th>Description</th>
-                            <th>Image</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -68,9 +67,6 @@ const ProductTable = () => {
                                 <td>{product.category_name}</td>
                                 <td>{product.quantity}</td>
                                 <td>{product.description}</td>
-                                <td>
-                                    <img src={product.product_image} alt={product.product_name} width="100" />
-                                </td>
                                 <td>
                                     <Button variant="secondary" onClick={() => handleViewProduct(product)}>
                                         View
