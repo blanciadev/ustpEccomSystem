@@ -121,6 +121,7 @@ router.post('/insert-order', async (req, res) => {
 
         // Start transaction
         console.log('Starting transaction...');
+        console.log('---------------- 124 START TRANSACTION --------------------');
         await db.query('START TRANSACTION');
 
         // Check if customer exists
@@ -134,6 +135,7 @@ router.post('/insert-order', async (req, res) => {
 
         // Generate a unique order ID
         const order_id = await generateOrderId();
+        console.log('------------------------------------');
         console.log('New order ID generated:', order_id);
 
         // Insert new order
@@ -141,6 +143,7 @@ router.post('/insert-order', async (req, res) => {
             INSERT INTO \`order\` (order_id, customer_id, order_date, total_price)
             VALUES (?, ?, ?, ?)
         `, [order_id, customer_id, formattedOrderDate, total_price]);
+        console.log('------------------------------------');
         console.log('Order inserted with result:', orderResult);
 
         const cartItemsUpdateIds = []; // Initialize this array
@@ -150,7 +153,8 @@ router.post('/insert-order', async (req, res) => {
             const { product_id, quantity, totalprice, payment_date, payment_method, payment_status, cart_items } = detail;
 
             // Validate fields
-            if (!product_id || !quantity || totalprice == null || !payment_method || !payment_status || !cart_items) {
+            if (!product_id || !quantity || !totalprice || !payment_method || !payment_status) {
+                console.log('------------ 156 ERROR ------------');
                 console.log('Invalid order detail:', detail);
                 await db.query('ROLLBACK');
                 return res.status(400).json({ error: 'Invalid order detail' });
@@ -165,11 +169,31 @@ router.post('/insert-order', async (req, res) => {
                 VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending', NOW())
             `, [order_id, product_id, quantity, totalprice, formattedPaymentDate, payment_method, payment_status]);
 
+            console.log('------------------- 170 INSERT ORDER DETAILS -----------------');
             console.log('Inserted order detail:', { order_id, product_id, quantity, totalprice, formattedPaymentDate, payment_method, payment_status });
 
             // Add cart_items to cartItemsUpdateIds for status update
             cartItemsUpdateIds.push(cart_items); // Use the correct cart_items id
             console.log('Added cart_items_id to cartItemsUpdateIds:', cart_items);
+            console.log('------------------------------------');
+
+
+
+            // Update product quantity
+            const updateQuantityQuery = `
+                UPDATE \`product\`
+                SET quantity = quantity - ?
+                WHERE product_code = ?
+                `;
+            const result = await db.query(updateQuantityQuery, [quantity, product_id]);
+
+            if (result[0].affectedRows > 0) {
+                console.log('---------------- 191 PRODUCT QUANTITY UPDATE --------------------');
+                console.log(`Successfully updated product quantity for product_id ${product_id}.`);
+            } else {
+                console.log('-------------- 194 ERROR ------------------');
+                console.log(`No product quantity was updated; please check the provided product_id: ${product_id}.`);
+            }
         }
 
         // At this point, let's check the populated cartItemsUpdateIds array
@@ -185,6 +209,7 @@ router.post('/insert-order', async (req, res) => {
                     WHERE cart_items_id IN (${cartItemsUpdateIds.map(() => '?').join(', ')})
                     AND customer_id = ?
                 `;
+            console.log('---------------- 192 UPDATE QUERY --------------------');
             console.log('Executing update query for IDs:', cartItemsUpdateIds);
 
             const result = await db.query(statusQuery, [...cartItemsUpdateIds, customer_id]);
@@ -192,6 +217,7 @@ router.post('/insert-order', async (req, res) => {
 
             // Check if any rows were affected
             if (result.affectedRows > 0) {
+                console.log('------------------ 200 SUCCESSFULL UPDATE ------------------');
                 console.log(`Successfully updated ${result.affectedRows} cart item(s) to "Order In Process".`);
             } else {
                 console.log('No cart items were updated; please check the provided IDs and customer ID.');
@@ -201,11 +227,13 @@ router.post('/insert-order', async (req, res) => {
         }
 
 
+
         // Insert into shipment table
         await db.query(`
             INSERT INTO shipment (order_id, customer_id, shipment_date, address, city, shipment_status, phoneNumber, postalCode)
             VALUES (?, ?, NOW(), ?, ?, 'Pending', ?, ?)
         `, [order_id, customer_id, address, region, phoneNumber, postalCode]);
+        console.log('----------------- 215 INSERT SHIPMENT -------------------');
         console.log('Inserted shipment details for order ID:', order_id);
 
         // Commit transaction
