@@ -80,7 +80,18 @@ const generateOrderId = async () => {
 
 // Route to insert a new order
 router.post('/insert-order', async (req, res) => {
-    const { customer_id, order_date, order_details, total_price, fullName, phoneNumber, address, region, postalCode, paymentMethod } = req.body;
+    const {
+        customer_id,
+        order_date,
+        order_details,
+        total_price,
+        fullName,
+        phoneNumber,
+        address,
+        region,
+        postalCode,
+        paymentMethod
+    } = req.body;
 
     console.log('Received order data:', { customer_id, order_date, order_details, total_price, fullName, phoneNumber, address, region, postalCode, paymentMethod });
 
@@ -101,7 +112,6 @@ router.post('/insert-order', async (req, res) => {
 
         const errorMessage = 'Invalid request data: ' + missingFields.join(', ');
         console.log('Error:', errorMessage);
-        console.log('Missing fields:', missingFields);
         return res.status(400).json({ error: errorMessage });
     }
 
@@ -133,15 +143,14 @@ router.post('/insert-order', async (req, res) => {
         `, [order_id, customer_id, formattedOrderDate, total_price]);
         console.log('Order inserted with result:', orderResult);
 
-        const productUpdateIds = [];
-        const productIdsInProcess = [];
+        const cartItemsUpdateIds = []; // Initialize this array
 
         // Loop through order_details
         for (const detail of order_details) {
-            const { product_id, quantity, totalprice, payment_date, payment_method, payment_status } = detail;
+            const { product_id, quantity, totalprice, payment_date, payment_method, payment_status, cart_items } = detail;
 
             // Validate fields
-            if (!product_id || !quantity || totalprice == null || !payment_method || !payment_status) {
+            if (!product_id || !quantity || totalprice == null || !payment_method || !payment_status || !cart_items) {
                 console.log('Invalid order detail:', detail);
                 await db.query('ROLLBACK');
                 return res.status(400).json({ error: 'Invalid order detail' });
@@ -156,52 +165,41 @@ router.post('/insert-order', async (req, res) => {
                 VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending', NOW())
             `, [order_id, product_id, quantity, totalprice, formattedPaymentDate, payment_method, payment_status]);
 
-
             console.log('Inserted order detail:', { order_id, product_id, quantity, totalprice, formattedPaymentDate, payment_method, payment_status });
 
-            // Add product_id to productUpdateIds for status update
-            productUpdateIds.push(product_id);
-
-            // Insert user product interaction
-            await db.query(`
-                INSERT INTO user_product_interactions (customer_id, product_code, interaction_type)
-                VALUES (?, ?, 'order')
-            `, [customer_id, product_id]);
-            console.log('Inserted user product interaction:', { customer_id, product_id });
+            // Add cart_items to cartItemsUpdateIds for status update
+            cartItemsUpdateIds.push(cart_items); // Use the correct cart_items id
+            console.log('Added cart_items_id to cartItemsUpdateIds:', cart_items);
         }
 
-        // Fetch cart items with status 'Order In Process' for the customer
-        if (productUpdateIds.length > 0) {
-            const [cartItemsInProcess] = await db.query(`
-                SELECT product_code
-                FROM \`cart_items\`
-                WHERE customer_id = ? 
-                AND product_code IN (${productUpdateIds.map(() => '?').join(', ')})
-                AND status = 'Order In Process'
-            `, [customer_id, ...productUpdateIds]);
-            console.log('Fetched cart items in process:', cartItemsInProcess);
+        // At this point, let's check the populated cartItemsUpdateIds array
+        console.log('Final cartItemsUpdateIds:', cartItemsUpdateIds);
 
-            // Extract product_codes that are already in process
-            if (cartItemsInProcess.length > 0) {
-                productIdsInProcess.push(...cartItemsInProcess.map(item => item.product_code));
-            }
-        }
+        // Update status for cart items directly without checking if they are in process
+        if (cartItemsUpdateIds.length > 0) {
+            console.log('Updating cart items status to "Order In Process"...');
 
-        // Filter out products that are already in process
-        const productIdsToUpdate = productUpdateIds.filter(product_id => !productIdsInProcess.includes(product_id));
-        console.log('Product IDs to update:', productIdsToUpdate);
-
-        // Update status for products not already in process
-        if (productIdsToUpdate.length > 0) {
             const statusQuery = `
-                UPDATE \`cart_items\`
-                SET status = 'Order In Process'
-                WHERE product_code IN (${productIdsToUpdate.map(() => '?').join(', ')})
-                AND customer_id = ?
-            `;
-            await db.query(statusQuery, [...productIdsToUpdate, customer_id]);
-            console.log('Updated product status for items not already in process.');
+                    UPDATE \`cart_items\`
+                    SET status = 'Order In Process'
+                    WHERE cart_items_id IN (${cartItemsUpdateIds.map(() => '?').join(', ')})
+                    AND customer_id = ?
+                `;
+            console.log('Executing update query for IDs:', cartItemsUpdateIds);
+
+            const result = await db.query(statusQuery, [...cartItemsUpdateIds, customer_id]);
+            console.log('Update result:', result);
+
+            // Check if any rows were affected
+            if (result.affectedRows > 0) {
+                console.log(`Successfully updated ${result.affectedRows} cart item(s) to "Order In Process".`);
+            } else {
+                console.log('No cart items were updated; please check the provided IDs and customer ID.');
+            }
+        } else {
+            console.log('No cart items to update; the cartItemsUpdateIds array is empty.');
         }
+
 
         // Insert into shipment table
         await db.query(`
@@ -221,6 +219,7 @@ router.post('/insert-order', async (req, res) => {
         res.status(500).json({ error: 'Failed to place order. Please try again.' });
     }
 });
+
 
 
 

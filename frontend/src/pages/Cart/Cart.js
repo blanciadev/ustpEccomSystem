@@ -128,6 +128,7 @@ const CartContent = () => {
                       />
                     </form>
                   </th>
+                  <th>ID</th>
                   <th>Product</th>
                   <th>Quantity</th>
                   <th>Price</th>
@@ -143,6 +144,7 @@ const CartContent = () => {
                     price={item.price}
                     subTotal={item.sub_total}
                     productCode={item.product_code}
+                    cartItemId={item.cart_items_id}
                     description={item.description}
                     brand={item.brand}
                     category={item.category}

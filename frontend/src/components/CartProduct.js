@@ -1,7 +1,7 @@
 import React from 'react';
 
 const CartProduct = ({
-  productName,
+  productName, cartItemId,
   quantity,
   price,
   subTotal,
@@ -22,10 +22,12 @@ const CartProduct = ({
           onChange={() => toggleItemSelection(productCode)}
         />
       </td>
+      <td>{cartItemId}</td>
       <td>{productName}</td>
+
       <td>{quantity}</td>
       <td>${price.toFixed(2)}</td>
-      <td>${subTotal.toFixed(2)}</td>
+
     </tr>
   );
 };

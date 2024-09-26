@@ -25,6 +25,10 @@ async function authenticateToken(req, res, next) {
     }
 }
 
+// Function to generate a unique code for cart_items_id
+function generateCartItemId() {
+    return 'CART-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+}
 
 // Route to add product to cart
 router.post('/add-to-cart', authenticateToken, async (req, res) => {
@@ -60,13 +64,13 @@ router.post('/add-to-cart', authenticateToken, async (req, res) => {
 
         // Check if the product already exists in the cart
         const [[existingCartItem]] = await db.query(
-            'SELECT cart_id, status, quantity FROM cart_items WHERE cart_id = ? AND customer_id = ? AND product_code = ? AND status = "Order Pending" ' ,
+            'SELECT cart_id, status, quantity FROM cart_items WHERE cart_id = ? AND customer_id = ? AND product_code = ? AND status = "Order Pending"',
             [cart_id, user_id, product_code]
         );
 
         if (existingCartItem) {
             console.log(`Product ${product_code} is already in the cart with status "Order In Progress". Updating quantity.`);
-                
+
             // Update the existing cart item quantity
             const [updateResult] = await db.query(
                 'UPDATE cart_items SET quantity = quantity + ? WHERE cart_id = ? AND product_code = ? AND status = "Order Pending"',
@@ -80,13 +84,16 @@ router.post('/add-to-cart', authenticateToken, async (req, res) => {
             } else {
                 console.log(`Failed to update product ${product_code} quantity.`);
             }
-           
+
         } else {
             // No existing cart item, so insert a new entry
             console.log(`No existing cart item for product ${product_code}. Inserting into cart.`);
+
+            const cart_items_id = generateCartItemId(); // Generate unique code
+
             const [insertResult] = await db.query(
-                'INSERT INTO cart_items (cart_id, customer_id, product_code, quantity, status) VALUES (?, ?, ?, ?, "Order Pending")',
-                [cart_id, user_id, product_code, quantity]
+                'INSERT INTO cart_items (cart_items_id, cart_id, customer_id, product_code, quantity, status) VALUES (?, ?, ?, ?, ?, "Order Pending")',
+                [cart_items_id, cart_id, user_id, product_code, quantity]
             );
 
             console.log('Insert result:', insertResult);
@@ -155,6 +162,7 @@ router.get('/cart', authenticateToken, async (req, res) => {
                 p.size,
                 p.expiration_date,
                 c.category_name,
+                ci.cart_items_id,  
                 ci.quantity
             FROM
                 cart_items AS ci
@@ -174,11 +182,11 @@ router.get('/cart', authenticateToken, async (req, res) => {
 
         res.status(200).json({
             items: rows.map(item => ({
+                cart_items_id: item.cart_items_id, // Include the cart item ID in the response
                 product_id: item.product_id,
                 product_code: item.product_code,
                 product_name: item.product_name,
                 description: item.description,
-                brand: item.brand,
                 category: item.category_name,
                 price: item.price,
                 quantity: item.quantity,
@@ -193,6 +201,7 @@ router.get('/cart', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
 
 
 router.get('/cart-item-count/:customer_id', async (req, res) => {

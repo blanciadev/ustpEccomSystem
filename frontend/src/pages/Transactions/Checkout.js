@@ -134,7 +134,9 @@ const Checkout = () => {
       const orderData = {
         customer_id: customerId,
         fullName: formData.fullName,
+
         order_details: savedProducts.map((product, index) => ({
+          cart_items: product.cart_items_id,
           product_id: product.product_code,
           quantity: quantities[index],
           totalprice: product.price * quantities[index],
@@ -150,6 +152,7 @@ const Checkout = () => {
         paymentMethod: formData.paymentMethod,
         phoneNumber: formData.phoneNumber,
         postalCode: formData.postalCode,
+
 
       };
 
@@ -223,7 +226,8 @@ const Checkout = () => {
           <div className='checkout-summary'>
             <h3>Order Summary</h3>
             <div className='summary-header'>
-              <span>Item</span>
+              <span>ID</span>
+              <span>Product Name</span>
               <span>Quantity</span>
               <span>Total Price</span>
               <span>Remove</span>
@@ -231,7 +235,9 @@ const Checkout = () => {
             <ul className="product-list">
               {savedProducts.length > 0 ? (
                 savedProducts.map((product, index) => (
+
                   <li key={product.product_code}>
+                    <span>{product.cart_items_id}</span>
                     <span>{product.product_name}</span>
                     <input
                       type="number"
