@@ -24,18 +24,30 @@ const ProductCard = React.memo(({ product, onAddToCart, onProductInteraction, on
     if (!product) {
         return <div>Product data is not available</div>;
     }
+    const isOutOfStock = product.quantity === 0;
 
     return (
         <div className="product-card" onClick={() => onProductClick(product)}>
             <img src={product.product_image} alt={product.product_name} />
             <h3>{product.product_name}</h3>
-            <p>{product.product_code}</p>
-            {/* Add stopPropagation in the button click handler */}
-            <button onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}>
-                Add to Cart
-            </button>
-            <button onClick={(e) => { e.stopPropagation(); onBuyNow(product); }}>Buy Now</button>
-
+            <p>{product.description || 'No description available.'}</p>
+            <br></br><p>Product Quantity : {product.quantity}</p>
+            <h3>P{product.price}</h3>
+            {isOutOfStock ? (
+                <p style={{ color: 'red' }}>Out of Stock</p>
+            ) : (
+                <>
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}
+                        disabled={isOutOfStock}
+                    >
+                        Add to Cart
+                    </button>
+                    <button onClick={(e) => { e.stopPropagation(); onBuyNow(product); }}>
+                        Buy Now
+                    </button>
+                </>
+            )}
         </div>
     );
 });
@@ -74,12 +86,14 @@ const ProductList = () => {
         const fetchProducts = async () => {
             setLoading(true);
             try {
+                const userId = localStorage.getItem('customer_id');
                 const response = await axios.get('http://localhost:5000/products-top-mix-picks');
                 const shuffledProducts = shuffleArray(response.data);
                 setProducts(shuffledProducts);
             } catch (error) {
                 setError('Error fetching products: ' + (error.response ? error.response.data : error.message));
-            } finally {
+            }
+            finally {
                 setLoading(false);
             }
         };
@@ -90,7 +104,7 @@ const ProductList = () => {
     // Fetch recommended products for a given customer
     const fetchRecommendations = async (customerId) => {
         try {
-            const response = await axios.get(`http://localhost:5000/recommend-products`);
+            const response = await axios.get(`http://localhost:5000/products-top-mix-picks`);
             const recShuffledProducts = shuffleArray(response.data);
             setRecommendedProducts(recShuffledProducts);
         } catch (error) {

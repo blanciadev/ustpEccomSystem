@@ -199,48 +199,73 @@ LIMIT 4;`);
     }
 });
 
-// for cart recommended
+
+
+// for cart recommended products excluding the current user
 router.get('/recommend-products', async (req, res) => {
     try {
-        // Fetch the top 4 cart interactions per product code
+        // const currentUserId = req.headers.customer_id;
+        const currentUserId = req.headers.customer_id;
+
+        console.log(`User ID: ${currentUserId}`);
+        // Debugging: Log the customer_id received
+        // console.log('Current User ID:', currentUserId);
+
+        if (!currentUserId) {
+            console.log('No customer_id found in request headers');
+            return res.status(400).json({ error: 'Missing customer_id in request headers' });
+        }
+
+        // Fetch the top 4 cart interactions excluding current user
         const [rankedInteractions] = await db.query(`
-           SELECT
-	p.product_id, 
-	p.product_code, 
-	p.product_name, 
-	p.price, 
-	p.description, 
-	p.quantity, 
-	c.category_name, 
-	COUNT(DISTINCT user_product_interactions.product_code) AS interaction_count, 
-	p.product_image
+          
+              SELECT 
+    p.product_id, 
+    p.product_code, 
+    p.product_name, 
+    p.price, 
+    p.description, 
+    p.quantity, 
+    c.category_name, 
+    COUNT(DISTINCT user_product_interactions.product_code) AS interaction_count, 
+    p.product_image
 FROM
-	product AS p
-	JOIN
-	category AS c
-	ON 
-		p.category_id = c.category_id
-	JOIN
-	user_product_interactions
-	ON 
-		p.product_code = user_product_interactions.product_code
+    product AS p
+JOIN
+    category AS c
+    ON p.category_id = c.category_id
+JOIN
+    user_product_interactions
+    ON p.product_code = user_product_interactions.product_code
 WHERE
-	user_product_interactions.interaction_type = 'order'
+    user_product_interactions.interaction_type = 'order'
+    AND user_product_interactions.customer_id != ?
 GROUP BY
-	p.product_id, 
-	p.product_code, 
-	p.product_name, 
-	p.price, 
-	p.description, 
-	p.quantity, 
-	c.category_name
+    p.product_id, 
+    p.product_code, 
+    p.product_name, 
+    p.price, 
+    p.description, 
+    p.quantity, 
+    c.category_name, 
+    p.product_image
 ORDER BY
-	interaction_count DESC
-    ;
-        `);
+    interaction_count DESC
+           LIMIT 4;
+        `, [currentUserId]);
+
+        // Debugging: Log the query result
+        console.log('Recommended Products:', rankedInteractions);
+
+        // If no products are found, log and send a message
+        if (rankedInteractions.length === 0) {
+            console.log('No recommended products found for the user.');
+            return res.status(404).json({ message: 'No recommended products found' });
+        }
 
         res.json(rankedInteractions);
     } catch (error) {
+        // Debugging: Log any error that occurs during execution
         console.error('Error recommending products:', error);
         res.status(500).send('Error recommending products');
     }
