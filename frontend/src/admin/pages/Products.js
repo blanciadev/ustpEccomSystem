@@ -10,6 +10,7 @@ import ProductStatistics from '../components/ProductStatistics';
 import ProductTable from '../components/ProductTable';
 import AddProductModal from '../components/AddProductModal';
 import ProductModal from '../components/UpdateProductModal';
+import BundleProduct from '../components/BundleProductModal.js';
 
 const Products = () => {
   const [bestSellingCount, setBestSellingCount] = useState(0);
@@ -27,6 +28,10 @@ const Products = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
 
+  // New state to manage the BundleProduct modal visibility
+  const [isBundleProductModalOpen, setIsBundleProductModalOpen] = useState(false);
+
+  // Handlers for showing and hiding the modals
   const handleShowAddModal = () => setShowAddModal(true);
   const handleCloseAddModal = () => setShowAddModal(false);
 
@@ -39,6 +44,10 @@ const Products = () => {
     setSelectedProduct(null);
     setIsProductModalOpen(false);
   };
+
+  // Handlers for BundleProduct modal
+  const handleShowBundleProductModal = () => setIsBundleProductModalOpen(true);
+  const handleCloseBundleProductModal = () => setIsBundleProductModalOpen(false);
 
   const fetchProductData = async () => {
     try {
@@ -141,6 +150,9 @@ const Products = () => {
                       Add Product
                     </Button>
                   </div>
+                  <Button variant="primary" onClick={handleShowBundleProductModal}>
+                    Bundle Product
+                  </Button>
                 </div>
               </div>
 
@@ -149,11 +161,20 @@ const Products = () => {
           </div>
         </div>
       </div>
+
       <AddProductModal
         show={showAddModal}
         handleClose={handleCloseAddModal}
         handleAddProduct={handleAddProduct}
       />
+
+      <BundleProduct
+        show={isBundleProductModalOpen}
+        handleClose={handleCloseBundleProductModal}
+        order={selectedProduct} // Pass selected product or any necessary data
+        handleUpdate={fetchProduct} // Refresh the product list after bundle action
+      />
+
       {selectedProduct && (
         <ProductModal
           show={isProductModalOpen}

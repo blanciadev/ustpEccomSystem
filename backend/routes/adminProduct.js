@@ -144,10 +144,10 @@ router.get('/top-products', async (req, res) => {
                 return {
                     id: product.id,
                     product: product.product,
-                    interaction_count: progress, // Percentage used for progress bar
-                    available_quantity: product.available_quantity, // Original stock availability
-                    cart_quantity: product.cart_quantity, // Total interactions
-                    product_image: product.product_image // Include product image
+                    interaction_count: progress, 
+                    available_quantity: product.available_quantity, 
+                    cart_quantity: product.cart_quantity, 
+                    product_image: product.product_image 
                 };
             })
         });
