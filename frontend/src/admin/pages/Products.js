@@ -10,7 +10,7 @@ import ProductStatistics from '../components/ProductStatistics';
 import ProductTable from '../components/ProductTable';
 import AddProductModal from '../components/AddProductModal';
 import ProductModal from '../components/UpdateProductModal';
-import BundleProduct from '../components/BundleProductModal.js';
+import BundleProduct from '../components/DiscountProductModal.js';
 
 const Products = () => {
   const [bestSellingCount, setBestSellingCount] = useState(0);
@@ -151,7 +151,7 @@ const Products = () => {
                     </Button>
                   </div>
                   <Button variant="primary" onClick={handleShowBundleProductModal}>
-                    Bundle Product
+                    Discounts
                   </Button>
                 </div>
               </div>
