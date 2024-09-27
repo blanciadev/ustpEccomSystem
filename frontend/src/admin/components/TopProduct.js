@@ -8,7 +8,7 @@ const TopProduct = () => {
   useEffect(() => {
     const fetchTopProducts = async () => {
       try {
-        const response = await fetch('http://localhost:5000/top-products');
+        const response = await fetch('http://localhost:5001/top-products');
         const result = await response.json();
         setData(result.products);
       } catch (error) {
@@ -38,12 +38,12 @@ const TopProduct = () => {
 
 
         <div className='product-table'>
-          <table>
-            <thead>
+          <table className='table table-striped'>
+            <thead className='bg-light sticky-top'>
               <tr>
                 <th>#</th>
                 <th>Product</th>
-                <th>Progress</th>
+                <th>Popularity</th>
                 <th>Quantity</th>
               </tr>
             </thead>

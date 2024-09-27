@@ -18,7 +18,7 @@ const CartContent = () => {
     const fetchCartItems = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://localhost:5000/cart', {
+        const response = await fetch('http://localhost:5001/cart', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },

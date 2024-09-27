@@ -128,7 +128,7 @@ const Checkout = () => {
       localStorage.setItem('checkoutOrderData', JSON.stringify(orderData));
 
       const response = await axios.post(
-        'http://localhost:5000/insert-order',
+        'http://localhost:5001/insert-order',
         orderData,
         {
           headers: {

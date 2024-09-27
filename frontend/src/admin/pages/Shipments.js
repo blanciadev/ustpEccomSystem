@@ -28,21 +28,20 @@ const Shipments = () => {
                 </div>
                 <AdminHeader/>
             </div>
-            <div className='dash-body'>
+            <div className='body'>
               <div className='admin-ship'>
-                <div className='ship-header'>
-                  <div className='ship-search'>
+                <div className='cheader'>
+                  <div className='search'>
                     <form>
-                      <input type='search'/>
-                      <button>Search</button>
+                      <input type='search' placeholder='Search...'/>
                     </form>
                   </div>
 
-                  <div className='ship-options'>
-                    <div className='ship-print'>
+                  <div className='options'>
+                    <div className='print'>
                       <button>Print Shipments Summary</button>
                     </div>
-                    <div className='ship-sort'>
+                    <div className='sort'>
                       <label for="sort">Sort By</label>
 
                       <select name="sort" id="sort">
@@ -56,8 +55,8 @@ const Shipments = () => {
                   </div>
                 </div>
                 <div className='ship-table'>
-                <table>
-                  <thead>
+                <table className='table table-hover'>
+                  <thead className='bg-light sticky-top'>
                     <tr>
                       <th><input type='checkbox'/></th>
                       <th>Shipment ID</th>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './modal.css'
 import axios from 'axios';
 
 const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
@@ -21,7 +22,7 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                 return;
             }
 
-            await axios.put(`http://localhost:5000/update-order-status/${order.order_id}`, {
+            await axios.put(`http://localhost:5001/update-order-status/${order.order_id}`, {
                 status,
                 products
             });
@@ -39,13 +40,10 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
 
     return (
         <div className={`modal fade ${show ? 'show' : ''}`} tabIndex="-1" role="dialog" style={{ display: show ? 'block' : 'none' }}>
-            <div className="modal-dialog" role="document">
+            <div className="modal-dialog modal-dialog-centered" role="document">
                 <div className="modal-content">
                     <div className="modal-header">
                         <h5 className="modal-title">Order Details</h5>
-                        <button type="button" className="close" onClick={handleClose}>
-                            <span>&times;</span>
-                        </button>
                     </div>
                     <div className="modal-body">
                         {order && (
@@ -69,7 +67,7 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                                         <option value="Pending">Pending</option>
                                     </select>
                                 </div>
-
+                                <br/>
                                 <h5>Products:</h5>
                                 <table className="table">
                                     <thead>
@@ -95,7 +93,7 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                             </div>
                         )}
                     </div>
-                    <div className="modal-footer">
+                    <div className="modal-footer justify-content-evenly">
                         <button type="button" className="btn btn-secondary" onClick={handleClose}>Close</button>
                         <button type="button" className="btn btn-primary" onClick={handleUpdate} disabled={loading}>
                             {loading ? 'Updating...' : 'Update Status'}

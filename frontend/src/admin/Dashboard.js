@@ -10,7 +10,6 @@ import AverageOrders from './components/AverageOrders';
 import OrderProcessing from './components/OrderProcessing';
 import TopProduct from './components/TopProduct';
 import AdminHeader from './components/AdminHeader';
-import { Dropdown } from 'react-bootstrap'; // Import Dropdown from react-bootstrap
 
 const Dashboard = () => {
     return (
@@ -25,45 +24,15 @@ const Dashboard = () => {
 
                     <AdminHeader />
 
-                    <div className='header-user'>
-                        <div className='noti'>
-                            <div className='bell-con'>
-                                <i className='bx bxs-bell-ring'></i>
-                            </div>
-                        </div>
-                        <div className='admin-profile'>
-                            <img
-                                src='https://t3.ftcdn.net/jpg/06/17/13/26/360_F_617132669_YptvM7fIuczaUbYYpMe3VTLimwZwzlWf.jpg'
-                                alt='Admin Profile'
-                            />
-                            <Dropdown>
-                                <Dropdown.Toggle as="p" variant='link' className='admin-text'>
-                                    Ma. Leonille Therese D. Silfavan {/* Admin Name */}
-                                </Dropdown.Toggle>
-
-                                <Dropdown.Menu style={{ marginTop: '22px' }}>
-                                    <Dropdown.Item href='#/profile'>Profile</Dropdown.Item>
-                                    <Dropdown.Item href='#/settings'>Settings</Dropdown.Item>
-                                    <Dropdown.Item href='#/logout'>Logout</Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
-                        </div>
-                    </div>
                 </div>
                 <div className='dash-body'>
-                    <div className='col-one'>
                         <OrderSummary />
                         <CustomerInsight />
                         <SalesOrders />
-                    </div>
-                    <div className='col-two'>
                         <PaymentInsight />
-                        <div className='two-col'>
-                            <AverageOrders />
-                            <OrderProcessing />
-                        </div>
+                        <AverageOrders />
+                        <OrderProcessing />
                         <TopProduct />
-                    </div>
                 </div>
             </div>
         </div>

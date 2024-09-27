@@ -15,7 +15,7 @@ const PaymentInsight = () => {
     useEffect(() => {
         const fetchPaymentInsight = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/payment-insight');
+                const response = await axios.get('http://localhost:5001/payment-insight');
                 setMonthlyCounts(response.data.monthlyCounts); // Set monthly counts from the response
             } catch (error) {
                 console.error('Error fetching payment insight:', error);

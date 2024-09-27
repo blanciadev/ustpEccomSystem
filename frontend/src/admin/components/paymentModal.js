@@ -17,7 +17,7 @@ const PaymentModal = ({ show, handleClose, order, handleUpdate }) => {
 
   const handleSave = async () => {
     try {
-      await axios.post('http://localhost:5000/update-payment-details', {
+      await axios.post('http://localhost:5001/update-payment-details', {
         order_id: order.order_id,
         payment_method: paymentMethod,
         order_status: orderStatus,
@@ -71,9 +71,6 @@ const PaymentModal = ({ show, handleClose, order, handleUpdate }) => {
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Close
-        </Button>
         <Button variant="primary" onClick={handleSave}>
           Save Changes
         </Button>

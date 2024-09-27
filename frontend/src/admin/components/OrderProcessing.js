@@ -16,7 +16,7 @@ const OrderProcessing = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/admin-order-history-total-component');  // Your API endpoint
+        const response = await axios.get('http://localhost:5001/admin-order-history-total-component');  // Your API endpoint
         const { statusCounts } = response.data;
 
         // Update chartData using the fetched status counts

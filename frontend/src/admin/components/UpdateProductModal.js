@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './modal.css'
 import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
 
@@ -36,7 +37,7 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
         // Fetch categories
         const fetchCategories = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/categories');
+                const response = await axios.get('http://localhost:5001/categories');
                 setCategories(response.data.categories); 
             } catch (error) {
                 console.error('Error fetching categories:', error);
@@ -63,7 +64,7 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
                     ...formData,
                     size: formData.size === 'Other' ? formData.custom_size : formData.size
                 };
-                await axios.put(`http://localhost:5000/admin-update-products/${formData.product_code}`, dataToSend);
+                await axios.put(`http://localhost:5001/admin-update-products/${formData.product_code}`, dataToSend);
                 handleUpdate(); 
                 handleClose();
             } else {
@@ -77,13 +78,14 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
     };
 
     return (
-        <Modal show={show} onHide={handleClose}>
+        <Modal  className='modal-lg' show={show} onHide={handleClose}>
             <Modal.Header closeButton>
                 <Modal.Title>Update Product</Modal.Title>
             </Modal.Header>
-            <Modal.Body>
+            <Modal.Body className='mbody one'>
                 {error && <div className="alert alert-danger">{error}</div>}
                 <Form onSubmit={handleSubmit}>
+                    <img src={product.product_image}/>
                     <Form.Group controlId="formProductCode">
                         <Form.Label>Product Code</Form.Label>
                         <Form.Control
@@ -200,6 +202,7 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
                             required
                         />
                     </Form.Group>
+                    <br/>
                     <Button variant="primary" type="submit">
                         Update Product
                     </Button>

@@ -18,7 +18,7 @@ const Orders = () => {
   // Fetch orders data from API
   const fetchOrders = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/admin-order-history', {
+      const response = await axios.get('http://localhost:5001/admin-order-history', {
         params: { status }
       });
       console.log('Fetched orders:', response.data.orders);
@@ -58,22 +58,21 @@ const Orders = () => {
           </div>
           <AdminHeader />
         </div>
-        <div className='dash-body'>
+        <div className='body'>
           <div className='admin-order'>
-            <div className='order-header'>
-              <div className='order-search'>
+            <div className='cheader'>
+              <div className='search'>
                 <form>
                   <input type='search' placeholder='Search orders...' />
-                  <button type='submit'>Search</button>
                 </form>
               </div>
 
-              <div className='order-options'>
-                <div className='order-print'>
+              <div className='options'>
+                <div className='print'>
                   <button>Print Order Summary</button>
                 </div>
-                <div className='order-sort'>
-                  <label htmlFor='sort'>Sort By</label>
+                <div className='sort'>
+                  <label htmlFor='sort'>Sort By:</label>
                   <select name='sort' id='sort'>
                     <option value='date'>Date</option>
                     <option value='status'>Status</option>
@@ -82,7 +81,7 @@ const Orders = () => {
                   </select>
                 </div>
                 <div className='order-filter'>
-                  <label htmlFor='status'>Filter By Status</label>
+                  <label htmlFor='status'>Filter By Status:</label>
                   <select
                     name='status'
                     id='status'
@@ -100,8 +99,8 @@ const Orders = () => {
               </div>
             </div>
             <div className='order-table'>
-              <table>
-                <thead>
+              <table className='table table-hover'>
+                <thead className='bg-light sticky-top'>
                   <tr>
                     <th><input type='checkbox' /></th>
                     <th>Order ID</th>

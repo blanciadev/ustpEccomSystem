@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import Pagination from 'react-bootstrap/Pagination';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../admin.css';
 import AdminNav from '../components/AdminNav';
 import AdminHeader from '../components/AdminHeader';
-import TopProduct from '../components/TopProduct';
+import InventoryCountComponent from '../components/InventoryCountComponent';
 import axios from 'axios';
 import { Modal, Button } from 'react-bootstrap'; // Import Bootstrap Modal and Button
 
@@ -27,7 +26,7 @@ const Inventory = () => {
     useEffect(() => {
         const fetchProductData = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/admin-products-with-interaction');
+                const response = await axios.get('http://localhost:5001/admin-products-with-interaction');
                 const {
                     total,
                     totalQuantity,
@@ -66,148 +65,65 @@ const Inventory = () => {
 
     return (
         <div className='dash-con'>
-            <AdminNav />
-            <div className='dash-board'>
-                <div className='dash-header'>
-                    <div className='header-title'>
-                        <i className='bx bxs-spa'></i>
-                        <h1>Products</h1>
-                    </div>
-                    <AdminHeader />
+        <AdminNav />
+        <div className='dash-board'>
+            <div className='dash-header'>
+                <div className='header-title'>
+                    <i class='bx bx-clipboard'></i>
+                    <h1>Inventory</h1>
                 </div>
-
-                <div className='dash-body'>
-                    <div className='product-con'>
-                        <div className='product-one'>
-                            <div className='product-qty'>
-                                <div className='best-selling'>
-                                    <div className='qty'>
-                                        <i className='bx bxs-spa'></i>
-                                        <h6>{bestSellingCount}</h6> {/* Displaying the count */}
-                                    </div>
-                                    <div>
-                                        <h6>Best Selling</h6>
-                                    </div>
-                                </div>
-
-                                <div className='in-stock'>
-                                    <div className='qty'>
-                                        <i className='bx bxs-spa'></i>
-                                        <h6>{totalQuantity}</h6> {/* Displaying the total quantity */}
-                                    </div>
-                                    <div>
-                                        <h6>Total Stock</h6>
-                                    </div>
-                                </div>
-
-                                <div className='low-stock'>
-                                    <div className='qty'>
-                                        <i className='bx bxs-spa'></i>
-                                        <h6>{lowStockCount}</h6> {/* Displaying the low stock count */}
-                                    </div>
-                                    <div>
-                                        <h6>Low Stock</h6>
-                                    </div>
-                                </div>
-
-                                <div className='unpopular'>
-                                    <div className='qty'>
-                                        <i className='bx bxs-spa'></i>
-                                        <h6>{unpopularProducts.length}</h6> {/* Displaying the count of unpopular products */}
-                                    </div>
-                                    <div>
-                                        <h6>Unpopular</h6>
-                                        <ul>
-                                            {/* Display unpopular products */}
-                                            {unpopularProducts.map((product, index) => (
-                                                <li key={index}>{product}</li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </div>
-
-                                <div className='out-of-stock'>
-                                    <div className='qty'>
-                                        <i className='bx bxs-spa'></i>
-                                        <h6>{outOfStockCount}</h6> {/* Displaying the count of out-of-stock items */}
-                                    </div>
-                                    <div>
-                                        <h6>Out of Stock</h6>
-                                    </div>
-                                </div>
-
-                                <div className='discontinued'>
-                                    <div className='qty'>
-                                        <i className='bx bxs-spa'></i>
-                                        <h6>{discontinuedCount}</h6>
-                                    </div>
-                                    <div>
-                                        <h6>Discontinued</h6>
-                                    </div>
-                                </div>
+                <AdminHeader />
+            </div>
+            <div className='body'>
+            <div className='user-con'>
+                <InventoryCountComponent/>
+                    <div className='report-list'>
+                        <div className='cheader'>
+                            <div className='search'>
+                                <form>
+                                <input type='search' placeholder='Search...'/>
+                                </form>
                             </div>
-                            <TopProduct />
+
+                           
                         </div>
-
-                        <div className='product-two'>
-                            {/* Table */}
-                            <div className='order-header'>
-                                <div className='order-search'>
-                                    <form onSubmit={handleSearch}>
-                                        <input type='search' placeholder='Search products...' />
-                                        <button type='submit'>Search</button>
-                                    </form>
-                                </div>
-
-                                {/* Add a button to trigger modal */}
-                                <div className='order-options'>
-                                    <div className='order-print'>
-                                        <button>Print Order Summary</button>
-                                    </div>
-                                    <div className='order-sort'>
-                                        <label htmlFor="sort">Sort By</label>
-                                        <select name="sort" id="sort">
-                                            <option value="date">Date</option>
-                                            <option value="status">Status</option>
-                                            <option value="id">ID</option>
-                                            <option value="customer-id">Customer</option>
-                                        </select>
-                                    </div>
-                                    <div className='order-add'>
-                                        <Button variant="primary" onClick={handleShowModal}>
-                                            Add Product
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='order-table'>
-                                <table>
-                                    <thead>
-                                        <tr>
+                        <div className='order-table'>
+                            <table className='table table-hover'>
+                                <thead className='bg-light sticky-top'>
+                                <tr>
                                             <th><input type='checkbox' /></th>
-                                            <th>Order ID</th>
-                                            <th>Customer ID</th>
-                                            <th>Order Date</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
+                                            <th>Product Code</th>
+                                            <th>Product Name</th>
+                                            <th>Category</th>
+                                            <th>Size</th>
+                                            <th>Quantity</th>
+                                            <th>Price</th>
+                                            <th>Total Amount</th>
+                                            <th>Date</th>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td><input type='checkbox' /></td>
+                                </thead>
+                                <tbody>
+                                 
+                                    <tr>
+                                        <td><input type='checkbox' /></td>
                                             <td>Order ID</td>
                                             <td>Customer ID</td>
                                             <td>Order Date</td>
                                             <td>Status</td>
-                                            <td><button>View</button></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                                            <td>Order Date</td>
+                                            <td>Status</td>
+                                            <td>Order Date</td>
+                                            <td>Status</td>
+                                    </tr>
+                                
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+                       
 
             {/* Modal for adding products */}
             <Modal show={showModal} onHide={handleCloseModal}>
