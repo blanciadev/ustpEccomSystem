@@ -16,7 +16,11 @@ const Navigation = () => {
         if (!token) return;
 
         try {
-            const response = await axios.get('http://localhost:5000/cart-item-count', {
+            //angela
+            const response = await axios.get('http://localhost:5001/cart-item-count', {
+
+            //kurt
+            // const response = await axios.get('http://localhost:5001/cart-item-count', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (response.status === 200) {
@@ -36,7 +40,11 @@ const Navigation = () => {
         }
 
         try {
-            const response = await axios.get('http://localhost:5000/validate-token', {
+            //angela
+            const response = await axios.get('http://localhost:5001/validate-token', {
+
+            //kurt
+            // const response = await axios.get('http://localhost:5001/validate-token', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (response.status === 200) {
@@ -66,8 +74,25 @@ const Navigation = () => {
         };
     }, []);
 
+
     // Handle user logout
-    const handleLogout = () => {
+    const handleLogout = async () => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                //angela
+                await axios.post('http://localhost:5001/logout', {}, {
+
+                //kurt
+                // await axios.post('http://localhost:5001/logout', {}, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                localStorage.removeItem('token');
+            } catch (error) {
+                console.error('Error logging out:', error.response ? error.response.data : error.message);
+            }
+        }
+
         localStorage.removeItem('token');
         localStorage.removeItem('user_id');
         localStorage.removeItem('username');
@@ -77,6 +102,7 @@ const Navigation = () => {
         setIsLoggedIn(false);
         navigate('/login');
     };
+
 
     // Navigate to cart or login if not logged in
     const handleCartClick = () => {

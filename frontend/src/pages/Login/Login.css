@@ -21,18 +21,20 @@
     
 }
 .login-form{
-    background-color: aquamarine;
+    /* background-color: aquamarine; */
     width: 45%;
-    height: 80%;
+    height: 90%;
     display: flex;
     justify-content: flex-start;
+
+    align-items: flex-start;
     flex-direction: column;
     gap: 20px;
 }
 .login-form .login-google{
     width: 100%;
     height: 25%;
-    background-color: cadetblue;
+    /* background-color: cadetblue; */
 }
 .login-google > form{
     width: 100%;

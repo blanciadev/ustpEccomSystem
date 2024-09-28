@@ -1,27 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import './Shop.css'; // Import CSS file
+import './Shop.css';
 import Navigation from '../../components/Navigation';
-import { cartEventEmitter } from '../../components/eventEmitter'; 
+import { cartEventEmitter } from '../../components/eventEmitter';
+import ProductModal from '../../components/ProductModal';
 
 const Shop = () => {
     const [products, setProducts] = useState([]);
-    const [recommendedProducts, setRecommendedProducts] = useState([]);
-    const [topPickedProducts, setTopPickedProducts] = useState([]); // State for top picked products
+    const [filteredProducts, setFilteredProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [showRecommendations, setShowRecommendations] = useState(false);
-    const [currentCategoryPages, setCurrentCategoryPages] = useState({});
-    const [currentRecommendationsPage, setCurrentRecommendationsPage] = useState(1);
-    const [productsPerPage] = useState(4); // Number of products per page
-    const [recommendationsPerPage] = useState(4); // Number of recommendations per page
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [productsPerPage] = useState(10);
+    const [categories, setCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [topPickedProducts, setTopPickedProducts] = useState([]);
+    const [recommendedProducts, setRecommendedProducts] = useState([]);
 
-    // Fetch all products
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/products');
-                setProducts(response.data);
+               // const response = await axios.get('http://localhost:5001/products');
+               const response = await axios.get('http://localhost:5001/products');
+               setProducts(response.data);
+                setFilteredProducts(response.data);
+                setCategories([...new Set(response.data.map(product => product.category_name))]);
             } catch (error) {
                 setError('Error fetching products: ' + (error.response ? error.response.data : error.message));
             } finally {
@@ -29,142 +34,103 @@ const Shop = () => {
             }
         };
 
-        fetchProducts();
-    }, []);
-
-    // Fetch recommended products
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        const userId = localStorage.getItem('customer_id');
-
-        if (token && userId) {
-            const fetchRecommendedProducts = async () => {
-                try {
-                    const response = await axios.get('http://localhost:5000/product-user', {
-                        params: { customerId: userId }
-                    });
-                    setRecommendedProducts(response.data);
-                    setShowRecommendations(true);
-                } catch (error) {
-                    console.error('Error fetching recommended products:', error.response ? error.response.data : error.message);
-                }
-            };
-
-            fetchRecommendedProducts();
-        } else {
-            console.log('User not logged in or user ID missing');
-        }
-
-        const handleCartUpdate = (data) => {
-            console.log('Cart updated:', data);
-        };
-
-        cartEventEmitter.on('cartUpdated', handleCartUpdate);
-
-        return () => {
-            cartEventEmitter.off('cartUpdated', handleCartUpdate);
-        };
-    }, []);
-
-    // Fetch top user-picked products
-    useEffect(() => {
         const fetchTopPickedProducts = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/products-top-picks');
+                const response = await axios.get('http://localhost:5001/products-top-picks');
                 setTopPickedProducts(response.data);
             } catch (error) {
                 console.error('Error fetching top-picked products:', error.response ? error.response.data : error.message);
             }
         };
 
+        const fetchRecommendedProducts = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const userId = localStorage.getItem('customer_id');
+
+                if (token && userId) {
+                    const response = await axios.get(`http://localhost:5001/recommend-products`);
+                    setRecommendedProducts(response.data);
+                }
+            } catch (error) {
+                console.error('Error fetching recommended products:', error.response ? error.response.data : error.message);
+            }
+        };
+
+        fetchProducts();
         fetchTopPickedProducts();
+        fetchRecommendedProducts();
     }, []);
 
-    // Handle product interaction
-    const handleProductInteraction = async (product_code) => {
-        console.log('Product interacted with, Code:', product_code);
+    const handleCategoryChange = (e) => {
+        const category = e.target.value;
+        setSelectedCategory(category);
+        const filtered = category ? products.filter(product => product.category_name === category) : products;
+        setFilteredProducts(filtered);
+        setCurrentPage(1);
+    };
+
+    const handleBuyNow = (product) => {
+        // Create an object that includes the product details and quantity
+        const productData = {
+            ...product,
+            quantity: product.quantity = 1,
+        };
+
+        // Retrieve existing selected products or create a new array
+        const existingProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
+
+        // Add the new product to the array
+        existingProducts.push(productData);
+
+        // Store the updated array in localStorage
+        localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
+
+        // Redirect to the checkout page
+        window.location.href = '/checkout';
+        console.log(productData);
+    };
+
+
+
+    const handleAddToCart = async (product) => {
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('customer_id');
+
+        if (!token || !userId) {
+            console.log('User not logged in or user ID missing');
+            return;
+        }
 
         try {
-            await axios.get('http://localhost:5000/products-interaction', {
-                params: { product_code }
-            });
+            await axios.post(
+                'http://localhost:5001/add-to-cart',
+                { product_code: product.product_code, quantity: 1 },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
 
-            console.log('Product interaction updated');
+            console.log('Product added to cart');
+            cartEventEmitter.emit('cartUpdated', { product_code: product.product_code, quantity: 1 });
         } catch (error) {
-            console.error('Error updating product interaction:', error.response ? error.response.data : error.message);
+            console.error('Error adding product to cart:', error.response ? error.response.data : error.message);
         }
     };
 
-    const handleAddToCart = async (product) => {
-    const token = localStorage.getItem('token');
-    const userId = localStorage.getItem('customer_id');
-
-    if (!token || !userId) {
-        console.log('User not logged in or user ID missing');
-        return;
-    }
-
-    try {
-        await axios.post(
-            'http://localhost:5000/add-to-cart',
-            {
-                product_code: product.product_code,
-                quantity: 1 // Adjust quantity as needed
-            },
-            {
-                headers: { Authorization: `Bearer ${token}` }
-            }
-        );
-
-        console.log('Product added to cart');
-        
-        // Emit cart updated event with product info and quantity
-        cartEventEmitter.emit('cartUpdated', {
-            product_code: product.product_code,
-            quantity: 1
-        });
-    } catch (error) {
-        console.error('Error adding product to cart:', error.response ? error.response.data : error.message);
-    }
-};
-
-
-    const groupProductsByCategory = (products) => {
-        return products.reduce((categories, product) => {
-            const category = product.category_name || 'Uncategorized';
-            if (!categories[category]) {
-                categories[category] = [];
-            }
-            categories[category].push(product);
-            return categories;
-        }, {});
+    const openModal = (product) => {
+        setSelectedProduct(product);
+        setIsModalOpen(true);
     };
 
-    const groupedProducts = groupProductsByCategory(products);
-
-    const paginate = (items, pageNumber, itemsPerPage) => {
-        const startIndex = (pageNumber - 1) * itemsPerPage;
-        return items.slice(startIndex, startIndex + itemsPerPage);
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedProduct(null);
     };
 
-    const handleCategoryPageChange = (category, direction) => {
-        setCurrentCategoryPages(prev => {
-            const newPage = Math.max(1, (prev[category] || 1) + direction);
-            return {
-                ...prev,
-                [category]: newPage
-            };
-        });
-    };
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
 
-    const handleRecommendationsPageChange = (direction) => {
-        setCurrentRecommendationsPage(prev => {
-            const newPage = Math.max(1, prev + direction);
-            return newPage;
-        });
-    };
-
-    const totalPages = (items, itemsPerPage) => Math.ceil(items.length / itemsPerPage);
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -183,14 +149,10 @@ const Shop = () => {
                 <h2>Top Picks</h2>
                 <div className='product-list'>
                     {topPickedProducts.map((product) => (
-                        <div
-                            key={product.product_code}
-                            className='product-item'
-                            onMouseEnter={() => handleProductInteraction(product.product_code)}
-                        >
+                        <div key={product.product_code} className='product-item' onClick={() => openModal(product)}>
                             <div className='product-img'>
                                 <img
-                                    src={product.image_url || 'https://via.placeholder.com/150'}
+                                    src={product.product_image || 'https://via.placeholder.com/150'}
                                     alt={product.product_name || 'Product Image'}
                                 />
                             </div>
@@ -201,31 +163,39 @@ const Shop = () => {
                                 <p className='product-brand'>Brand: {product.brand}</p>
                                 <button
                                     className='add-to-cart-button'
-                                    onClick={() => handleAddToCart(product)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleAddToCart(product);
+                                    }}
                                 >
                                     Add to Cart
                                 </button>
-                                <button className='buy-now-button'>Buy Now</button>
+                                <button
+                                    className='buy-now-button'
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleBuyNow(product, product.quantity);
+                                    }}
+                                >
+                                    Buy Now
+                                </button>
+
                             </div>
                         </div>
                     ))}
                 </div>
             </div>
 
-            {/* Recommended and General Products Sections */}
-            {showRecommendations && (
+            {/* Recommended Products Section */}
+            {recommendedProducts.length > 0 && (
                 <div className='recommendations-section'>
                     <h2>Recommended for You</h2>
                     <div className='product-list'>
-                        {paginate(recommendedProducts, currentRecommendationsPage, recommendationsPerPage).map((product) => (
-                            <div
-                                key={product.product_code}
-                                className='product-item'
-                                onMouseEnter={() => handleProductInteraction(product.product_code)}
-                            >
+                        {recommendedProducts.map((product) => (
+                            <div key={product.product_code} className='product-item' onClick={() => openModal(product)}>
                                 <div className='product-img'>
                                     <img
-                                        src={product.image_url || 'https://via.placeholder.com/150'}
+                                        src={product.product_image || 'https://via.placeholder.com/150'}
                                         alt={product.product_name || 'Product Image'}
                                     />
                                 </div>
@@ -236,90 +206,97 @@ const Shop = () => {
                                     <p className='product-brand'>Brand: {product.brand}</p>
                                     <button
                                         className='add-to-cart-button'
-                                        onClick={() => handleAddToCart(product)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleAddToCart(product);
+                                        }}
                                     >
                                         Add to Cart
                                     </button>
-                                    <button className='buy-now-button'>Buy Now</button>
+                                    <button
+                                        className='buy-now-button'
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleBuyNow(product, product.quantity);
+                                        }}
+                                    >
+                                        Buy Now
+                                    </button>
+
                                 </div>
                             </div>
                         ))}
                     </div>
-                    <div className='pagination'>
-                        <button
-                            onClick={() => handleRecommendationsPageChange(-1)}
-                            disabled={currentRecommendationsPage === 1}
-                        >
-                            Previous
-                        </button>
-                        <span>Page {currentRecommendationsPage} of {totalPages(recommendedProducts, recommendationsPerPage)}</span>
-                        <button
-                            onClick={() => handleRecommendationsPageChange(1)}
-                            disabled={currentRecommendationsPage === totalPages(recommendedProducts, recommendationsPerPage)}
-                        >
-                            Next
-                        </button>
-                    </div>
                 </div>
             )}
 
-            <div className='general-products-section'>
-                <h2>All Products</h2>
-                {Object.keys(groupedProducts).map((categoryName) => {
-                    const categoryProducts = groupedProducts[categoryName];
-                    const currentPage = currentCategoryPages[categoryName] || 1;
-
-                    return (
-                        <div key={categoryName} className='category-section'>
-                            <h3>{categoryName}</h3>
-                            <div className='product-list'>
-                                {paginate(categoryProducts, currentPage, productsPerPage).map((product) => (
-                                    <div
-                                        key={product.product_code}
-                                        className='product-item'
-                                        onMouseEnter={() => handleProductInteraction(product.product_code)}
-                                    >
-                                        <div className='product-img'>
-                                            <img
-                                                src={product.image_url || 'https://via.placeholder.com/150'}
-                                                alt={product.product_name || 'Product Image'}
-                                            />
-                                        </div>
-                                        <div className='product-desc'>
-                                            <p className='product-name'>{product.product_name || 'No product name'}</p>
-                                            <p className='product-quantity'>Quantity: {product.quantity}</p>
-                                            <p className='product-price'>Price: ${product.price}</p>
-                                            <p className='product-brand'>Brand: {product.brand}</p>
-                                            <button
-                                                className='add-to-cart-button'
-                                                onClick={() => handleAddToCart(product)}
-                                            >
-                                                Add to Cart
-                                            </button>
-                                            <button className='buy-now-button'>Buy Now</button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className='pagination'>
-                                <button
-                                    onClick={() => handleCategoryPageChange(categoryName, -1)}
-                                    disabled={currentPage === 1}
-                                >
-                                    Previous
-                                </button>
-                                <span>Page {currentPage} of {totalPages(categoryProducts, productsPerPage)}</span>
-                                <button
-                                    onClick={() => handleCategoryPageChange(categoryName, 1)}
-                                    disabled={currentPage === totalPages(categoryProducts, productsPerPage)}
-                                >
-                                    Next
-                                </button>
-                            </div>
-                        </div>
-                    );
-                })}
+            {/* Filter Section */}
+            <div className='filter-section'>
+                <label htmlFor='category-filter'>Filter by Category:</label>
+                <select id='category-filter' value={selectedCategory} onChange={handleCategoryChange}>
+                    <option value=''>All Categories</option>
+                    {categories.map((category) => (
+                        <option key={category} value={category}>{category}</option>
+                    ))}
+                </select>
             </div>
+
+            {/* Products List */}
+            <div className='product-list'>
+                {currentProducts.map((product) => (
+                    <div key={product.product_code} className='product-item' onClick={() => openModal(product)}>
+                        <div className='product-img'>
+                            <img
+                                src={product.product_image || 'https://via.placeholder.com/150'}
+                                alt={product.product_name || 'Product Image'}
+                            />
+                        </div>
+                        <div className='product-desc'>
+                            <p className='product-name'>{product.product_name || 'No product name'}</p>
+                            <p className='product-quantity'>Quantity: {product.quantity}</p>
+                            <p className='product-price'>Price: ${product.price}</p>
+                            <p className='product-brand'>Brand: {product.brand}</p>
+                            <button
+                                className='add-to-cart-button'
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleAddToCart(product);
+                                }}
+                            >
+                                Add to Cart
+                            </button>
+                            <button
+                                className='buy-now-button'
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleBuyNow(product, product.quantity);
+                                }}
+                            >
+                                Buy Now
+                            </button>
+
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Pagination */}
+            <div className='pagination'>
+                {[...Array(Math.ceil(filteredProducts.length / productsPerPage)).keys()].map(number => (
+                    <button key={number + 1} onClick={() => paginate(number + 1)} className={number + 1 === currentPage ? 'active' : ''}>
+                        {number + 1}
+                    </button>
+                ))}
+            </div>
+
+            {isModalOpen && (
+                <ProductModal
+                    isOpen={isModalOpen}
+                    product={selectedProduct}
+                    onAddToCart={handleAddToCart}
+                    onClose={closeModal}
+                />
+            )}
         </div>
     );
 };

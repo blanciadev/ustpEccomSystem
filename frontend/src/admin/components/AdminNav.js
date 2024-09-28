@@ -56,6 +56,12 @@ const AdminNav = () => {
         >
           Reports
         </a>
+        <a
+          href='/admin/manage-users'
+          className={location.pathname === '/admin/manage-users' ? 'active' : ''}
+        >
+          Users
+        </a>
       </div>
     </div>
   );

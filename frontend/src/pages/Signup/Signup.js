@@ -29,7 +29,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/customer-signup', {
+      const response = await fetch('http://localhost:5001/customer-signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -64,25 +64,31 @@ const Signup = () => {
     <div className='signup-con'>
       <div className='signup-box'>
         <div className='signup-form'>
+          <h1>Sign Up</h1>
+          {error && <p className='error'>{error}</p>}
+          {success && <p className='success'>{success}</p>}
+
           <form onSubmit={handleSubmit}>
-            <div className='input'>
-              <label>First Name</label>
-              <input
-                type='text'
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                required
-              />
-            </div>
-            <div className='input'>
-              <label>Last Name</label>
-              <input
-                type='text'
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                required
-              />
-            </div>
+            <div className='two-column'>
+              <div className='input'>
+                <label>First Name</label>
+                <input
+                  type='text'
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className='input'>
+                <label>Last Name</label>
+                <input
+                  type='text'
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                />
+              </div>
+          </div>
             <div className='input'>
               <label>Email</label>
               <input
@@ -110,6 +116,7 @@ const Signup = () => {
                 required
               />
             </div>
+            <div className='two-column'>
             <div className='input'>
               <label>Password</label>
               <input
@@ -128,12 +135,16 @@ const Signup = () => {
                 required
               />
             </div>
+            </div>
             <button type='submit'>Sign Up</button>
           </form>
-          {error && <p className='error'>{error}</p>}
-          {success && <p className='success'>{success}</p>}
+          
+          <p>Have an account? <a href='/login'>Log In</a></p>
         </div>
-        <div></div>
+        <div className='signup-image'>
+          <img src='https://res.cloudinary.com/urbanclap/image/upload/t_high_res_template/dpr_2,fl_progressive:steep,q_auto:low,f_auto,c_limit/images/growth/luminosity/1723441265778-917980.jpeg'/>
+                
+        </div>
       </div>
     </div>
   );

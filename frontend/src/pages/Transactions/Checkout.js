@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Transaction.css';
 import Navigation from '../../components/Navigation';
 import Footer from '../../components/Footer';
@@ -12,7 +12,9 @@ const Checkout = () => {
   const customerId = localStorage.getItem('customer_id');
   console.log('Customer ID:', customerId);
 
-  const { selectedProducts = [], totalPrice = 0 } = location.state || {};
+  // Retrieve from local storage
+  const savedProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
+  const totalPrice = location.state?.totalPrice || JSON.parse(localStorage.getItem('totalPrice')) || 0;
 
   const [authToken, setAuthToken] = useState(localStorage.getItem('token'));
   const [formData, setFormData] = useState({
@@ -23,9 +25,28 @@ const Checkout = () => {
     postalCode: '',
     paymentMethod: '',
   });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // Manage quantities of saved products
+  const [quantities, setQuantities] = useState(savedProducts.map(product => product.quantity));
+
+  // Clear local storage data on page close
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      localStorage.removeItem('selectedProducts');
+      localStorage.removeItem('totalPrice');
+      localStorage.removeItem('checkoutFormData');
+      localStorage.removeItem('checkoutOrderData');
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -40,6 +61,15 @@ const Checkout = () => {
       ...formData,
       paymentMethod: e.target.value,
     });
+  };
+
+  const handleQuantityChange = (index, e) => {
+    const newQuantity = Number(e.target.value);
+    if (newQuantity <= savedProducts[index].quantity) {
+      const newQuantities = [...quantities];
+      newQuantities[index] = newQuantity;
+      setQuantities(newQuantities);
+    }
   };
 
   const validateForm = () => {
@@ -70,22 +100,35 @@ const Checkout = () => {
         return;
       }
 
+      // Check if selectedProducts and totalPrice are available
+      if (savedProducts.length === 0 || totalPrice <= 0) {
+        setLoading(false);
+        setError('No products selected or total price is invalid.');
+        return;
+      }
+
+      // Save formData to localStorage
+      localStorage.setItem('checkoutFormData', JSON.stringify(formData));
+
       const orderData = {
         customer_id: customerId,
         order_date: new Date().toISOString(),
-        order_details: selectedProducts.map(product => ({
+        order_details: savedProducts.map((product, index) => ({
           product_id: product.product_code,
-          quantity: product.quantity,
-          totalprice: product.price * product.quantity, // Add total price here
-          payment_date: new Date().toISOString(), // Set payment_date to current date
-          payment_method: formData.paymentMethod, // Use payment method from form
-          payment_status: 'Pending', // Default payment status
+          quantity: quantities[index],
+          totalprice: product.price * quantities[index],
+          payment_date: new Date().toISOString(),
+          payment_method: formData.paymentMethod,
+          payment_status: 'Pending',
         })),
-        total_price: totalPrice // Include total price for order summary
+        total_price: quantities.reduce((total, qty, index) => total + (savedProducts[index].price * qty), 0),
       };
 
+      // Save orderData to localStorage (if needed)
+      localStorage.setItem('checkoutOrderData', JSON.stringify(orderData));
+
       const response = await axios.post(
-        'http://localhost:5000/insert-order',
+        'http://localhost:5001/insert-order',
         orderData,
         {
           headers: {
@@ -97,7 +140,7 @@ const Checkout = () => {
 
       if (response.status === 201) {
         setSuccess('Order placed successfully!');
-        navigate('/order-success'); // Navigate to a success page or order summary
+        navigate('/order-success');
       }
     } catch (error) {
       console.error('Error placing order:', error.message);
@@ -214,12 +257,18 @@ const Checkout = () => {
               <span>Total Price</span>
             </div>
             <ul className='product-list'>
-              {selectedProducts.length > 0 ? (
-                selectedProducts.map((product) => (
+              {savedProducts.length > 0 ? (
+                savedProducts.map((product, index) => (
                   <li key={product.product_code}>
                     <span>{product.product_name}</span>
-                    <span className='quantity'>{product.quantity}</span>
-                    <span className='total-price'>₱{product.price * product.quantity}</span>
+                    <input
+                      type='number'
+                      min='1'
+                      max={product.quantity}
+                      value={quantities[index]}
+                      onChange={(e) => handleQuantityChange(index, e)}
+                    />
+                    <span className='total-price'>₱{product.price * quantities[index]}</span>
                   </li>
                 ))
               ) : (
@@ -227,7 +276,7 @@ const Checkout = () => {
               )}
             </ul>
             <br />
-            <h4>Total: ₱ {totalPrice}</h4>
+            <h4>Total: ₱ {quantities.reduce((total, qty, index) => total + (savedProducts[index].price * qty), 0)}</h4>
           </div>
         </div>
       </div>
