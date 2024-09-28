@@ -167,7 +167,9 @@ const Shop = () => {
                                 <p className='product-name'>{product.product_name || 'No product name'}</p>
                                 <p className='product-quantity'>Quantity: {product.quantity}</p>
                                 <p className='product-price'>Price: ${product.price}</p>
-
+                                {product.product_status === 'Discounted' && (
+                                    <p className='product-price'>Product Discount: P{product.product_discount}%</p>
+                                )}
                                 {product.quantity > 0 ? (
                                     <>
                                         <button
@@ -216,7 +218,11 @@ const Shop = () => {
                                     <p className='product-name'>{product.product_name || 'No product name'}</p>
                                     <p className='product-quantity'>Quantity: {product.quantity}</p>
                                     <p className='product-price'>Price: ${product.price}</p>
-                                    <p className='product-brand'>Brand: {product.brand}</p>
+
+                                    {product.product_status === 'Discounted' && (
+                                        <p className='product-price'>Product Discount: P{product.product_discount}%</p>
+                                    )}
+
                                     {product.quantity > 0 ? (
                                         <>
                                             <button
@@ -273,8 +279,11 @@ const Shop = () => {
                         <div className='product-desc'>
                             <p className='product-name'>{product.product_name || 'No product name'}</p>
                             <p className='product-quantity'>Quantity: {product.quantity}</p>
-                            <p className='product-price'>Price: ${product.price}</p>
-                            <p className='product-brand'>Brand: {product.brand}</p>
+                            <p className='product-price'>Price: P{product.price}</p>
+                            {product.product_status === 'Discounted' && (
+                                <p className='product-price'>Product Discount: P{product.product_discount}%</p>
+                            )}
+                            {/* <p className='product-brand'>Brand: {product.brand}</p> */}
 
                             {product.quantity > 0 ? (
                                 <>

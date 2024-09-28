@@ -33,6 +33,7 @@ const ProductCard = React.memo(({ product, onAddToCart, onProductInteraction, on
             <p>{product.description || 'No description available.'}</p>
             <br></br><p>Product Quantity : {product.quantity}</p>
             <h3>P{product.price}</h3>
+            <h3>Discounted Price : P{product.Discounted_price}</h3>
             {isOutOfStock ? (
                 <p style={{ color: 'red' }}>Out of Stock</p>
             ) : (

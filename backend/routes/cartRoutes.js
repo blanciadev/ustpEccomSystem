@@ -147,7 +147,7 @@ router.get('/cart-item-count', authenticateToken, async (req, res) => {
     }
 });
 
-
+// Fetch Cart Items
 router.get('/cart', authenticateToken, async (req, res) => {
     const { user_id } = req;
 
@@ -201,6 +201,81 @@ router.get('/cart', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+// Update cart item quantity
+router.post('/cart-update-quantity', authenticateToken, async (req, res) => {
+    const { cart_items_id, newQuantity } = req.body;
+
+    console.log("CART ITEMS ID ---- ", cart_items_id);
+    console.log("New Quantity ---- ", newQuantity);
+
+    if (!cart_items_id || isNaN(newQuantity)) {
+        return res.status(400).json({ message: 'Invalid cart item ID or quantity' });
+    }
+
+    if (newQuantity < 1) {
+        return res.status(400).json({ message: 'Quantity must be at least 1' });
+    }
+
+    try {
+        const [result] = await db.query(`
+        UPDATE cart_items 
+        SET quantity = ? 
+        WHERE cart_items_id = ? AND status = 'Order Pending'
+      `, [newQuantity, cart_items_id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Cart item not found' });
+        }
+
+        res.status(200).json({ message: 'Quantity updated successfully' });
+    } catch (err) {
+        console.error('Error updating cart item:', err.message);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+
+// CheckOut Page Backend
+router.get('/products/:productCode', async (req, res) => {
+    const { productCode } = req.params;
+    console.log(productCode);
+    try {
+        // Query to fetch the product based on the product code
+        const [rows] = await db.query(`
+            SELECT
+                p.product_id, 
+                p.product_code, 
+                p.product_name, 
+                p.price, 
+                p.description, 
+                p.quantity, 
+                c.category_name, 
+                p.product_image, 
+                p.product_discount
+            FROM
+                product AS p
+                INNER JOIN
+                category AS c
+                ON 
+                    p.category_id = c.category_id
+                        WHERE p.product_code = ?
+        `, [productCode]);
+
+        // Check if product exists
+        if (rows.length === 0) {
+            return res.status(404).send('Product not found');
+        }
+
+        // Respond with the product details
+        res.json(rows[0]);
+    } catch (error) {
+        console.error('Error fetching product:', error);
+        res.status(500).send('Error fetching product');
+    }
+});
+
 
 
 

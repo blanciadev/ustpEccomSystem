@@ -123,6 +123,13 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                                             <span className="product-name">{recProduct.product_name}</span>
                                             <span className="product-price">${recProduct.price}</span>
 
+                                            {/* Conditionally render the discount if product_status is 'Discounted' */}
+                                            {recProduct.product_status === 'Discounted' && (
+                                                <span className="product-discount">
+                                                    Discounted by: {recProduct.product_discount}%
+                                                </span>
+                                            )}
+
                                             {/* Conditionally render the buttons based on recommended product quantity */}
                                             {recProduct.quantity > 0 ? (
                                                 <>
@@ -166,6 +173,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                             </div>
                         )}
                     </div>
+
 
                 </div>
             </div>
