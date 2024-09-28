@@ -51,7 +51,7 @@ const Products = () => {
 
   const fetchProductData = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/admin-products-with-interaction');
+      const response = await axios.get('http://localhost:5001/admin-products-with-interaction');
       const {
         total, totalQuantity, lowStockCount, lowStockQuantity, unpopularProducts, outOfStockCount, outOfStockQuantity, discontinuedCount, discontinuedQuantity
       } = response.data;
@@ -72,7 +72,7 @@ const Products = () => {
 
   const fetchProduct = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/products');
+      const response = await axios.get('http://localhost:5001/products');
       setProducts(response.data);  // Save the fetched products
     } catch (error) {
       console.error('Error fetching product data:', error);
@@ -86,7 +86,7 @@ const Products = () => {
 
   const handleAddProduct = async (newProduct) => {
     try {
-      await axios.post('http://localhost:5000/admin-products', newProduct);
+      await axios.post('http://localhost:5001/admin-products', newProduct);
       handleCloseAddModal();
       fetchProduct();
     } catch (error) {
@@ -106,7 +106,7 @@ const Products = () => {
           <AdminHeader />
         </div>
 
-        <div className='dash-body'>
+        <div className='body'>
           <div className='product-con'>
             <div className='product-one'>
               <ProductStatistics
@@ -124,19 +124,20 @@ const Products = () => {
             </div>
 
             <div className='product-two'>
-              <div className='order-header'>
-                <div className='order-search'>
+              <div className='cheader'>
+                <div className='search'>
                   <form>
                     <input type='search' placeholder="Search products..." />
-                    <button type="submit">Search</button>
                   </form>
                 </div>
 
-                <div className='order-options'>
-                  <div className='order-print'>
-                    <button>Print Order Summary</button>
+                <div className='options'>
+                  <div className='print'>
+                    <button onClick={handleShowAddModal}>
+                      Add Product
+                    </button>
                   </div>
-                  <div className='order-sort'>
+                  <div className='sort'>
                     <label htmlFor="sort">Sort By</label>
                     <select name="sort" id="sort">
                       <option value="date">Date</option>
@@ -153,6 +154,7 @@ const Products = () => {
                   <Button variant="primary" onClick={handleShowBundleProductModal}>
                     Discounts
                   </Button>
+
                 </div>
               </div>
 

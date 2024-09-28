@@ -12,7 +12,7 @@ const CustomerInsight = () => {
   useEffect(() => {
     const fetchCustomerInsights = async () => {
       try {
-        const response = await fetch('http://localhost:5000/customer-insight', {
+        const response = await fetch('http://localhost:5001/customer-insight', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -67,7 +67,7 @@ const CustomerInsight = () => {
     scales: {
       x: {
         title: {
-          display: true,
+          display: false,
           text: 'Week',
         },
       },
@@ -84,7 +84,6 @@ const CustomerInsight = () => {
     <div className='customer-insight'>
       <div className='header'>
         <h5>Customers Insight</h5>
-        <button className='see-all'>See all</button>
       </div>
       <div className='line-chart'>
         <Line data={chartData} options={options} />

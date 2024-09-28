@@ -12,7 +12,7 @@ const SalesOrders = () => {
   useEffect(() => {
     const fetchSalesData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/sales');
+        const response = await fetch('http://localhost:5001/sales');
         const data = await response.json();
 
         // Prepare the labels and data for the chart
@@ -93,9 +93,6 @@ const SalesOrders = () => {
       <div className='header'>
         <div className='title'>
           <h5>Sales Orders</h5>
-        </div>
-        <div className='see-all'>
-          <button>See all</button>
         </div>
       </div>
       <div className='bar-chart'>

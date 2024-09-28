@@ -80,6 +80,38 @@ const Shipments = () => {
               ) : (
                 <table>
                   <thead>
+
+                <AdminHeader/>
+            </div>
+            <div className='body'>
+              <div className='admin-ship'>
+                <div className='cheader'>
+                  <div className='search'>
+                    <form>
+                      <input type='search' placeholder='Search...'/>
+                    </form>
+                  </div>
+
+                  <div className='options'>
+                    <div className='print'>
+                      <button>Print Shipments Summary</button>
+                    </div>
+                    <div className='sort'>
+                      <label for="sort">Sort By</label>
+
+                      <select name="sort" id="sort">
+                        <option value="date">Date</option>
+                        <option value="status">Status</option>
+                        <option value="id">ID</option>
+                        <option value="customer-id">customer</option>
+                      </select>
+                    </div>
+                    
+                  </div>
+                </div>
+                <div className='ship-table'>
+                <table className='table table-hover'>
+                  <thead className='bg-light sticky-top'>
                     <tr>
                       <th><input type='checkbox' /></th>
                       <th>Shipment ID</th>

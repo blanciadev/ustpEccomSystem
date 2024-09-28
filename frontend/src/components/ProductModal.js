@@ -16,7 +16,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
             setLoading(true);
             setError(null);
 
-            fetch('http://localhost:5000/products-recommendations', {
+            fetch('http://localhost:5001/products-recommendations', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

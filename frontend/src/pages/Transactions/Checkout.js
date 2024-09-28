@@ -186,6 +186,21 @@ const Checkout = () => {
         headers: { Authorization: `Bearer ${authToken}`, 'Content-Type': 'application/json' },
       });
 
+      // Save orderData to localStorage (if needed)
+      localStorage.setItem('checkoutOrderData', JSON.stringify(orderData));
+
+//       const response = await axios.post(
+//         'http://localhost:5001/insert-order',
+//         orderData,
+//         {
+//           headers: {
+//             'Authorization': `Bearer ${authToken}`,
+//             'Content-Type': 'application/json',
+//           },
+//         }
+//       );
+
+
       if (response.status === 201) {
         setSuccess('Order placed successfully!');
         localStorage.removeItem('selectedProducts');

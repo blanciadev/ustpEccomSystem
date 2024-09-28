@@ -7,10 +7,10 @@ const cors = require('cors');
 // const crypto = require('crypto'); // For generating random tokens
 
 // Angela Port
-// const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5001;
 
 //Kurt Port
-const PORT = process.env.PORT || 5000;
+// const PORT = process.env.PORT || 5000;
 
 const cartRoutes = require('./routes/cartRoutes');
 const customerSignUpRoutes = require('./routes/customerSignUpRoutes');
@@ -97,6 +97,8 @@ app.get('/validate-token', async (req, res) => {
     }
 });
 
+// DUPLICATE KAG REQUEST SA API GAMIT SAIMO PORT PERO DILI NMO I DILETE ANG ORIGINAL API 
+// BANTOG WALA KAI MAKITA NA PITURE KAI ANG API PORT SAYOP
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);

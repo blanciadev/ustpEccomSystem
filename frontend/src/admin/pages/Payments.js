@@ -25,7 +25,7 @@ const Payments = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/admin-order-history', {
+      const response = await axios.get('http://localhost:5001/admin-order-history', {
         params: {
           status: statusFilter,
         },
@@ -124,20 +124,19 @@ const Payments = () => {
           </div>
           <AdminHeader />
         </div>
-        <div className='dash-body'>
+        <div className='body'>
           <div className='admin-payment'>
-            <div className='payment-header'>
-              <div className='payment-search'>
+            <div className='cheader'>
+              <div className='search'>
                 <form>
-                  <input type='search' />
-                  <button>Search</button>
+                  <input type='search' placeholder='Search...' />
                 </form>
               </div>
-              <div className='payment-options'>
-                <div className='payment-print'>
+              <div className='options'>
+                <div className='print'>
                   <button>Print Payment Summary</button>
                 </div>
-                <div className='payment-sort'>
+                <div className='sort'>
                   <label htmlFor="sort">Sort By</label>
                   <select name="sort" id="sort" value={sortBy} onChange={handleSortChange}>
                     <option value="date">Date</option>
@@ -153,8 +152,8 @@ const Payments = () => {
               {loading ? (
                 <p>Loading...</p>
               ) : (
-                <table>
-                  <thead>
+                <table className='table table-hover'>
+                  <thead className='bg-light sticky-top'>
                     <tr>
                       <th><input type='checkbox' /></th>
                       <th>Order ID</th>

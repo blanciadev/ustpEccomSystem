@@ -17,7 +17,7 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await fetch('http://localhost:5000/product-category');
+                const response = await fetch('http://localhost:5001/product-category');
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
@@ -68,7 +68,7 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
         };
 
         try {
-            const response = await fetch('http://localhost:5000/add-product', {
+            const response = await fetch('http://localhost:5001/add-product', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -91,11 +91,11 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
 
 
     return (
-        <Modal show={show} onHide={handleClose}>
+        <Modal className='modal-lg' show={show} onHide={handleClose}>
             <Modal.Header closeButton>
                 <Modal.Title>Add Product</Modal.Title>
             </Modal.Header>
-            <Modal.Body>
+            <Modal.Body className='mbody two'>
                 {error && <div className="alert alert-danger">{error}</div>}
                 <Form onSubmit={handleFormSubmit}>
                     <Form.Group controlId="formProductName">
@@ -213,17 +213,13 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
                             required
                         />
                     </Form.Group>
-
+                    
                     <Button variant="primary" type="submit">
                         Add Product
                     </Button>
                 </Form>
             </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
-                    Close
-                </Button>
-            </Modal.Footer>
+            
         </Modal>
     );
 };

@@ -8,7 +8,7 @@ const OrderSummary = () => {
     useEffect(() => {
         const fetchOrderCounts = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/admin-order-history-component');
+                const response = await axios.get('http://localhost:5001/admin-order-history-component');
                 setOrderCounts(response.data.statusCounts);
             } catch (error) {
                 console.error('Error fetching order counts:', error);
@@ -25,13 +25,10 @@ const OrderSummary = () => {
                     <h5>Today's Orders</h5>
                     <p>Order Summary</p>
                 </div>
-                <div className='see-all'>
-                    <button>See all</button>
-                </div>
             </div>
 
             <div className='summ'>
-                <div className='completed'>
+                <div className='delivered'>
                     <div>
                         <i className='bx bxs-package'></i>
                     </div>

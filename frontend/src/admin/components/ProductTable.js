@@ -12,7 +12,9 @@ const ProductTable = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
+
                 const response = await axios.get('http://localhost:5000/admin-products');
+
                 setProducts(response.data);
             } catch (error) {
                 console.error('Error fetching product data:', error);
@@ -34,7 +36,9 @@ const ProductTable = () => {
 
     const handleUpdateProduct = async () => {
         try {
+
             const response = await axios.get('http://localhost:5000/admin-products');
+
             setProducts(response.data);
         } catch (error) {
             console.error('Error fetching updated product data:', error);
@@ -44,8 +48,8 @@ const ProductTable = () => {
     return (
         <>
             <div className='order-table table-responsive'>
-                <table className="table">
-                    <thead>
+                <table className="table table-hover">
+                    <thead className='bg-light sticky-top'>
                         <tr>
                             <th><input type='checkbox' /></th>
                             <th>Product Code</th>
@@ -68,9 +72,13 @@ const ProductTable = () => {
                                 <td>{product.quantity}</td>
                                 <td>{product.description}</td>
                                 <td>
+
                                     <Button variant="secondary" onClick={() => handleViewProduct(product)}>
+                                    <img src={product.product_image} alt={product.product_name} width="60" />
+                                </td>
+
                                         View
-                                    </Button>
+                                    </button>
                                 </td>
                             </tr>
                         ))}

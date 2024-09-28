@@ -16,7 +16,11 @@ const Navigation = () => {
         if (!token) return;
 
         try {
-            const response = await axios.get('http://localhost:5000/cart-item-count', {
+            //angela
+            const response = await axios.get('http://localhost:5001/cart-item-count', {
+
+            //kurt
+            // const response = await axios.get('http://localhost:5001/cart-item-count', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (response.status === 200) {
@@ -36,7 +40,11 @@ const Navigation = () => {
         }
 
         try {
-            const response = await axios.get('http://localhost:5000/validate-token', {
+            //angela
+            const response = await axios.get('http://localhost:5001/validate-token', {
+
+            //kurt
+            // const response = await axios.get('http://localhost:5001/validate-token', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (response.status === 200) {
@@ -72,7 +80,11 @@ const Navigation = () => {
         const token = localStorage.getItem('token');
         if (token) {
             try {
-                await axios.post('http://localhost:5000/logout', {}, {
+                //angela
+                await axios.post('http://localhost:5001/logout', {}, {
+
+                //kurt
+                // await axios.post('http://localhost:5001/logout', {}, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 localStorage.removeItem('token');

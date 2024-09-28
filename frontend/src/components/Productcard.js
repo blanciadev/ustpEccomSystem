@@ -89,6 +89,13 @@ const ProductList = () => {
             try {
                 const userId = localStorage.getItem('customer_id');
                 const response = await axios.get('http://localhost:5000/products-top-mix-picks');
+
+                //angela
+               // const response = await axios.get('http://localhost:5001/products-top-mix-picks');
+
+                // kurt
+                 const response = await axios.get('http://localhost:5001/products-top-mix-picks');
+
                 const shuffledProducts = shuffleArray(response.data);
                 setProducts(shuffledProducts);
             } catch (error) {
@@ -106,6 +113,13 @@ const ProductList = () => {
     const fetchRecommendations = async (customerId) => {
         try {
             const response = await axios.get(`http://localhost:5000/products-top-mix-picks`);
+
+            //angela
+           // const response = await axios.get(`http://localhost:5001/recommend-products`);
+
+            //kurt
+             const response = await axios.get(`http://localhost:5001/recommend-products`);
+
             const recShuffledProducts = shuffleArray(response.data);
             setRecommendedProducts(recShuffledProducts);
         } catch (error) {
@@ -126,7 +140,11 @@ const ProductList = () => {
                 }
 
                 try {
-                    const response = await axios.post('http://localhost:5000/add-to-cart', {
+                    //angela
+                    const response = await axios.post('http://localhost:5001/add-to-cart', {
+
+                    //kurt
+                    // const response = await axios.post('http://localhost:5001/add-to-cart', {
                         customer_id: customerId,
                         product_code: product.product_code,
                         quantity: 1
@@ -153,7 +171,11 @@ const ProductList = () => {
         }
 
         try {
-            await axios.get('http://localhost:5000/products-interaction', {
+            //angela
+            await axios.get('http://localhost:5001/products-interaction', {
+
+            //kurt
+            // await axios.get('http://localhost:5001/products-interaction', {
                 params: {
                     product_code: productCode,
                     customerId: customerId,

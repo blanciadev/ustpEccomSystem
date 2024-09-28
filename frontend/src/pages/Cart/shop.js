@@ -22,8 +22,9 @@ const Shop = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/products');
-                setProducts(response.data);
+               // const response = await axios.get('http://localhost:5001/products');
+               const response = await axios.get('http://localhost:5001/products');
+               setProducts(response.data);
                 setFilteredProducts(response.data);
                 setCategories([...new Set(response.data.map(product => product.category_name))]);
             } catch (error) {
@@ -35,7 +36,7 @@ const Shop = () => {
 
         const fetchTopPickedProducts = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/products-top-picks');
+                const response = await axios.get('http://localhost:5001/products-top-picks');
                 setTopPickedProducts(response.data);
             } catch (error) {
                 console.error('Error fetching top-picked products:', error.response ? error.response.data : error.message);
@@ -57,6 +58,8 @@ const Shop = () => {
                     });
 
                     // Set the recommended products in the state
+                   // const response = await axios.get(`http://localhost:5001/recommend-products`);
+
                     setRecommendedProducts(response.data);
                 } else {
                     console.log('Token or userId is missing in localStorage');
@@ -111,7 +114,7 @@ const Shop = () => {
 
         try {
             await axios.post(
-                'http://localhost:5000/add-to-cart',
+                'http://localhost:5001/add-to-cart',
                 { product_code: product.product_code, quantity: 1 },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

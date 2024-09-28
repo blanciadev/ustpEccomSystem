@@ -18,7 +18,7 @@ const AdminHeader = () => {
                                 Ma. Leonille  D. Silfavan {/* Admin Name */}
                         </Dropdown.Toggle>
 
-                        <Dropdown.Menu style={{marginTop: '22px'}}>
+                        <Dropdown.Menu style={{marginTop: '35px', width:'200px'}}>
                         <Dropdown.Item href='#/profile'>Profile</Dropdown.Item>
                         <Dropdown.Item href='#/settings'>Settings</Dropdown.Item>
                         <Dropdown.Item href='#/logout'>Logout</Dropdown.Item>
