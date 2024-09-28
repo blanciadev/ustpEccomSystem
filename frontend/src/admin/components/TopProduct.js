@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import '../admin.css';
 
 const TopProduct = () => {
   const [data, setData] = useState([]);
@@ -19,23 +18,86 @@ const TopProduct = () => {
     fetchTopProducts();
   }, []);
 
-  // Sort data by interaction_count and interaction_orders (descending)
-  const sortedData = [...data].sort((a, b) => {
-    if (b.interaction_count === a.interaction_count) {
-      return b.interaction_orders - a.interaction_orders; // If interaction count is the same, sort by interaction_orders
-    }
-    return b.interaction_count - a.interaction_count; // Sort by interaction count first
-  });
+  // Sort data by interaction_count (descending)
+  const sortedData = [...data].sort((a, b) => b.cart_quantity - a.cart_quantity); // Sorting by cart_quantity
+
+  // CSS styles
+  const styles = {
+    topProducts: {
+      padding: '20px',
+      backgroundColor: '#f9f9f9',
+      borderRadius: '8px',
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    },
+    header: {
+      marginBottom: '15px',
+    },
+    productTable: {
+      width: '120%',
+      borderCollapse: 'collapse',
+    },
+    tableHeader: {
+      backgroundColor: '#007bff',
+      color: '#fff',
+    },
+    tableRow: {
+      borderBottom: '1px solid #ddd',
+    },
+    progressBarContainer: {
+      position: 'relative',
+      height: '20px',
+      backgroundColor: '#e0e0e0',
+      borderRadius: '5px',
+    },
+    progressBar: {
+      height: '100%',
+      backgroundColor: '#76c7c0',
+      borderRadius: '5px',
+      transition: 'width 0.3s ease',
+    },
+    progressPercentage: {
+      position: 'absolute',
+      top: 0,
+      left: '50%',
+      transform: 'translateX(-50%)',
+      fontWeight: 'bold',
+    },
+  };
 
   return (
-    <>
-      <div className='top-products'>
-        <div className='header'>
-          <div className='title'>
-            <h5>Top Products</h5>
-          </div>
+    <div style={styles.topProducts}>
+      <div style={styles.header}>
+        <div style={styles.title}>
+          <h5>Top Products</h5>
         </div>
+      </div>
 
+      <div className="product-table">
+        <table style={styles.productTable}>
+          <thead>
+            <tr style={styles.tableHeader}>
+              <th>#</th>
+              <th>Product</th>
+              <th>Progress</th>
+              <th>Available Quantity</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sortedData.map((item, index) => (
+              <tr key={item.id} style={styles.tableRow}>
+                <td>{index + 1}</td>
+                <td>{item.product}</td>
+                <td>
+                  <div style={styles.progressBarContainer}>
+                    <div
+                      style={{
+                        ...styles.progressBar,
+                        width: `${(item.cart_quantity / item.available_quantity) * 100}%`,
+                      }}
+                    />
+                  </div>
+                </td>
+                <td>{item.available_quantity}</td>
 
         <div className='product-table'>
           <table className='table table-striped'>
@@ -46,29 +108,11 @@ const TopProduct = () => {
                 <th>Popularity</th>
                 <th>Quantity</th>
               </tr>
-            </thead>
-            <tbody>
-              {sortedData.map((item, index) => (
-                <tr key={item.id}>
-                  <td>{index + 1}</td> {/* Ranking starts from 1 */}
-                  <td>{item.product}</td>
-                  <td>
-                    <div className='progress-bar'>
-                      <div
-                        className='progress'
-                        style={{ width: `${item.interaction_count}%` }}
-                      />
-                      {item.interaction_count}% {/* Inventory progress percentage */}
-                    </div>
-                  </td>
-                  <td>{item.available_quantity}</td> {/* Display the interaction_orders */}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
-    </>
+    </div>
   );
 };
 

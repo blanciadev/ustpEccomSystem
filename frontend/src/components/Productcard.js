@@ -20,20 +20,35 @@ const shuffleArray = (array) => {
 const PAGE_SIZE = 4;
 
 // ProductCard Component
-const ProductCard = React.memo(({ product, onAddToCart, onProductInteraction, onProductClick }) => {
+const ProductCard = React.memo(({ product, onAddToCart, onProductInteraction, onProductClick, onBuyNow }) => {
     if (!product) {
         return <div>Product data is not available</div>;
     }
+    const isOutOfStock = product.quantity === 0;
 
     return (
         <div className="product-card" onClick={() => onProductClick(product)}>
             <img src={product.product_image} alt={product.product_name} />
             <h3>{product.product_name}</h3>
-            <p>{product.product_code}</p>
-            {/* Add stopPropagation in the button click handler */}
-            <button onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}>
-                Add to Cart
-            </button>
+            <p>{product.description || 'No description available.'}</p>
+            <br></br><p>Product Quantity : {product.quantity}</p>
+            <h3>P{product.price}</h3>
+            <h3>Discounted Price : P{product.Discounted_price}</h3>
+            {isOutOfStock ? (
+                <p style={{ color: 'red' }}>Out of Stock</p>
+            ) : (
+                <>
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}
+                        disabled={isOutOfStock}
+                    >
+                        Add to Cart
+                    </button>
+                    <button onClick={(e) => { e.stopPropagation(); onBuyNow(product); }}>
+                        Buy Now
+                    </button>
+                </>
+            )}
         </div>
     );
 });
@@ -62,6 +77,7 @@ const ProductList = () => {
     const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
 
     useEffect(() => {
+        localStorage.removeItem('selectedProducts');
         const storedCustomerId = localStorage.getItem('customer_id');
         if (storedCustomerId) {
             setCustomerId(storedCustomerId);
@@ -71,17 +87,21 @@ const ProductList = () => {
         const fetchProducts = async () => {
             setLoading(true);
             try {
+                const userId = localStorage.getItem('customer_id');
+                const response = await axios.get('http://localhost:5000/products-top-mix-picks');
+
                 //angela
-                const response = await axios.get('http://localhost:5001/products-top-mix-picks');
+               // const response = await axios.get('http://localhost:5001/products-top-mix-picks');
 
                 // kurt
-                // const response = await axios.get('http://localhost:5001/products-top-mix-picks');
+                 const response = await axios.get('http://localhost:5001/products-top-mix-picks');
 
                 const shuffledProducts = shuffleArray(response.data);
                 setProducts(shuffledProducts);
             } catch (error) {
                 setError('Error fetching products: ' + (error.response ? error.response.data : error.message));
-            } finally {
+            }
+            finally {
                 setLoading(false);
             }
         };
@@ -92,11 +112,14 @@ const ProductList = () => {
     // Fetch recommended products for a given customer
     const fetchRecommendations = async (customerId) => {
         try {
+            const response = await axios.get(`http://localhost:5000/products-top-mix-picks`);
+
             //angela
-            const response = await axios.get(`http://localhost:5001/recommend-products`);
+           // const response = await axios.get(`http://localhost:5001/recommend-products`);
 
             //kurt
-            // const response = await axios.get(`http://localhost:5001/recommend-products`);
+             const response = await axios.get(`http://localhost:5001/recommend-products`);
+
             const recShuffledProducts = shuffleArray(response.data);
             setRecommendedProducts(recShuffledProducts);
         } catch (error) {
@@ -192,6 +215,29 @@ const ProductList = () => {
         return <div>{error}</div>;
     }
 
+    const handleBuyNow = (product) => {
+        // Create an object that includes the product details and quantity
+        const productData = {
+            ...product,
+            quantity: 1,
+        };
+
+        // Retrieve existing selected products or create a new array
+        const existingProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
+
+        // Add the new product to the array
+        existingProducts.push(productData);
+
+        // Store the updated array in localStorage
+        localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
+
+        // Redirect to the checkout page
+        window.location.href = '/checkout';
+
+
+    };
+
+
     const paginatedProducts = products.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
 
     return (
@@ -204,7 +250,8 @@ const ProductList = () => {
                         product={product}
                         onAddToCart={handleAddToCart}
                         onProductInteraction={handleProductInteraction}
-                        onProductClick={handleProductClick}  // Pass down the click handler for modal
+                        onProductClick={handleProductClick}
+                        onBuyNow={handleBuyNow}
                     />
                 ))}
             </div>

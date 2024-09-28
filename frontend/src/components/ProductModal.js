@@ -41,6 +41,23 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         }
     }, [product]);
 
+    // Handle Buy Now action
+    const handleBuyNow = (product) => {
+        const productData = {
+            ...product,
+            quantity: 1,
+        };
+
+        const existingProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
+
+        existingProducts.push(productData);
+
+        localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
+
+        // Redirect to checkout
+        window.location.href = '/checkout';
+    };
+
     // Get current products for pagination
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
@@ -54,7 +71,6 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
     };
 
     if (!isOpen || !product) return null;
-
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -67,12 +83,25 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                     />
                     <h3>{product.product_name}</h3>
                     <p>{product.description || 'No description available.'}</p>
-                    <p>Price: ${product.price}</p>
+                    <p>Price: P{product.price}</p>
                     <p>Available Quantity: {product.quantity}</p>
 
-                    {/* Add to Cart Button */}
-                    <button onClick={() => onAddToCart(product)}>Add to Cart</button>
-                    <button onClick={onClose}>Close</button>
+                    {/* Conditionally render buttons based on product quantity */}
+                    {product.quantity > 0 ? (
+                        <>
+                            <button onClick={() => onAddToCart(product)}>Add to Cart</button>
+                            <button
+                                onClick={() => handleBuyNow(product)}
+                                style={{ marginLeft: '10px' }}
+                            >
+                                Buy Now
+                            </button>
+                        </>
+                    ) : (
+                        <p style={{ color: 'red' }}>Out of stock</p>
+                    )}
+
+                    <button onClick={onClose} style={{ marginLeft: '10px' }}>Close</button>
 
                     {/* Recommendations Section */}
                     <div className="recommendations">
@@ -94,13 +123,33 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                                             <span className="product-name">{recProduct.product_name}</span>
                                             <span className="product-price">${recProduct.price}</span>
 
-                                            {/* Add to Cart Button for Recommended Product */}
-                                            <button
-                                                className="add-to-cart-btn"
-                                                onClick={() => onAddToCart(recProduct)}
-                                            >
-                                                Add to Cart
-                                            </button>
+                                            {/* Conditionally render the discount if product_status is 'Discounted' */}
+                                            {recProduct.product_status === 'Discounted' && (
+                                                <span className="product-discount">
+                                                    Discounted by: {recProduct.product_discount}%
+                                                </span>
+                                            )}
+
+                                            {/* Conditionally render the buttons based on recommended product quantity */}
+                                            {recProduct.quantity > 0 ? (
+                                                <>
+                                                    <button
+                                                        className="add-to-cart-btn"
+                                                        onClick={() => onAddToCart(recProduct)}
+                                                    >
+                                                        Add to Cart
+                                                    </button>
+                                                    <button
+                                                        className="buy-now-btn"
+                                                        onClick={() => handleBuyNow(recProduct)}
+                                                        style={{ marginLeft: '10px' }}
+                                                    >
+                                                        Buy Now
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <p style={{ color: 'red' }}>Out of stock</p>
+                                            )}
                                         </div>
                                     </div>
                                 ))}
@@ -124,10 +173,13 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                             </div>
                         )}
                     </div>
+
+
                 </div>
             </div>
         </div>
     );
+
 };
 
 // PropTypes for validation
@@ -142,7 +194,7 @@ ProductModal.propTypes = {
         quantity: PropTypes.number
     }),
     onAddToCart: PropTypes.func.isRequired,
-    onClose: PropTypes.func.isRequired
+    onClose: PropTypes.func.isRequired,
 };
 
 export default ProductModal;

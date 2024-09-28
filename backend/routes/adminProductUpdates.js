@@ -77,7 +77,7 @@ router.get('/product-category', async (req, res) => {
         const [rows] = await db.query(query);
         // Respond with product categories
         res.json(rows);
-        console.error('output', rows);
+        // console.error('output', rows);
     } catch (error) {
         console.error('Error fetching product categories:', error);
         res.status(500).send('Error fetching product categories');
@@ -146,5 +146,32 @@ router.get('/admin-products', async (req, res) => {
     }
 });
 
+router.get('/admin-products-targeted', async (req, res) => {
+    const { product_code } = req.query; // Extract product_code from the query parameters
+
+    try {
+        let query = `
+            SELECT p.product_id, p.product_code, p.product_name, p.price, p.description, p.quantity, c.category_name, p.product_image
+            FROM product p
+            INNER JOIN category c ON p.category_id = c.category_id
+        `;
+        let queryParams = [];
+
+        // If product_code is provided, filter the results by product_code
+        if (product_code) {
+            query += ` WHERE p.product_code = ?`;
+            queryParams.push(product_code);
+        }
+
+        // Execute the query
+        const [rows] = await db.query(query, queryParams);
+
+        // Respond with the product details
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        res.status(500).send('Error fetching products');
+    }
+});
 
 module.exports = router;

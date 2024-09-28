@@ -104,10 +104,11 @@ const Orders = () => {
                   <tr>
                     <th><input type='checkbox' /></th>
                     <th>Order ID</th>
-                    <th>Customer ID</th>
+
                     <th>Customer Name</th>
                     <th>Order Date</th>
                     <th>Status</th>
+                    <th>Payment Status</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -116,10 +117,11 @@ const Orders = () => {
                     <tr key={order.order_id}>
                       <td><input type='checkbox' /></td>
                       <td>{order.order_id}</td>
-                      <td>{order.customer_id}</td>
+
                       <td>{`${order.customer_first_name} ${order.customer_last_name}`}</td>
                       <td>{new Date(order.order_date).toLocaleDateString()}</td>
                       <td>{order.order_status}</td>
+                      <td>{order.payment_status}</td>
                       <td><button onClick={() => handleOpenModal(order)}>View</button></td>
                     </tr>
                   ))}

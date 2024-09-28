@@ -1,0 +1,23 @@
+.table th,
+.table td {
+    text-align: center;
+}
+
+.table-striped tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+    /* Light blue on hover */
+}
+
+.modal-title {
+    font-weight: bold;
+    color: #333;
+}
+
+button {
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+    /* Darker blue on hover */
+}

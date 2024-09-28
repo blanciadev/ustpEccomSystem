@@ -49,8 +49,20 @@ const Shop = () => {
                 const userId = localStorage.getItem('customer_id');
 
                 if (token && userId) {
-                    const response = await axios.get(`http://localhost:5001/recommend-products`);
+                    // Fetch recommended products with authorization token
+                    const response = await axios.get(`http://localhost:5000/recommend-products`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            customer_id: userId, // Pass customer_id in headers
+                        },
+                    });
+
+                    // Set the recommended products in the state
+                   // const response = await axios.get(`http://localhost:5001/recommend-products`);
+
                     setRecommendedProducts(response.data);
+                } else {
+                    console.log('Token or userId is missing in localStorage');
                 }
             } catch (error) {
                 console.error('Error fetching recommended products:', error.response ? error.response.data : error.message);
@@ -90,8 +102,6 @@ const Shop = () => {
         window.location.href = '/checkout';
         console.log(productData);
     };
-
-
 
     const handleAddToCart = async (product) => {
         const token = localStorage.getItem('token');
@@ -160,25 +170,33 @@ const Shop = () => {
                                 <p className='product-name'>{product.product_name || 'No product name'}</p>
                                 <p className='product-quantity'>Quantity: {product.quantity}</p>
                                 <p className='product-price'>Price: ${product.price}</p>
-                                <p className='product-brand'>Brand: {product.brand}</p>
-                                <button
-                                    className='add-to-cart-button'
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleAddToCart(product);
-                                    }}
-                                >
-                                    Add to Cart
-                                </button>
-                                <button
-                                    className='buy-now-button'
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleBuyNow(product, product.quantity);
-                                    }}
-                                >
-                                    Buy Now
-                                </button>
+                                {product.product_status === 'Discounted' && (
+                                    <p className='product-price'>Product Discount: P{product.product_discount}%</p>
+                                )}
+                                {product.quantity > 0 ? (
+                                    <>
+                                        <button
+                                            className='add-to-cart-button'
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleAddToCart(product);
+                                            }}
+                                        >
+                                            Add to Cart
+                                        </button>
+                                        <button
+                                            className='buy-now-button'
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleBuyNow(product, product.quantity);
+                                            }}
+                                        >
+                                            Buy Now
+                                        </button>
+                                    </>
+                                ) : (
+                                    <p className='out-of-stock'>Out of Stock</p>
+                                )}
 
                             </div>
                         </div>
@@ -203,25 +221,35 @@ const Shop = () => {
                                     <p className='product-name'>{product.product_name || 'No product name'}</p>
                                     <p className='product-quantity'>Quantity: {product.quantity}</p>
                                     <p className='product-price'>Price: ${product.price}</p>
-                                    <p className='product-brand'>Brand: {product.brand}</p>
-                                    <button
-                                        className='add-to-cart-button'
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleAddToCart(product);
-                                        }}
-                                    >
-                                        Add to Cart
-                                    </button>
-                                    <button
-                                        className='buy-now-button'
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleBuyNow(product, product.quantity);
-                                        }}
-                                    >
-                                        Buy Now
-                                    </button>
+
+                                    {product.product_status === 'Discounted' && (
+                                        <p className='product-price'>Product Discount: P{product.product_discount}%</p>
+                                    )}
+
+                                    {product.quantity > 0 ? (
+                                        <>
+                                            <button
+                                                className='add-to-cart-button'
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleAddToCart(product);
+                                                }}
+                                            >
+                                                Add to Cart
+                                            </button>
+                                            <button
+                                                className='buy-now-button'
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleBuyNow(product, product.quantity);
+                                                }}
+                                            >
+                                                Buy Now
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <p className='out-of-stock'>Out of Stock</p>
+                                    )}
 
                                 </div>
                             </div>
@@ -254,26 +282,36 @@ const Shop = () => {
                         <div className='product-desc'>
                             <p className='product-name'>{product.product_name || 'No product name'}</p>
                             <p className='product-quantity'>Quantity: {product.quantity}</p>
-                            <p className='product-price'>Price: ${product.price}</p>
-                            <p className='product-brand'>Brand: {product.brand}</p>
-                            <button
-                                className='add-to-cart-button'
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleAddToCart(product);
-                                }}
-                            >
-                                Add to Cart
-                            </button>
-                            <button
-                                className='buy-now-button'
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleBuyNow(product, product.quantity);
-                                }}
-                            >
-                                Buy Now
-                            </button>
+                            <p className='product-price'>Price: P{product.price}</p>
+                            {product.product_status === 'Discounted' && (
+                                <p className='product-price'>Product Discount: P{product.product_discount}%</p>
+                            )}
+                            {/* <p className='product-brand'>Brand: {product.brand}</p> */}
+
+                            {product.quantity > 0 ? (
+                                <>
+                                    <button
+                                        className='add-to-cart-button'
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleAddToCart(product);
+                                        }}
+                                    >
+                                        Add to Cart
+                                    </button>
+                                    <button
+                                        className='buy-now-button'
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleBuyNow(product, product.quantity);
+                                        }}
+                                    >
+                                        Buy Now
+                                    </button>
+                                </>
+                            ) : (
+                                <p style={{ color: 'red' }}>Out of stock</p>
+                            )}
 
                         </div>
                     </div>

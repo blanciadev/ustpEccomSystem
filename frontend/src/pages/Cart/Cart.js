@@ -89,12 +89,9 @@ const CartContent = () => {
       return;
     }
 
-    // Save selected products in localStorage before navigating
     localStorage.setItem('selectedProducts', JSON.stringify(selectedProducts));
-
     navigate('/checkout', { state: { selectedProducts, totalPrice } });
   };
-
 
   const handleSelectAllChange = () => {
     const allSelected = Object.keys(selectedItems).length === cartItems.length;
@@ -102,6 +99,37 @@ const CartContent = () => {
     cartEventEmitter.emit('toggleSelectAll', newSelectAllState);
     handleSelectAll(newSelectAllState);
   };
+
+  const updateCartQuantity = async (cartItemId, newQuantity) => {
+    try {
+      const response = await fetch(`http://localhost:5000/cart-update-quantity`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({
+          cart_items_id: cartItemId, // Send the cart item ID correctly
+          newQuantity: newQuantity, // Send the updated numeric quantity
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update quantity');
+      }
+
+      const updatedItems = cartItems.map((item) =>
+        item.cart_items_id === cartItemId ? { ...item, quantity: newQuantity } : item
+      );
+
+      // Update local state to reflect the quantity change
+      setCartItems(updatedItems);
+    } catch (err) {
+      setError('Error updating quantity. Please try again later.');
+    }
+  };
+
+
 
   return (
     <div className='cart-con'>
@@ -128,6 +156,7 @@ const CartContent = () => {
                       />
                     </form>
                   </th>
+                  <th>ID</th>
                   <th>Product</th>
                   <th>Quantity</th>
                   <th>Price</th>
@@ -143,12 +172,14 @@ const CartContent = () => {
                     price={item.price}
                     subTotal={item.sub_total}
                     productCode={item.product_code}
+                    cartItemId={item.cart_items_id}
                     description={item.description}
                     brand={item.brand}
                     category={item.category}
                     size={item.size}
                     isSelected={!!selectedItems[item.product_code]}
                     toggleItemSelection={toggleItemSelection}
+                    updateQuantity={updateCartQuantity}
                   />
                 ))}
               </tbody>
