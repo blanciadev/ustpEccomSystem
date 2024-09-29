@@ -39,7 +39,7 @@ const Checkout = () => {
         try {
           const productData = await Promise.all(
             savedProducts.map(product =>
-              axios.get(`http://localhost:5000/products/${product.product_code}`)
+              axios.get(`http://localhost:5001/products/${product.product_code}`)
                 .then(response => response.data)
             )
           );
@@ -182,23 +182,23 @@ const Checkout = () => {
 
       console.log(orderData);
 
-      const response = await axios.post('http://localhost:5000/insert-order', orderData, {
+      const response = await axios.post('http://localhost:5001/insert-order', orderData, {
         headers: { Authorization: `Bearer ${authToken}`, 'Content-Type': 'application/json' },
       });
 
       // Save orderData to localStorage (if needed)
       localStorage.setItem('checkoutOrderData', JSON.stringify(orderData));
 
-//       const response = await axios.post(
-//         'http://localhost:5001/insert-order',
-//         orderData,
-//         {
-//           headers: {
-//             'Authorization': `Bearer ${authToken}`,
-//             'Content-Type': 'application/json',
-//           },
-//         }
-//       );
+      //       const response = await axios.post(
+      //         'http://localhost:5001/insert-order',
+      //         orderData,
+      //         {
+      //           headers: {
+      //             'Authorization': `Bearer ${authToken}`,
+      //             'Content-Type': 'application/json',
+      //           },
+      //         }
+      //       );
 
 
       if (response.status === 201) {

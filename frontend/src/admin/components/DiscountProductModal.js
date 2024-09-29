@@ -11,7 +11,7 @@ const DiscountProduct = ({ show, handleClose, order, handleUpdate }) => {
   useEffect(() => {
     if (show) {
       axios
-        .get('http://localhost:5000/discount-product') // Update endpoint if necessary
+        .get('http://localhost:5001/discount-product') // Update endpoint if necessary
         .then((response) => {
           setProducts(response.data); // Set the products from response
           setDiscounts({}); // Reset discounts when the modal is shown
@@ -45,7 +45,7 @@ const DiscountProduct = ({ show, handleClose, order, handleUpdate }) => {
       ];
 
       // Send the array of applied discounts to the backend
-      const response = await axios.post('http://localhost:5000/discount-product-update', {
+      const response = await axios.post('http://localhost:5001/discount-product-update', {
         appliedDiscounts
       });
 

@@ -88,13 +88,13 @@ const ProductList = () => {
             setLoading(true);
             try {
                 const userId = localStorage.getItem('customer_id');
-                const response = await axios.get('http://localhost:5000/products-top-mix-picks');
+                const response = await axios.get('http://localhost:5001/products-top-mix-picks');
 
                 //angela
-               // const response = await axios.get('http://localhost:5001/products-top-mix-picks');
+                // const response = await axios.get('http://localhost:5001/products-top-mix-picks');
 
                 // kurt
-                 const response = await axios.get('http://localhost:5001/products-top-mix-picks');
+                //  const response = await axios.get('http://localhost:5001/products-top-mix-picks');
 
                 const shuffledProducts = shuffleArray(response.data);
                 setProducts(shuffledProducts);
@@ -112,13 +112,7 @@ const ProductList = () => {
     // Fetch recommended products for a given customer
     const fetchRecommendations = async (customerId) => {
         try {
-            const response = await axios.get(`http://localhost:5000/products-top-mix-picks`);
-
-            //angela
-           // const response = await axios.get(`http://localhost:5001/recommend-products`);
-
-            //kurt
-             const response = await axios.get(`http://localhost:5001/recommend-products`);
+            const response = await axios.get(`http://localhost:5001/products-top-mix-picks`);
 
             const recShuffledProducts = shuffleArray(response.data);
             setRecommendedProducts(recShuffledProducts);
@@ -143,8 +137,6 @@ const ProductList = () => {
                     //angela
                     const response = await axios.post('http://localhost:5001/add-to-cart', {
 
-                    //kurt
-                    // const response = await axios.post('http://localhost:5001/add-to-cart', {
                         customer_id: customerId,
                         product_code: product.product_code,
                         quantity: 1
@@ -171,11 +163,8 @@ const ProductList = () => {
         }
 
         try {
-            //angela
-            await axios.get('http://localhost:5001/products-interaction', {
 
-            //kurt
-            // await axios.get('http://localhost:5001/products-interaction', {
+            await axios.get('http://localhost:5001/products-interaction', {
                 params: {
                     product_code: productCode,
                     customerId: customerId,
@@ -198,7 +187,7 @@ const ProductList = () => {
 
     const handleProductClick = (product) => {
         setSelectedProduct(product);
-        setIsModalOpen(true); // Open modal
+        setIsModalOpen(true);
         handleProductInteraction(product.product_code, 'view');
     };
 

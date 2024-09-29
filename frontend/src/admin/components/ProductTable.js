@@ -13,7 +13,7 @@ const ProductTable = () => {
         const fetchProducts = async () => {
             try {
 
-                const response = await axios.get('http://localhost:5000/admin-products');
+                const response = await axios.get('http://localhost:5001/admin-products');
 
                 setProducts(response.data);
             } catch (error) {
@@ -37,7 +37,7 @@ const ProductTable = () => {
     const handleUpdateProduct = async () => {
         try {
 
-            const response = await axios.get('http://localhost:5000/admin-products');
+            const response = await axios.get('http://localhost:5001/admin-products');
 
             setProducts(response.data);
         } catch (error) {
@@ -72,19 +72,17 @@ const ProductTable = () => {
                                 <td>{product.quantity}</td>
                                 <td>{product.description}</td>
                                 <td>
-
                                     <Button variant="secondary" onClick={() => handleViewProduct(product)}>
-                                    <img src={product.product_image} alt={product.product_name} width="60" />
-                                </td>
-
                                         View
-                                    </button>
+                                    </Button>
+                                    <img src={product.product_image} alt={product.product_name} width="60" />
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
+
             {selectedProduct && (
                 <UpdateProductModal
                     show={isModalOpen}

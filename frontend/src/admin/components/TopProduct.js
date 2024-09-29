@@ -98,15 +98,6 @@ const TopProduct = () => {
                   </div>
                 </td>
                 <td>{item.available_quantity}</td>
-
-        <div className='product-table'>
-          <table className='table table-striped'>
-            <thead className='bg-light sticky-top'>
-              <tr>
-                <th>#</th>
-                <th>Product</th>
-                <th>Popularity</th>
-                <th>Quantity</th>
               </tr>
             ))}
           </tbody>

@@ -102,7 +102,7 @@ const CartContent = () => {
 
   const updateCartQuantity = async (cartItemId, newQuantity) => {
     try {
-      const response = await fetch(`http://localhost:5000/cart-update-quantity`, {
+      const response = await fetch(`http://localhost:5001/cart-update-quantity`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

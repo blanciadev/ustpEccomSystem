@@ -14,7 +14,7 @@ const Shipments = () => {
   useEffect(() => {
     const fetchShipments = async () => {
       try {
-        const response = await fetch('http://localhost:5000/shipments'); // Adjust the API endpoint if necessary
+        const response = await fetch('http://localhost:5001/shipments'); // Adjust the API endpoint if necessary
         if (!response.ok) {
           throw new Error('Failed to fetch shipments');
         }
@@ -55,7 +55,7 @@ const Shipments = () => {
             <div className='ship-header'>
               <div className='ship-search'>
                 <form>
-                  <input type='search' />
+                  <input type='search' placeholder='Search...' />
                   <button type='submit'>Search</button>
                 </form>
               </div>
@@ -78,38 +78,6 @@ const Shipments = () => {
               {loading ? (
                 <p>Loading shipments...</p>
               ) : (
-                <table>
-                  <thead>
-
-                <AdminHeader/>
-            </div>
-            <div className='body'>
-              <div className='admin-ship'>
-                <div className='cheader'>
-                  <div className='search'>
-                    <form>
-                      <input type='search' placeholder='Search...'/>
-                    </form>
-                  </div>
-
-                  <div className='options'>
-                    <div className='print'>
-                      <button>Print Shipments Summary</button>
-                    </div>
-                    <div className='sort'>
-                      <label for="sort">Sort By</label>
-
-                      <select name="sort" id="sort">
-                        <option value="date">Date</option>
-                        <option value="status">Status</option>
-                        <option value="id">ID</option>
-                        <option value="customer-id">customer</option>
-                      </select>
-                    </div>
-                    
-                  </div>
-                </div>
-                <div className='ship-table'>
                 <table className='table table-hover'>
                   <thead className='bg-light sticky-top'>
                     <tr>
@@ -136,7 +104,6 @@ const Shipments = () => {
                         <td>{shipment.phoneNumber}</td>
                         <td>{shipment.postalCode}</td>
                         <td>{shipment.shipment_status}</td>
-
                       </tr>
                     ))}
                   </tbody>

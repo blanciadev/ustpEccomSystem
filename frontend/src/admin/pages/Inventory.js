@@ -19,6 +19,7 @@ const Inventory = () => {
     const [discontinuedCount, setDiscontinuedCount] = useState(0);
     const [discontinuedQuantity, setDiscontinuedQuantity] = useState(0);
     const [productNames, setProductNames] = useState([]);
+    const [inventoryItems, setInventoryItems] = useState([]); // Define inventoryItems for inventory table
     const [showModal, setShowModal] = useState(false);
 
     const handleCloseModal = () => setShowModal(false);
@@ -26,7 +27,7 @@ const Inventory = () => {
 
     const fetchProductStatistics = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/admin-products-with-interaction');
+            const response = await axios.get('http://localhost:5001/admin-products-with-interaction');
             const {
                 total,
                 totalQuantity,
@@ -55,50 +56,26 @@ const Inventory = () => {
 
     const fetchProductNames = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/admin-products');
+            const response = await axios.get('http://localhost:5001/admin-products');
             setProductNames(response.data);
         } catch (error) {
             console.error('Error fetching product names:', error);
         }
     };
 
+    const fetchInventoryItems = async () => {
+        try {
+            const response = await axios.get('http://localhost:5001/admin-inventory');
+            setInventoryItems(response.data); // Ensure you have a proper API endpoint for this
+        } catch (error) {
+            console.error('Error fetching inventory items:', error);
+        }
+    };
+
     useEffect(() => {
         fetchProductStatistics();
         fetchProductNames();
-
-        const fetchProductData = async () => {
-            try {
-                const response = await axios.get('http://localhost:5001/admin-products-with-interaction');
-                const {
-                    total,
-                    totalQuantity,
-                    products,
-                    lowStockCount,
-                    lowStockQuantity,
-                    unpopularProducts,
-                    outOfStockCount,
-                    outOfStockQuantity,
-                    discontinuedCount,
-                    discontinuedQuantity
-                } = response.data;
-
-                setBestSellingCount(total);
-                setTotalQuantity(totalQuantity);
-                setLowStockCount(lowStockCount);
-                setLowStockQuantity(lowStockQuantity);
-                setProductNames(products);
-                setUnpopularProducts(unpopularProducts || []);
-                setOutOfStockCount(outOfStockCount);
-                setOutOfStockQuantity(outOfStockQuantity);
-                setDiscontinuedCount(discontinuedCount);
-                setDiscontinuedQuantity(discontinuedQuantity);
-            } catch (error) {
-                console.error('Error fetching product data:', error);
-            }
-        };
-
-        fetchProductData();
-
+        fetchInventoryItems();
     }, []);
 
     const handleSearch = (e) => {
@@ -133,7 +110,6 @@ const Inventory = () => {
                                 discontinuedCount={discontinuedCount}
                                 discontinuedQuantity={discontinuedQuantity}
                             />
-                            <TopProduct />
                         </div>
 
                         {/* Product Table */}
@@ -148,7 +124,7 @@ const Inventory = () => {
                             </div>
 
                             <div className="order-table table-responsive">
-                                <table>
+                                <table className="table table-hover">
                                     <thead>
                                         <tr>
                                             <th>Product ID</th>
@@ -168,8 +144,6 @@ const Inventory = () => {
                                                 stockStatus = 'Good Stocks';
                                             } else if (product.quantity > 20) {
                                                 stockStatus = 'Moderately Low';
-                                            } else if (product.quantity > 10) {
-                                                stockStatus = 'Low on Stock';
                                             }
 
                                             return (
@@ -187,68 +161,68 @@ const Inventory = () => {
                                     </tbody>
                                 </table>
                             </div>
-
-
-        <div className='dash-con'>
-        <AdminNav />
-        <div className='dash-board'>
-            <div className='dash-header'>
-                <div className='header-title'>
-                    <i class='bx bx-clipboard'></i>
-                    <h1>Inventory</h1>
-                </div>
-                <AdminHeader />
-            </div>
-            <div className='body'>
-            <div className='user-con'>
-                <InventoryCountComponent/>
-                    <div className='report-list'>
-                        <div className='cheader'>
-                            <div className='search'>
-                                <form>
-                                <input type='search' placeholder='Search...'/>
-                                </form>
-                            </div>
-
-                           
                         </div>
-                        <div className='order-table'>
-                            <table className='table table-hover'>
-                                <thead className='bg-light sticky-top'>
-                                <tr>
-                                            <th><input type='checkbox' /></th>
-                                            <th>Product Code</th>
-                                            <th>Product Name</th>
-                                            <th>Category</th>
-                                            <th>Size</th>
-                                            <th>Quantity</th>
-                                            <th>Price</th>
-                                            <th>Total Amount</th>
-                                            <th>Date</th>
-                                        </tr>
-                                </thead>
-                                <tbody>
-                                 
-                                    <tr>
-                                        <td><input type='checkbox' /></td>
-                                            <td>Order ID</td>
-                                            <td>Customer ID</td>
-                                            <td>Order Date</td>
-                                            <td>Status</td>
-                                            <td>Order Date</td>
-                                            <td>Status</td>
-                                            <td>Order Date</td>
-                                            <td>Status</td>
-                                    </tr>
-                                
-                                </tbody>
-                            </table>
+                    </div>
+                </div>
+
+                {/* Inventory Section */}
+                <div className="dash-board">
+                    <div className="dash-header">
+                        <div className="header-title">
+                            <i className="bx bx-clipboard"></i>
+                            <h1>Inventory</h1>
+                        </div>
+                        <AdminHeader />
+                    </div>
+                    <div className="body">
+                        <div className="user-con">
+                            <InventoryCountComponent />
+                            <div className="report-list">
+                                <div className="cheader">
+                                    <div className="search">
+                                        <form>
+                                            <input type="search" placeholder="Search..." />
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <div className="order-table">
+                                    <table className="table table-hover">
+                                        <thead className="bg-light sticky-top">
+                                            <tr>
+                                                <th><input type="checkbox" /></th>
+                                                <th>Product Code</th>
+                                                <th>Product Name</th>
+                                                <th>Category</th>
+                                                <th>Size</th>
+                                                <th>Quantity</th>
+                                                <th>Price</th>
+                                                <th>Total Amount</th>
+                                                <th>Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {inventoryItems.map((item) => (
+                                                <tr key={item.id}>
+                                                    <td><input type="checkbox" /></td>
+                                                    <td>{item.product_code}</td>
+                                                    <td>{item.product_name}</td>
+                                                    <td>{item.category}</td>
+                                                    <td>{item.size}</td>
+                                                    <td>{item.quantity}</td>
+                                                    <td>{item.price}</td>
+                                                    <td>{item.total_amount}</td>
+                                                    <td>{item.date}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-                       
 
             {/* Modal for adding products */}
             <Modal show={showModal} onHide={handleCloseModal}>

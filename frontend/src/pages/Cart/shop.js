@@ -22,9 +22,9 @@ const Shop = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-               // const response = await axios.get('http://localhost:5001/products');
-               const response = await axios.get('http://localhost:5001/products');
-               setProducts(response.data);
+                // const response = await axios.get('http://localhost:5001/products');
+                const response = await axios.get('http://localhost:5001/products');
+                setProducts(response.data);
                 setFilteredProducts(response.data);
                 setCategories([...new Set(response.data.map(product => product.category_name))]);
             } catch (error) {
@@ -50,7 +50,7 @@ const Shop = () => {
 
                 if (token && userId) {
                     // Fetch recommended products with authorization token
-                    const response = await axios.get(`http://localhost:5000/recommend-products`, {
+                    const response = await axios.get(`http://localhost:5001/recommend-products`, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                             customer_id: userId, // Pass customer_id in headers
@@ -58,7 +58,7 @@ const Shop = () => {
                     });
 
                     // Set the recommended products in the state
-                   // const response = await axios.get(`http://localhost:5001/recommend-products`);
+                    // const response = await axios.get(`http://localhost:5001/recommend-products`);
 
                     setRecommendedProducts(response.data);
                 } else {
