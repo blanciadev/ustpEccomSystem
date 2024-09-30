@@ -53,13 +53,11 @@ const Shop = () => {
                     const response = await axios.get(`http://localhost:5001/recommend-products`, {
                         headers: {
                             Authorization: `Bearer ${token}`,
-                            customer_id: userId, // Pass customer_id in headers
+                            customer_id: userId, 
                         },
                     });
 
-                    // Set the recommended products in the state
-                    // const response = await axios.get(`http://localhost:5001/recommend-products`);
-
+                  
                     setRecommendedProducts(response.data);
                 } else {
                     console.log('Token or userId is missing in localStorage');

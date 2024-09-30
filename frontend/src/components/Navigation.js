@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { cartEventEmitter } from './eventEmitter'; // Import the event emitter
+import { cartEventEmitter } from './eventEmitter';
 
 const Navigation = () => {
     const [username, setUsername] = useState('');
@@ -10,17 +10,58 @@ const Navigation = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
 
-    // Fetch cart item count
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        const storedUsername = localStorage.getItem('username');
+        const storedFirstName = localStorage.getItem('first_name');
+
+        if (token) {
+            setIsLoggedIn(true);
+            setUsername(storedUsername || '');
+            setFirstName(storedFirstName || '');
+            fetchCartItemCount(); 
+        }
+
+        validateTokenAndRedirect(); 
+        cartEventEmitter.on('cartUpdated', fetchCartItemCount);
+        return () => {
+            cartEventEmitter.off('cartUpdated', fetchCartItemCount);
+        };
+    }, []);
+
+    const validateTokenAndRedirect = async () => {
+        const token = localStorage.getItem('token');
+    
+        if (!token) {
+            setIsLoggedIn(false);
+            navigate('/login');
+            return;
+        }
+    
+        try {
+            const response = await axios.get('http://localhost:5001/validate-token', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.status === 200) {
+                setIsLoggedIn(true);
+                setUsername(localStorage.getItem('username') || '');
+                setFirstName(localStorage.getItem('first_name') || '');
+                fetchCartItemCount(); 
+            }
+        } catch (error) {
+            console.error('Error validating token:', error.response ? error.response.data : error.message);
+            setIsLoggedIn(false);
+            navigate('/login'); 
+        }
+    };
+    
+
     const fetchCartItemCount = async () => {
         const token = localStorage.getItem('token');
         if (!token) return;
 
         try {
-            //angela
             const response = await axios.get('http://localhost:5001/cart-item-count', {
-
-            //kurt
-            // const response = await axios.get('http://localhost:5001/cart-item-count', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (response.status === 200) {
@@ -31,60 +72,11 @@ const Navigation = () => {
         }
     };
 
-    // Validate token and user session
-    const validateToken = async () => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            setIsLoggedIn(false);
-            return;
-        }
-
-        try {
-            //angela
-            const response = await axios.get('http://localhost:5001/validate-token', {
-
-            //kurt
-            // const response = await axios.get('http://localhost:5001/validate-token', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (response.status === 200) {
-                setIsLoggedIn(true);
-                setUsername(localStorage.getItem('username') || '');
-                setFirstName(localStorage.getItem('first_name') || ''); // Retrieve first_name
-                fetchCartItemCount(); // Fetch cart count on valid session
-            } else {
-                setIsLoggedIn(false);
-            }
-        } catch (error) {
-            console.error('Error validating token:', error.response ? error.response.data : error.message);
-            setIsLoggedIn(false);
-        }
-    };
-
-    // Set up event listener for cart updates
-    useEffect(() => {
-        validateToken();
-
-        // Subscribe to cart updates
-        cartEventEmitter.on('cartUpdated', fetchCartItemCount);
-
-        // Cleanup event listener on component unmount
-        return () => {
-            cartEventEmitter.off('cartUpdated', fetchCartItemCount);
-        };
-    }, []);
-
-
-    // Handle user logout
     const handleLogout = async () => {
         const token = localStorage.getItem('token');
         if (token) {
             try {
-                //angela
                 await axios.post('http://localhost:5001/logout', {}, {
-
-                //kurt
-                // await axios.post('http://localhost:5001/logout', {}, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 localStorage.removeItem('token');
@@ -93,18 +85,13 @@ const Navigation = () => {
             }
         }
 
-        localStorage.removeItem('token');
-        localStorage.removeItem('user_id');
-        localStorage.removeItem('username');
-        localStorage.removeItem('first_name'); // Remove first_name
+        localStorage.clear();
         setUsername('');
         setFirstName('');
         setIsLoggedIn(false);
         navigate('/login');
     };
 
-
-    // Navigate to cart or login if not logged in
     const handleCartClick = () => {
         if (isLoggedIn) {
             navigate('/cart');
@@ -113,12 +100,10 @@ const Navigation = () => {
         }
     };
 
-    // Handle profile click to navigate to transaction page
     const handleProfileClick = () => {
         navigate('/user/purchase');
     };
 
-    // Define navigation links
     const commonLinks = [
         { id: 1, page: "Shop", link: "/shop" },
         { id: 2, page: "About Us", link: "/about-us" },

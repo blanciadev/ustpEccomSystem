@@ -34,12 +34,26 @@ const Checkout = () => {
   const [hasFetched, setHasFetched] = useState(false);
 
   useEffect(() => {
+    // Check if the user is logged in by checking the token
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      // If no token, redirect to the login page
+      navigate('/login');
+      return;
+    }
+
     if (savedProducts.length > 0 && !hasFetched) {
       const fetchOriginalQuantities = async () => {
         try {
           const productData = await Promise.all(
             savedProducts.map(product =>
-              axios.get(`http://localhost:5001/products/${product.product_code}`)
+              axios
+                .get(`http://localhost:5001/products-checkout/${product.product_code}`, {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                })
                 .then(response => response.data)
             )
           );
@@ -58,17 +72,18 @@ const Checkout = () => {
 
       fetchOriginalQuantities();
     }
-
+  
     const handleBeforeUnload = () => {
       localStorage.removeItem('selectedProducts');
     };
-
+  
     window.addEventListener('beforeunload', handleBeforeUnload);
-
+  
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [savedProducts, hasFetched]);
+  
 
 
   const handleInputChange = (e) => {
@@ -188,19 +203,7 @@ const Checkout = () => {
 
       // Save orderData to localStorage (if needed)
       localStorage.setItem('checkoutOrderData', JSON.stringify(orderData));
-
-      //       const response = await axios.post(
-      //         'http://localhost:5001/insert-order',
-      //         orderData,
-      //         {
-      //           headers: {
-      //             'Authorization': `Bearer ${authToken}`,
-      //             'Content-Type': 'application/json',
-      //           },
-      //         }
-      //       );
-
-
+      
       if (response.status === 201) {
         setSuccess('Order placed successfully!');
         localStorage.removeItem('selectedProducts');

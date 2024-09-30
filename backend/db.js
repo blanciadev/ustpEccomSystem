@@ -10,7 +10,7 @@ const pool = mysql.createPool({
     // password: '',
 
     // PORT KURT 
-    port: '3307',
+    port: '3308',
     password: 'root',
 
     // //other Laptop 

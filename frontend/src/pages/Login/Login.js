@@ -22,7 +22,7 @@ const Login = () => {
 
             // Make the login request
             //angela
-            const response = await axios.post('http://localhost:5001/customer-login', { email, password });
+            const response = await axios.post('http://localhost:5001/users-login', { email, password });
 
             //kurt
             // const response = await axios.post('http://localhost:5001/customer-login', { email, password });

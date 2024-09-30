@@ -28,6 +28,8 @@ const adminProductUpdate = require('./routes/adminProductUpdates.js');
 const AdminBundleOrder = require('./routes/AdminBundleOrder.js');
 const AdminUsersRoutes = require('./routes/AdminUsersRoutes.js');
 
+const token = require('./routes/tokenValidation.js');
+
 
 const customerData = require('./routes/customerData.js');
 const handleLogout = require('./routes/handlelogout.js');
@@ -58,6 +60,9 @@ app.use('/', customerData);
 app.use('/', AdminUsersRoutes);
 
 app.use('/', handleLogout);
+
+app.use('/', token);
+
 
 
 

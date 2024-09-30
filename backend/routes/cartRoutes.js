@@ -20,7 +20,7 @@ async function authenticateToken(req, res, next) {
         req.user_id = rows[0].user_id;
         next();
     } catch (err) {
-        console.error('Error during token validation:', err.message);
+        console.error('Token Validation Backedn CART Error during token validation:', err.message);
         res.status(500).json({ message: 'Internal server error' });
     }
 }
@@ -238,7 +238,7 @@ router.post('/cart-update-quantity', authenticateToken, async (req, res) => {
 
 
 // CheckOut Page Backend
-router.get('/products/:productCode', async (req, res) => {
+router.get('/products-checkout/:productCode', async (req, res) => {
     const { productCode } = req.params;
     console.log(productCode);
     try {

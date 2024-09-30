@@ -6,6 +6,8 @@ import StickyComponent from './StickyComponent';
 import { cartEventEmitter } from './eventEmitter';
 import './modal.css';
 import './productList.css'; // Import the new CSS file
+import { useNavigate } from 'react-router-dom'; 
+
 
 const PAGE_SIZE = 4;
 
@@ -38,6 +40,8 @@ const ProductCard = React.memo(({ product, onAddToCart, onBuyNow, onProductClick
 
 // ProductList Component
 const ProductList = ({ stickyComponents }) => {
+    const navigate = useNavigate()
+
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -96,29 +100,39 @@ const ProductList = ({ stickyComponents }) => {
         fetchProducts();
     }, []);
 
-    const handleAddToCart = async (product) => {
-        const token = localStorage.getItem('token');
-        const customerId = localStorage.getItem('customer_id');
+   // Handle "Add to Cart" button click
+   const handleAddToCart = async (product) => {
+    const token = localStorage.getItem('token');
+    const customerId = localStorage.getItem('customer_id');
 
-        if (!token || !customerId) {
-            console.log('User not logged in or customer ID missing');
-            return;
-        }
+    // If token is not found, redirect to the login page
+    if (!token || !customerId) {
+        navigate('/login'); // Redirect to the login page
+        return;
+    }
 
-        try {
-            await axios.post('http://localhost:5001/add-to-cart', {
-                customer_id: customerId,
-                product_code: product.product_code,
-                quantity: 1
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+    try {
+        const response = await axios.post('http://localhost:5001/add-to-cart', {
+            customer_id: customerId,
+            product_code: product.product_code,
+            quantity: 1
+        }, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
 
-            cartEventEmitter.emit('cartUpdated');
-        } catch (error) {
+        // Emit cart update event to refresh cart count
+        cartEventEmitter.emit('cartUpdated');
+    } catch (error) {
+        if (error.response && error.response.status === 401) {
+            // Redirect to the login page if unauthorized
+            navigate('/login');
+        } else {
             console.error('Error adding product to cart:', error.response ? error.response.data : error.message);
         }
-    };
+    }
+};
+
+
 
     const handleBuyNow = (product) => {
         const productData = {

@@ -25,7 +25,7 @@ router.post('/users-signup', async (req, res) => {
 
         res.status(201).json({ message: 'users created successfully' });
     } catch (err) {
-        console.error('Error during sign up:', err.message);
+        console.error('Token Validation Backedn signup Error during sign up:', err.message);
         res.status(500).json({ message: 'Internal server error' });
     }
 });

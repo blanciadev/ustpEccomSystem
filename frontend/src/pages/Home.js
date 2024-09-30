@@ -10,7 +10,6 @@ const Home = () => {
   return (
     <div className='home-con'>
       <Navigation />
-      {/* <StickyComponent /> */}
       <Slideshow />
       <Products />
       <Footer />
