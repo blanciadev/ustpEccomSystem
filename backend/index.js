@@ -10,7 +10,7 @@ const cors = require('cors');
 const PORT = process.env.PORT || 5001;
 
 //Kurt Port
-// const PORT = process.env.PORT || 5000;
+// const PORT = process.env.PORT || 5001;
 
 const cartRoutes = require('./routes/cartRoutes');
 const customerSignUpRoutes = require('./routes/customerSignUpRoutes');
@@ -19,14 +19,6 @@ const productRoutes = require('./routes/productsRoutes.js');
 const OrderRoutes = require('./routes/orderRoutes.js');
 const viewTransactionsRoute = require('./routes/viewTransactionsRoute.js');
 const userInteraction = require('./routes/userInteraction.js');
-
-
-const adminOrderHistory = require('./routes/adminOrderHistory.js');
-const adminOrderUpdates = require('./routes/adminOrderUpdates.js');
-const adminProduct = require('./routes/adminProduct.js');
-const adminProductUpdate = require('./routes/adminProductUpdates.js');
-const AdminBundleOrder = require('./routes/AdminBundleOrder.js');
-const AdminUsersRoutes = require('./routes/AdminUsersRoutes.js');
 
 
 const customerData = require('./routes/customerData.js');
@@ -49,13 +41,7 @@ app.use('/', viewTransactionsRoute);
 app.use('/', userInteraction);
 
 
-app.use('/', adminOrderHistory);
-app.use('/', adminOrderUpdates);
-app.use('/', adminProduct);
-app.use('/', adminProductUpdate);
-app.use('/', AdminBundleOrder);
 app.use('/', customerData);
-app.use('/', AdminUsersRoutes);
 
 app.use('/', handleLogout);
 
