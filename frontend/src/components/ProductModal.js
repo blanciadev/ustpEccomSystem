@@ -193,7 +193,7 @@ ProductModal.propTypes = {
         price: PropTypes.number,
         quantity: PropTypes.number
     }),
-    onAddToCart: PropTypes.func.isRequired,
+    // onAddToCart: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
 };
 

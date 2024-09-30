@@ -306,6 +306,69 @@ router.post('/products-recommendations', async (req, res) => {
     }
 });
 
+router.get('/sticky-components', async (req, res) => {
+    const { hairType, hairTexture, hairVirgin, hairColor, hairRebonded } = req.query;
+
+    console.log('--------- STICKY COMPONENT -------');
+    console.log('Received parameters:', req.query);
+
+    try {
+        // Base query to fetch active products
+        let query = 'SELECT * FROM product WHERE product_status IN ("active", "Discounted")';
+
+        // List of possible search terms
+        const searchTerms = [];
+        const queryParams = [];
+
+        // Check each parameter and add to searchTerms array if provided
+        if (hairType) {
+            searchTerms.push('LOWER(description) LIKE ?');
+            queryParams.push(`%${hairType.toLowerCase()}%`);
+        }
+
+        if (hairTexture) {
+            searchTerms.push('LOWER(description) LIKE ?');
+            queryParams.push(`%${hairTexture.toLowerCase()}%`);
+        }
+
+        if (hairVirgin) {
+            searchTerms.push('LOWER(description) LIKE ?');
+            queryParams.push(`%${hairVirgin.toLowerCase()}%`);
+        }
+
+        if (hairColor) {
+            searchTerms.push('LOWER(description) LIKE ?');
+            queryParams.push(`%${hairColor.toLowerCase()}%`);
+        }
+
+        if (hairRebonded) {
+            searchTerms.push('LOWER(description) LIKE ?');
+            queryParams.push(`%${hairRebonded.toLowerCase()}%`);
+        }
+
+        // Add the search conditions to the query if there are any
+        if (searchTerms.length > 0) {
+            query += ' AND (' + searchTerms.join(' OR ') + ')';  // Join conditions with OR
+        }
+
+        // Add a LIMIT clause to the query (e.g., limit to 4 products)
+        query += ' LIMIT 4';
+
+        console.log('Final query to execute:', query);
+        console.log('Query parameters:', queryParams);
+
+        const [products] = await db.query(query, queryParams);
+
+        console.log('Fetched products:', products);
+
+        res.json(products);
+    } catch (error) {
+        console.error('Error fetching products:', error.message);
+        res.status(500).send('Server error');
+    }
+});
+
+
 
 
 

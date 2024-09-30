@@ -6,7 +6,8 @@ import AdminHeader from '../components/AdminHeader';
 import InventoryCountComponent from '../components/InventoryCountComponent';
 import axios from 'axios';
 import { Modal, Button } from 'react-bootstrap';
-import ProductStatistics from '../components/ProductStatistics'; // Import the statistics component
+import ProductStatistics from '../components/ProductStatistics';
+import TopProduct from '../components/TopProduct';
 
 const Inventory = () => {
     const [bestSellingCount, setBestSellingCount] = useState(0);
@@ -19,8 +20,9 @@ const Inventory = () => {
     const [discontinuedCount, setDiscontinuedCount] = useState(0);
     const [discontinuedQuantity, setDiscontinuedQuantity] = useState(0);
     const [productNames, setProductNames] = useState([]);
-    const [inventoryItems, setInventoryItems] = useState([]); // Define inventoryItems for inventory table
+    const [inventoryItems, setInventoryItems] = useState([]);
     const [showModal, setShowModal] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const handleCloseModal = () => setShowModal(false);
     const handleShowModal = () => setShowModal(true);
@@ -66,7 +68,7 @@ const Inventory = () => {
     const fetchInventoryItems = async () => {
         try {
             const response = await axios.get('http://localhost:5001/admin-inventory');
-            setInventoryItems(response.data); // Ensure you have a proper API endpoint for this
+            setInventoryItems(response.data);
         } catch (error) {
             console.error('Error fetching inventory items:', error);
         }
@@ -80,7 +82,8 @@ const Inventory = () => {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        // Add search logic here
+        // You can implement search logic here if necessary
+        // For example, filtering `productNames` based on `searchTerm`
     };
 
     return (
@@ -110,6 +113,7 @@ const Inventory = () => {
                                 discontinuedCount={discontinuedCount}
                                 discontinuedQuantity={discontinuedQuantity}
                             />
+                            <TopProduct />
                         </div>
 
                         {/* Product Table */}
@@ -117,7 +121,12 @@ const Inventory = () => {
                             <div className="order-header">
                                 <div className="order-search">
                                     <form onSubmit={handleSearch}>
-                                        <input type="search" placeholder="Search products..." />
+                                        <input
+                                            type="search"
+                                            placeholder="Search products..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                        />
                                         <button type="submit">Search</button>
                                     </form>
                                 </div>
@@ -137,27 +146,29 @@ const Inventory = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {productNames.map((product) => {
-                                            // Determine stock status based on quantity
-                                            let stockStatus = 'Low on Stock'; // Default status
-                                            if (product.quantity > 50) {
-                                                stockStatus = 'Good Stocks';
-                                            } else if (product.quantity > 20) {
-                                                stockStatus = 'Moderately Low';
-                                            }
+                                        {productNames
+                                            .filter(product => product.product_name.toLowerCase().includes(searchTerm.toLowerCase())) // Implementing search filter
+                                            .map((product) => {
+                                                // Determine stock status based on quantity
+                                                let stockStatus = 'Low on Stock'; // Default status
+                                                if (product.quantity > 50) {
+                                                    stockStatus = 'Good Stocks';
+                                                } else if (product.quantity > 20) {
+                                                    stockStatus = 'Moderately Low';
+                                                }
 
-                                            return (
-                                                <tr key={product.product_id}>
-                                                    <td>{product.product_id}</td>
-                                                    <td>{product.product_code}</td>
-                                                    <td>{product.product_name}</td>
-                                                    <td>{product.price}</td>
-                                                    <td>{product.quantity}</td>
-                                                    <td>{product.category_name}</td>
-                                                    <td>{stockStatus}</td> {/* Display calculated stock status */}
-                                                </tr>
-                                            );
-                                        })}
+                                                return (
+                                                    <tr key={product.product_id}>
+                                                        <td>{product.product_id}</td>
+                                                        <td>{product.product_code}</td>
+                                                        <td>{product.product_name}</td>
+                                                        <td>{product.price}</td>
+                                                        <td>{product.quantity}</td>
+                                                        <td>{product.category_name}</td>
+                                                        <td>{stockStatus}</td>
+                                                    </tr>
+                                                );
+                                            })}
                                     </tbody>
                                 </table>
                             </div>
@@ -165,82 +176,24 @@ const Inventory = () => {
                     </div>
                 </div>
 
-                {/* Inventory Section */}
-                <div className="dash-board">
-                    <div className="dash-header">
-                        <div className="header-title">
-                            <i className="bx bx-clipboard"></i>
-                            <h1>Inventory</h1>
-                        </div>
-                        <AdminHeader />
-                    </div>
-                    <div className="body">
-                        <div className="user-con">
-                            <InventoryCountComponent />
-                            <div className="report-list">
-                                <div className="cheader">
-                                    <div className="search">
-                                        <form>
-                                            <input type="search" placeholder="Search..." />
-                                        </form>
-                                    </div>
-                                </div>
-
-                                <div className="order-table">
-                                    <table className="table table-hover">
-                                        <thead className="bg-light sticky-top">
-                                            <tr>
-                                                <th><input type="checkbox" /></th>
-                                                <th>Product Code</th>
-                                                <th>Product Name</th>
-                                                <th>Category</th>
-                                                <th>Size</th>
-                                                <th>Quantity</th>
-                                                <th>Price</th>
-                                                <th>Total Amount</th>
-                                                <th>Date</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {inventoryItems.map((item) => (
-                                                <tr key={item.id}>
-                                                    <td><input type="checkbox" /></td>
-                                                    <td>{item.product_code}</td>
-                                                    <td>{item.product_name}</td>
-                                                    <td>{item.category}</td>
-                                                    <td>{item.size}</td>
-                                                    <td>{item.quantity}</td>
-                                                    <td>{item.price}</td>
-                                                    <td>{item.total_amount}</td>
-                                                    <td>{item.date}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {/* Modal for adding products */}
+                <Modal show={showModal} onHide={handleCloseModal}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Add Product</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {/* Add product form content goes here */}
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleCloseModal}>
+                            Close
+                        </Button>
+                        <Button variant="primary" onClick={handleCloseModal}>
+                            Save Changes
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             </div>
-
-            {/* Modal for adding products */}
-            <Modal show={showModal} onHide={handleCloseModal}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Add Product</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    {/* Add product form content goes here */}
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleCloseModal}>
-                        Close
-                    </Button>
-                    <Button variant="primary" onClick={handleCloseModal}>
-                        Save Changes
-                    </Button>
-                </Modal.Footer>
-            </Modal>
         </div>
     );
 };

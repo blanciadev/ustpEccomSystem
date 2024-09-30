@@ -173,8 +173,8 @@ const Products = () => {
       <BundleProduct
         show={isBundleProductModalOpen}
         handleClose={handleCloseBundleProductModal}
-        order={selectedProduct} // Pass selected product or any necessary data
-        handleUpdate={fetchProduct} // Refresh the product list after bundle action
+        order={selectedProduct}
+        handleUpdate={fetchProduct}
       />
 
       {selectedProduct && (
@@ -182,7 +182,7 @@ const Products = () => {
           show={isProductModalOpen}
           product={selectedProduct}
           handleClose={handleCloseProductModal}
-          handleUpdateProduct={fetchProduct} // Refresh the product list
+          handleUpdateProduct={fetchProduct}
         />
       )}
     </div>

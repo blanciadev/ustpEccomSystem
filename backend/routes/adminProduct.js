@@ -144,10 +144,10 @@ router.get('/top-products', async (req, res) => {
                 return {
                     id: product.id,
                     product: product.product,
-                    interaction_count: progress, 
-                    available_quantity: product.available_quantity, 
-                    cart_quantity: product.cart_quantity, 
-                    product_image: product.product_image 
+                    interaction_count: progress,
+                    available_quantity: product.available_quantity,
+                    cart_quantity: product.cart_quantity,
+                    product_image: product.product_image
                 };
             })
         });
@@ -180,6 +180,71 @@ router.get('/shipments', async (req, res) => {
     }
 });
 
+// Route to get today's sales
+router.get('/sales-for-today', async (req, res) => {
+    try {
+        const query = `
+            SELECT
+                COUNT(order_details.order_id) AS total_completed_orders, 
+                SUM(order_details.total_price) AS total_completed_sales, 
+                SUM(order_details.quantity) AS total_products_sold
+            FROM
+                order_details
+            WHERE
+                order_details.order_status = 'Completed' 
+                AND DATE(order_details.order_date) = CURDATE();
+        `;
 
+        // Execute the query without a callback, as it returns a promise
+        const [results] = await db.execute(query);
+
+        // Ensure salesData is an object
+        const salesData = results[0] || {};
+        res.json({
+            total_sales: salesData.total_completed_sales || 0, // Match key name with frontend
+            total_orders: salesData.total_completed_orders || 0, // Match key name with frontend
+            total_products_sold: salesData.total_products_sold || 0,
+        });
+    } catch (error) {
+        console.error('Error retrieving sales data:', error.message);
+        res.status(500).json({ error: 'Failed to retrieve sales data. Please try again.' });
+    }
+});
+
+
+// Route to get product reports per month
+router.get('/product-reports-per-month', async (req, res) => {
+    try {
+        const query = `
+       SELECT
+    product.product_code, 
+    product.product_name, 
+    SUM(order_details.quantity) AS total_quantity,  -- Total quantity for the product
+    SUM(order_details.total_price) AS total_amount, -- Total sales amount for the product
+    (SUM(order_details.quantity) * SUM(order_details.total_price)) AS total_sales, -- Total sales for the product
+    DATE_FORMAT(order_details.order_date, '%b %Y') AS period
+FROM 
+    order_details
+JOIN 
+    product ON order_details.product_id = product.product_code
+WHERE 
+    order_details.order_status = 'Completed'
+GROUP BY 
+    period, product.product_code, product.product_name
+ORDER BY 
+    period DESC;
+
+        `;
+
+        const [results] = await db.execute(query);
+
+        res.json({
+            data: results
+        });
+    } catch (error) {
+        console.error('Error retrieving product reports:', error.message);
+        res.status(500).json({ error: 'Failed to retrieve product reports. Please try again.' });
+    }
+});
 
 module.exports = router;

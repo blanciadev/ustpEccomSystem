@@ -6,7 +6,7 @@ const crypto = require('crypto');
 
 const TOKEN_EXPIRATION_TIME = 3600000; // 1 hour
 
-router.post('/customer-login', async (req, res) => {
+router.post('/users-login', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -15,7 +15,7 @@ router.post('/customer-login', async (req, res) => {
 
     try {
         // Fetch user data from the database
-        const [rows] = await db.query('SELECT * FROM customer WHERE email = ?', [email]);
+        const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
 
         if (rows.length === 0) {
             return res.status(401).json({ message: 'Invalid email or password' });

@@ -25,7 +25,7 @@ const authenticateToken = async (req, res, next) => {
         }
 
         // Fetch user details based on the token
-        const [userRows] = await db.query('SELECT * FROM customer WHERE customer_id = ?', [tokenData.user_id]);
+        const [userRows] = await db.query('SELECT * FROM users WHERE customer_id = ?', [tokenData.user_id]);
 
         if (userRows.length === 0) {
             return res.status(401).json({ message: 'User not found' });

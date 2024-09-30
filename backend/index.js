@@ -26,6 +26,7 @@ const adminOrderUpdates = require('./routes/adminOrderUpdates.js');
 const adminProduct = require('./routes/adminProduct.js');
 const adminProductUpdate = require('./routes/adminProductUpdates.js');
 const AdminBundleOrder = require('./routes/AdminBundleOrder.js');
+const AdminUsersRoutes = require('./routes/AdminUsersRoutes.js');
 
 
 const customerData = require('./routes/customerData.js');
@@ -54,6 +55,7 @@ app.use('/', adminProduct);
 app.use('/', adminProductUpdate);
 app.use('/', AdminBundleOrder);
 app.use('/', customerData);
+app.use('/', AdminUsersRoutes);
 
 app.use('/', handleLogout);
 

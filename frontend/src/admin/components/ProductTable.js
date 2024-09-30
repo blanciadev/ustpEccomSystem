@@ -75,7 +75,7 @@ const ProductTable = () => {
                                     <Button variant="secondary" onClick={() => handleViewProduct(product)}>
                                         View
                                     </Button>
-                                    <img src={product.product_image} alt={product.product_name} width="60" />
+                                    {/* <img src={product.product_image} alt={product.product_name} width="60" /> */}
                                 </td>
                             </tr>
                         ))}
