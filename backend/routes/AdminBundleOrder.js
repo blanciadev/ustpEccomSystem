@@ -136,6 +136,51 @@ router.post('/discount-product-update', async (req, res) => {
 });
 
 
+let bundleIdCounter = 0; // Initialize a counter for custom bundle IDs
+
+// Function to generate a simple unique bundle ID
+const generateSimpleBundleId = () => {
+    bundleIdCounter += 1; // Increment the counter for each new bundle
+    return `BUNDLE-${bundleIdCounter}`; // Return the new unique ID
+};
+
+router.post('/bundles', async (req, res) => {
+    const { selectedProducts, discount } = req.body; // Get selected products and discount from request
+    console.log('----- BUNDLE INSERT ------');
+
+    // Generate a simple unique bundle ID
+    const customBundleId = generateSimpleBundleId();
+
+    // Calculate custom price based on selected products and discount
+    const totalPrice = selectedProducts.reduce((acc, product) => acc + product.price, 0);
+    const customPrice = discount ? totalPrice - (totalPrice * discount / 100) : totalPrice;
+
+    console.log('Calculated Custom Price:', customPrice, 'Discount:', discount);
+
+    // Insert the bundle into the bundles table
+    try {
+        const result = await db.query(
+            'INSERT INTO bundles (bundle_id, custom_price, discount) VALUES (?, ?, ?)',
+            [customBundleId, customPrice, discount] // Use the custom bundle ID here
+        );
+
+        // Insert each product into the bundle_products table
+        for (const product of selectedProducts) {
+            await db.query(
+                'INSERT INTO bundle_products (bundle_id, product_code) VALUES (?, ?)',
+                [customBundleId, product.product_code] // Use the custom bundle ID here
+            );
+        }
+
+        res.status(201).json({ message: 'Bundle created successfully', bundleId: customBundleId });
+    } catch (error) {
+        console.error('Error creating bundle:', error);
+        res.status(500).json({ error: 'Failed to create bundle' });
+    }
+});
+
+
+
 
 
 

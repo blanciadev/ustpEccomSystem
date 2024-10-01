@@ -22,7 +22,7 @@ const Shop = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                // const response = await axios.get('http://localhost:5001/products');
+
                 const response = await axios.get('http://localhost:5001/products');
                 setProducts(response.data);
                 setFilteredProducts(response.data);
@@ -43,29 +43,20 @@ const Shop = () => {
             }
         };
 
+
         const fetchRecommendedProducts = async () => {
             try {
-                const token = localStorage.getItem('token');
-                const userId = localStorage.getItem('customer_id');
-
-                if (token && userId) {
-                    // Fetch recommended products with authorization token
-                    const response = await axios.get(`http://localhost:5001/recommend-products`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            customer_id: userId, 
-                        },
-                    });
-
-                  
-                    setRecommendedProducts(response.data);
-                } else {
-                    console.log('Token or userId is missing in localStorage');
+                const response = await axios.get(`http://localhost:5001/products-bundle-recommendation`);
+                if (response.data.length === 0) {
+                    console.log('No recommended products found.');
                 }
+                setRecommendedProducts(response.data);
             } catch (error) {
                 console.error('Error fetching recommended products:', error.response ? error.response.data : error.message);
             }
         };
+
+
 
         fetchProducts();
         fetchTopPickedProducts();
@@ -81,19 +72,16 @@ const Shop = () => {
     };
 
     const handleBuyNow = (product) => {
-        // Create an object that includes the product details and quantity
         const productData = {
             ...product,
             quantity: product.quantity = 1,
         };
 
-        // Retrieve existing selected products or create a new array
         const existingProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
 
-        // Add the new product to the array
         existingProducts.push(productData);
 
-        // Store the updated array in localStorage
+
         localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
 
         // Redirect to the checkout page
@@ -202,10 +190,10 @@ const Shop = () => {
                 </div>
             </div>
 
-            {/* Recommended Products Section */}
+            {/* Bundle Section */}
             {recommendedProducts.length > 0 && (
                 <div className='recommendations-section'>
-                    <h2>Recommended for You</h2>
+                    <h2>Discounted Products</h2>
                     <div className='product-list'>
                         {recommendedProducts.map((product) => (
                             <div key={product.product_code} className='product-item' onClick={() => openModal(product)}>
@@ -213,19 +201,20 @@ const Shop = () => {
                                     <img
                                         src={product.product_image || 'https://via.placeholder.com/150'}
                                         alt={product.product_name || 'Product Image'}
+                                        loading="lazy"
                                     />
                                 </div>
                                 <div className='product-desc'>
-                                    <p className='product-name'>{product.product_name || 'No product name'}</p>
-                                    <p className='product-quantity'>Quantity: {product.quantity}</p>
-                                    <p className='product-price'>Price: ${product.price}</p>
+                                    <p className='product-name'>{product.product_name || 'No product name available'}</p>
+                                    <p className='product-quantity'>Quantity: {product.quantity !== undefined ? product.quantity : 'N/A'}</p>
+                                    <p className='product-price'>Price: ${product.price !== undefined ? product.price.toFixed(2) : 'N/A'}</p>
 
                                     {product.product_status === 'Discounted' && (
-                                        <p className='product-price'>Product Discount: P{product.product_discount}%</p>
+                                        <p className='product-discount'>Discount: {product.product_discount}%</p>
                                     )}
 
                                     {product.quantity > 0 ? (
-                                        <>
+                                        <div className='button-group'>
                                             <button
                                                 className='add-to-cart-button'
                                                 onClick={(e) => {
@@ -244,11 +233,10 @@ const Shop = () => {
                                             >
                                                 Buy Now
                                             </button>
-                                        </>
+                                        </div>
                                     ) : (
                                         <p className='out-of-stock'>Out of Stock</p>
                                     )}
-
                                 </div>
                             </div>
                         ))}

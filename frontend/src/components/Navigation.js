@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { cartEventEmitter } from './eventEmitter';
 
@@ -9,6 +9,7 @@ const Navigation = () => {
     const [cartItemCount, setCartItemCount] = useState(0);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation(); // Get the current location
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -19,10 +20,10 @@ const Navigation = () => {
             setIsLoggedIn(true);
             setUsername(storedUsername || '');
             setFirstName(storedFirstName || '');
-            fetchCartItemCount(); 
+            fetchCartItemCount();
         }
 
-        validateTokenAndRedirect(); 
+        validateTokenAndRedirect();
         cartEventEmitter.on('cartUpdated', fetchCartItemCount);
         return () => {
             cartEventEmitter.off('cartUpdated', fetchCartItemCount);
@@ -31,13 +32,18 @@ const Navigation = () => {
 
     const validateTokenAndRedirect = async () => {
         const token = localStorage.getItem('token');
-    
+
         if (!token) {
-            setIsLoggedIn(false);
-            navigate('/login');
-            return;
+            if (location.pathname !== '/') {
+                navigate('/');
+            } else {
+                setIsLoggedIn(false);
+                navigate('/');
+                return;
+            }
+
         }
-    
+
         try {
             const response = await axios.get('http://localhost:5001/validate-token', {
                 headers: { Authorization: `Bearer ${token}` }
@@ -46,15 +52,17 @@ const Navigation = () => {
                 setIsLoggedIn(true);
                 setUsername(localStorage.getItem('username') || '');
                 setFirstName(localStorage.getItem('first_name') || '');
-                fetchCartItemCount(); 
+                fetchCartItemCount();
             }
         } catch (error) {
             console.error('Error validating token:', error.response ? error.response.data : error.message);
             setIsLoggedIn(false);
-            navigate('/login'); 
+            // Check if the current location is not '/home' before redirecting to '/login'
+            if (location.pathname !== '/home') {
+                navigate('/login');
+            }
         }
     };
-    
 
     const fetchCartItemCount = async () => {
         const token = localStorage.getItem('token');

@@ -109,8 +109,8 @@ const CartContent = () => {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({
-          cart_items_id: cartItemId, // Send the cart item ID correctly
-          newQuantity: newQuantity, // Send the updated numeric quantity
+          cart_items_id: cartItemId,
+          newQuantity: newQuantity,
         }),
       });
 
@@ -128,7 +128,6 @@ const CartContent = () => {
       setError('Error updating quantity. Please try again later.');
     }
   };
-
 
 
   return (

@@ -76,6 +76,7 @@ router.get('/products', async (req, res) => {
 
 
 
+
 // Route to get top products from different categories
 router.get('/products-top-mix-picks', async (req, res) => {
     try {
@@ -166,9 +167,7 @@ GROUP BY
 	c.category_name
 ORDER BY
 	interaction_count DESC
-LIMIT 4;
-
-`);
+LIMIT 4;`);
 
         // Respond with top picked products
         res.json(rows);
@@ -197,39 +196,40 @@ router.get('/recommend-products', async (req, res) => {
 
         // Fetch the top 4 cart interactions excluding current user
         const [rankedInteractions] = await db.query(`
-                    SELECT 
-            p.product_id, 
-            p.product_code, 
-            p.product_name, 
-            p.price, 
-            p.description, 
-            p.quantity, 
-            c.category_name, 
-            COUNT(DISTINCT user_product_interactions.product_code) AS interaction_count, 
-            p.product_image
-        FROM
-            product AS p
-        JOIN
-            category AS c
-            ON p.category_id = c.category_id
-        JOIN
-            user_product_interactions
-            ON p.product_code = user_product_interactions.product_code
-        WHERE
-            user_product_interactions.interaction_type = 'cart'
-        -- AND user_product_interactions.customer_id != ?
-        GROUP BY
-            p.product_id, 
-            p.product_code, 
-            p.product_name, 
-            p.price, 
-            p.description, 
-            p.quantity, 
-            c.category_name, 
-            p.product_image
-        ORDER BY
-            interaction_count DESC
-                LIMIT 4;
+          
+              SELECT 
+    p.product_id, 
+    p.product_code, 
+    p.product_name, 
+    p.price, 
+    p.description, 
+    p.quantity, 
+    c.category_name, 
+    COUNT(DISTINCT user_product_interactions.product_code) AS interaction_count, 
+    p.product_image
+FROM
+    product AS p
+JOIN
+    category AS c
+    ON p.category_id = c.category_id
+JOIN
+    user_product_interactions
+    ON p.product_code = user_product_interactions.product_code
+WHERE
+    user_product_interactions.interaction_type = 'order'
+    AND user_product_interactions.customer_id != ?
+GROUP BY
+    p.product_id, 
+    p.product_code, 
+    p.product_name, 
+    p.price, 
+    p.description, 
+    p.quantity, 
+    c.category_name, 
+    p.product_image
+ORDER BY
+    interaction_count DESC
+           LIMIT 4;
         `, [currentUserId]);
 
         // Debugging: Log the query result
@@ -370,8 +370,42 @@ router.get('/sticky-components', async (req, res) => {
 });
 
 
+router.get('/products-bundle-recommendation', async (req, res) => {
+    console.log('--- BUNDLE PRODUCTS ---');
 
+    try {
+        // Fetch all products and their categories
+        const [rows] = await db.query(`
+         SELECT
+            p.product_id,
+            p.category_id,
+            p.product_code,
+            p.product_name,
+            p.price,
+            p.description,
+            p.quantity,
+            p.product_discount,
+            p.product_image,
+            p.product_status 
+        FROM
+            product AS p 
+        WHERE
+            p.product_status = 'Discounted' 
+        ORDER BY
+            CASE
+                WHEN p.product_status = 'Discounted' THEN 1 
+                ELSE 2 
+            END
+        LIMIT 4;  
 
+    `);
+
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        res.status(500).send('Error fetching products');
+    }
+});
 
 
 module.exports = router;

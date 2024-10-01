@@ -10,9 +10,11 @@ import ProductStatistics from '../components/ProductStatistics';
 import ProductTable from '../components/ProductTable';
 import AddProductModal from '../components/AddProductModal';
 import ProductModal from '../components/UpdateProductModal';
-import BundleProduct from '../components/DiscountProductModal.js';
+import DiscountProduct from '../components/DiscountProductModal';
+import BundleProduct from '../components/BundleProductModal'; // Import the modal
 
 const Products = () => {
+  // States for product data
   const [bestSellingCount, setBestSellingCount] = useState(0);
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [lowStockCount, setLowStockCount] = useState(0);
@@ -23,32 +25,15 @@ const Products = () => {
   const [discontinuedCount, setDiscontinuedCount] = useState(0);
   const [discontinuedQuantity, setDiscontinuedQuantity] = useState(0);
 
+  // States for products and modal visibility
   const [products, setProducts] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [isDiscountProductModalOpen, setIsDiscountProductModalOpen] = useState(false);
+  const [isBundleProductModalOpen, setIsBundleProductModalOpen] = useState(false); // State for BundleProduct modal
 
-  // New state to manage the BundleProduct modal visibility
-  const [isBundleProductModalOpen, setIsBundleProductModalOpen] = useState(false);
-
-  // Handlers for showing and hiding the modals
-  const handleShowAddModal = () => setShowAddModal(true);
-  const handleCloseAddModal = () => setShowAddModal(false);
-
-  const handleShowProductModal = (product) => {
-    setSelectedProduct(product);
-    setIsProductModalOpen(true);
-  };
-
-  const handleCloseProductModal = () => {
-    setSelectedProduct(null);
-    setIsProductModalOpen(false);
-  };
-
-  // Handlers for BundleProduct modal
-  const handleShowBundleProductModal = () => setIsBundleProductModalOpen(true);
-  const handleCloseBundleProductModal = () => setIsBundleProductModalOpen(false);
-
+  // Fetch data for product statistics and list
   const fetchProductData = async () => {
     try {
       const response = await axios.get('http://localhost:5001/admin-products-with-interaction');
@@ -73,7 +58,7 @@ const Products = () => {
   const fetchProduct = async () => {
     try {
       const response = await axios.get('http://localhost:5001/products');
-      setProducts(response.data);  // Save the fetched products
+      setProducts(response.data);
     } catch (error) {
       console.error('Error fetching product data:', error);
     }
@@ -84,6 +69,7 @@ const Products = () => {
     fetchProduct();
   }, []);
 
+  // Add product handler
   const handleAddProduct = async (newProduct) => {
     try {
       await axios.post('http://localhost:5001/admin-products', newProduct);
@@ -93,6 +79,29 @@ const Products = () => {
       console.error('Error adding product:', error);
     }
   };
+
+  // Handlers for Add Product Modal
+  const handleShowAddModal = () => setShowAddModal(true);
+  const handleCloseAddModal = () => setShowAddModal(false);
+
+  // Handlers for Update Product Modal
+  const handleShowProductModal = (product) => {
+    setSelectedProduct(product);
+    setIsProductModalOpen(true);
+  };
+
+  const handleCloseProductModal = () => {
+    setSelectedProduct(null);
+    setIsProductModalOpen(false);
+  };
+
+  // Handlers for Discount Product Modal
+  const handleShowDiscountProductModal = () => setIsDiscountProductModalOpen(true);
+  const handleCloseDiscountProductModal = () => setIsDiscountProductModalOpen(false);
+
+  // Handlers for Bundle Product Modal
+  const handleShowBundleProductModal = () => setIsBundleProductModalOpen(true); // Show modal
+  const handleCloseBundleProductModal = () => setIsBundleProductModalOpen(false); // Close modal
 
   return (
     <div className='dash-con'>
@@ -132,11 +141,6 @@ const Products = () => {
                 </div>
 
                 <div className='options'>
-                  <div className='print'>
-                    <button onClick={handleShowAddModal}>
-                      Add Product
-                    </button>
-                  </div>
                   <div className='sort'>
                     <label htmlFor="sort">Sort By</label>
                     <select name="sort" id="sort">
@@ -151,7 +155,7 @@ const Products = () => {
                       Add Product
                     </Button>
                   </div>
-                  <Button variant="primary" onClick={handleShowBundleProductModal}>
+                  <Button variant="primary" onClick={handleShowDiscountProductModal}>
                     Discounts
                   </Button>
 
@@ -170,10 +174,16 @@ const Products = () => {
         handleAddProduct={handleAddProduct}
       />
 
-      <BundleProduct
-        show={isBundleProductModalOpen}
-        handleClose={handleCloseBundleProductModal}
+      <DiscountProduct
+        show={isDiscountProductModalOpen}
+        handleClose={handleCloseDiscountProductModal}
         order={selectedProduct}
+        handleUpdate={fetchProduct}
+      />
+
+      <BundleProduct
+        show={isBundleProductModalOpen} // Render the bundle modal
+        handleClose={handleCloseBundleProductModal}
         handleUpdate={fetchProduct}
       />
 
