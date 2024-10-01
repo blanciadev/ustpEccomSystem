@@ -6,12 +6,12 @@ const pool = mysql.createPool({
     user: 'root',
 
     //angela
-    port: '3306',
-    password: '',
+    // port: '3308',
+    // password: '',
 
     // PORT KURT 
-    // port: '3307',
-    // password: 'root',
+    port: '3307',
+    password: 'root',
 
     // //other Laptop 
     // port: '3307',

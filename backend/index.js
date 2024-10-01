@@ -19,6 +19,7 @@ const productRoutes = require('./routes/productsRoutes.js');
 const OrderRoutes = require('./routes/orderRoutes.js');
 const viewTransactionsRoute = require('./routes/viewTransactionsRoute.js');
 const userInteraction = require('./routes/userInteraction.js');
+const TokenValidation = require('./routes/TokenValidation.js');
 
 
 const customerData = require('./routes/customerData.js');
@@ -45,6 +46,7 @@ app.use('/', customerData);
 
 app.use('/', handleLogout);
 
+app.use('/', TokenValidation);
 
 
 

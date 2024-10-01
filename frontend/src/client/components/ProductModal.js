@@ -9,7 +9,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
 
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
-    const [productsPerPage] = useState(3); // Set number of products per page
+    const [productsPerPage] = useState(3);
 
     useEffect(() => {
         if (product) {
@@ -41,7 +41,6 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         }
     }, [product]);
 
-    // Handle Buy Now action
     const handleBuyNow = (product) => {
         const productData = {
             ...product,
@@ -58,12 +57,9 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         window.location.href = '/checkout';
     };
 
-    // Get current products for pagination
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const currentRecommendedProducts = recommendedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
-
-    // Pagination controls
     const totalPages = Math.ceil(recommendedProducts.length / productsPerPage);
 
     const handlePageChange = (pageNumber) => {
@@ -71,41 +67,35 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
     };
 
     if (!isOpen || !product) return null;
+
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                <button className="modal-close" onClick={onClose}>X</button>
+                <button className="modal-close" onClick={onClose}>✖</button>
                 <div className="modal-body">
                     <img
                         src={product.product_image}
                         alt={product.product_name}
-                        style={{ width: '100%' }}
+                        className="product-image"
                     />
-                    <h3>{product.product_name}</h3>
-                    <p>{product.description || 'No description available.'}</p>
-                    <p>Price: P{product.price}</p>
-                    <p>Available Quantity: {product.quantity}</p>
+                    <h3 className="product-title">{product.product_name}</h3>
+                    <p className="product-description">{product.description || 'No description available.'}</p>
+                    <p className="product-price">Price: <span className="price-value">P{product.price}</span></p>
+                    <p className="product-quantity">Available Quantity: {product.quantity}</p>
 
-                    {/* Conditionally render buttons based on product quantity */}
                     {product.quantity > 0 ? (
-                        <>
-                            <button onClick={() => onAddToCart(product)}>Add to Cart</button>
-                            <button
-                                onClick={() => handleBuyNow(product)}
-                                style={{ marginLeft: '10px' }}
-                            >
-                                Buy Now
-                            </button>
-                        </>
+                        <div className="button-group">
+                            <button className="add-to-cart-btn" onClick={() => onAddToCart(product)}>Add to Cart</button>
+                            <button className="buy-now-btn" onClick={() => handleBuyNow(product)}>Buy Now</button>
+                        </div>
                     ) : (
-                        <p style={{ color: 'red' }}>Out of stock</p>
+                        <p className="out-of-stock">Out of stock</p>
                     )}
 
-                    <button onClick={onClose} style={{ marginLeft: '10px' }}>Close</button>
+                    <button className="modal-close" onClick={onClose}>Close</button>
 
-                    {/* Recommendations Section */}
                     <div className="recommendations">
-                        <h4>Recommended Products</h4>
+                        <h4 className="recommendations-title">Recommended Products</h4>
                         {loading ? (
                             <p>Loading recommendations...</p>
                         ) : error ? (
@@ -117,38 +107,23 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                                         <img
                                             src={recProduct.product_image}
                                             alt={recProduct.product_name}
-                                            className="product-image"
+                                            className="recommended-product-image"
                                         />
                                         <div className="product-details">
                                             <span className="product-name">{recProduct.product_name}</span>
                                             <span className="product-price">${recProduct.price}</span>
-
-                                            {/* Conditionally render the discount if product_status is 'Discounted' */}
                                             {recProduct.product_status === 'Discounted' && (
                                                 <span className="product-discount">
                                                     Discounted by: {recProduct.product_discount}%
                                                 </span>
                                             )}
-
-                                            {/* Conditionally render the buttons based on recommended product quantity */}
                                             {recProduct.quantity > 0 ? (
-                                                <>
-                                                    <button
-                                                        className="add-to-cart-btn"
-                                                        onClick={() => onAddToCart(recProduct)}
-                                                    >
-                                                        Add to Cart
-                                                    </button>
-                                                    <button
-                                                        className="buy-now-btn"
-                                                        onClick={() => handleBuyNow(recProduct)}
-                                                        style={{ marginLeft: '10px' }}
-                                                    >
-                                                        Buy Now
-                                                    </button>
-                                                </>
+                                                <div className="recommended-button-group">
+                                                    <button className="add-to-cart-btn" onClick={() => onAddToCart(recProduct)}>Add to Cart</button>
+                                                    <button className="buy-now-btn" onClick={() => handleBuyNow(recProduct)}>Buy Now</button>
+                                                </div>
                                             ) : (
-                                                <p style={{ color: 'red' }}>Out of stock</p>
+                                                <p className="out-of-stock">Out of stock</p>
                                             )}
                                         </div>
                                     </div>
@@ -158,14 +133,13 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                             <p>No recommendations available.</p>
                         )}
 
-                        {/* Pagination Controls */}
                         {totalPages > 1 && (
                             <div className="pagination">
                                 {[...Array(totalPages).keys()].map(number => (
                                     <button
                                         key={number + 1}
                                         onClick={() => handlePageChange(number + 1)}
-                                        className={number + 1 === currentPage ? 'active' : ''}
+                                        className={`pagination-button ${number + 1 === currentPage ? 'active' : ''}`}
                                     >
                                         {number + 1}
                                     </button>
@@ -173,16 +147,12 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                             </div>
                         )}
                     </div>
-
-
                 </div>
             </div>
         </div>
     );
-
 };
 
-// PropTypes for validation
 ProductModal.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     product: PropTypes.shape({
@@ -193,7 +163,7 @@ ProductModal.propTypes = {
         price: PropTypes.number,
         quantity: PropTypes.number
     }),
-    // onAddToCart: PropTypes.func.isRequired,
+    onAddToCart: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
 };
 

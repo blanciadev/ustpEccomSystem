@@ -76,6 +76,7 @@ router.get('/products', async (req, res) => {
 
 
 
+
 // Route to get top products from different categories
 router.get('/products-top-mix-picks', async (req, res) => {
     try {
@@ -371,6 +372,42 @@ router.get('/sticky-components', async (req, res) => {
 
 
 
+router.get('/products-bundle-recommendation', async (req, res) => {
+    console.log('--- BUNDLE PRODUCTS ---');
+
+    try {
+        // Fetch all products and their categories
+        const [rows] = await db.query(`
+         SELECT
+    p.product_id,
+    p.category_id,
+    p.product_code,
+    p.product_name,
+    p.price,
+    p.description,
+    p.quantity,
+    p.product_discount,
+    p.product_image,
+    p.product_status 
+FROM
+    product AS p 
+WHERE
+    p.product_status = 'Discounted' 
+ORDER BY
+    CASE
+        WHEN p.product_status = 'Discounted' THEN 1 
+        ELSE 2 
+    END
+LIMIT 4;  
+
+    `);
+
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        res.status(500).send('Error fetching products');
+    }
+});
 
 
 module.exports = router;
