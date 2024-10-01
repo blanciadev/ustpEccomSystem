@@ -69,19 +69,25 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
     if (!isOpen || !product) return null;
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                <button className="modal-close" onClick={onClose}>✖</button>
-                <div className="modal-body">
+        <div className="promodal-overlay" onClick={onClose}>
+            <div className="promodal-content" onClick={(e) => e.stopPropagation()}>
+                <div className="promodal-body"> 
+                <button className="promodal-close" onClick={onClose}>✖</button>
+                    <div className='selected-product'>
+
                     <img
                         src={product.product_image}
                         alt={product.product_name}
-                        className="product-image"
+                        className="modalproduct-image"
                     />
-                    <h3 className="product-title">{product.product_name}</h3>
-                    <p className="product-description">{product.description || 'No description available.'}</p>
-                    <p className="product-price">Price: <span className="price-value">P{product.price}</span></p>
-                    <p className="product-quantity">Available Quantity: {product.quantity}</p>
+                    <hr/>
+
+                    <h3 className="modalproduct-title">{product.product_name}</h3>
+
+                    <p className="modalproduct-description">{product.description || 'No description available.'}</p>
+
+                    <p className="modalproduct-price">Price: <span className="price-value">P{product.price}</span></p>
+                    <p className="modalproduct-quantity">Available: {product.quantity}</p>
 
                     {product.quantity > 0 ? (
                         <div className="button-group">
@@ -92,8 +98,9 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                         <p className="out-of-stock">Out of stock</p>
                     )}
 
-                    <button className="modal-close" onClick={onClose}>Close</button>
 
+                    </div>
+                    
                     <div className="recommendations">
                         <h4 className="recommendations-title">Recommended Products</h4>
                         {loading ? (
@@ -101,19 +108,19 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                         ) : error ? (
                             <p>{error}</p>
                         ) : currentRecommendedProducts.length > 0 ? (
-                            <div className="recommended-products-grid">
+                            <div className="recommended-modalproducts-grid">
                                 {currentRecommendedProducts.map((recProduct) => (
-                                    <div key={recProduct.product_id} className="product-card">
+                                    <div key={recProduct.product_id} className="modalproduct-card">
                                         <img
                                             src={recProduct.product_image}
                                             alt={recProduct.product_name}
-                                            className="recommended-product-image"
+                                            className="recommended-modalproduct-image"
                                         />
-                                        <div className="product-details">
-                                            <span className="product-name">{recProduct.product_name}</span>
-                                            <span className="product-price">${recProduct.price}</span>
+                                        <div className="modalproduct-details">
+                                            <span className="modalproduct-name">{recProduct.product_name}</span>
+                                            <span className="modalproduct-price">${recProduct.price}</span>
                                             {recProduct.product_status === 'Discounted' && (
-                                                <span className="product-discount">
+                                                <span className="modalproduct-discount">
                                                     Discounted by: {recProduct.product_discount}%
                                                 </span>
                                             )}

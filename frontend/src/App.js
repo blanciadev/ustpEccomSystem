@@ -14,6 +14,9 @@ import Shop from './client/pages/Cart/shop';
 import ForgotPassword from './client/pages/ForgotPassword/ForgotPassword'
 import Verification from './client/pages/ForgotPassword/Verification'
 import ChangePassword from './client/pages/ForgotPassword/ChangePassword'
+import UserProfile from './client/pages/Transactions/UserProfile';
+import Notification from './client/pages/Transactions/Notification';
+import DiscountsandVouchers from './client/pages/Transactions/DiscountsandVouchers';
 
 
 function App() {
@@ -39,7 +42,9 @@ function App() {
         <Route path="/cart" element={<Cart/>}/>
         <Route path="/checkout" element={<Checkout/>}/>
         <Route path="/user/purchase" element={<OrderHistory/>}/>
-
+        <Route path="/user" element={<UserProfile/>}/>
+        <Route path="/user/notifications" element={<Notification/>}/>
+        <Route path="/user/discounts+vouchers" element={<DiscountsandVouchers/>}/>
         
         <Route path='/forgot-password' element={<ForgotPassword/>}></Route>
         <Route path='/verify' element={<Verification/>}></Route>

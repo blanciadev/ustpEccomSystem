@@ -25,6 +25,7 @@ body{
     align-items: center;
     justify-content: space-around;
     border-bottom: 1px solid black;
+    background-color: white;
     width: 98vw;
     height: 50px;
 }
@@ -38,7 +39,7 @@ body{
 }
 .nav-container > .logo > a > img{
     width: 50px;
-    height: 50px;
+    height: 40px;
     object-fit: contain;
 }
 .nav-container > .logo > a > h1{

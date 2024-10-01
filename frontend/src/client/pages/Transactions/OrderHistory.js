@@ -70,7 +70,6 @@ const OrderHistory = () => {
             <div className='purchase-header'>
               <h3>Order History</h3>
             </div>
-            
             <div className='purchase-body'>
               <div className='purchase-btncon'>
                 <button onClick={() => handleStatusClick('')}>All</button>
@@ -94,7 +93,6 @@ const OrderHistory = () => {
                         <h5>Product Details</h5>
                         {order.products.map((product, index) => (
                           <div key={index} className="product-details">
-                            <img src='#'/>
                             <p>Product Name: {product.product_name}</p>
                             <p>Price: P{product.price ? product.price.toFixed(2) : '0.00'}</p>
                             <p>Quantity: {product.quantity}</p>
