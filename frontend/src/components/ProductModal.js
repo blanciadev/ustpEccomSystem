@@ -4,10 +4,11 @@ import './modal.css';
 
 const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
     const [recommendedProducts, setRecommendedProducts] = useState([]);
+    const [bundleProducts, setBundleProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Pagination state
+    // Pagination state for recommendations
     const [currentPage, setCurrentPage] = useState(1);
     const [productsPerPage] = useState(3); // Set number of products per page
 
@@ -16,32 +17,62 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
             setLoading(true);
             setError(null);
 
-            fetch('http://localhost:5001/products-recommendations', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ product_code: product.product_code }),
-            })
-                .then(response => {
-                    if (!response.ok) {
+            // Fetch recommendations and bundle products
+            Promise.all([
+                fetch('http://localhost:5001/products-recommendations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ product_code: product.product_code }),
+                }),
+                fetch('http://localhost:5001/product-bundles', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ product_code: product.product_code }),
+                })
+            ])
+                .then(async ([recommendationRes, bundleRes]) => {
+                    if (!recommendationRes.ok || !bundleRes.ok) {
                         throw new Error('Network response was not ok');
                     }
-                    return response.json();
-                })
-                .then(data => {
-                    setRecommendedProducts(data);
+
+                    const recommendationData = await recommendationRes.json();
+                    const bundleData = await bundleRes.json();
+
+                    setRecommendedProducts(recommendationData);
+                    setBundleProducts(bundleData);
                     setLoading(false);
                 })
                 .catch(error => {
-                    console.error('Error fetching recommendations:', error);
-                    setError('Failed to load recommendations.');
+                    console.error('Error fetching data:', error);
+                    setError('Failed to load data.');
                     setLoading(false);
                 });
         }
     }, [product]);
 
-    // Handle Buy Now action
+    // Handle Buy Now action for bundle
+    const handleBuyNowBundle = () => {
+        const bundleData = bundleProducts.map(bProduct => ({
+            ...bProduct,
+            quantity: 1, // Default to 1 for each product in the bundle
+        }));
+
+        const existingProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
+
+        // Add bundle products to the existing cart
+        existingProducts.push(...bundleData);
+
+        localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
+
+        // Redirect to checkout with the bundle
+        window.location.href = '/checkout';
+    };
+
+    // Handle Buy Now action for individual product
     const handleBuyNow = (product) => {
         const productData = {
             ...product,
@@ -58,12 +89,12 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         window.location.href = '/checkout';
     };
 
-    // Get current products for pagination
+    // Get current products for pagination (individual product recommendations)
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const currentRecommendedProducts = recommendedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
 
-    // Pagination controls
+    // Pagination controls for recommendations
     const totalPages = Math.ceil(recommendedProducts.length / productsPerPage);
 
     const handlePageChange = (pageNumber) => {
@@ -103,6 +134,23 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
 
                     <button onClick={onClose} style={{ marginLeft: '10px' }}>Close</button>
 
+                    {/* Bundle Section */}
+                    {bundleProducts.length > 0 && (
+                        <div className="bundle-section">
+                            <h4>Available Bundle</h4>
+                            <ul>
+                                {bundleProducts.map((bProduct) => (
+                                    <li key={bProduct.product_id}>
+                                        {bProduct.product_name} - P{bProduct.price}
+                                    </li>
+                                ))}
+                            </ul>
+                            <button onClick={handleBuyNowBundle} className="buy-now-btn">
+                                Buy Bundle Now
+                            </button>
+                        </div>
+                    )}
+
                     {/* Recommendations Section */}
                     <div className="recommendations">
                         <h4>Recommended Products</h4>
@@ -121,7 +169,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                                         />
                                         <div className="product-details">
                                             <span className="product-name">{recProduct.product_name}</span>
-                                            <span className="product-price">${recProduct.price}</span>
+                                            <span className="product-price">P{recProduct.price}</span>
 
                                             {/* Conditionally render the discount if product_status is 'Discounted' */}
                                             {recProduct.product_status === 'Discounted' && (
@@ -173,13 +221,10 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                             </div>
                         )}
                     </div>
-
-
                 </div>
             </div>
         </div>
     );
-
 };
 
 // PropTypes for validation
@@ -193,7 +238,7 @@ ProductModal.propTypes = {
         price: PropTypes.number,
         quantity: PropTypes.number
     }),
-    // onAddToCart: PropTypes.func.isRequired,
+    onAddToCart: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
 };
 

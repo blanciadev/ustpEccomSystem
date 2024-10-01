@@ -182,6 +182,34 @@ router.post('/bundles', async (req, res) => {
 
 
 
+// Fetch product bundles by product_code
+router.post('/product-bundles', async (req, res) => {
+    const { product_code } = req.body;
+
+    try {
+        // Query to find bundle that contains the given product_code
+        const [bundles] = await db.query(
+            `SELECT b.bundle_id, b.custom_price, b.discount, bp.product_code, p.product_name, p.price
+             FROM bundles b
+             JOIN bundle_products bp ON b.bundle_id = bp.bundle_id
+             JOIN product p ON bp.product_code = p.product_code
+             WHERE bp.product_code = ?`, 
+            [product_code]
+        );
+
+        if (bundles.length === 0) {
+            return res.status(404).json({ message: 'No bundles found for this product' });
+        }
+
+        res.json(bundles);
+    } catch (err) {
+        console.error('Error fetching product bundles:', err);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+
 
 
 module.exports = router;

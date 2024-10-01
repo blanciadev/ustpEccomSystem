@@ -65,45 +65,6 @@ app.use('/', token);
 
 
 
-
-
-
-
-// Token validation
-app.get('/validate-token', async (req, res) => {
-    // Extract token from 'Authorization' header
-    const token = req.headers.authorization?.split(' ')[1];
-
-    if (!token) {
-        return res.status(401).json({ message: 'No token provided' });
-    }
-
-    try {
-        // Validate token and fetch associated customer information
-        const [rows] = await db.query(`
-            SELECT c.first_name, c.last_name, c.email
-            FROM tokens t
-            JOIN customer c ON t.user_id = c.customer_id
-            WHERE t.token = ?
-              AND t.expires_at > NOW()
-        `, [token]);
-
-        if (rows.length === 0) {
-            return res.status(401).json({ message: 'Invalid or expired token' });
-        }
-
-        const customer = rows[0];
-        res.json({
-            first_name: customer.first_name,
-            last_name: customer.last_name,
-            email: customer.email
-        });
-    } catch (err) {
-        console.error('Error during token validation:', err.message);
-        res.status(500).json({ message: 'Internal server error' });
-    }
-});
-
 // DUPLICATE KAG REQUEST SA API GAMIT SAIMO PORT PERO DILI NMO I DILETE ANG ORIGINAL API 
 // BANTOG WALA KAI MAKITA NA PITURE KAI ANG API PORT SAYOP
 

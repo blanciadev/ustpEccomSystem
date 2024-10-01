@@ -24,7 +24,7 @@ const ProductCard = React.memo(({ product, onAddToCart, onBuyNow, onProductClick
             <p>Product Quantity: {product.quantity}</p>
             <h3>P{product.price}</h3>
             {product.product_status === 'Discounted' && (
-                <h3>Discounted Price: P{(product.price * (1 - product.product_discount / 100)).toFixed(2)}</h3>
+                <h3>Discounted Price: {product.product_discount}%</h3>
             )}
             {isOutOfStock ? (
                 <p style={{ color: 'red' }}>Out of Stock</p>
