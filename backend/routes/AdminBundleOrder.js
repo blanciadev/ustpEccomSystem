@@ -135,40 +135,55 @@ router.post('/discount-product-update', async (req, res) => {
     }
 });
 
+// INSERT NEW BUNDLE UPDATE 
 
 let bundleIdCounter = 0; // Initialize a counter for custom bundle IDs
 
-// Function to generate a simple unique bundle ID
-const generateSimpleBundleId = () => {
-    bundleIdCounter += 1; // Increment the counter for each new bundle
-    return `BUNDLE-${bundleIdCounter}`; // Return the new unique ID
+const generateUniqueBundleId = async () => {
+    let isUnique = false;
+    let customBundleId;
+
+    while (!isUnique) {
+        customBundleId = `BUNDLE-${bundleIdCounter}`;
+        bundleIdCounter += 1; // Increment counter
+
+        // Check if this bundle_id already exists
+        const [rows] = await db.query('SELECT bundle_id FROM bundles WHERE bundle_id = ?', [customBundleId]);
+
+        if (rows.length === 0) {
+            isUnique = true; // If no matching rows, it's unique
+        }
+    }
+    return customBundleId;
 };
 
 router.post('/bundles', async (req, res) => {
-    const { selectedProducts, discount } = req.body; // Get selected products and discount from request
+    const { selectedProducts, discount } = req.body;
     console.log('----- BUNDLE INSERT ------');
 
-    // Generate a simple unique bundle ID
-    const customBundleId = generateSimpleBundleId();
+    // Generate a unique bundle ID
+    const customBundleId = await generateUniqueBundleId();
 
-    // Calculate custom price based on selected products and discount
-    const totalPrice = selectedProducts.reduce((acc, product) => acc + product.price, 0);
-    const customPrice = discount ? totalPrice - (totalPrice * discount / 100) : totalPrice;
+    // Calculate custom price
+    const totalPrice = selectedProducts.reduce((acc, product) => acc + parseFloat(product.discountedPrice), 0);
+    const customPrice = totalPrice.toFixed(2);
 
-    console.log('Calculated Custom Price:', customPrice, 'Discount:', discount);
-
-    // Insert the bundle into the bundles table
     try {
-        const result = await db.query(
+        await db.query(
             'INSERT INTO bundles (bundle_id, custom_price, discount) VALUES (?, ?, ?)',
-            [customBundleId, customPrice, discount] // Use the custom bundle ID here
+            [customBundleId, customPrice, discount]
         );
 
-        // Insert each product into the bundle_products table
+        // Insert each product and update its status and discount
         for (const product of selectedProducts) {
             await db.query(
-                'INSERT INTO bundle_products (bundle_id, product_code) VALUES (?, ?)',
-                [customBundleId, product.product_code] // Use the custom bundle ID here
+                'INSERT INTO bundle_products (bundle_id, product_code, discounted_price) VALUES (?, ?, ?)',
+                [customBundleId, product.product_code, product.discountedPrice]
+            );
+
+            await db.query(
+                'UPDATE product SET product_status = ?, product_discount = ? WHERE product_code = ?',
+                ['Bundled', discount, product.product_code]
             );
         }
 
@@ -180,27 +195,53 @@ router.post('/bundles', async (req, res) => {
 });
 
 
-
-
-// Fetch product bundles by product_code
+// Fetch product bundles by product's category (excluding the product itself)
 router.post('/product-bundles', async (req, res) => {
     const { product_code } = req.body;
 
     try {
-        // Query to find bundle that contains the given product_code
-        const [bundles] = await db.query(
-            `SELECT b.bundle_id, b.custom_price, b.discount, bp.product_code, p.product_name, p.price
-             FROM bundles b
-             JOIN bundle_products bp ON b.bundle_id = bp.bundle_id
-             JOIN product p ON bp.product_code = p.product_code
-             WHERE bp.product_code = ?`, 
+        // First, find the category of the given product_code
+        const [product] = await db.query(
+            `SELECT category_id FROM product WHERE product_code = ?`,
             [product_code]
         );
 
-        if (bundles.length === 0) {
-            return res.status(404).json({ message: 'No bundles found for this product' });
+        if (product.length === 0) {
+            return res.status(404).json({ message: 'Product not found' });
         }
 
+        const category_id = product[0].category_id;
+
+        // Query to find bundles that contain products in the same category, excluding the given product_code
+        const [bundles] = await db.query(
+            `SELECT
+                b.bundle_id, 
+                b.discount, 
+                bp.product_code, 
+                bp.discounted_price, 
+                p.product_name, 
+                p.price,
+                (bp.discounted_price - (bp.discounted_price * b.discount / 100)) AS final_price
+            FROM
+                bundles AS b
+                JOIN
+                bundle_products AS bp
+                ON 
+                    b.bundle_id = bp.bundle_id
+                JOIN
+                product AS p
+                ON 
+                    bp.product_code = p.product_code
+            WHERE 
+                p.category_id = ? AND p.product_code != ?`,
+            [category_id, product_code]
+        );
+
+        if (bundles.length === 0) {
+            return res.status(404).json({ message: 'No bundles found for this category' });
+        }
+
+        // Sending the calculated fields in the response
         res.json(bundles);
     } catch (err) {
         console.error('Error fetching product bundles:', err);
@@ -209,6 +250,25 @@ router.post('/product-bundles', async (req, res) => {
 });
 
 
+
+router.get('/products-no-bundle', async (req, res) => {
+    try {
+        // Fetch all products and their categories
+        const [rows] = await db.query(`
+            SELECT p.product_id, p.product_code, p.product_name, p.price ,p.description, p.quantity, c.category_name, p.product_image,  p.product_discount, 
+                p.product_status
+            FROM product p
+            INNER JOIN category c ON p.category_id = c.category_id
+            WHERE product_status = 'Active'
+        `);
+
+        // Respond with product details including categories
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        res.status(500).send('Error fetching products');
+    }
+});
 
 
 

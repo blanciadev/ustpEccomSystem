@@ -6,7 +6,7 @@ const BundleProductModal = () => {
     const [show, setShow] = useState(false);
     const [products, setProducts] = useState([]);
     const [selectedProducts, setSelectedProducts] = useState([]);
-    const [customPrice, setCustomPrice] = useState(0); // This can be used for displaying total
+    const [customPrice, setCustomPrice] = useState(0); // Total bundle price
     const [discount, setDiscount] = useState(''); // Use a string to match the dropdown value type
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState(null);
@@ -41,18 +41,27 @@ const BundleProductModal = () => {
 
     // Calculate the total price of selected products
     useEffect(() => {
-        const total = selectedProducts.reduce((acc, product) => acc + product.price, 0);
-        const finalPrice = discount ? total - (total * discount / 100) : total;
-        setCustomPrice(finalPrice.toFixed(2)); // Set custom price to state
+        const total = selectedProducts.reduce((acc, product) => {
+            const discountedPrice = product.originalPrice - (product.originalPrice * discount / 100);
+            return acc + discountedPrice;
+        }, 0);
+
+        setCustomPrice(total.toFixed(2)); // Set custom price to state
     }, [selectedProducts, discount]); // Recalculate whenever selectedProducts or discount changes
 
     // Handle form submission (selected products)
     const handleBundleSubmit = async (e) => {
         e.preventDefault();
 
-        // Create the bundle with selected products and discount
+        // Calculate discountedPrice for each selected product
+        const discountedProducts = selectedProducts.map(product => ({
+            ...product,
+            discountedPrice: (product.originalPrice - (product.originalPrice * discount / 100)).toFixed(2),
+        }));
+
+        // Create the bundle with discounted products and discount
         const bundleData = {
-            selectedProducts, // Include selected products in the request
+            selectedProducts: discountedProducts, // Include discounted products in the request
             discount,
         };
 
@@ -73,13 +82,19 @@ const BundleProductModal = () => {
         }
     };
 
+
     // Handle product selection toggle
     const handleProductSelection = (product) => {
+        const updatedProduct = {
+            ...product,
+            originalPrice: product.price, // Store original price when selecting a product
+        };
+
         setSelectedProducts((prevSelected) => {
-            if (prevSelected.includes(product)) {
+            if (prevSelected.some((p) => p.product_id === product.product_id)) {
                 return prevSelected.filter((p) => p.product_id !== product.product_id);
             } else {
-                return [...prevSelected, product];
+                return [...prevSelected, updatedProduct];
             }
         });
     };
@@ -100,6 +115,12 @@ const BundleProductModal = () => {
         setSelectedProducts((prevSelected) =>
             prevSelected.filter((product) => product.product_id !== productId)
         );
+    };
+
+    // Calculate discounted price for each product
+    const getDiscountedPrice = (product) => {
+        const discountedPrice = product.originalPrice - (product.originalPrice * discount / 100);
+        return discountedPrice.toFixed(2);
     };
 
     return (
@@ -153,7 +174,8 @@ const BundleProductModal = () => {
                             <thead>
                                 <tr>
                                     <th>Product Name</th>
-                                    <th>Price</th>
+                                    <th>Original Price</th>
+                                    <th>Discounted Price</th>
                                     <th>Category</th>
                                     <th>Action</th>
                                 </tr>
@@ -162,7 +184,8 @@ const BundleProductModal = () => {
                                 {selectedProducts.map((product) => (
                                     <tr key={product.product_id}>
                                         <td>{product.product_name}</td>
-                                        <td>{product.price}</td>
+                                        <td>{product.originalPrice}</td>
+                                        <td>{getDiscountedPrice(product)}</td>
                                         <td>{product.category_name}</td>
                                         <td>
                                             <Button

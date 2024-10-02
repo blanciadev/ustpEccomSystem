@@ -12,6 +12,9 @@ const Checkout = () => {
   const customerId = localStorage.getItem('customer_id');
   const authToken = localStorage.getItem('token');
 
+  const globalDiscounts = JSON.parse(localStorage.getItem('globalDiscounts')) || [];
+
+  // console.log(globalDiscounts);
 
   const [discounts, setDiscounts] = useState([]);
 
@@ -36,12 +39,12 @@ const Checkout = () => {
   useEffect(() => {
     // Check if the user is logged in by checking the token
     const token = localStorage.getItem('token');
-    
-    if (!token) {
-      // If no token, redirect to the login page
-      navigate('/login');
-      return;
-    }
+
+    // if (!token) {
+    //   // If no token, redirect to the login page
+    //   navigate('/login');
+    //   return;
+    // }
 
     if (savedProducts.length > 0 && !hasFetched) {
       const fetchOriginalQuantities = async () => {
@@ -58,13 +61,14 @@ const Checkout = () => {
             )
           );
 
-          const productQuantities = productData.map(item => item.quantity); // Extract quantities
-          setOriginalQuantities(productQuantities); // Update state with the correct quantities
+          const productQuantities = productData.map(item => item.quantity);
+          setOriginalQuantities(productQuantities);
 
-          const productDiscounts = productData.map(item => item.product_discount || 0); // Extract discounts (default to 0 if not present)
-          setDiscounts(productDiscounts); // Update state with discounts
+          // Retrieve discounts directly from saved products
+          const productDiscounts = savedProducts.map(product => product.discount || 0);
+          setDiscounts(productDiscounts); // Store the retrieved discounts
 
-          setHasFetched(true); // Mark as fetched after successful operation
+          setHasFetched(true);
         } catch (error) {
           console.error('Error fetching quantities and discounts:', error);
         }
@@ -72,18 +76,18 @@ const Checkout = () => {
 
       fetchOriginalQuantities();
     }
-  
+
     const handleBeforeUnload = () => {
       localStorage.removeItem('selectedProducts');
     };
-  
+
     window.addEventListener('beforeunload', handleBeforeUnload);
-  
+
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [savedProducts, hasFetched]);
-  
+
 
 
   const handleInputChange = (e) => {
@@ -141,6 +145,7 @@ const Checkout = () => {
     // Update savedProducts state so the component re-renders with the updated list
     setOriginalQuantities(updatedQuantities);
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -203,7 +208,7 @@ const Checkout = () => {
 
       // Save orderData to localStorage (if needed)
       localStorage.setItem('checkoutOrderData', JSON.stringify(orderData));
-      
+
       if (response.status === 201) {
         setSuccess('Order placed successfully!');
         localStorage.removeItem('selectedProducts');
@@ -217,19 +222,52 @@ const Checkout = () => {
     }
   };
 
-  // Calculate total price only if there are products, otherwise set to 0
+
   const calculateTotalPrice = () => {
+    // Helper function to check if all elements in an array are equal
+    const allValuesEqual = (array) => {
+      if (array.length === 0) return true; // An empty array is considered equal
+      return array.every(value => value === array[0]);
+    };
+
+    let discounts = globalDiscounts;
+
+    // If there are no products, return 0
+    if (savedProducts.length === 0) return 0;
+
+    // If all discounts are the same, use the first value; otherwise, keep as an array
+    const effectiveDiscount = allValuesEqual(discounts) ? discounts[0] : discounts;
+
     const productTotal = savedProducts.reduce((acc, product, index) => {
-      const discountedPrice = product.price * (1 - (discounts[index] / 100)); // Apply the discount
-      const totalForProduct = discountedPrice * quantities[index]; // Calculate total for this product
-      return acc + totalForProduct; // Accumulate total price
+      let effectivePrice;
+
+      // Check if the product has a discounted price
+      if (product.discounted_price) {
+        // Use the discounted price for total calculation
+        effectivePrice = product.discounted_price;
+      } else {
+        // Calculate the discount if there is no discounted price
+        const discount = Array.isArray(effectiveDiscount) ? effectiveDiscount[index] || 0 : effectiveDiscount;
+        effectivePrice = product.price * (1 - (discount / 100)); // Apply discount for regular products
+      }
+
+      // Calculate the total for this product based on the effective price
+      const totalForProduct = effectivePrice * (quantities[index] || 0); // Default to 0 if quantity is undefined
+
+      return acc + totalForProduct;
     }, 0);
 
-    const shippingFee = 150; // Set your shipping fee here
-    const transactionTotal = productTotal + shippingFee; // Add shipping fee to the total price
+    const shippingFee = 150;
+    const transactionTotal = productTotal + shippingFee;
 
-    return transactionTotal; // Return the final total price
+    return Math.round(transactionTotal);
   };
+
+
+
+
+
+
 
   return (
     <div className='checkout-container'>
@@ -310,40 +348,43 @@ const Checkout = () => {
               <span>Action</span>
             </div>
 
-            <ul className="product-list" style={{
-              listStyle: 'none',
-              padding: '0',
-              marginTop: '10px'
-            }}>
+            <ul className="product-list" style={{ listStyle: 'none', padding: '0', marginTop: '10px' }}>
               {savedProducts.length > 0 ? (
                 savedProducts.map((product, index) => {
-                  const discountedPrice = product.price * (1 - (discounts[index] / 100)); // Calculate discounted price
-                  const productTotal = discountedPrice * quantities[index]; // Calculate total for this product
+                  // Use discountedPrice for bundles or fallback to regular price for unbundled items
+                  const effectivePrice = product.discounted_price || product.price;
+                  const productTotal = effectivePrice * quantities[index]; // Calculate total for this product
+
+                  // Calculate the effective discount percentage if applicable
+                  const discountPercentage = product.discounted_price
+                    ? ((product.price - product.discounted_price) / product.price) * 100
+                    : discounts[index] || 0;
+
+                  // Calculate the "discounted" price for display
+                  const discountedPrice = product.discounted_price || product.price * (1 - (discounts[index] / 100));
 
                   return (
-                    <li key={product.product_code} style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 2fr 1fr 1fr 1fr 1fr',
-                      alignItems: 'center',
-                      padding: '15px',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: '8px',
-                      marginBottom: '10px',
-                      backgroundColor: '#f8f9fa',
-                      transition: 'transform 0.3s, box-shadow 0.3s',
-                      cursor: 'pointer',
-                    }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.1)';
-                        e.currentTarget.style.transform = 'scale(1.02)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.boxShadow = 'none';
-                        e.currentTarget.style.transform = 'scale(1)';
+                    <li
+                      key={product.product_code}
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 2fr 1fr 1fr 1fr 1fr',
+                        alignItems: 'center',
+                        padding: '15px',
+                        border: '1px solid #e0e0e0',
+                        borderRadius: '8px',
+                        marginBottom: '10px',
+                        backgroundColor: '#f8f9fa',
                       }}
                     >
-                      <span style={{ marginRight: '10px', fontSize: '14px' }}>{product.cart_items_id}</span>
-                      <span style={{ fontWeight: 'bold', marginRight: '10px', color: '#333' }}>{product.product_name}</span>
+                      <span style={{ marginRight: '10px', fontSize: '14px' }}>
+                        {product.cart_items_id}
+                      </span>
+                      <span style={{ fontWeight: 'bold', marginRight: '10px', color: '#333' }}>
+                        {product.product_name}
+                      </span>
+
+                      {/* Quantity Input */}
                       <input
                         type="number"
                         min="1"
@@ -356,20 +397,30 @@ const Checkout = () => {
                           textAlign: 'center',
                           border: '1px solid #ccc',
                           borderRadius: '4px',
-                          outline: 'none',
-                          fontSize: '14px',
-                          transition: 'border-color 0.2s',
-                          backgroundColor: '#fff'
                         }}
-                        onFocus={(e) => (e.target.style.borderColor = '#007bff')}
-                        onBlur={(e) => (e.target.style.borderColor = '#ccc')}
                       />
-                      <p style={{ margin: '5px 0', fontSize: '14px', color: discounts[index] ? '#28a745' : '#555' }}>
-                        {discounts[index] ? `${discounts[index]}%` : ''}
+
+                      {/* Discount status */}
+                      <p style={{ margin: '5px 0', fontSize: '14px', color: discountPercentage > 0 ? '#28a745' : '#555' }}>
+                        {discountPercentage > 0 ? `${discountPercentage.toFixed(2)}% off` : ''}
                       </p>
-                      <span style={{ fontWeight: 'bold', color: '#333' }}>₱{productTotal.toFixed(2)}</span>
+
+                      {/* Total price calculation */}
+                      <span style={{ fontWeight: 'bold', color: '#333' }}>
+                        {/* Render original price with line-through if there is a discount */}
+                        <span style={{ textDecoration: product.discounted_price ? 'line-through' : 'none' }}>
+                          ₱{(product.price * quantities[index]).toFixed(2)}
+                        </span>
+                        {/* Render the rendered discounted price only if there is a discount */}
+                        {product.discounted_price ? (
+                          <> ➔ ₱{productTotal.toFixed(2)}</>
+                        ) : null}
+                      </span>
+
+
+                      {/* Remove button */}
                       <button
-                        className='remove-btn'
+                        className="remove-btn"
                         onClick={() => handleRemoveProduct(index)}
                         style={{
                           marginLeft: '10px',
@@ -379,10 +430,7 @@ const Checkout = () => {
                           borderRadius: '4px',
                           padding: '8px 12px',
                           cursor: 'pointer',
-                          transition: 'background-color 0.3s ease',
                         }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = '#ff3333'}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = '#ff4d4d'}
                       >
                         Remove
                       </button>
@@ -390,13 +438,12 @@ const Checkout = () => {
                   );
                 })
               ) : (
-                <p style={{
-                  textAlign: 'center',
-                  color: '#999',
-                  marginTop: '20px'
-                }}>No products selected.</p>
+                <li>No products selected.</li>
               )}
             </ul>
+
+
+
 
             <h3 style={{
               textAlign: 'right',
@@ -414,9 +461,6 @@ const Checkout = () => {
               color: '#007bff'
             }}>Total Price: ₱{(calculateTotalPrice())}</h4>
           </div>
-
-
-
         </div>
       </div>
       <Footer />

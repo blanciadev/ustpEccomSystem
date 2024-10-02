@@ -58,8 +58,10 @@ const Navigation = () => {
             console.error('Error validating token:', error.response ? error.response.data : error.message);
             setIsLoggedIn(false);
             // Check if the current location is not '/home' before redirecting to '/login'
-            if (location.pathname !== '/home') {
+            if (location.pathname !== '/') {
                 navigate('/login');
+            } else {
+                navigate('/');
             }
         }
     };

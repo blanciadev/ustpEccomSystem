@@ -54,23 +54,38 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         }
     }, [product]);
 
-    // Handle Buy Now action for bundle
+
     const handleBuyNowBundle = () => {
+        // Map the discounts from the bundle products
+        const globalDiscounts = bundleProducts.map(bProduct => bProduct.discount);
+        console.log(globalDiscounts); // Use this to check the values stored
+
+        // Prepare the selected product data
+        const selectedProductData = {
+            ...product,
+            quantity: 1,
+            discount: product.product_discount || 0,
+        };
+
         const bundleData = bundleProducts.map(bProduct => ({
             ...bProduct,
-            quantity: 1, // Default to 1 for each product in the bundle
+            quantity: 1,
+            discount: bProduct.product_discount || 0,
         }));
 
+        const allProducts = [selectedProductData, ...bundleData];
         const existingProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
+        existingProducts.push(...allProducts);
 
-        // Add bundle products to the existing cart
-        existingProducts.push(...bundleData);
-
+        // Store selected products and global discounts in local storage
         localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
+        localStorage.setItem('globalDiscounts', JSON.stringify(globalDiscounts)); // Save the discounts
 
-        // Redirect to checkout with the bundle
+        // Redirect to checkout
         window.location.href = '/checkout';
     };
+
+
 
     // Handle Buy Now action for individual product
     const handleBuyNow = (product) => {
@@ -140,8 +155,11 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                             <h4>Available Bundle</h4>
                             <ul>
                                 {bundleProducts.map((bProduct) => (
-                                    <li key={bProduct.product_id}>
-                                        {bProduct.product_name} - P{bProduct.price}
+                                    <li key={bProduct.product_code}>
+                                        {bProduct.product_name} - P{bProduct.discounted_price}
+                                        <span style={{ marginLeft: '10px', color: 'red' }}>
+                                            (Discount: {bProduct.discount}%)
+                                        </span>
                                     </li>
                                 ))}
                             </ul>
