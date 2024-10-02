@@ -233,7 +233,7 @@ router.post('/product-bundles', async (req, res) => {
                 ON 
                     bp.product_code = p.product_code
             WHERE 
-                p.category_id = ? AND p.product_code != ?`,
+                p.category_id = ?`,
             [category_id, product_code]
         );
 

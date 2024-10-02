@@ -253,7 +253,7 @@ const Checkout = () => {
 
       // Calculate the total for this product based on the effective price
       const totalForProduct = effectivePrice * (quantities[index] || 0); // Default to 0 if quantity is undefined
-
+      console.log(totalForProduct);
       return acc + totalForProduct;
     }, 0);
 
@@ -349,98 +349,96 @@ const Checkout = () => {
             </div>
 
             <ul className="product-list" style={{ listStyle: 'none', padding: '0', marginTop: '10px' }}>
-              {savedProducts.length > 0 ? (
-                savedProducts.map((product, index) => {
-                  // Use discountedPrice for bundles or fallback to regular price for unbundled items
-                  const effectivePrice = product.discounted_price || product.price;
-                  const productTotal = effectivePrice * quantities[index]; // Calculate total for this product
+  {savedProducts.length > 0 ? (
+    savedProducts.map((product, index) => {
+      // Check if the product has a discounted price, otherwise calculate the discount for unbundled items
+      const isBundled = product.discounted_price != null;
+      const effectivePrice = isBundled ? product.discounted_price : product.price * (1 - (discounts[index] / 100));
+      const productTotal = effectivePrice * quantities[index]; // Calculate total for this product
 
-                  // Calculate the effective discount percentage if applicable
-                  const discountPercentage = product.discounted_price
-                    ? ((product.price - product.discounted_price) / product.price) * 100
-                    : discounts[index] || 0;
+      // Calculate the discount percentage, even for unbundled items
+      const discountPercentage = isBundled
+        ? ((product.price - product.discounted_price) / product.price) * 100
+        : discounts[index] || 0;
 
-                  // Calculate the "discounted" price for display
-                  const discountedPrice = product.discounted_price || product.price * (1 - (discounts[index] / 100));
+      return (
+        <li
+          key={product.product_code}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 2fr 1fr 1fr 1fr 1fr',
+            alignItems: 'center',
+            padding: '15px',
+            border: '1px solid #e0e0e0',
+            borderRadius: '8px',
+            marginBottom: '10px',
+            backgroundColor: '#f8f9fa',
+          }}
+        >
+          <span style={{ marginRight: '10px', fontSize: '14px' }}>
+            {product.cart_items_id}
+          </span>
+          <span style={{ fontWeight: 'bold', marginRight: '10px', color: '#333' }}>
+            {product.product_name}
+          </span>
 
-                  return (
-                    <li
-                      key={product.product_code}
-                      style={{
-                        display: 'grid',
-                        gridTemplateColumns: '1fr 2fr 1fr 1fr 1fr 1fr',
-                        alignItems: 'center',
-                        padding: '15px',
-                        border: '1px solid #e0e0e0',
-                        borderRadius: '8px',
-                        marginBottom: '10px',
-                        backgroundColor: '#f8f9fa',
-                      }}
-                    >
-                      <span style={{ marginRight: '10px', fontSize: '14px' }}>
-                        {product.cart_items_id}
-                      </span>
-                      <span style={{ fontWeight: 'bold', marginRight: '10px', color: '#333' }}>
-                        {product.product_name}
-                      </span>
+          {/* Quantity Input */}
+          <input
+            type="number"
+            min="1"
+            max={originalQuantities[index]}
+            value={quantities[index]}
+            onChange={(e) => handleQuantityChange(index, e)}
+            style={{
+              width: '60px',
+              padding: '5px',
+              textAlign: 'center',
+              border: '1px solid #ccc',
+              borderRadius: '4px',
+            }}
+          />
 
-                      {/* Quantity Input */}
-                      <input
-                        type="number"
-                        min="1"
-                        max={originalQuantities[index]}
-                        value={quantities[index]}
-                        onChange={(e) => handleQuantityChange(index, e)}
-                        style={{
-                          width: '60px',
-                          padding: '5px',
-                          textAlign: 'center',
-                          border: '1px solid #ccc',
-                          borderRadius: '4px',
-                        }}
-                      />
+          {/* Discount status */}
+          <p style={{ margin: '5px 0', fontSize: '14px', color: discountPercentage > 0 ? '#28a745' : '#555' }}>
+            {discountPercentage > 0 ? `${discountPercentage.toFixed(2)}% off` : ''}
+          </p>
 
-                      {/* Discount status */}
-                      <p style={{ margin: '5px 0', fontSize: '14px', color: discountPercentage > 0 ? '#28a745' : '#555' }}>
-                        {discountPercentage > 0 ? `${discountPercentage.toFixed(2)}% off` : ''}
-                      </p>
+          {/* Total price calculation */}
+          <span style={{ fontWeight: 'bold', color: '#333' }}>
+            {/* Render original price with line-through if there is a discount */}
+            <span style={{ textDecoration: discountPercentage > 0 ? 'line-through' : 'none' }}>
+              ₱{(product.price * quantities[index]).toFixed(2)}
+            </span>
+            {/* Render discounted price if there is a discount */}
+            {discountPercentage > 0 ? (
+              <> ➔ ₱{productTotal.toFixed(2)}</>
+            ) : null}
+          </span>
 
-                      {/* Total price calculation */}
-                      <span style={{ fontWeight: 'bold', color: '#333' }}>
-                        {/* Render original price with line-through if there is a discount */}
-                        <span style={{ textDecoration: product.discounted_price ? 'line-through' : 'none' }}>
-                          ₱{(product.price * quantities[index]).toFixed(2)}
-                        </span>
-                        {/* Render the rendered discounted price only if there is a discount */}
-                        {product.discounted_price ? (
-                          <> ➔ ₱{productTotal.toFixed(2)}</>
-                        ) : null}
-                      </span>
+          {/* Remove button */}
+          <button
+            className="remove-btn"
+            onClick={() => handleRemoveProduct(index)}
+            style={{
+              marginLeft: '10px',
+              backgroundColor: '#ff4d4d',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              padding: '8px 12px',
+              cursor: 'pointer',
+            }}
+          >
+            Remove
+          </button>
+        </li>
+      );
+    })
+  ) : (
+    <li>No products selected.</li>
+  )}
+</ul>
 
-
-                      {/* Remove button */}
-                      <button
-                        className="remove-btn"
-                        onClick={() => handleRemoveProduct(index)}
-                        style={{
-                          marginLeft: '10px',
-                          backgroundColor: '#ff4d4d',
-                          color: '#fff',
-                          border: 'none',
-                          borderRadius: '4px',
-                          padding: '8px 12px',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        Remove
-                      </button>
-                    </li>
-                  );
-                })
-              ) : (
-                <li>No products selected.</li>
-              )}
-            </ul>
 
 
 

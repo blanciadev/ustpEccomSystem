@@ -7,6 +7,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
     const [bundleProducts, setBundleProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedBundleProducts, setSelectedBundleProducts] = useState({});
 
     // Pagination state for recommendations
     const [currentPage, setCurrentPage] = useState(1);
@@ -44,6 +45,14 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
 
                     setRecommendedProducts(recommendationData);
                     setBundleProducts(bundleData);
+
+                    // Select all bundle products when the modal opens
+                    const initialSelection = {};
+                    bundleData.forEach(bProduct => {
+                        initialSelection[bProduct.product_code] = true; // Set all to selected
+                    });
+                    setSelectedBundleProducts(initialSelection);
+                    
                     setLoading(false);
                 })
                 .catch(error => {
@@ -54,48 +63,55 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         }
     }, [product]);
 
+    // Calculate price after discount for individual product
+    const calculateDiscountedPrice = (price, discount) => {
+        if (discount && discount > 0) {
+            return price - (price * discount) / 100;
+        }
+        return price;
+    };
 
     const handleBuyNowBundle = () => {
-        // Map the discounts from the bundle products
-        const globalDiscounts = bundleProducts.map(bProduct => bProduct.discount);
-        console.log(globalDiscounts); // Use this to check the values stored
+        // Prepare selected bundle product data (including discounted price)
+        const selectedProducts = Object.entries(selectedBundleProducts)
+            .filter(([_, value]) => value) // Keep only selected products
+            .map(([key]) => {
+                const bProduct = bundleProducts.find(product => product.product_code === key);
+                return {
+                    ...bProduct,
+                    quantity: 1,
+                    discount: bProduct.discount || 0,
+                    original_price: bProduct.price,
+                    discounted_price: calculateDiscountedPrice(bProduct.price, bProduct.discount),
+                };
+            })
+            .filter(Boolean); // Filter out any undefined products
 
-        // Prepare the selected product data
-        const selectedProductData = {
-            ...product,
-            quantity: 1,
-            discount: product.product_discount || 0,
-        };
+        if (selectedProducts.length === 0) {
+            alert('Please select at least one product from the bundle.');
+            return;
+        }
 
-        const bundleData = bundleProducts.map(bProduct => ({
-            ...bProduct,
-            quantity: 1,
-            discount: bProduct.product_discount || 0,
-        }));
-
-        const allProducts = [selectedProductData, ...bundleData];
         const existingProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
-        existingProducts.push(...allProducts);
+        existingProducts.push(...selectedProducts);
 
-        // Store selected products and global discounts in local storage
+        // Store selected products in local storage
         localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
-        localStorage.setItem('globalDiscounts', JSON.stringify(globalDiscounts)); // Save the discounts
 
         // Redirect to checkout
         window.location.href = '/checkout';
     };
 
-
-
     // Handle Buy Now action for individual product
     const handleBuyNow = (product) => {
+        const discountedPrice = calculateDiscountedPrice(product.price, product.product_discount);
         const productData = {
             ...product,
             quantity: 1,
+            discounted_price: discountedPrice
         };
 
         const existingProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
-
         existingProducts.push(productData);
 
         localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
@@ -116,6 +132,14 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         setCurrentPage(pageNumber);
     };
 
+    // Handle selection of individual bundle products
+    const handleBundleProductSelect = (productCode) => {
+        setSelectedBundleProducts(prevState => ({
+            ...prevState,
+            [productCode]: !prevState[productCode], // Toggle selection
+        }));
+    };
+
     if (!isOpen || !product) return null;
     return (
         <div className="modal-overlay" onClick={onClose}>
@@ -129,10 +153,16 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                     />
                     <h3>{product.product_name}</h3>
                     <p>{product.description || 'No description available.'}</p>
-                    <p>Price: P{product.price}</p>
+                    <p>
+                        Price: P{calculateDiscountedPrice(product.price, product.product_discount)}
+                        {product.product_discount && (
+                            <span style={{ marginLeft: '10px', color: 'green' }}>
+                                (Discount: {product.product_discount}%)
+                            </span>
+                        )}
+                    </p>
                     <p>Available Quantity: {product.quantity}</p>
 
-                    {/* Conditionally render buttons based on product quantity */}
                     {product.quantity > 0 ? (
                         <>
                             <button onClick={() => onAddToCart(product)}>Add to Cart</button>
@@ -156,15 +186,22 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                             <ul>
                                 {bundleProducts.map((bProduct) => (
                                     <li key={bProduct.product_code}>
-                                        {bProduct.product_name} - P{bProduct.discounted_price}
-                                        <span style={{ marginLeft: '10px', color: 'red' }}>
-                                            (Discount: {bProduct.discount}%)
-                                        </span>
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedBundleProducts[bProduct.product_code] || false}
+                                                onChange={() => handleBundleProductSelect(bProduct.product_code)}
+                                            />
+                                            {bProduct.product_name} - P{calculateDiscountedPrice(bProduct.price, bProduct.discount)}
+                                            <span style={{ marginLeft: '10px', color: 'red' }}>
+                                                (Discount: {bProduct.discount}%)
+                                            </span>
+                                        </label>
                                     </li>
                                 ))}
                             </ul>
                             <button onClick={handleBuyNowBundle} className="buy-now-btn">
-                                Buy Bundle Now
+                                Buy Selected Products Now
                             </button>
                         </div>
                     )}
@@ -187,16 +224,14 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                                         />
                                         <div className="product-details">
                                             <span className="product-name">{recProduct.product_name}</span>
-                                            <span className="product-price">P{recProduct.price}</span>
+                                            <span className="product-price">P{calculateDiscountedPrice(recProduct.price, recProduct.product_discount)}</span>
 
-                                            {/* Conditionally render the discount if product_status is 'Discounted' */}
                                             {recProduct.product_status === 'Discounted' && (
                                                 <span className="product-discount">
                                                     Discounted by: {recProduct.product_discount}%
                                                 </span>
                                             )}
 
-                                            {/* Conditionally render the buttons based on recommended product quantity */}
                                             {recProduct.quantity > 0 ? (
                                                 <>
                                                     <button
@@ -226,14 +261,14 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
 
                         {/* Pagination Controls */}
                         {totalPages > 1 && (
-                            <div className="pagination">
-                                {[...Array(totalPages).keys()].map(number => (
+                            <div className="pagination-controls">
+                                {Array.from({ length: totalPages }, (_, index) => (
                                     <button
-                                        key={number + 1}
-                                        onClick={() => handlePageChange(number + 1)}
-                                        className={number + 1 === currentPage ? 'active' : ''}
+                                        key={index + 1}
+                                        className={currentPage === index + 1 ? 'active' : ''}
+                                        onClick={() => handlePageChange(index + 1)}
                                     >
-                                        {number + 1}
+                                        {index + 1}
                                     </button>
                                 ))}
                             </div>
@@ -245,17 +280,9 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
     );
 };
 
-// PropTypes for validation
 ProductModal.propTypes = {
     isOpen: PropTypes.bool.isRequired,
-    product: PropTypes.shape({
-        product_image: PropTypes.string.isRequired,
-        product_code: PropTypes.string,
-        product_name: PropTypes.string,
-        description: PropTypes.string,
-        price: PropTypes.number,
-        quantity: PropTypes.number
-    }),
+    product: PropTypes.object,
     onAddToCart: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
 };
