@@ -52,7 +52,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                         initialSelection[bProduct.product_code] = true; // Set all to selected
                     });
                     setSelectedBundleProducts(initialSelection);
-                    
+
                     setLoading(false);
                 })
                 .catch(error => {
@@ -71,12 +71,19 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         return price;
     };
 
+
     const handleBuyNowBundle = () => {
         // Prepare selected bundle product data (including discounted price)
         const selectedProducts = Object.entries(selectedBundleProducts)
-            .filter(([_, value]) => value) // Keep only selected products
+            .filter(([_, value]) => value)
             .map(([key]) => {
                 const bProduct = bundleProducts.find(product => product.product_code === key);
+
+                if (!bProduct) {
+                    console.log(`Product with code ${key} is not part of the bundle.`);
+                    return null;
+                }
+
                 return {
                     ...bProduct,
                     quantity: 1,
@@ -85,12 +92,54 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                     discounted_price: calculateDiscountedPrice(bProduct.price, bProduct.discount),
                 };
             })
-            .filter(Boolean); // Filter out any undefined products
+            .filter(Boolean);
 
-        if (selectedProducts.length === 0) {
+        // Calculate the total discount from the selected bundle products
+        const totalBundleDiscount = selectedProducts.reduce((acc, product) => {
+            return acc + (product.discount || 0);
+        }, 0);
+
+        // Create the original product entry and apply discount if applicable
+        const originalProduct = {
+            ...product,
+            quantity: 1,
+            discount: Math.min(totalBundleDiscount, product.product_discount || 0), // Use the lesser discount
+            original_price: product.price,
+            discounted_price: calculateDiscountedPrice(product.price, Math.min(totalBundleDiscount, product.product_discount || 0)), // Apply the discount
+        };
+
+        // Ensure at least one product is selected
+        if (selectedProducts.length === 0 && originalProduct.discount <= 0) {
             alert('Please select at least one product from the bundle.');
             return;
         }
+
+        // Add the original product if it's not already included
+        if (!selectedProducts.some(item => item.product_code === originalProduct.product_code)) {
+            selectedProducts.push(originalProduct);
+        }
+
+        // Handle unbundled products (if any) selected by the user
+        const unbundledProducts = JSON.parse(localStorage.getItem('unbundledProducts')) || [];
+        unbundledProducts.forEach(product => {
+            const unbundledDiscount = product.product_discount || 0;
+            const discountedPrice = calculateDiscountedPrice(product.price, unbundledDiscount);
+
+            // Push the unbundled product with discount information
+            selectedProducts.push({
+                ...product,
+                quantity: 1,
+                original_price: product.price,
+                discount: unbundledDiscount,
+                discounted_price: discountedPrice, // Calculate discount for unbundled products
+            });
+
+            // Log for debugging/verification (optional)
+            console.log(`Unbundled Product: ${product.product_name}`);
+            console.log(`  Original Price: $${product.price}`);
+            console.log(`  Discount: ${unbundledDiscount}%`);
+            console.log(`  Discounted Price: $${discountedPrice}`);
+        });
 
         const existingProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
         existingProducts.push(...selectedProducts);
@@ -101,6 +150,10 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         // Redirect to checkout
         window.location.href = '/checkout';
     };
+
+
+
+
 
     // Handle Buy Now action for individual product
     const handleBuyNow = (product) => {
