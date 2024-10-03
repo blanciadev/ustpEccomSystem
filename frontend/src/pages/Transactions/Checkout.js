@@ -214,10 +214,15 @@ const Checkout = () => {
         const effectiveDiscount = allValuesEqual(discounts) ? discounts[0] : discounts || 0;
         const discountMultiplier = (1 - (effectiveDiscount / 100 || 0));
         effectivePrice = product.discounted_price * discountMultiplier;
-        console.log(`${product.product_name} (Bundled)`);
 
         console.log(`  Discounted Price: $${effectivePrice.toFixed(2)}`);
-      } else {
+      } else if (product.price) {
+        console.log("No Discount");
+        effectivePrice = product.price;
+        console.log("---------product Price test ----------");
+        console.log(`(Effective PRICE )`, effectivePrice);
+      }
+      else {
         // Apply a general discount to non-bundled products if a bundle discount exists
         let effectiveDiscount = generalDiscountExists ? discounts[0] : 0;
         const discountMultiplier = (1 - (effectiveDiscount / 100 || 0));
@@ -227,9 +232,11 @@ const Checkout = () => {
         if (generalDiscountExists) {
           console.log(`  Discount: ${effectiveDiscount}% (due to bundle)`);
         } else {
-          console.log("  No Discount");
+          console.log("No Discount");
         }
         console.log(`  Price: $${effectivePrice.toFixed(2)}`);
+
+        console.log(`(Effective Discount )`, effectiveDiscount);
       }
 
       // Ensure quantities[index] is a valid number and add flat shipping ($150)

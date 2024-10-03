@@ -129,6 +129,25 @@ const CartContent = () => {
     }
   };
 
+  const removeFromCart = async (cartItemId) => {
+    try {
+      const response = await fetch(`http://localhost:5001/cart-delete/${cartItemId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to remove item from cart');
+      }
+
+      // Remove the item from the cartItems state
+      setCartItems(cartItems.filter(item => item.cart_items_id !== cartItemId));
+    } catch (err) {
+      setError('Error removing item. Please try again later.');
+    }
+  };
 
   return (
     <div className='cart-con'>
@@ -146,20 +165,13 @@ const CartContent = () => {
             <table>
               <thead>
                 <tr>
-                  <th>
-                    <form>
-                      <input
-                        type='checkbox'
-                        checked={Object.keys(selectedItems).length === cartItems.length && cartItems.length > 0}
-                        onChange={handleSelectAllChange}
-                      />
-                    </form>
-                  </th>
+                  <th></th>
                   <th>ID</th>
                   <th>Product</th>
                   <th>Quantity</th>
                   <th>Price</th>
                   <th>Sub-total</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -172,13 +184,10 @@ const CartContent = () => {
                     subTotal={item.sub_total}
                     productCode={item.product_code}
                     cartItemId={item.cart_items_id}
-                    description={item.description}
-                    brand={item.brand}
-                    category={item.category}
-                    size={item.size}
                     isSelected={!!selectedItems[item.product_code]}
                     toggleItemSelection={toggleItemSelection}
                     updateQuantity={updateCartQuantity}
+                    removeFromCart={removeFromCart} // Pass the remove function
                   />
                 ))}
               </tbody>

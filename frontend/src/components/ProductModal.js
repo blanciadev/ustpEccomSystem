@@ -152,16 +152,13 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
     };
 
 
-
-
-
     // Handle Buy Now action for individual product
     const handleBuyNow = (product) => {
-        const discountedPrice = calculateDiscountedPrice(product.price, product.product_discount);
+        // const discountedPrice = calculateDiscountedPrice(product.price, product.product_discount);
         const productData = {
             ...product,
             quantity: 1,
-            discounted_price: discountedPrice
+
         };
 
         const existingProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];

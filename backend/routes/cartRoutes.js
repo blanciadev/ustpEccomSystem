@@ -291,6 +291,23 @@ router.get('/cart-item-count/:customer_id', async (req, res) => {
     }
 });
 
+// Delete Cart Item
+router.delete('/cart-delete/:cart_items_id', authenticateToken, async (req, res) => {
+    const { cart_items_id } = req.params;
+
+    try {
+        const [result] = await db.query('DELETE FROM cart_items WHERE cart_items_id = ?', [cart_items_id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Item not found' });
+        }
+
+        res.status(200).json({ message: 'Item removed from cart' });
+    } catch (err) {
+        console.error('Error removing cart item:', err.message);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
 
 
