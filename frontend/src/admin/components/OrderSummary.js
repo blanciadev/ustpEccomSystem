@@ -19,16 +19,16 @@ const OrderSummary = () => {
     }, []);
 
     return (
-        <div className='todays-order'>
-            <div className='header'>
-                <div className='title'>
+        <div className='order-summary'>
+            <div className='order-summary__header'>
+                <div className='order-summary__title'>
                     <h5>Today's Orders</h5>
                     <p>Order Summary</p>
                 </div>
             </div>
 
-            <div className='summ'>
-                <div className='delivered'>
+            <div className='order-summary__summ '>
+                <div className='order-summary__delivered'>
                     <div>
                         <i className='bx bxs-package'></i>
                     </div>
@@ -36,7 +36,7 @@ const OrderSummary = () => {
                     <p><strong>Completed</strong></p>
                 </div>
 
-                <div className='pending'>
+                <div className='order-summary__pending'>
                     <div>
                         <i className='bx bx-time'></i>
                     </div>
@@ -44,7 +44,7 @@ const OrderSummary = () => {
                     <p><strong>To Process</strong></p>
                 </div>
 
-                <div className='intransit'>
+                <div className='order-summary__intransit'>
                     <div>
                         <i className='bx bxs-truck'></i>
                     </div>
@@ -52,7 +52,7 @@ const OrderSummary = () => {
                     <p><strong>In Transit</strong></p>
                 </div>
 
-                <div className='cancelled'>
+                <div className='order-summary__cancelled'>
                     <div>
                         <i className='bx bxs-x-circle'></i>
                     </div>
@@ -60,7 +60,7 @@ const OrderSummary = () => {
                     <p><strong>Cancelled</strong></p>
                 </div>
 
-                <div className='returned'>
+                <div className='order-summary__returned'>
                     <div>
                         <i className='bx bx-reset'></i>
                     </div>

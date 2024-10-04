@@ -22,7 +22,7 @@ const Login = () => {
 
             // Make the login request
             //angela
-            const response = await axios.post('http://localhost:5001/users-login', { email, password });
+            const response = await axios.post('http://localhost:5001/customer-login', { email, password });
 
             //kurt
             // const response = await axios.post('http://localhost:5001/customer-login', { email, password });
@@ -108,7 +108,7 @@ const Login = () => {
                     <p>Don't have an account? <a href='/signup'>Sign Up</a></p>
                 </div>
                 <div className='login-image'>
-                    <img src='https://res.cloudinary.com/urbanclap/image/upload/t_high_res_template/dpr_2,fl_progressive:steep,q_auto:low,f_auto,c_limit/images/growth/luminosity/1723441265778-917980.jpeg'/>
+                    <img src='https://res.cloudinary.com/urbanclap/image/upload/t_high_res_template/dpr_2,fl_progressive:steep,q_auto:low,f_auto,c_limit/images/growth/luminosity/1723441265778-917980.jpeg' alt='highlight photo' />
                 </div>
                 
             </div>

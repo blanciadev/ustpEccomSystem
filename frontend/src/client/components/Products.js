@@ -5,7 +5,7 @@ import ProductList from './ProductList';
 const Products = () => {
   return (
     <div className='products-con'>
-      <h2>SHOP</h2>
+      <h2>Top Products</h2>
       <div className='products'>
         <ProductList />
 

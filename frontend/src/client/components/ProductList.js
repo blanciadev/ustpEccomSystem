@@ -6,8 +6,6 @@ import StickyComponent from './StickyComponent';
 import { cartEventEmitter } from './eventEmitter';
 import './modal.css';
 import './productList.css'; // Import the new CSS file
-import { useNavigate } from 'react-router-dom'; 
-
 
 const PAGE_SIZE = 4;
 
@@ -24,7 +22,7 @@ const ProductCard = React.memo(({ product, onAddToCart, onBuyNow, onProductClick
             <p>Product Quantity: {product.quantity}</p>
             <h3>P{product.price}</h3>
             {product.product_status === 'Discounted' && (
-                <h3>Discounted Price: {product.product_discount}%</h3>
+                <h3>Discounted Price: P{(product.price * (1 - product.product_discount / 100)).toFixed(2)}</h3>
             )}
             {isOutOfStock ? (
                 <p style={{ color: 'red' }}>Out of Stock</p>
@@ -40,8 +38,6 @@ const ProductCard = React.memo(({ product, onAddToCart, onBuyNow, onProductClick
 
 // ProductList Component
 const ProductList = ({ stickyComponents }) => {
-    const navigate = useNavigate()
-
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -100,39 +96,29 @@ const ProductList = ({ stickyComponents }) => {
         fetchProducts();
     }, []);
 
-   // Handle "Add to Cart" button click
-   const handleAddToCart = async (product) => {
-    const token = localStorage.getItem('token');
-    const customerId = localStorage.getItem('customer_id');
+    const handleAddToCart = async (product) => {
+        const token = localStorage.getItem('token');
+        const customerId = localStorage.getItem('customer_id');
 
-    // If token is not found, redirect to the login page
-    if (!token || !customerId) {
-        navigate('/login'); // Redirect to the login page
-        return;
-    }
+        if (!token || !customerId) {
+            console.log('User not logged in or customer ID missing');
+            return;
+        }
 
-    try {
-        const response = await axios.post('http://localhost:5001/add-to-cart', {
-            customer_id: customerId,
-            product_code: product.product_code,
-            quantity: 1
-        }, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        try {
+            await axios.post('http://localhost:5001/add-to-cart', {
+                customer_id: customerId,
+                product_code: product.product_code,
+                quantity: 1
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
 
-        // Emit cart update event to refresh cart count
-        cartEventEmitter.emit('cartUpdated');
-    } catch (error) {
-        if (error.response && error.response.status === 401) {
-            // Redirect to the login page if unauthorized
-            navigate('/login');
-        } else {
+            cartEventEmitter.emit('cartUpdated');
+        } catch (error) {
             console.error('Error adding product to cart:', error.response ? error.response.data : error.message);
         }
-    }
-};
-
-
+    };
 
     const handleBuyNow = (product) => {
         const productData = {
@@ -159,7 +145,6 @@ const ProductList = ({ stickyComponents }) => {
     return (
         <div className='product-list'>
             <StickyComponent onSubmit={handleStickySubmit} />
-            <h2>Top Products</h2>
             <div className='product-list-container'>
                 {paginatedProducts.map((product) => (
                     <ProductCard

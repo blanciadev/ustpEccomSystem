@@ -25,7 +25,7 @@
     margin-bottom: 30px;
   }
   
-  table {
+.cart-table table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
@@ -34,13 +34,22 @@
   thead th {
     text-align: left;
     padding: 10px;
-    background-color: #333;
-    color: #fff;
+    background-color: #ffffff;
+    color: #000000;
+    border-bottom: 1px solid hotpink;
   }
   
   tbody td {
     padding: 15px 10px;
     border-bottom: 1px solid #e6e6e6;
+  }
+  tbody td:nth-child(4) {
+    display: flex;
+    /* background-color: #218838; */
+  }
+  tbody td:nth-child(4) >input {
+    border-radius: 2px;
+    border: 0.5px solid black;
   }
   
   tfoot td {
@@ -66,12 +75,12 @@
   }
   
   .checkout-btn {
-    padding: 12px 25px;
-    background-color: #28a745;
+    padding: 12px 25px!important;
+    background-color: #28a745 !important;
     color: white;
     font-size: 18px;
     border: none;
-    border-radius: 5px;
+    border-radius: 5px !important;
     cursor: pointer;
     transition: background-color 0.3s ease-in-out;
   }
@@ -90,6 +99,14 @@
     font-size: 24px;
     margin-top: 20px;
     color: #777;
+  }
+  .cart-table button{
+    padding: 0 5px;
+    margin: 0;
+    border: none;
+    border-radius: 30%;
+    background-color: white;
+    font-size: 1.5rem;
   }
   
   @media (max-width: 768px) {

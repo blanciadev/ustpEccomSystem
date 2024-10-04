@@ -4,7 +4,6 @@
     padding: 10px;
     font-size: 0.9em;
 }
-
 .product-list-container {
     display: flex;
     flex-wrap: wrap;
@@ -152,7 +151,7 @@
 }
 
 /* Button styles */
-button {
+.product-list button {
     background-color: #007bff;
     color: white;
     border: none;

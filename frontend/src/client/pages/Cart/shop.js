@@ -139,25 +139,24 @@ const Shop = () => {
     return (
         <div className='shop-container'>
             <Navigation />
-
             {/* Top Picks Section */}
             <div className='top-picks-section'>
                 <h2>Top Picks</h2>
-                <div className='product-list'>
+                <div className='shopproduct-list'>
                     {topPickedProducts.map((product) => (
-                        <div key={product.product_code} className='product-item' onClick={() => openModal(product)}>
-                            <div className='product-img'>
+                        <div key={product.product_code} className='shopproduct-item' onClick={() => openModal(product)}>
+                            <div className='shopproduct-img'>
                                 <img
                                     src={product.product_image || 'https://via.placeholder.com/150'}
                                     alt={product.product_name || 'Product Image'}
                                 />
                             </div>
-                            <div className='product-desc'>
-                                <p className='product-name'>{product.product_name || 'No product name'}</p>
-                                <p className='product-quantity'>Quantity: {product.quantity}</p>
-                                <p className='product-price'>Price: ${product.price}</p>
+                            <div className='shopproduct-desc'>
+                                <p className='shopproduct-name'>{product.product_name || 'No product name'}</p>
+                                <p className='shopproduct-quantity'>Quantity: {product.quantity}</p>
+                                <p className='shopproduct-price'>Price: ${product.price}</p>
                                 {product.product_status === 'Discounted' && (
-                                    <p className='product-price'>Product Discount: P{product.product_discount}%</p>
+                                    <p className='shopproduct-price'>Product Discount: P{product.product_discount}%</p>
                                 )}
                                 {product.quantity > 0 ? (
                                     <>
@@ -194,23 +193,23 @@ const Shop = () => {
             {recommendedProducts.length > 0 && (
                 <div className='recommendations-section'>
                     <h2>Discounted Products</h2>
-                    <div className='product-list'>
+                    <div className='shopproduct-list'>
                         {recommendedProducts.map((product) => (
-                            <div key={product.product_code} className='product-item' onClick={() => openModal(product)}>
-                                <div className='product-img'>
+                            <div key={product.product_code} className='shopproduct-item' onClick={() => openModal(product)}>
+                                <div className='shopproduct-img'>
                                     <img
                                         src={product.product_image || 'https://via.placeholder.com/150'}
                                         alt={product.product_name || 'Product Image'}
                                         loading="lazy"
                                     />
                                 </div>
-                                <div className='product-desc'>
-                                    <p className='product-name'>{product.product_name || 'No product name available'}</p>
-                                    <p className='product-quantity'>Quantity: {product.quantity !== undefined ? product.quantity : 'N/A'}</p>
-                                    <p className='product-price'>Price: ${product.price !== undefined ? product.price.toFixed(2) : 'N/A'}</p>
+                                <div className='shopproduct-desc'>
+                                    <p className='shopproduct-name'>{product.product_name || 'No product name available'}</p>
+                                    <p className='shopproduct-quantity'>Quantity: {product.quantity !== undefined ? product.quantity : 'N/A'}</p>
+                                    <p className='shopproduct-price'>Price: ${product.price !== undefined ? product.price.toFixed(2) : 'N/A'}</p>
 
                                     {product.product_status === 'Discounted' && (
-                                        <p className='product-discount'>Discount: {product.product_discount}%</p>
+                                        <p className='shopproduct-discount'>Discount: {product.product_discount}%</p>
                                     )}
 
                                     {product.quantity > 0 ? (
@@ -256,23 +255,23 @@ const Shop = () => {
             </div>
 
             {/* Products List */}
-            <div className='product-list'>
+            <div className='shopproduct-list'>
                 {currentProducts.map((product) => (
-                    <div key={product.product_code} className='product-item' onClick={() => openModal(product)}>
-                        <div className='product-img'>
+                    <div key={product.product_code} className='shopproduct-item' onClick={() => openModal(product)}>
+                        <div className='shopproduct-img'>
                             <img
                                 src={product.product_image || 'https://via.placeholder.com/150'}
                                 alt={product.product_name || 'Product Image'}
                             />
                         </div>
-                        <div className='product-desc'>
-                            <p className='product-name'>{product.product_name || 'No product name'}</p>
-                            <p className='product-quantity'>Quantity: {product.quantity}</p>
-                            <p className='product-price'>Price: P{product.price}</p>
+                        <div className='shopproduct-desc'>
+                            <p className='shopproduct-name'>{product.product_name || 'No product name'}</p>
+                            <p className='shopproduct-quantity'>Quantity: {product.quantity}</p>
+                            <p className='shopproduct-price'>Price: P{product.price}</p>
                             {product.product_status === 'Discounted' && (
-                                <p className='product-price'>Product Discount: P{product.product_discount}%</p>
+                                <p className='shopproduct-price'>Product Discount: P{product.product_discount}%</p>
                             )}
-                            {/* <p className='product-brand'>Brand: {product.brand}</p> */}
+                            {/* <p className='shopproduct-brand'>Brand: {product.brand}</p> */}
 
                             {product.quantity > 0 ? (
                                 <>
@@ -305,7 +304,7 @@ const Shop = () => {
             </div>
 
             {/* Pagination */}
-            <div className='pagination'>
+            <div className='shoppagination'>
                 {[...Array(Math.ceil(filteredProducts.length / productsPerPage)).keys()].map(number => (
                     <button key={number + 1} onClick={() => paginate(number + 1)} className={number + 1 === currentPage ? 'active' : ''}>
                         {number + 1}
