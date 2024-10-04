@@ -155,9 +155,14 @@ const Products = () => {
                       Add Product
                     </Button>
                   </div>
-                  <Button variant="primary" onClick={handleShowDiscountProductModal}>
+                  <BundleProduct
+                    show={isBundleProductModalOpen}
+                    handleClose={handleCloseBundleProductModal}
+                    handleUpdate={fetchProduct}
+                  />
+                  {/* <Button variant="primary" onClick={handleShowDiscountProductModal}>
                     Discounts
-                  </Button>
+                  </Button> */}
 
                 </div>
               </div>
@@ -174,18 +179,14 @@ const Products = () => {
         handleAddProduct={handleAddProduct}
       />
 
-      <DiscountProduct
+      {/* <DiscountProduct
         show={isDiscountProductModalOpen}
         handleClose={handleCloseDiscountProductModal}
         order={selectedProduct}
         handleUpdate={fetchProduct}
-      />
+      /> */}
 
-      <BundleProduct
-        show={isBundleProductModalOpen} // Render the bundle modal
-        handleClose={handleCloseBundleProductModal}
-        handleUpdate={fetchProduct}
-      />
+
 
       {selectedProduct && (
         <ProductModal

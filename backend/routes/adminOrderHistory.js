@@ -208,7 +208,6 @@ router.get('/admin-order-history-component', async (req, res) => {
                 'To Receive': statusCounts['To Receive'] || 0,
                 Cancelled: statusCounts['Cancelled'] || 0,
                 'Return/Refund': statusCounts['Return/Refund'] || 0,
-                'In Transit': statusCounts['In Transit'] || 0,
                 Returned: statusCounts['Returned'] || 0,
             }
         });

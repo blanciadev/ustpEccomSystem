@@ -48,8 +48,8 @@ const OrderSummary = () => {
                     <div>
                         <i className='bx bxs-truck'></i>
                     </div>
-                    <h6>{orderCounts['In Transit'] || 0}</h6> {/* number of INTRANSIT orders */}
-                    <p><strong>In Transit</strong></p>
+                    <h6>{orderCounts['To Ship'] || 0}</h6> {/* number of To Ship orders */}
+                    <p><strong>To Ship</strong></p>
                 </div>
 
                 <div className='cancelled'>

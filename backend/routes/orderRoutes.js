@@ -177,8 +177,6 @@ router.post('/insert-order', async (req, res) => {
             console.log('Added cart_items_id to cartItemsUpdateIds:', cart_items);
             console.log('------------------------------------');
 
-
-
             // Update product quantity
             const updateQuantityQuery = `
                 UPDATE \`product\`
