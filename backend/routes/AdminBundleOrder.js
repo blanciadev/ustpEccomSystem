@@ -270,6 +270,79 @@ router.get('/products-no-bundle', async (req, res) => {
     }
 });
 
+router.get('/products-disable-bundle', async (req, res) => {
+    try {
+        // Fetch all products and their categories
+        const [rows] = await db.query(`
+            SELECT
+	p.product_id, 
+	p.product_code, 
+	p.product_name, 
+	p.price, 
+	p.description, 
+	p.quantity, 
+	c.category_name, 
+	p.product_image, 
+	p.product_discount, 
+	p.product_status, 
+	bundle_products.bundle_id
+FROM
+	product AS p
+	INNER JOIN
+	category AS c
+	ON 
+		p.category_id = c.category_id
+	INNER JOIN
+	bundle_products
+	ON 
+		p.product_code = bundle_products.product_code
+WHERE
+	product_status = 'Bundled'
+        `);
+
+        // Respond with product details including categories
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        res.status(500).send('Error fetching products');
+    }
+});
+
+
+router.post('/remove-discount/:productCode', async (req, res) => {
+    const { productCode } = req.params;
+  
+    // Log the incoming request with the product code
+    console.log(`Received request to remove discount from product with code: ${productCode}`);
+  
+    try {
+      // Attempt to update the product discount
+      const [result] = await db.query(
+        `UPDATE product SET product_discount = 0, product_status = 'Active' WHERE product_code = ?`,
+        [productCode]
+      );
+      
+      // Log the result of the update operation
+      console.log(`Database query result: `, result);
+  
+      // If no rows were affected, log and send a 404 response
+      if (result.affectedRows === 0) {
+        console.log(`No product found with code: ${productCode} or no discount to remove`);
+        return res.status(404).send('Product not found or no discount to remove');
+      }
+  
+      // Log success and send the response
+      console.log(`Discount successfully removed from product with code: ${productCode}`);
+      res.status(200).send('Discount removed successfully');
+    } catch (error) {
+      // Log the error and send a 500 response
+      console.error('Error removing discount:', error);
+      res.status(500).send('Error removing discount');
+    }
+  });
+  
+  
+
 
 
 module.exports = router;

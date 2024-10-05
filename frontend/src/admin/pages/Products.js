@@ -10,7 +10,7 @@ import ProductStatistics from '../components/ProductStatistics';
 import ProductTable from '../components/ProductTable';
 import AddProductModal from '../components/AddProductModal';
 import ProductModal from '../components/UpdateProductModal';
-import DiscountProduct from '../components/DiscountProductModal';
+import RemoveDiscountProduct from '../components/DiscountProductModal';
 import BundleProduct from '../components/BundleProductModal'; // Import the modal
 
 const Products = () => {
@@ -160,9 +160,9 @@ const Products = () => {
                     handleClose={handleCloseBundleProductModal}
                     handleUpdate={fetchProduct}
                   />
-                  {/* <Button variant="primary" onClick={handleShowDiscountProductModal}>
-                    Discounts
-                  </Button> */}
+                  <Button variant="primary" onClick={handleShowDiscountProductModal}>
+                    Remove Discount/Bundle
+                  </Button>
 
                 </div>
               </div>
@@ -179,12 +179,12 @@ const Products = () => {
         handleAddProduct={handleAddProduct}
       />
 
-      {/* <DiscountProduct
+      <RemoveDiscountProduct
         show={isDiscountProductModalOpen}
         handleClose={handleCloseDiscountProductModal}
         order={selectedProduct}
         handleUpdate={fetchProduct}
-      /> */}
+      />
 
 
 
