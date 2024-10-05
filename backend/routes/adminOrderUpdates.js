@@ -4,10 +4,10 @@ const db = require('../db');
 
 
 
-// Route to update order status and subtract quantity if status is 'To Ship'
+// Route to update order status
 router.put('/update-order-status/:orderId', async (req, res) => {
     const { orderId } = req.params;
-    const { status, products } = req.body; 
+    const { status } = req.body;
 
     // Check if status is provided
     if (!status) {
@@ -31,40 +31,40 @@ router.put('/update-order-status/:orderId', async (req, res) => {
         }
 
         // If the status is 'To Ship', subtract the quantity from the product table
-        if (status === 'To Ship') {
-            for (const product of products) {
-                const { product_id, quantity } = product;
+        // if (status === 'To Ship') {
+        //     for (const product of products) {
+        //         const { product_id, quantity } = product;
 
-                // Check if the product has sufficient stock
-                const [productResult] = await db.query(
-                    'SELECT quantity FROM product WHERE product_code = ?',
-                    [product_id]
-                );
+        //         // Check if the product has sufficient stock
+        //         const [productResult] = await db.query(
+        //             'SELECT quantity FROM product WHERE product_code = ?',
+        //             [product_id]
+        //         );
 
-                if (productResult.length === 0) {
-                    await db.query('ROLLBACK');
-                    return res.status(404).json({ message: `Product ID ${product_id} not found` });
-                }
+        //         if (productResult.length === 0) {
+        //             await db.query('ROLLBACK');
+        //             return res.status(404).json({ message: `Product ID ${product_id} not found` });
+        //         }
 
-                if (productResult[0].quantity < quantity) {
-                    await db.query('ROLLBACK');
-                    return res.status(400).json({
-                        message: `Not enough stock for product ID ${product_id}. Available: ${productResult[0].quantity}`,
-                    });
-                }
+        //         if (productResult[0].quantity < quantity) {
+        //             await db.query('ROLLBACK');
+        //             return res.status(400).json({
+        //                 message: `Not enough stock for product ID ${product_id}. Available: ${productResult[0].quantity}`,
+        //             });
+        //         }
 
-                // Subtract the quantity from the product table
-                const updateResult = await db.query(
-                    'UPDATE product SET quantity = quantity - ? WHERE product_code = ?',
-                    [quantity, product_id]
-                );
+        //         // Subtract the quantity from the product table
+        //         const updateResult = await db.query(
+        //             'UPDATE product SET quantity = quantity - ? WHERE product_code = ?',
+        //             [quantity, product_id]
+        //         );
 
-                if (updateResult.affectedRows === 0) {
-                    await db.query('ROLLBACK');
-                    return res.status(404).json({ message: `Failed to update stock for product ID ${product_id}` });
-                }
-            }
-        }
+        //         if (updateResult.affectedRows === 0) {
+        //             await db.query('ROLLBACK');
+        //             return res.status(404).json({ message: `Failed to update stock for product ID ${product_id}` });
+        //         }
+        //     }
+        // }
 
         // Commit the transaction after all updates
         await db.query('COMMIT');
@@ -78,7 +78,6 @@ router.put('/update-order-status/:orderId', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 });
-
 
 router.post('/update-payment-details', async (req, res) => {
     try {
@@ -96,20 +95,36 @@ router.post('/update-payment-details', async (req, res) => {
             WHERE order_id = ?
         `;
 
-        // Execute the query
+        // Execute the query for payment details
         const [result] = await db.query(query, [payment_method, order_status, payment_status, order_id]);
 
-        // Check if the update was successful
-        if (result.affectedRows > 0) {
-            res.json({ message: 'Payment details updated successfully' });
-        } else {
-            res.status(404).json({ message: 'Order not found' });
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Order not found' });
         }
+
+        // SQL query to update the shipment details
+        const shipmentUpdate = `
+            UPDATE shipment
+            SET shipment_status = ?
+            WHERE order_id = ?
+        `;
+
+        // Execute the query for shipment details
+        const [shipment] = await db.query(shipmentUpdate, ['Delivered', order_id]);
+
+        if (shipment.affectedRows === 0) {
+            return res.status(404).json({ message: 'Shipment not found' });
+        }
+
+        // If both updates are successful, send a single response
+        res.json({ message: 'Payment and shipment details updated successfully' });
+
     } catch (error) {
         console.error('Error updating payment details:', error.message);
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 });
+
 
 
 

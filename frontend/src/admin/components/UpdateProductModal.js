@@ -9,15 +9,17 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
         product_name: '',
         price: '',
         category_id: '',
+        category_name: '',
         quantity: '',
         description: '',
         image_url: '',
-        size: '', 
-        custom_size: '', 
-        expiration_date: '' 
+        size: '',
+        custom_size: '',
+        expiration_date: ''
     });
     const [error, setError] = useState('');
-    const [categories, setCategories] = useState([]); 
+    const [categories, setCategories] = useState([]);
+
     useEffect(() => {
         if (product) {
             setFormData({
@@ -25,12 +27,13 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
                 product_name: product.product_name || '',
                 price: product.price || '',
                 category_id: product.category_id || '',
+                category_name: product.category_name || '',
                 quantity: product.quantity || '',
                 description: product.description || '',
-                image_url: product.image_url || '',
-                size: product.size || '', 
+                image_url: product.product_image || '',
+                size: product.size || '',
                 custom_size: product.size && !['500', '100', '150', '200', '250'].includes(product.size) ? product.size : '', // Handle custom size
-                expiration_date: product.expiration_date || '' 
+                expiration_date: product.expiration_date || ''
             });
         }
 
@@ -38,7 +41,7 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
         const fetchCategories = async () => {
             try {
                 const response = await axios.get('http://localhost:5001/categories');
-                setCategories(response.data.categories); 
+                setCategories(response.data.categories);
             } catch (error) {
                 console.error('Error fetching categories:', error);
                 setError('Failed to load categories.');
@@ -65,7 +68,7 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
                     size: formData.size === 'Other' ? formData.custom_size : formData.size
                 };
                 await axios.put(`http://localhost:5001/admin-update-products/${formData.product_code}`, dataToSend);
-                handleUpdate(); 
+                handleUpdate();
                 handleClose();
             } else {
                 console.error('Product code is undefined');
@@ -78,14 +81,14 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
     };
 
     return (
-        <Modal  className='modal-lg' show={show} onHide={handleClose}>
+        <Modal className='modal-lg' show={show} onHide={handleClose}>
             <Modal.Header closeButton>
                 <Modal.Title>Update Product</Modal.Title>
             </Modal.Header>
             <Modal.Body className='mbody one'>
                 {error && <div className="alert alert-danger">{error}</div>}
                 <Form onSubmit={handleSubmit}>
-                    <img src={product.product_image}/>
+                    <img src={product.product_image} alt="Product" />
                     <Form.Group controlId="formProductCode">
                         <Form.Label>Product Code</Form.Label>
                         <Form.Control
@@ -126,7 +129,10 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
                             onChange={handleChange}
                             required
                         >
-                            <option value="">Select category</option>
+                            <option value="">
+                                {formData.category_name ? `${formData.category_name}` : "Select a category"}
+                            </option>
+
                             {categories.map((category) => (
                                 <option key={category.category_id} value={category.category_id}>
                                     {category.category_name}
@@ -134,6 +140,7 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
                             ))}
                         </Form.Control>
                     </Form.Group>
+
                     <Form.Group controlId="formSize">
                         <Form.Label>Size</Form.Label>
                         <Form.Control
@@ -202,7 +209,7 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
                             required
                         />
                     </Form.Group>
-                    <br/>
+                    <br />
                     <Button variant="primary" type="submit">
                         Update Product
                     </Button>

@@ -76,6 +76,7 @@ router.get('/products', async (req, res) => {
 
 
 
+
 // Route to get top products from different categories
 router.get('/products-top-mix-picks', async (req, res) => {
     try {
@@ -306,8 +307,105 @@ router.post('/products-recommendations', async (req, res) => {
     }
 });
 
+router.get('/sticky-components', async (req, res) => {
+    const { hairType, hairTexture, hairVirgin, hairColor, hairRebonded } = req.query;
+
+    console.log('--------- STICKY COMPONENT -------');
+    console.log('Received parameters:', req.query);
+
+    try {
+        // Base query to fetch active products
+        let query = 'SELECT * FROM product WHERE product_status IN ("active", "Discounted")';
+
+        // List of possible search terms
+        const searchTerms = [];
+        const queryParams = [];
+
+        // Check each parameter and add to searchTerms array if provided
+        if (hairType) {
+            searchTerms.push('LOWER(description) LIKE ?');
+            queryParams.push(`%${hairType.toLowerCase()}%`);
+        }
+
+        if (hairTexture) {
+            searchTerms.push('LOWER(description) LIKE ?');
+            queryParams.push(`%${hairTexture.toLowerCase()}%`);
+        }
+
+        if (hairVirgin) {
+            searchTerms.push('LOWER(description) LIKE ?');
+            queryParams.push(`%${hairVirgin.toLowerCase()}%`);
+        }
+
+        if (hairColor) {
+            searchTerms.push('LOWER(description) LIKE ?');
+            queryParams.push(`%${hairColor.toLowerCase()}%`);
+        }
+
+        if (hairRebonded) {
+            searchTerms.push('LOWER(description) LIKE ?');
+            queryParams.push(`%${hairRebonded.toLowerCase()}%`);
+        }
+
+        // Add the search conditions to the query if there are any
+        if (searchTerms.length > 0) {
+            query += ' AND (' + searchTerms.join(' OR ') + ')';  // Join conditions with OR
+        }
+
+        // Add a LIMIT clause to the query (e.g., limit to 4 products)
+        query += ' LIMIT 4';
+
+        console.log('Final query to execute:', query);
+        console.log('Query parameters:', queryParams);
+
+        const [products] = await db.query(query, queryParams);
+
+        console.log('Fetched products:', products);
+
+        res.json(products);
+    } catch (error) {
+        console.error('Error fetching products:', error.message);
+        res.status(500).send('Server error');
+    }
+});
 
 
+router.get('/products-bundle-recommendation', async (req, res) => {
+    console.log('--- BUNDLE PRODUCTS ---');
+
+    try {
+        // Fetch all products and their categories
+        const [rows] = await db.query(`
+         SELECT
+            p.product_id,
+            p.category_id,
+            p.product_code,
+            p.product_name,
+            p.price,
+            p.description,
+            p.quantity,
+            p.product_discount,
+            p.product_image,
+            p.product_status 
+        FROM
+            product AS p 
+        WHERE
+            p.product_status = 'Discounted' 
+        ORDER BY
+            CASE
+                WHEN p.product_status = 'Discounted' THEN 1 
+                ELSE 2 
+            END
+        LIMIT 4;  
+
+    `);
+
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        res.status(500).send('Error fetching products');
+    }
+});
 
 
 module.exports = router;

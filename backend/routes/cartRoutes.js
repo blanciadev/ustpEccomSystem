@@ -20,7 +20,7 @@ async function authenticateToken(req, res, next) {
         req.user_id = rows[0].user_id;
         next();
     } catch (err) {
-        console.error('Error during token validation:', err.message);
+        console.error('Token Validation Backedn CART Error during token validation:', err.message);
         res.status(500).json({ message: 'Internal server error' });
     }
 }
@@ -238,7 +238,7 @@ router.post('/cart-update-quantity', authenticateToken, async (req, res) => {
 
 
 // CheckOut Page Backend
-router.get('/products/:productCode', async (req, res) => {
+router.get('/products-checkout/:productCode', async (req, res) => {
     const { productCode } = req.params;
     console.log(productCode);
     try {
@@ -291,6 +291,23 @@ router.get('/cart-item-count/:customer_id', async (req, res) => {
     }
 });
 
+// Delete Cart Item
+router.delete('/cart-delete/:cart_items_id', authenticateToken, async (req, res) => {
+    const { cart_items_id } = req.params;
+
+    try {
+        const [result] = await db.query('DELETE FROM cart_items WHERE cart_items_id = ?', [cart_items_id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Item not found' });
+        }
+
+        res.status(200).json({ message: 'Item removed from cart' });
+    } catch (err) {
+        console.error('Error removing cart item:', err.message);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
 
 

@@ -12,9 +12,9 @@ const Checkout = () => {
   const customerId = localStorage.getItem('customer_id');
   const authToken = localStorage.getItem('token');
 
+  const globalDiscounts = JSON.parse(localStorage.getItem('globalDiscounts')) || [];
 
   const [discounts, setDiscounts] = useState([]);
-
   const savedProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
   const [quantities, setQuantities] = useState(savedProducts.map(product => product.quantity || 1));
   const [originalQuantities, setOriginalQuantities] = useState([]);
@@ -34,23 +34,26 @@ const Checkout = () => {
   const [hasFetched, setHasFetched] = useState(false);
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+
     if (savedProducts.length > 0 && !hasFetched) {
       const fetchOriginalQuantities = async () => {
         try {
           const productData = await Promise.all(
             savedProducts.map(product =>
-              axios.get(`http://localhost:5001/products/${product.product_code}`)
-                .then(response => response.data)
+              axios.get(`http://localhost:5001/products-checkout/${product.product_code}`, {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }).then(response => response.data)
             )
           );
 
-          const productQuantities = productData.map(item => item.quantity); // Extract quantities
-          setOriginalQuantities(productQuantities); // Update state with the correct quantities
-
-          const productDiscounts = productData.map(item => item.product_discount || 0); // Extract discounts (default to 0 if not present)
-          setDiscounts(productDiscounts); // Update state with discounts
-
-          setHasFetched(true); // Mark as fetched after successful operation
+          const productQuantities = productData.map(item => item.quantity);
+          setOriginalQuantities(productQuantities);
+          const productDiscounts = savedProducts.map(product => product.discount || 0);
+          setDiscounts(productDiscounts);
+          setHasFetched(true);
         } catch (error) {
           console.error('Error fetching quantities and discounts:', error);
         }
@@ -64,26 +67,24 @@ const Checkout = () => {
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
-
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [savedProducts, hasFetched]);
 
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData(prevData => ({
+      ...prevData,
       [name]: value,
-    });
+    }));
   };
 
   const handlePaymentChange = (e) => {
-    setFormData({
-      ...formData,
+    setFormData(prevData => ({
+      ...prevData,
       paymentMethod: e.target.value,
-    });
+    }));
   };
 
   const handleQuantityChange = (index, e) => {
@@ -106,7 +107,6 @@ const Checkout = () => {
   };
 
   const handleRemoveProduct = (index) => {
-    // Remove the product from savedProducts and quantities
     const updatedProducts = [...savedProducts];
     const updatedQuantities = [...quantities];
 
@@ -114,18 +114,15 @@ const Checkout = () => {
     updatedQuantities.splice(index, 1);
 
     setQuantities(updatedQuantities);
-
-    // Update localStorage with the new list of selected products
     localStorage.setItem('selectedProducts', JSON.stringify(updatedProducts));
 
-    // Remove from localStorage if no products are left
     if (updatedProducts.length === 0) {
       localStorage.removeItem('selectedProducts');
     }
 
-    // Update savedProducts state so the component re-renders with the updated list
     setOriginalQuantities(updatedQuantities);
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -145,31 +142,24 @@ const Checkout = () => {
         return;
       }
 
-      // Use the calculateTotalPrice function to get the total price
       const totalOrderPrice = calculateTotalPrice().toFixed(2);
-
       const orderData = {
         customer_id: customerId,
         fullName: formData.fullName,
-
-        // Map through savedProducts to calculate individual product totals with discount
         order_details: savedProducts.map((product, index) => {
-          const discountedPrice = product.price * (1 - (discounts[index] / 100)); // Apply discount
-          const productTotal = discountedPrice * quantities[index]; // Calculate total for the product
+          const discountedPrice = product.price * (1 - (discounts[index] / 100));
+          const productTotal = discountedPrice * quantities[index];
 
           return {
             cart_items: product.cart_items_id,
             product_id: product.product_code,
             quantity: quantities[index],
-            totalprice: productTotal.toFixed(2), // Store discounted total price
+            totalprice: productTotal.toFixed(2),
             payment_method: 'COD',
             payment_status: 'Pending',
           };
         }),
-
-        // Use the calculated total price
-        total_price: totalOrderPrice, // Correctly reference totalOrderPrice here
-
+        total_price: totalOrderPrice,
         order_date: new Date().toISOString(),
         shipment_date: new Date().toISOString(),
         address: formData.address,
@@ -180,26 +170,11 @@ const Checkout = () => {
         postalCode: formData.postalCode,
       };
 
-      console.log(orderData);
-
       const response = await axios.post('http://localhost:5001/insert-order', orderData, {
         headers: { Authorization: `Bearer ${authToken}`, 'Content-Type': 'application/json' },
       });
 
-      // Save orderData to localStorage (if needed)
       localStorage.setItem('checkoutOrderData', JSON.stringify(orderData));
-
-      //       const response = await axios.post(
-      //         'http://localhost:5001/insert-order',
-      //         orderData,
-      //         {
-      //           headers: {
-      //             'Authorization': `Bearer ${authToken}`,
-      //             'Content-Type': 'application/json',
-      //           },
-      //         }
-      //       );
-
 
       if (response.status === 201) {
         setSuccess('Order placed successfully!');
@@ -214,18 +189,84 @@ const Checkout = () => {
     }
   };
 
-  // Calculate total price only if there are products, otherwise set to 0
+
   const calculateTotalPrice = () => {
+    const allValuesEqual = (array) => {
+      if (array.length === 0) return true;
+      return array.every(value => value === array[0]);
+    };
+
+    let discounts = globalDiscounts;
+
+    if (savedProducts.length === 0) return 0;
+
+    console.log("----- Receipt -----");
+
+    // Flag to check if a general discount exists
+    const generalDiscountExists = allValuesEqual(discounts) && discounts[0] > 0;
+
     const productTotal = savedProducts.reduce((acc, product, index) => {
-      const discountedPrice = product.price * (1 - (discounts[index] / 100)); // Apply the discount
-      const totalForProduct = discountedPrice * quantities[index]; // Calculate total for this product
-      return acc + totalForProduct; // Accumulate total price
+      let effectivePrice = 0;
+
+      // Check if the product has a discounted price (bundled product)
+      if (product.discounted_price) {
+        // Apply the discount to the bundled product
+        const effectiveDiscount = allValuesEqual(discounts) ? discounts[0] : discounts || 0;
+        const discountMultiplier = (1 - (effectiveDiscount / 100 || 0));
+        effectivePrice = product.discounted_price * discountMultiplier;
+
+        console.log(`  Discounted Price: $${effectivePrice.toFixed(2)}`);
+      } else if (product.price) {
+        console.log("No Discount");
+        effectivePrice = product.price;
+        console.log("---------product Price test ----------");
+        console.log(`(Effective PRICE )`, effectivePrice);
+      }
+      else {
+        // Apply a general discount to non-bundled products if a bundle discount exists
+        let effectiveDiscount = generalDiscountExists ? discounts[0] : 0;
+        const discountMultiplier = (1 - (effectiveDiscount / 100 || 0));
+        effectivePrice = product.price * discountMultiplier;
+        console.log(`${product.product_name} (Non-Bundled)`);
+
+        if (generalDiscountExists) {
+          console.log(`  Discount: ${effectiveDiscount}% (due to bundle)`);
+        } else {
+          console.log("No Discount");
+        }
+        console.log(`  Price: $${effectivePrice.toFixed(2)}`);
+
+        console.log(`(Effective Discount )`, effectiveDiscount);
+      }
+
+      // Ensure quantities[index] is a valid number and add flat shipping ($150)
+      const quantity = quantities[index] || 0;
+      const shipping = 150;
+      const totalForProduct = effectivePrice * quantity + shipping;
+
+      // Log total for the product with quantity and shipping
+      console.log(`  Quantity: ${quantity}`);
+      console.log(`  Shipping: $${shipping}`);
+      console.log(`  Total for ${product.product_name}: $${totalForProduct.toFixed(2)}`);
+      console.log("------------------------------");
+
+      return acc + totalForProduct;
     }, 0);
 
-    const shippingFee = 150; // Set your shipping fee here
-    const transactionTotal = productTotal + shippingFee; // Add shipping fee to the total price
+    const transactionTotal = productTotal;
 
-    return transactionTotal; // Return the final total price
+    console.log(`Transaction Total: $${transactionTotal.toFixed(2)}`);
+    console.log("----- End of Receipt -----");
+
+    return Math.round(transactionTotal);
+  };
+
+
+
+
+
+  const getDiscountedPrice = (price, discount) => {
+    return price * (1 - (discount / 100));
   };
 
   return (
@@ -277,149 +318,60 @@ const Checkout = () => {
             maxWidth: '800px',
             margin: '0 auto',
             padding: '20px',
-            border: '1px solid #e0e0e0',
+            border: '1px solid #ccc',
             borderRadius: '8px',
-            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-            backgroundColor: '#fff',
-            fontFamily: 'Arial, sans-serif'
+            backgroundColor: '#f9f9f9'
           }}>
-            <h3 style={{
-              textAlign: 'center',
-              fontSize: '24px',
-              fontWeight: 'bold',
-              marginBottom: '20px',
-              color: '#333'
-            }}>Order Summary</h3>
+            <h3>Order Summary</h3>
+            {savedProducts.map((product, index) => {
+              const effectiveDiscount = discounts[0] || 0; // Adjust as necessary for multiple discounts
+              const discountedPrice = getDiscountedPrice(product.price, effectiveDiscount);
+              const total = (discountedPrice * quantities[index]).toFixed(2);
 
-            <div className='summary-header' style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 2fr 1fr 1fr 1fr 1fr',
-              fontWeight: 'bold',
-              padding: '10px 0',
-              borderBottom: '2px solid #f0f0f0',
-              color: '#555'
-            }}>
-              <span>ID</span>
-              <span>Product Name</span>
-              <span>Quantity</span>
-              <span>Discount</span>
-              <span>Total Price</span>
-              <span>Action</span>
-            </div>
+              return (
+                <div className='product-summary' key={index} style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '10px 0',
+                  borderBottom: '1px solid #ddd'
+                }}>
+                  <div>
+                    <h4>{product.product_name}</h4>
+                    <p>Original Price: ${product.price.toFixed(2)} (Discounted Price: ${discountedPrice.toFixed(2)} at {effectiveDiscount}% Off)</p>
+                    <input
+                      type='number'
+                      min='1'
+                      value={quantities[index]}
+                      onChange={e => handleQuantityChange(index, e)}
+                      style={{ width: '50px', marginRight: '10px' }}
+                    />
+                    <button onClick={() => handleRemoveProduct(index)}>Remove</button>
+                  </div>
+                  <div style={{ fontWeight: 'bold' }}>${total}</div>
+                </div>
+              );
+            })}
 
-            <ul className="product-list" style={{
-              listStyle: 'none',
-              padding: '0',
-              marginTop: '10px'
-            }}>
-              {savedProducts.length > 0 ? (
-                savedProducts.map((product, index) => {
-                  const discountedPrice = product.price * (1 - (discounts[index] / 100)); // Calculate discounted price
-                  const productTotal = discountedPrice * quantities[index]; // Calculate total for this product
-
-                  return (
-                    <li key={product.product_code} style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 2fr 1fr 1fr 1fr 1fr',
-                      alignItems: 'center',
-                      padding: '15px',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: '8px',
-                      marginBottom: '10px',
-                      backgroundColor: '#f8f9fa',
-                      transition: 'transform 0.3s, box-shadow 0.3s',
-                      cursor: 'pointer',
-                    }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.1)';
-                        e.currentTarget.style.transform = 'scale(1.02)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.boxShadow = 'none';
-                        e.currentTarget.style.transform = 'scale(1)';
-                      }}
-                    >
-                      <span style={{ marginRight: '10px', fontSize: '14px' }}>{product.cart_items_id}</span>
-                      <span style={{ fontWeight: 'bold', marginRight: '10px', color: '#333' }}>{product.product_name}</span>
-                      <input
-                        type="number"
-                        min="1"
-                        max={originalQuantities[index]}
-                        value={quantities[index]}
-                        onChange={(e) => handleQuantityChange(index, e)}
-                        style={{
-                          width: '60px',
-                          padding: '5px',
-                          textAlign: 'center',
-                          border: '1px solid #ccc',
-                          borderRadius: '4px',
-                          outline: 'none',
-                          fontSize: '14px',
-                          transition: 'border-color 0.2s',
-                          backgroundColor: '#fff'
-                        }}
-                        onFocus={(e) => (e.target.style.borderColor = '#007bff')}
-                        onBlur={(e) => (e.target.style.borderColor = '#ccc')}
-                      />
-                      <p style={{ margin: '5px 0', fontSize: '14px', color: discounts[index] ? '#28a745' : '#555' }}>
-                        {discounts[index] ? `${discounts[index]}%` : ''}
-                      </p>
-                      <span style={{ fontWeight: 'bold', color: '#333' }}>₱{productTotal.toFixed(2)}</span>
-                      <button
-                        className='remove-btn'
-                        onClick={() => handleRemoveProduct(index)}
-                        style={{
-                          marginLeft: '10px',
-                          backgroundColor: '#ff4d4d',
-                          color: '#fff',
-                          border: 'none',
-                          borderRadius: '4px',
-                          padding: '8px 12px',
-                          cursor: 'pointer',
-                          transition: 'background-color 0.3s ease',
-                        }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = '#ff3333'}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = '#ff4d4d'}
-                      >
-                        Remove
-                      </button>
-                    </li>
-                  );
-                })
-              ) : (
-                <p style={{
-                  textAlign: 'center',
-                  color: '#999',
-                  marginTop: '20px'
-                }}>No products selected.</p>
-              )}
-            </ul>
-
-            <h3 style={{
-              textAlign: 'right',
-              fontSize: '18px',
+            <span>Shipping Fee: P150</span>
+            <div className='total-price' style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
               marginTop: '20px',
-              fontWeight: 'bold',
-              color: '#333'
-            }}>Shipping Total: ₱150</h3>
+              fontSize: '1.2em',
+              fontWeight: 'bold'
+            }}>
 
-            <h4 style={{
-              textAlign: 'right',
-              fontSize: '20px',
-              marginTop: '10px',
-              fontWeight: 'bold',
-              color: '#007bff'
-            }}>Total Price: ₱{(calculateTotalPrice())}</h4>
+              <span>Total Price:</span>
+              <span>${calculateTotalPrice().toFixed(2)}</span>
+            </div>
           </div>
-
-
-
         </div>
       </div>
       <Footer />
     </div>
   );
-
 };
 
 export default Checkout;

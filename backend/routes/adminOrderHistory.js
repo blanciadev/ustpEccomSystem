@@ -83,14 +83,14 @@ router.get('/admin-order-history', async (req, res) => {
                 order_details.quantity, 
                 order_details.payment_status, 
                 product.price, 
-                customer.customer_id,   
-                customer.first_name, 
-                customer.last_name, 
-                customer.email, 
-                customer.phone_number, 
-                customer.street_name, 
-                customer.region, 
-                customer.postal_code,
+                users.customer_id,   
+                users.first_name, 
+                users.last_name, 
+                users.email, 
+                users.phone_number, 
+                users.street_name, 
+                users.region, 
+                users.postal_code,
                 order_details.order_status
             FROM
                 \`order\`
@@ -98,8 +98,8 @@ router.get('/admin-order-history', async (req, res) => {
                 ON \`order\`.order_id = order_details.order_id
             INNER JOIN product
                 ON order_details.product_id = product.product_code
-            INNER JOIN customer
-                ON \`order\`.customer_id = customer.customer_id
+            INNER JOIN users
+                ON \`order\`.customer_id = users.customer_id
         `;
 
         if (status) {
@@ -208,7 +208,6 @@ router.get('/admin-order-history-component', async (req, res) => {
                 'To Receive': statusCounts['To Receive'] || 0,
                 Cancelled: statusCounts['Cancelled'] || 0,
                 'Return/Refund': statusCounts['Return/Refund'] || 0,
-                'In Transit': statusCounts['In Transit'] || 0,
                 Returned: statusCounts['Returned'] || 0,
             }
         });

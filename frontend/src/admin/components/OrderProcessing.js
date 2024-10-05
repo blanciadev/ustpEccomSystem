@@ -2,15 +2,15 @@ import React, { useState, useEffect } from 'react';
 import '../admin.css';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import axios from 'axios'; // Ensure you have axios installed for API calls
+import axios from 'axios';
 
 // Register the components needed for Chart.js
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const OrderProcessing = () => {
-  const [chartData, setChartData] = useState(null);  // For storing chart data
-  const [loading, setLoading] = useState(true);  // Loading state
-  const [error, setError] = useState(null);  // Error state
+  const [chartData, setChartData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Fetch data from backend on component mount
   useEffect(() => {
@@ -21,7 +21,7 @@ const OrderProcessing = () => {
 
         // Update chartData using the fetched status counts
         setChartData({
-          labels: ['Completed', 'Pending', 'To Ship', 'To Receive', 'Cancelled', 'Return/Refund', 'In Transit', 'Returned'],
+          labels: ['Completed', 'Pending', 'To Ship', 'To Receive', 'Cancelled', 'Return/Refund', 'Returned'],
           datasets: [
             {
               label: 'Order Status',
@@ -32,7 +32,7 @@ const OrderProcessing = () => {
                 statusCounts['To Receive'],
                 statusCounts.Cancelled,
                 statusCounts['Return/Refund'],
-                statusCounts['In Transit'],
+                // statusCounts['In Transit'],
                 statusCounts.Returned,
               ],
               backgroundColor: [
@@ -42,7 +42,6 @@ const OrderProcessing = () => {
                 'rgba(54, 162, 235, 0.5)', // Color for To Receive
                 'rgba(153, 102, 255, 0.5)', // Color for Cancelled
                 'rgba(255, 206, 86, 0.5)', // Color for Return/Refund
-                'rgba(75, 192, 192, 0.5)', // Color for In Transit
                 'rgba(201, 203, 207, 0.5)', // Color for Returned
               ],
               borderColor: [
@@ -52,7 +51,6 @@ const OrderProcessing = () => {
                 'rgba(54, 162, 235, 1)', // Border for To Receive
                 'rgba(153, 102, 255, 1)', // Border for Cancelled
                 'rgba(255, 206, 86, 1)', // Border for Return/Refund
-                'rgba(75, 192, 192, 1)', // Border for In Transit
                 'rgba(201, 203, 207, 1)', // Border for Returned
               ],
               borderWidth: 1,  // Border width

@@ -33,7 +33,7 @@ const authenticateToken = async (req, res, next) => {
         }
 
         // Fetch user details based on the token
-        const [userRows] = await db.query('SELECT * FROM customer WHERE customer_id = ?', [tokenData.user_id]);
+        const [userRows] = await db.query('SELECT * FROM users WHERE customer_id = ?', [tokenData.user_id]);
 
         if (userRows.length === 0) {
             return res.status(401).json({ message: 'User not found' });
@@ -125,7 +125,7 @@ router.post('/insert-order', async (req, res) => {
         await db.query('START TRANSACTION');
 
         // Check if customer exists
-        const [customerResult] = await db.query('SELECT COUNT(*) AS count FROM `customer` WHERE `customer_id` = ?', [customer_id]);
+        const [customerResult] = await db.query('SELECT COUNT(*) AS count FROM `users` WHERE `customer_id` = ?', [customer_id]);
         console.log('Customer check result:', customerResult);
         if (customerResult[0].count === 0) {
             console.log('Customer does not exist:', customer_id);
@@ -176,8 +176,6 @@ router.post('/insert-order', async (req, res) => {
             cartItemsUpdateIds.push(cart_items); // Use the correct cart_items id
             console.log('Added cart_items_id to cartItemsUpdateIds:', cart_items);
             console.log('------------------------------------');
-
-
 
             // Update product quantity
             const updateQuantityQuery = `
@@ -273,13 +271,13 @@ router.post('/update-customer-details/:customer_id', authenticateToken, async (r
         }
 
         // Check if customer details exist
-        const [customerDetails] = await db.query('SELECT * FROM customer WHERE customer_id = ?', [customer_id]);
+        const [customerDetails] = await db.query('SELECT * FROM users WHERE customer_id = ?', [customer_id]);
         console.log(`Customer details found: ${JSON.stringify(customerDetails)}`);
 
         if (customerDetails.length > 0) {
             // If customer details exist, update the fields
             const updateQuery = `
-                UPDATE customer 
+                UPDATE users 
                 SET street_name = ?, region = ?, postal_code = ?, phone_number = ?
                 WHERE customer_id = ?
             `;

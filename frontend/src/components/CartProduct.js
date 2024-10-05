@@ -8,7 +8,8 @@ const CartProduct = ({
   productCode,
   isSelected,
   toggleItemSelection,
-  updateQuantity // Function to handle quantity updates
+  updateQuantity, // Function to handle quantity updates
+  removeFromCart // New function to handle removing the product from the cart
 }) => {
   const [localQuantity, setLocalQuantity] = useState(quantity);
 
@@ -40,6 +41,11 @@ const CartProduct = ({
     updateQuantity(cartItemId, newQuantity);
   };
 
+  // Function to remove item from cart
+  const handleRemoveFromCart = () => {
+    removeFromCart(cartItemId); // Calls the function passed from the parent
+  };
+
   return (
     <tr>
       <td>
@@ -64,6 +70,9 @@ const CartProduct = ({
       </td>
       <td>P{price.toFixed(2)}</td>
       <td>P{(price * localQuantity).toFixed(2)}</td>
+      <td>
+        <button onClick={handleRemoveFromCart}>Remove</button> {/* Remove button */}
+      </td>
     </tr>
   );
 };

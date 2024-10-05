@@ -6,7 +6,7 @@ const crypto = require('crypto');
 
 const TOKEN_EXPIRATION_TIME = 3600000; // 1 hour
 
-router.post('/customer-login', async (req, res) => {
+router.post('/users-login', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -15,7 +15,7 @@ router.post('/customer-login', async (req, res) => {
 
     try {
         // Fetch user data from the database
-        const [rows] = await db.query('SELECT * FROM customer WHERE email = ?', [email]);
+        const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
 
         if (rows.length === 0) {
             return res.status(401).json({ message: 'Invalid email or password' });
@@ -55,25 +55,11 @@ router.post('/customer-login', async (req, res) => {
         });
     } catch (err) {
         // Log only the message
-        console.error('Error during login:', err.message);
+        console.error('Token Validation Backedn Error during login:', err.message);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
 
-
-// // Logout endpoint
-// router.post('/logout', (req, res) => {
-//     const token = req.headers['authorization']?.split(' ')[1]; // Extract token from headers
-
-//     if (!token) {
-//         return res.status(400).json({ message: 'No token provided.' });
-//     }
-
-//     // Add token to blacklist (you could also store it in a DB)
-//     blacklistToken(token); // This function should handle adding the token to a blacklist
-
-//     res.status(200).json({ message: 'Logged out successfully.' });
-// });
 
 
 
