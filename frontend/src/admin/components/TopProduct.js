@@ -1,65 +1,108 @@
-import React from 'react';
-import '../admin.css';
-
-const data = [
-  { id: 1, product: 'Product A', popularity: 90, sales: 70 },
-  { id: 2, product: 'Product B', popularity: 75, sales: 65 },
-  { id: 3, product: 'Product C', popularity: 90, sales: 80 },
-  { id: 4, product: 'Product D', popularity: 60, sales: 55 },
-  { id: 5, product: 'Product E', popularity: 70, sales: 60 },
-];
-
-// Sort data by popularity and sales (descending)
-const sortedData = [...data].sort((a, b) => {
-  // First sort by popularity, then by sales if popularity is the same
-  if (b.popularity === a.popularity) {
-    return b.sales - a.sales;
-  }
-  return b.popularity - a.popularity;
-});
+import React, { useEffect, useState } from 'react';
 
 const TopProduct = () => {
-  return (
-    <div className='top-products'>
-        <div className='header'>
-            <div className='title'>
-                <h5>Top Products</h5>
-            </div> 
-            <div className='see-all'>
-                <button>See all</button>
-            </div>
-        </div>
-        <div className='product-table'>
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Product</th>
-                <th>Popularity</th>
-                <th>Sales</th>
-              </tr>
-            </thead>
-            <tbody>
+  const [data, setData] = useState([]);
 
-            {sortedData.map((item, index) => (
-                <tr key={item.id}>
-                  <td>{index + 1}</td> {/* Ranking starts from 1 */}
-                  <td>{item.product}</td>
-                  <td>
-                    <div className='progress-bar'>
-                      <div
-                        className='progress'
-                        style={{ width: `${item.popularity}%` }}
-                      />
-                      {item.popularity}%
-                    </div>
-                  </td>
-                  <td>{item.sales}%</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+  // Fetch top products data from the backend
+  useEffect(() => {
+    const fetchTopProducts = async () => {
+      try {
+        const response = await fetch('http://localhost:5001/top-products');
+        const result = await response.json();
+        setData(result.products);
+      } catch (error) {
+        console.error('Error fetching top products:', error);
+      }
+    };
+
+    fetchTopProducts();
+  }, []);
+
+  // Sort data by interaction_count (descending)
+  const sortedData = [...data].sort((a, b) => b.cart_quantity - a.cart_quantity); // Sorting by cart_quantity
+
+  // CSS styles
+  const styles = {
+    topProducts: {
+      padding: '20px',
+      backgroundColor: '#f9f9f9',
+      borderRadius: '8px',
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    },
+    header: {
+      marginBottom: '15px',
+    },
+    productTable: {
+      width: '120%',
+      borderCollapse: 'collapse',
+    },
+    tableHeader: {
+      backgroundColor: '#007bff',
+      color: '#fff',
+    },
+    tableRow: {
+      borderBottom: '1px solid #ddd',
+    },
+    progressBarContainer: {
+      position: 'relative',
+      height: '20px',
+      backgroundColor: '#e0e0e0',
+      borderRadius: '5px',
+    },
+    progressBar: {
+      height: '100%',
+      backgroundColor: '#76c7c0',
+      borderRadius: '5px',
+      transition: 'width 0.3s ease',
+    },
+    progressPercentage: {
+      position: 'absolute',
+      top: 0,
+      left: '50%',
+      transform: 'translateX(-50%)',
+      fontWeight: 'bold',
+    },
+  };
+
+  return (
+    <div style={styles.topProducts}>
+      <div style={styles.header}>
+        <div style={styles.title}>
+          <h5>Top Products</h5>
         </div>
+      </div>
+
+      <div className="product-table">
+        <table style={styles.productTable}>
+          <thead>
+            <tr style={styles.tableHeader}>
+              <th>#</th>
+              <th>Product</th>
+              <th>Progress</th>
+              <th>Available Quantity</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sortedData.map((item, index) => (
+              <tr key={item.id} style={styles.tableRow}>
+                <td>{index + 1}</td>
+                <td>{item.product}</td>
+                <td>
+                  <div style={styles.progressBarContainer}>
+                    <div
+                      style={{
+                        ...styles.progressBar,
+                        width: `${(item.cart_quantity / item.available_quantity) * 100}%`,
+                      }}
+                    />
+                  </div>
+                </td>
+                <td>{item.available_quantity}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

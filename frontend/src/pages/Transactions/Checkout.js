@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Transaction.css';
 import Navigation from '../../components/Navigation';
 import Footer from '../../components/Footer';
@@ -10,11 +10,15 @@ const Checkout = () => {
   const navigate = useNavigate();
 
   const customerId = localStorage.getItem('customer_id');
-  console.log('Customer ID:', customerId);
+  const authToken = localStorage.getItem('token');
 
-  const { selectedProducts = [], totalPrice = 0 } = location.state || {};
+  const globalDiscounts = JSON.parse(localStorage.getItem('globalDiscounts')) || [];
 
-  const [authToken, setAuthToken] = useState(localStorage.getItem('token'));
+  const [discounts, setDiscounts] = useState([]);
+  const savedProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
+  const [quantities, setQuantities] = useState(savedProducts.map(product => product.quantity || 1));
+  const [originalQuantities, setOriginalQuantities] = useState([]);
+
   const [formData, setFormData] = useState({
     fullName: '',
     phoneNumber: '',
@@ -23,31 +27,100 @@ const Checkout = () => {
     postalCode: '',
     paymentMethod: '',
   });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [hasFetched, setHasFetched] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    if (savedProducts.length > 0 && !hasFetched) {
+      const fetchOriginalQuantities = async () => {
+        try {
+          const productData = await Promise.all(
+            savedProducts.map(product =>
+              axios.get(`http://localhost:5001/products-checkout/${product.product_code}`, {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }).then(response => response.data)
+            )
+          );
+
+          const productQuantities = productData.map(item => item.quantity);
+          setOriginalQuantities(productQuantities);
+          const productDiscounts = savedProducts.map(product => product.discount || 0);
+          setDiscounts(productDiscounts);
+          setHasFetched(true);
+        } catch (error) {
+          console.error('Error fetching quantities and discounts:', error);
+        }
+      };
+
+      fetchOriginalQuantities();
+    }
+
+    const handleBeforeUnload = () => {
+      localStorage.removeItem('selectedProducts');
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [savedProducts, hasFetched]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData(prevData => ({
+      ...prevData,
       [name]: value,
-    });
+    }));
   };
 
   const handlePaymentChange = (e) => {
-    setFormData({
-      ...formData,
+    setFormData(prevData => ({
+      ...prevData,
       paymentMethod: e.target.value,
-    });
+    }));
+  };
+
+  const handleQuantityChange = (index, e) => {
+    const newQuantity = Math.max(1, Number(e.target.value));
+
+    if (newQuantity > originalQuantities[index]) {
+      setError(`Quantity exceeds available stock for ${savedProducts[index].product_name}. Available: ${originalQuantities[index]}`);
+      return;
+    }
+
+    const newQuantities = [...quantities];
+    newQuantities[index] = newQuantity;
+    setQuantities(newQuantities);
+    setError('');
   };
 
   const validateForm = () => {
     const { fullName, phoneNumber, address, region, postalCode, paymentMethod } = formData;
-    if (!fullName || !phoneNumber || !address || !region || !postalCode || !paymentMethod) {
-      return 'All fields are required.';
+    return fullName && phoneNumber && address && region && postalCode && paymentMethod;
+  };
+
+  const handleRemoveProduct = (index) => {
+    const updatedProducts = [...savedProducts];
+    const updatedQuantities = [...quantities];
+
+    updatedProducts.splice(index, 1);
+    updatedQuantities.splice(index, 1);
+
+    setQuantities(updatedQuantities);
+    localStorage.setItem('selectedProducts', JSON.stringify(updatedProducts));
+
+    if (updatedProducts.length === 0) {
+      localStorage.removeItem('selectedProducts');
     }
-    return '';
+
+    setOriginalQuantities(updatedQuantities);
   };
 
   const handleSubmit = async (e) => {
@@ -56,55 +129,144 @@ const Checkout = () => {
     setError('');
     setSuccess('');
 
-    const validationError = validateForm();
-    if (validationError) {
+    if (!validateForm()) {
       setLoading(false);
-      setError(validationError);
+      setError('All fields are required.');
       return;
     }
 
     try {
-      if (!customerId) {
+      if (!customerId || savedProducts.length === 0) {
         setLoading(false);
-        setError('Customer ID is missing.');
+        setError('Missing customer ID or no products selected.');
         return;
       }
 
+      const totalOrderPrice = calculateTotalPrice().toFixed(2);
       const orderData = {
         customer_id: customerId,
+        fullName: formData.fullName,
+        order_details: savedProducts.map((product, index) => {
+          const discountedPrice = product.price * (1 - (discounts[index] / 100));
+          const productTotal = discountedPrice * quantities[index];
+
+          return {
+            cart_items: product.cart_items_id,
+            product_id: product.product_code,
+            quantity: quantities[index],
+            totalprice: productTotal.toFixed(2),
+            payment_method: 'COD',
+            payment_status: 'Pending',
+          };
+        }),
+        total_price: totalOrderPrice,
         order_date: new Date().toISOString(),
-        order_details: selectedProducts.map(product => ({
-          product_id: product.product_code,
-          quantity: product.quantity,
-          totalprice: product.price * product.quantity, // Add total price here
-          payment_date: new Date().toISOString(), // Set payment_date to current date
-          payment_method: formData.paymentMethod, // Use payment method from form
-          payment_status: 'Pending', // Default payment status
-        })),
-        total_price: totalPrice // Include total price for order summary
+        shipment_date: new Date().toISOString(),
+        address: formData.address,
+        region: formData.region,
+        shipment_status: 'Pending',
+        paymentMethod: formData.paymentMethod,
+        phoneNumber: formData.phoneNumber,
+        postalCode: formData.postalCode,
       };
 
-      const response = await axios.post(
-        'http://localhost:5000/insert-order',
-        orderData,
-        {
-          headers: {
-            'Authorization': `Bearer ${authToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const response = await axios.post('http://localhost:5001/insert-order', orderData, {
+        headers: { Authorization: `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+      });
+
+      localStorage.setItem('checkoutOrderData', JSON.stringify(orderData));
 
       if (response.status === 201) {
         setSuccess('Order placed successfully!');
-        navigate('/order-success'); // Navigate to a success page or order summary
+        localStorage.removeItem('selectedProducts');
+        navigate('/order-success');
       }
     } catch (error) {
-      console.error('Error placing order:', error.message);
+      console.error('Error placing order:', error);
       setError('Failed to place order. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+
+  const calculateTotalPrice = () => {
+    const allValuesEqual = (array) => {
+      if (array.length === 0) return true;
+      return array.every(value => value === array[0]);
+    };
+
+    let discounts = globalDiscounts;
+
+    if (savedProducts.length === 0) return 0;
+
+    console.log("----- Receipt -----");
+
+    // Flag to check if a general discount exists
+    const generalDiscountExists = allValuesEqual(discounts) && discounts[0] > 0;
+
+    const productTotal = savedProducts.reduce((acc, product, index) => {
+      let effectivePrice = 0;
+
+      // Check if the product has a discounted price (bundled product)
+      if (product.discounted_price) {
+        // Apply the discount to the bundled product
+        const effectiveDiscount = allValuesEqual(discounts) ? discounts[0] : discounts || 0;
+        const discountMultiplier = (1 - (effectiveDiscount / 100 || 0));
+        effectivePrice = product.discounted_price * discountMultiplier;
+
+        console.log(`  Discounted Price: $${effectivePrice.toFixed(2)}`);
+      } else if (product.price) {
+        console.log("No Discount");
+        effectivePrice = product.price;
+        console.log("---------product Price test ----------");
+        console.log(`(Effective PRICE )`, effectivePrice);
+      }
+      else {
+        // Apply a general discount to non-bundled products if a bundle discount exists
+        let effectiveDiscount = generalDiscountExists ? discounts[0] : 0;
+        const discountMultiplier = (1 - (effectiveDiscount / 100 || 0));
+        effectivePrice = product.price * discountMultiplier;
+        console.log(`${product.product_name} (Non-Bundled)`);
+
+        if (generalDiscountExists) {
+          console.log(`  Discount: ${effectiveDiscount}% (due to bundle)`);
+        } else {
+          console.log("No Discount");
+        }
+        console.log(`  Price: $${effectivePrice.toFixed(2)}`);
+
+        console.log(`(Effective Discount )`, effectiveDiscount);
+      }
+
+      // Ensure quantities[index] is a valid number and add flat shipping ($150)
+      const quantity = quantities[index] || 0;
+      const shipping = 150;
+      const totalForProduct = effectivePrice * quantity + shipping;
+
+      // Log total for the product with quantity and shipping
+      console.log(`  Quantity: ${quantity}`);
+      console.log(`  Shipping: $${shipping}`);
+      console.log(`  Total for ${product.product_name}: $${totalForProduct.toFixed(2)}`);
+      console.log("------------------------------");
+
+      return acc + totalForProduct;
+    }, 0);
+
+    const transactionTotal = productTotal;
+
+    console.log(`Transaction Total: $${transactionTotal.toFixed(2)}`);
+    console.log("----- End of Receipt -----");
+
+    return Math.round(transactionTotal);
+  };
+
+
+
+
+
+  const getDiscountedPrice = (price, discount) => {
+    return price * (1 - (discount / 100));
   };
 
   return (
@@ -115,89 +277,34 @@ const Checkout = () => {
         <div className='checkout-content'>
           <div className='checkout-address'>
             <h3>Delivery Address</h3>
-            <button className='change-address-btn'>Change</button>
             <form className='address-form' onSubmit={handleSubmit}>
               {error && <p className='error-message'>{error}</p>}
               {success && <p className='success-message'>{success}</p>}
-              <div className='form-group'>
-                <label htmlFor='fullName'>Full Name</label>
-                <input
-                  type='text'
-                  id='fullName'
-                  name='fullName'
-                  value={formData.fullName}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className='form-group'>
-                <label htmlFor='phoneNumber'>Phone Number</label>
-                <input
-                  type='text'
-                  id='phoneNumber'
-                  name='phoneNumber'
-                  value={formData.phoneNumber}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className='form-group'>
-                <label htmlFor='address'>Street Name, Building, House Number</label>
-                <input
-                  type='text'
-                  id='address'
-                  name='address'
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className='form-group'>
-                <label htmlFor='region'>Region, Province, City, Barangay</label>
-                <input
-                  type='text'
-                  id='region'
-                  name='region'
-                  value={formData.region}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className='form-group'>
-                <label htmlFor='postalCode'>Postal Code</label>
-                <input
-                  type='text'
-                  id='postalCode'
-                  name='postalCode'
-                  value={formData.postalCode}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
+              {['fullName', 'phoneNumber', 'address', 'region', 'postalCode'].map(field => (
+                <div className='form-group' key={field}>
+                  <label htmlFor={field}>{field.replace(/([A-Z])/g, ' $1').toUpperCase()}</label>
+                  <input
+                    type='text'
+                    id={field}
+                    name={field}
+                    value={formData[field]}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+              ))}
               <div className='form-group'>
                 <h3>Payment Method</h3>
-                <div className='payment-options'>
-                  <label>
-                    <input
-                      type='radio'
-                      name='paymentMethod'
-                      value='COD'
-                      checked={formData.paymentMethod === 'COD'}
-                      onChange={handlePaymentChange}
-                    />
-                    Cash On Delivery
-                  </label>
-                  <label>
-                    <input
-                      type='radio'
-                      name='paymentMethod'
-                      value='Credit/Debit Card'
-                      checked={formData.paymentMethod === 'Credit/Debit Card'}
-                      onChange={handlePaymentChange}
-                    />
-                    Credit/Debit Card
-                  </label>
-                </div>
+                <label>
+                  <input
+                    type='radio'
+                    name='paymentMethod'
+                    value='COD'
+                    checked={formData.paymentMethod === 'COD'}
+                    onChange={handlePaymentChange}
+                  />
+                  Cash On Delivery
+                </label>
               </div>
               <div className='form-group'>
                 <button type='submit' className='submit-btn' disabled={loading}>
@@ -206,28 +313,59 @@ const Checkout = () => {
               </div>
             </form>
           </div>
-          <div className='checkout-summary'>
+          <div className='checkout-summary' style={{
+            width: '100%',
+            maxWidth: '800px',
+            margin: '0 auto',
+            padding: '20px',
+            border: '1px solid #ccc',
+            borderRadius: '8px',
+            backgroundColor: '#f9f9f9'
+          }}>
             <h3>Order Summary</h3>
-            <div className='summary-header'>
-              <span>Item</span>
-              <span>Quantity</span>
-              <span>Total Price</span>
+            {savedProducts.map((product, index) => {
+              const effectiveDiscount = discounts[0] || 0; // Adjust as necessary for multiple discounts
+              const discountedPrice = getDiscountedPrice(product.price, effectiveDiscount);
+              const total = (discountedPrice * quantities[index]).toFixed(2);
+
+              return (
+                <div className='product-summary' key={index} style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '10px 0',
+                  borderBottom: '1px solid #ddd'
+                }}>
+                  <div>
+                    <h4>{product.product_name}</h4>
+                    <p>Original Price: ${product.price.toFixed(2)} (Discounted Price: ${discountedPrice.toFixed(2)} at {effectiveDiscount}% Off)</p>
+                    <input
+                      type='number'
+                      min='1'
+                      value={quantities[index]}
+                      onChange={e => handleQuantityChange(index, e)}
+                      style={{ width: '50px', marginRight: '10px' }}
+                    />
+                    <button onClick={() => handleRemoveProduct(index)}>Remove</button>
+                  </div>
+                  <div style={{ fontWeight: 'bold' }}>${total}</div>
+                </div>
+              );
+            })}
+
+            <span>Shipping Fee: P150</span>
+            <div className='total-price' style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginTop: '20px',
+              fontSize: '1.2em',
+              fontWeight: 'bold'
+            }}>
+
+              <span>Total Price:</span>
+              <span>${calculateTotalPrice().toFixed(2)}</span>
             </div>
-            <ul className='product-list'>
-              {selectedProducts.length > 0 ? (
-                selectedProducts.map((product) => (
-                  <li key={product.product_code}>
-                    <span>{product.product_name}</span>
-                    <span className='quantity'>{product.quantity}</span>
-                    <span className='total-price'>₱{product.price * product.quantity}</span>
-                  </li>
-                ))
-              ) : (
-                <p>No products selected.</p>
-              )}
-            </ul>
-            <br />
-            <h4>Total: ₱ {totalPrice}</h4>
           </div>
         </div>
       </div>

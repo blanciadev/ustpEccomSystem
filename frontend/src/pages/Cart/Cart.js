@@ -3,7 +3,7 @@ import './Cart.css';
 import Navigation from '../../components/Navigation';
 import Footer from '../../components/Footer';
 import CartProduct from '../../components/CartProduct';
-import cartEventEmitter from '../../components/cartEventEmitter'; 
+import cartEventEmitter from '../../components/cartEventEmitter';
 import { useNavigate } from 'react-router-dom';
 
 const CartContent = () => {
@@ -18,7 +18,7 @@ const CartContent = () => {
     const fetchCartItems = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://localhost:5000/cart', {
+        const response = await fetch('http://localhost:5001/cart', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -83,6 +83,13 @@ const CartContent = () => {
 
   const handleCheckout = () => {
     const selectedProducts = cartItems.filter(item => selectedItems[item.product_code]);
+
+    if (selectedProducts.length === 0) {
+      alert("Please select at least one product to proceed to checkout.");
+      return;
+    }
+
+    localStorage.setItem('selectedProducts', JSON.stringify(selectedProducts));
     navigate('/checkout', { state: { selectedProducts, totalPrice } });
   };
 
@@ -91,6 +98,55 @@ const CartContent = () => {
     const newSelectAllState = !allSelected;
     cartEventEmitter.emit('toggleSelectAll', newSelectAllState);
     handleSelectAll(newSelectAllState);
+  };
+
+  const updateCartQuantity = async (cartItemId, newQuantity) => {
+    try {
+      const response = await fetch(`http://localhost:5001/cart-update-quantity`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({
+          cart_items_id: cartItemId,
+          newQuantity: newQuantity,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update quantity');
+      }
+
+      const updatedItems = cartItems.map((item) =>
+        item.cart_items_id === cartItemId ? { ...item, quantity: newQuantity } : item
+      );
+
+      // Update local state to reflect the quantity change
+      setCartItems(updatedItems);
+    } catch (err) {
+      setError('Error updating quantity. Please try again later.');
+    }
+  };
+
+  const removeFromCart = async (cartItemId) => {
+    try {
+      const response = await fetch(`http://localhost:5001/cart-delete/${cartItemId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to remove item from cart');
+      }
+
+      // Remove the item from the cartItems state
+      setCartItems(cartItems.filter(item => item.cart_items_id !== cartItemId));
+    } catch (err) {
+      setError('Error removing item. Please try again later.');
+    }
   };
 
   return (
@@ -109,19 +165,13 @@ const CartContent = () => {
             <table>
               <thead>
                 <tr>
-                  <th>
-                    <form>
-                      <input
-                        type='checkbox'
-                        checked={Object.keys(selectedItems).length === cartItems.length && cartItems.length > 0}
-                        onChange={handleSelectAllChange}
-                      />
-                    </form>
-                  </th>
+                  <th></th>
+                  <th>ID</th>
                   <th>Product</th>
                   <th>Quantity</th>
                   <th>Price</th>
                   <th>Sub-total</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -133,12 +183,11 @@ const CartContent = () => {
                     price={item.price}
                     subTotal={item.sub_total}
                     productCode={item.product_code}
-                    description={item.description}
-                    brand={item.brand}
-                    category={item.category}
-                    size={item.size}
+                    cartItemId={item.cart_items_id}
                     isSelected={!!selectedItems[item.product_code]}
                     toggleItemSelection={toggleItemSelection}
+                    updateQuantity={updateCartQuantity}
+                    removeFromCart={removeFromCart} // Pass the remove function
                   />
                 ))}
               </tbody>

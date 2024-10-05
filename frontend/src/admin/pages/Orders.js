@@ -1,109 +1,146 @@
-
-import React, {useState} from 'react'
-import Pagination from 'react-bootstrap/Pagination';
+import React, { useState, useEffect } from 'react'; // Include useEffect here
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '../admin.css'
-import AdminNav from '../components/AdminNav'
+import '../admin.css';
+import AdminNav from '../components/AdminNav';
 import AdminHeader from '../components/AdminHeader';
+import axios from 'axios';
+import OrderModal from '../components/OrderModal';
 
 const Orders = () => {
+  const [orders, setOrders] = useState([]);
+  const [status, setStatus] = useState('');
+  const [statusOptions, setStatusOptions] = useState([
+    'To Ship', 'To Receive', 'Completed', 'Cancelled', 'Return/Refund', 'Pending'
+  ]);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [modalShow, setModalShow] = useState(false);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // Change this based on your preference
-  
-  const totalOrders = 1; // Replace with actual number of orders
-  const totalPages = Math.ceil(totalOrders / itemsPerPage);
+  // Fetch orders data from API
+  const fetchOrders = async () => {
+    try {
+      const response = await axios.get('http://localhost:5001/admin-order-history', {
+        params: { status }
+      });
+      console.log('Fetched orders:', response.data.orders);
+      setOrders(response.data.orders);
+    } catch (error) {
+      console.error('Error fetching orders:', error.message);
+    }
+  };
 
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
+  useEffect(() => {
+    fetchOrders();
+  }, [status]);
+
+  const handleOpenModal = (order) => {
+    setSelectedOrder(order);
+    setModalShow(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedOrder(null);
+    setModalShow(false);
+    fetchOrders(); // Refresh orders when modal closes
+  };
+
+  const refreshOrders = () => {
+    fetchOrders();
   };
 
   return (
     <div className='dash-con'>
-        <AdminNav/>
-        <div className='dash-board'>
-            <div className='dash-header'>
-                <div className='header-title'>
-                    <i class='bx bxs-package' ></i>
-                    <h1>Orders</h1>
-                </div>
-                <AdminHeader/>
-            </div>
-            <div className='dash-body'>
-              <div className='admin-order'>
-                <div className='order-header'>
-                  <div className='order-search'>
-                    <form>
-                      <input type='search'/>
-                      <button>Search</button>
-                    </form>
-                  </div>
-
-                  <div className='order-options'>
-                    <div className='order-print'>
-                      <button>Print Order Summary</button>
-                    </div>
-                    <div className='order-sort'>
-                      <label for="sort">Sort By</label>
-
-                      <select name="sort" id="sort">
-                        <option value="date">Date</option>
-                        <option value="status">Status</option>
-                        <option value="id">ID</option>
-                        <option value="customer-id">customer</option>
-                      </select>
-                    </div>
-                    
-                  </div>
-                </div>
-                <div className='order-table'>
-                <table>
-                  <thead>
-                    <tr>
-                      <th><input type='checkbox'/></th>
-                      <th>Order ID</th>
-                      <th>Customer ID</th>
-                      <th>Order Date</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  <tr>
-                      <td><input type='checkbox'/></td>
-                      <td>Order ID</td>
-                      <td>Customer ID</td>
-                      <td>Order Date</td>
-                      <td>Status</td>
-                      <td><button>View</button></td>
-                    </tr>
-                    
-                  </tbody>
-                </table>
-
-                </div>
-                <div className='pagination-container'>
-                  <Pagination>
-                    <Pagination.First onClick={() => handlePageChange(1)} disabled={currentPage === 1} />
-                    <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
-                    {[...Array(totalPages).keys()].map(pageNumber => (
-                      <Pagination.Item
-                        key={pageNumber + 1}
-                        active={pageNumber + 1 === currentPage}
-                        onClick={() => handlePageChange(pageNumber + 1)}
-                      >
-                        {pageNumber + 1}
-                      </Pagination.Item>
-                    ))}
-                    <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
-                    <Pagination.Last onClick={() => handlePageChange(totalPages)} disabled={currentPage === totalPages} />
-                  </Pagination>
-                </div>
+      <AdminNav />
+      <div className='dash-board'>
+        <div className='dash-header'>
+          <div className='header-title'>
+            <i className='bx bxs-package'></i>
+            <h1>Orders</h1>
+          </div>
+          <AdminHeader />
+        </div>
+        <div className='body'>
+          <div className='admin-order'>
+            <div className='cheader'>
+              <div className='search'>
+                <form>
+                  <input type='search' placeholder='Search orders...' />
+                </form>
               </div>
 
+              <div className='options'>
+                <div className='print'>
+                  <button>Print Order Summary</button>
+                </div>
+                <div className='sort'>
+                  <label htmlFor='sort'>Sort By:</label>
+                  <select name='sort' id='sort'>
+                    <option value='date'>Date</option>
+                    <option value='status'>Status</option>
+                    <option value='id'>ID</option>
+                    <option value='customer-id'>Customer ID</option>
+                  </select>
+                </div>
+                <div className='order-filter'>
+                  <label htmlFor='status'>Filter By Status:</label>
+                  <select
+                    name='status'
+                    id='status'
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                  >
+                    <option value=''>All</option>
+                    {statusOptions.map(option => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
             </div>
+            <div className='order-table'>
+              <table className='table table-hover'>
+                <thead className='bg-light sticky-top'>
+                  <tr>
+                    <th><input type='checkbox' /></th>
+                    <th>Order ID</th>
+
+                    <th>Customer Name</th>
+                    <th>Order Date</th>
+                    <th>Status</th>
+                    <th>Payment Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders.map(order => (
+                    <tr key={order.order_id}>
+                      <td><input type='checkbox' /></td>
+                      <td>{order.order_id}</td>
+
+                      <td>{`${order.customer_first_name} ${order.customer_last_name}`}</td>
+                      <td>{new Date(order.order_date).toLocaleDateString()}</td>
+                      <td>{order.order_status}</td>
+                      <td>{order.payment_status}</td>
+                      <td><button onClick={() => handleOpenModal(order)}>View</button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
+      </div>
+      {selectedOrder && (
+        <OrderModal
+          order={selectedOrder}
+          show={modalShow}
+          handleClose={handleCloseModal}
+          refreshOrders={refreshOrders} // Pass the refreshOrders function as a prop
+        />
+      )}
     </div>
+  );
+};
 
-
-export default Orders
+export default Orders;

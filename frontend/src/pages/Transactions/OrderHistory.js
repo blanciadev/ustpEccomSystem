@@ -13,7 +13,7 @@ const OrderHistory = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/order-history', {
+        const response = await axios.get('http://localhost:5001/order-history', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           },
@@ -39,7 +39,7 @@ const OrderHistory = () => {
 
   const handleCancelOrder = async (orderId) => {
     try {
-      await axios.post('http://localhost:5000/cancel-order', {
+      await axios.post('http://localhost:5001/cancel-order', {
         order_id: orderId
       }, {
         headers: {
@@ -102,8 +102,8 @@ const OrderHistory = () => {
                       </div>
                       <button
                         onClick={() => handleCancelOrder(order.order_id)}
-                        className={`cancel-button ${order.order_status === 'To Process' ? '' : 'disabled'}`}
-                        disabled={order.order_status !== 'To Process'}
+                        className={`cancel-button ${order.order_status === 'Pending' ? '' : 'disabled'}`}
+                        disabled={order.order_status !== 'Pending'}
                       >
                         Cancel Order
                       </button>
