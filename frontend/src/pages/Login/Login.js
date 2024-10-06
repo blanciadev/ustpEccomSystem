@@ -15,40 +15,27 @@ const Login = () => {
         e.preventDefault();
         setError('');
         setLoading(true);
-        console.log('Form submission started');
-
+    
         try {
-            console.log('Sending login request with:', { email, password });
-
-            // Make the login request
-            //angela
             const response = await axios.post('http://localhost:5001/users-login', { email, password });
-
-            //kurt
-            // const response = await axios.post('http://localhost:5001/customer-login', { email, password });
-
-            console.log('Login response:', response);
-
+    
             if (response.status === 200) {
-                // If login is successful, store token, user_id, username, and first_name
                 setLoginStatus('Login successful');
-                localStorage.setItem('token', response.data.token); // Store token
-                localStorage.setItem('customer_id', response.data.user_id); // Store user_id
-                localStorage.setItem('username', response.data.username); // Store username
-
-                // Store first_name and log it
-                localStorage.setItem('first_name', response.data.first_name); // Store first_name
-
-                console.log('Stored first_name:', response.data.first_name); // Log the stored first_name
-                console.log('Stored ID:', response.data.user_id); // Log the stored first_name
-
-                // Redirect to homepage
-                navigate('/');
+                localStorage.setItem('token', response.data.token);
+                localStorage.setItem('customer_id', response.data.user_id);
+                localStorage.setItem('username', response.data.username);
+                localStorage.setItem('first_name', response.data.first_name);
+    
+                // Check if there's a redirect page stored
+                const redirectTo = localStorage.getItem('redirectTo');
+                if (redirectTo) {
+                    localStorage.removeItem('redirectTo'); // Clean up after redirect
+                    navigate(redirectTo); // Redirect to the saved page (e.g., /checkout)
+                } else {
+                    navigate('/'); // Default redirect to home page
+                }
             }
         } catch (err) {
-            // Handle errors
-            console.error('Error during login:', err);
-
             if (err.response) {
                 setError(err.response.data.message || 'An error occurred during login');
             } else if (err.request) {
@@ -58,9 +45,9 @@ const Login = () => {
             }
         } finally {
             setLoading(false);
-            console.log('Form submission ended, loading state:', loading);
         }
     };
+    
 
     return (
         <div className='login-con'>

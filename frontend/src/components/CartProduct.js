@@ -2,28 +2,28 @@ import React, { useState, useEffect } from 'react';
 
 const CartProduct = ({
   productName,
-  cartItemId, // Correct ID for cart_items_id
-  quantity, // Initial quantity from props
+  cartItemId, 
+  quantity, 
   price,
   productCode,
   isSelected,
   toggleItemSelection,
-  updateQuantity, // Function to handle quantity updates
-  removeFromCart // New function to handle removing the product from the cart
+  updateQuantity, 
+  removeFromCart 
 }) => {
   const [localQuantity, setLocalQuantity] = useState(quantity);
 
   // Sync localQuantity with the props.quantity if it changes
   useEffect(() => {
     setLocalQuantity(quantity);
-  }, [quantity]); // Dependency on quantity to update localQuantity
+  }, [quantity]); 
 
   // Function to handle quantity change from input or buttons
   const handleQuantityChange = (event) => {
-    const newQuantity = parseInt(event.target.value, 10); // Ensure it's an integer
+    const newQuantity = parseInt(event.target.value, 10); 
     if (newQuantity >= 1) {
-      setLocalQuantity(newQuantity); // Update local quantity
-      updateQuantity(cartItemId, newQuantity); // Send updated quantity to parent or backend
+      setLocalQuantity(newQuantity); 
+      updateQuantity(cartItemId, newQuantity); 
     }
   };
 
@@ -43,7 +43,7 @@ const CartProduct = ({
 
   // Function to remove item from cart
   const handleRemoveFromCart = () => {
-    removeFromCart(cartItemId); // Calls the function passed from the parent
+    removeFromCart(cartItemId); 
   };
 
   return (
@@ -63,13 +63,13 @@ const CartProduct = ({
           type="number"
           value={localQuantity}
           min="1"
-          onChange={handleQuantityChange} // Input change for manual input
+          onChange={handleQuantityChange} 
           style={{ width: "50px", textAlign: "center" }}
         />
         <button onClick={incrementQuantity}>+</button> {/* Increment button */}
       </td>
-      <td>P{price.toFixed(2)}</td>
-      <td>P{(price * localQuantity).toFixed(2)}</td>
+      <td>₱{price.toFixed(2)}</td>
+      <td>₱{(price * localQuantity).toFixed(2)}</td>
       <td>
         <button onClick={handleRemoveFromCart}>Remove</button> {/* Remove button */}
       </td>

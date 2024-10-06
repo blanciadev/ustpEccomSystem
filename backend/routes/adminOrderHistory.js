@@ -185,7 +185,7 @@ router.get('/admin-order-history-component', async (req, res) => {
         `;
 
         if (status) {
-            query += ` AND order_details.order_status = ?`;  // Add status filter if provided
+            query += ` AND order_details.order_status = ?`;  
         }
 
         const queryParams = status ? [status] : [];
@@ -237,7 +237,7 @@ router.get('/admin-order-history-total-component', async (req, res) => {
         `;
 
         if (status) {
-            query += ` WHERE order_details.order_status = ?`;  // Add status filter if provided
+            query += ` WHERE order_details.order_status = ?`;  
         }
 
         const queryParams = status ? [status] : [];
@@ -277,17 +277,17 @@ router.get('/sales', async (req, res) => {
         // Query the order_details table for completed orders, grouped by the month of the order_date
         const [rows] = await db.query(`
             SELECT 
-                MONTH(order_date) AS month,       -- Extract the month from the order_date
-                COUNT(*) AS completed_sales,      -- Count the number of completed orders
-                SUM(total_price) AS total_sales_amount  -- Sum the total price for the completed sales
+                MONTH(order_date) AS month,      
+                COUNT(*) AS completed_sales,     
+                SUM(total_price) AS total_sales_amount  
             FROM 
                 order_details
             WHERE 
-                order_status = 'Completed'        -- Only count completed orders
+                order_status = 'Completed'        
             GROUP BY 
-                MONTH(order_date)                 -- Group by month of the order_date
+                MONTH(order_date)                
             ORDER BY 
-                MONTH(order_date)                 -- Sort by the month
+                MONTH(order_date)               
         `);
 
         res.json({ insights: rows });  // Send the result back to the frontend
@@ -315,7 +315,7 @@ router.get('/payment-insight', async (req, res) => {
         `;
 
         const result = await db.query(query);
-        console.log(result); // Check the structure of the result
+        console.log(result); 
 
         // Check if result is nested and extract data accordingly
         const monthlyCounts = Array.isArray(result) && result.length > 0
@@ -325,7 +325,7 @@ router.get('/payment-insight', async (req, res) => {
             }))
             : [];
 
-        console.log(monthlyCounts); // Log the final monthly counts
+        console.log(monthlyCounts); 
 
         res.json({ monthlyCounts });
     } catch (error) {

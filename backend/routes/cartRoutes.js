@@ -182,7 +182,7 @@ router.get('/cart', authenticateToken, async (req, res) => {
 
         res.status(200).json({
             items: rows.map(item => ({
-                cart_items_id: item.cart_items_id, // Include the cart item ID in the response
+                cart_items_id: item.cart_items_id, 
                 product_id: item.product_id,
                 product_code: item.product_code,
                 product_name: item.product_name,

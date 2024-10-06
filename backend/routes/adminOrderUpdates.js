@@ -30,43 +30,7 @@ router.put('/update-order-status/:orderId', async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
-        // If the status is 'To Ship', subtract the quantity from the product table
-        // if (status === 'To Ship') {
-        //     for (const product of products) {
-        //         const { product_id, quantity } = product;
-
-        //         // Check if the product has sufficient stock
-        //         const [productResult] = await db.query(
-        //             'SELECT quantity FROM product WHERE product_code = ?',
-        //             [product_id]
-        //         );
-
-        //         if (productResult.length === 0) {
-        //             await db.query('ROLLBACK');
-        //             return res.status(404).json({ message: `Product ID ${product_id} not found` });
-        //         }
-
-        //         if (productResult[0].quantity < quantity) {
-        //             await db.query('ROLLBACK');
-        //             return res.status(400).json({
-        //                 message: `Not enough stock for product ID ${product_id}. Available: ${productResult[0].quantity}`,
-        //             });
-        //         }
-
-        //         // Subtract the quantity from the product table
-        //         const updateResult = await db.query(
-        //             'UPDATE product SET quantity = quantity - ? WHERE product_code = ?',
-        //             [quantity, product_id]
-        //         );
-
-        //         if (updateResult.affectedRows === 0) {
-        //             await db.query('ROLLBACK');
-        //             return res.status(404).json({ message: `Failed to update stock for product ID ${product_id}` });
-        //         }
-        //     }
-        // }
-
-        // Commit the transaction after all updates
+       
         await db.query('COMMIT');
 
         // Respond with success

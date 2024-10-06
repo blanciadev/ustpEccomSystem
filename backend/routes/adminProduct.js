@@ -201,8 +201,8 @@ router.get('/sales-for-today', async (req, res) => {
         // Ensure salesData is an object
         const salesData = results[0] || {};
         res.json({
-            total_sales: salesData.total_completed_sales || 0, // Match key name with frontend
-            total_orders: salesData.total_completed_orders || 0, // Match key name with frontend
+            total_sales: salesData.total_completed_sales || 0, 
+            total_orders: salesData.total_completed_orders || 0, 
             total_products_sold: salesData.total_products_sold || 0,
         });
     } catch (error) {
@@ -219,9 +219,9 @@ router.get('/product-reports-per-month', async (req, res) => {
        SELECT
     product.product_code, 
     product.product_name, 
-    SUM(order_details.quantity) AS total_quantity,  -- Total quantity for the product
-    SUM(order_details.total_price) AS total_amount, -- Total sales amount for the product
-    (SUM(order_details.quantity) * SUM(order_details.total_price)) AS total_sales, -- Total sales for the product
+    SUM(order_details.quantity) AS total_quantity,  
+    SUM(order_details.total_price) AS total_amount,
+    (SUM(order_details.quantity) * SUM(order_details.total_price)) AS total_sales, 
     DATE_FORMAT(order_details.order_date, '%b %Y') AS period
 FROM 
     order_details

@@ -7,7 +7,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const data = {
-  labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'], // X-axis labels
+  labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
   datasets: [
     {
       label: 'Last Month',

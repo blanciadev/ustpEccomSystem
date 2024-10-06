@@ -71,7 +71,7 @@ const generateOrderId = async () => {
 
         // Check if the order ID already exists
         const [result] = await db.query('SELECT COUNT(*) AS count FROM `order` WHERE `order_id` = ?', [orderId]);
-        isUnique = result[0].count === 0; // If count is 0, the ID is unique
+        isUnique = result[0].count === 0;
     }
 
     return orderId;
@@ -146,7 +146,7 @@ router.post('/insert-order', async (req, res) => {
         console.log('------------------------------------');
         console.log('Order inserted with result:', orderResult);
 
-        const cartItemsUpdateIds = []; // Initialize this array
+        const cartItemsUpdateIds = []; 
 
         // Loop through order_details
         for (const detail of order_details) {
@@ -173,7 +173,7 @@ router.post('/insert-order', async (req, res) => {
             console.log('Inserted order detail:', { order_id, product_id, quantity, totalprice, formattedPaymentDate, payment_method, payment_status });
 
             // Add cart_items to cartItemsUpdateIds for status update
-            cartItemsUpdateIds.push(cart_items); // Use the correct cart_items id
+            cartItemsUpdateIds.push(cart_items); 
             console.log('Added cart_items_id to cartItemsUpdateIds:', cart_items);
             console.log('------------------------------------');
 
@@ -194,7 +194,7 @@ router.post('/insert-order', async (req, res) => {
             }
         }
 
-        // At this point, let's check the populated cartItemsUpdateIds array
+      
         console.log('Final cartItemsUpdateIds:', cartItemsUpdateIds);
 
         // Update status for cart items directly without checking if they are in process
@@ -258,9 +258,9 @@ router.post('/insert-order', async (req, res) => {
 // Route to update customer details based on customer_id
 router.post('/update-customer-details/:customer_id', authenticateToken, async (req, res) => {
     try {
-        const user = req.user; // Get the authenticated user
-        const { address, region, postal_code, phone_number } = req.body; // Extract data from request body
-        const { customer_id } = req.params; // Get customer_id from URL parameters
+        const user = req.user; 
+        const { address, region, postal_code, phone_number } = req.body; 
+        const { customer_id } = req.params;
 
         console.log(`Request received to update customer details for ID: ${customer_id}`);
 
@@ -312,8 +312,8 @@ router.post('/update-customer-details/:customer_id', authenticateToken, async (r
 // Route to get order history for a user with optional status filter
 router.get('/order-history', authenticateToken, async (req, res) => {
     try {
-        const { customer_id } = req.user; // Get customer_id from authenticated user
-        const { status } = req.query; // Get the order status from query parameter
+        const { customer_id } = req.user; 
+        const { status } = req.query;
 
         // Base query to fetch order history along with product details
         let query = `
@@ -359,7 +359,7 @@ router.get('/order-history', authenticateToken, async (req, res) => {
                     order_id: order.order_id,
                     order_date: order.order_date,
                     order_total: order.order_total,
-                    order_status: order.order_status, // Include order_status here
+                    order_status: order.order_status,
                     products: []
                 };
             }
@@ -385,7 +385,7 @@ router.get('/order-history', authenticateToken, async (req, res) => {
 // Route to cancel an order
 router.post('/cancel-order', authenticateToken, async (req, res) => {
     try {
-        const { order_id } = req.body; // Get order_id from request body
+        const { order_id } = req.body; 
 
         // Update order status to 'Cancelled'
         await db.query(`

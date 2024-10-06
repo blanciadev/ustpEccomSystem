@@ -31,7 +31,7 @@ const authenticateToken = async (req, res, next) => {
             return res.status(401).json({ message: 'User not found' });
         }
 
-        req.user = userRows[0]; // Attach user info to request
+        req.user = userRows[0]; 
         next();
     } catch (error) {
         console.error('Authentication error:', error.message);
@@ -42,7 +42,7 @@ const authenticateToken = async (req, res, next) => {
 
 // Logout endpoint
 router.post('/logout', authenticateToken, async (req, res) => {
-    const token = req.headers['authorization']?.split(' ')[1]; // Extract token from headers
+    const token = req.headers['authorization']?.split(' ')[1];
 
     if (!token) {
         return res.status(400).json({ message: 'No token provided.' });

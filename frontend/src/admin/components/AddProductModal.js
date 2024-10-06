@@ -8,10 +8,10 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
     const [price, setPrice] = useState('');
     const [quantity, setQuantity] = useState('');
     const [expirationDate, setExpirationDate] = useState('');
-    const [imageURL, setImageURL] = useState(''); // Changed from file to URL
+    const [imageURL, setImageURL] = useState(''); 
     const [categories, setCategories] = useState([]);
     const [error, setError] = useState('');
-    const [size, setSize] = useState('500'); // Default size
+    const [size, setSize] = useState('500'); 
     const [customSize, setCustomSize] = useState('');
 
     useEffect(() => {
@@ -73,7 +73,7 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(productData), // Ensure imageURL is included
+                body: JSON.stringify(productData),
             });
 
             if (!response.ok) {
@@ -81,7 +81,7 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
             }
 
             const result = await response.text();
-            console.log(result); // Log or handle the result
+            console.log(result); 
             handleClose();
         } catch (error) {
             console.error('Error adding product:', error);

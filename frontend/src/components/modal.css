@@ -5,20 +5,22 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.8);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    padding: 20px; /* Ensure some padding for mobile responsiveness */
 }
 
 .modal-content {
     background: white;
     padding: 20px;
     border-radius: 8px;
-    width: 80%;
+    width: 90%;
     max-width: 800px;
     position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .modal-close {
@@ -29,6 +31,12 @@
     border: none;
     font-size: 20px;
     cursor: pointer;
+    color: #888;
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: #333;
 }
 
 .modal-body {
@@ -39,9 +47,16 @@ img {
     max-width: 100%;
     border-radius: 8px;
     margin-bottom: 20px;
+    height: auto;
 }
 
-/* Recommendations Grid */
+/* Bundle Section */
+.bundle-section {
+    margin-top: 20px;
+    text-align: left;
+}
+
+/* Recommended Products */
 .recommended-products-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -49,11 +64,14 @@ img {
     margin-top: 20px;
 }
 
-/* Product Card */
+.recommendations {
+    margin-top: 30px;
+}
+
 .product-card {
     border: 1px solid #ddd;
     border-radius: 8px;
-    padding: 10px;
+    padding: 20px;
     text-align: center;
     background-color: #f9f9f9;
     transition: box-shadow 0.2s ease;
@@ -87,15 +105,49 @@ img {
     margin-bottom: 10px;
 }
 
-.add-to-cart-btn {
+.add-to-cart-btn, .buy-now-btn {
     background-color: #007bff;
     color: white;
     border: none;
     padding: 8px 16px;
     border-radius: 4px;
     cursor: pointer;
+    margin: 5px 0;
+    width: 100%;
+    transition: background-color 0.3s;
 }
 
-.add-to-cart-btn:hover {
+.add-to-cart-btn:hover, .buy-now-btn:hover {
+    background-color: #0056b3;
+}
+
+.product-discount {
+    color: red;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* Pagination Controls */
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination-controls button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    margin: 0 5px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.pagination-controls button.active {
+    background-color: #0056b3;
+}
+
+.pagination-controls button:hover {
     background-color: #0056b3;
 }

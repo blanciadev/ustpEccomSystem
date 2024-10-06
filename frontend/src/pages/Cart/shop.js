@@ -89,28 +89,65 @@ const Shop = () => {
         console.log(productData);
     };
 
-    const handleAddToCart = async (product) => {
-        const token = localStorage.getItem('token');
-        const userId = localStorage.getItem('customer_id');
+   // Function to generate a unique code for cart_items_id
+function generateCartItemId() {
+    return 'CART-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+}
 
-        if (!token || !userId) {
-            console.log('User not logged in or user ID missing');
-            return;
+const handleAddToCart = async (product) => {
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('customer_id');
+
+    if (!token || !userId) {
+        console.log('User not logged in or user ID missing, saving to localStorage.');
+
+        // Handle saving to localStorage
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const existingProductIndex = cart.findIndex(item => item.product_code === product.product_code);
+
+        if (existingProductIndex !== -1) {
+            // If the product already exists, increase the quantity
+            cart[existingProductIndex].quantity += 1;
+            cart[existingProductIndex].sub_total = cart[existingProductIndex].quantity * cart[existingProductIndex].price;
+            console.log('Increased quantity for existing product:', cart[existingProductIndex]);
+        } else {
+            // Add a new product to the cart
+            const newCartItem = {
+                cart_items_id: generateCartItemId(), // Generate unique ID for the cart item
+                product_code: product.product_code,
+                product_name: product.product_name,
+                price: product.price,
+                quantity: 1,
+                sub_total: product.price // Initial sub_total is equal to price
+            };
+            cart.push(newCartItem);
+            console.log('Added new product to cart:', newCartItem);
         }
 
-        try {
-            await axios.post(
-                'http://localhost:5001/add-to-cart',
-                { product_code: product.product_code, quantity: 1 },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+        // Save the updated cart to localStorage
+        localStorage.setItem('cart', JSON.stringify(cart));
+        console.log('Cart updated and saved to localStorage:', cart);
 
-            console.log('Product added to cart');
-            cartEventEmitter.emit('cartUpdated', { product_code: product.product_code, quantity: 1 });
-        } catch (error) {
-            console.error('Error adding product to cart:', error.response ? error.response.data : error.message);
-        }
-    };
+        // Emit cart update event
+        cartEventEmitter.emit('cartUpdated', { product_code: product.product_code, quantity: 1 });
+        return;
+    }
+
+    try {
+        // If the user is logged in, add the product to the server-side cart
+        await axios.post(
+            'http://localhost:5001/add-to-cart',
+            { product_code: product.product_code, quantity: 1 },
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        console.log('Product added to server-side cart');
+        cartEventEmitter.emit('cartUpdated', { product_code: product.product_code, quantity: 1 });
+    } catch (error) {
+        console.error('Error adding product to cart:', error.response ? error.response.data : error.message);
+    }
+};
+
 
     const openModal = (product) => {
         setSelectedProduct(product);

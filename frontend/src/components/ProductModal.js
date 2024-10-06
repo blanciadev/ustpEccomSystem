@@ -11,7 +11,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
 
     // Pagination state for recommendations
     const [currentPage, setCurrentPage] = useState(1);
-    const [productsPerPage] = useState(3); // Set number of products per page
+    const [productsPerPage] = useState(3); 
 
     useEffect(() => {
         if (product) {
@@ -49,7 +49,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                     // Select all bundle products when the modal opens
                     const initialSelection = {};
                     bundleData.forEach(bProduct => {
-                        initialSelection[bProduct.product_code] = true; // Set all to selected
+                        initialSelection[bProduct.product_code] = true; 
                     });
                     setSelectedBundleProducts(initialSelection);
 
@@ -186,7 +186,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
     const handleBundleProductSelect = (productCode) => {
         setSelectedBundleProducts(prevState => ({
             ...prevState,
-            [productCode]: !prevState[productCode], // Toggle selection
+            [productCode]: !prevState[productCode], 
         }));
     };
 

@@ -14,22 +14,32 @@ const CartContent = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  // Check if user is logged in
+  const isLoggedIn = !!localStorage.getItem('token');
+
   useEffect(() => {
     const fetchCartItems = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://localhost:5001/cart', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        });
+        if (isLoggedIn) {
+          // Fetch cart from the server if user is logged in
+          const response = await fetch('http://localhost:5001/cart', {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          });
 
-        const data = await response.json();
+          const data = await response.json();
 
-        if (response.ok) {
-          setCartItems(data.items);
+          if (response.ok) {
+            setCartItems(data.items);
+          } else {
+            setError(data.message || 'Failed to fetch cart items');
+          }
         } else {
-          setError(data.message || 'Failed to fetch cart items');
+          // Get cart items from localStorage for guest users
+          const localCart = JSON.parse(localStorage.getItem('cart')) || [];
+          setCartItems(localCart);
         }
       } catch (err) {
         setError('Error fetching cart items. Please try again later.');
@@ -39,7 +49,7 @@ const CartContent = () => {
     };
 
     fetchCartItems();
-  }, []);
+  }, [isLoggedIn]);
 
   const computeTotalPrice = () => {
     return cartItems.reduce((total, item) => {
@@ -93,57 +103,88 @@ const CartContent = () => {
     navigate('/checkout', { state: { selectedProducts, totalPrice } });
   };
 
-  const handleSelectAllChange = () => {
-    const allSelected = Object.keys(selectedItems).length === cartItems.length;
-    const newSelectAllState = !allSelected;
-    cartEventEmitter.emit('toggleSelectAll', newSelectAllState);
-    handleSelectAll(newSelectAllState);
-  };
 
   const updateCartQuantity = async (cartItemId, newQuantity) => {
     try {
-      const response = await fetch(`http://localhost:5001/cart-update-quantity`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({
-          cart_items_id: cartItemId,
-          newQuantity: newQuantity,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update quantity');
+      console.log(`Attempting to update quantity for cart item ID: ${cartItemId} to new quantity: ${newQuantity}`);
+      
+      if (isLoggedIn) {
+        // Update cart on the server for logged-in users
+        const response = await fetch(`http://localhost:5001/cart-update-quantity`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+          body: JSON.stringify({
+            cart_items_id: cartItemId,
+            newQuantity: newQuantity,
+          }),
+        });
+  
+        console.log(`Server response status: ${response.status}`);
+  
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Error from server:', errorData);
+          throw new Error('Failed to update quantity');
+        }
+  
+        console.log('Quantity updated successfully on the server');
+      } else {
+        // Update cart in localStorage for guest users
+        const updatedItems = cartItems.map((item) => {
+          console.log(`Checking item: `, item);
+  
+          // Make sure cart_items_id matches cartItemId
+          if (item.cart_items_id === cartItemId) {
+            const updatedItem = { 
+              ...item, 
+              quantity: newQuantity, 
+              sub_total: item.price * newQuantity 
+            };
+            console.log(`Updated item: `, updatedItem);
+            return updatedItem;
+          }
+          return item; // Return the item unchanged if it doesn't match
+        });
+  
+        setCartItems(updatedItems);
+        localStorage.setItem('cart', JSON.stringify(updatedItems));
+        console.log('Local storage updated with new cart items:', updatedItems);
       }
-
-      const updatedItems = cartItems.map((item) =>
-        item.cart_items_id === cartItemId ? { ...item, quantity: newQuantity } : item
-      );
-
-      // Update local state to reflect the quantity change
-      setCartItems(updatedItems);
     } catch (err) {
+      console.error('Error updating quantity:', err);
       setError('Error updating quantity. Please try again later.');
     }
   };
+  
+  
 
   const removeFromCart = async (cartItemId) => {
     try {
-      const response = await fetch(`http://localhost:5001/cart-delete/${cartItemId}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
+      if (isLoggedIn) {
+        // Remove item from the server cart for logged-in users
+        const response = await fetch(`http://localhost:5001/cart-delete/${cartItemId}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
 
-      if (!response.ok) {
-        throw new Error('Failed to remove item from cart');
+        if (!response.ok) {
+          throw new Error('Failed to remove item from cart');
+        }
       }
 
-      // Remove the item from the cartItems state
-      setCartItems(cartItems.filter(item => item.cart_items_id !== cartItemId));
+      // Remove item from the cart (server or localStorage)
+      const updatedCart = cartItems.filter(item => item.cart_items_id !== cartItemId);
+      setCartItems(updatedCart);
+      
+      if (!isLoggedIn) {
+        // Update cart in localStorage for guest users
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
+      }
     } catch (err) {
       setError('Error removing item. Please try again later.');
     }
@@ -187,7 +228,7 @@ const CartContent = () => {
                     isSelected={!!selectedItems[item.product_code]}
                     toggleItemSelection={toggleItemSelection}
                     updateQuantity={updateCartQuantity}
-                    removeFromCart={removeFromCart} // Pass the remove function
+                    removeFromCart={removeFromCart} 
                   />
                 ))}
               </tbody>

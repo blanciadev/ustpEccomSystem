@@ -10,9 +10,9 @@ const RemoveDiscountProduct = ({ show, handleClose, order, handleUpdate }) => {
   useEffect(() => {
     if (show) {
       axios
-        .get('http://localhost:5001/products-disable-bundle') // Update the endpoint to fetch only products with discounts
+        .get('http://localhost:5001/products-disable-bundle') 
         .then((response) => {
-          setProducts(response.data); // Set the products from the response
+          setProducts(response.data); 
         })
         .catch((error) => {
           console.error('Error fetching products:', error);
@@ -23,11 +23,11 @@ const RemoveDiscountProduct = ({ show, handleClose, order, handleUpdate }) => {
   // Function to remove the discount from the product using product_code
   const handleRemoveDiscount = (productCode) => {
     axios
-      .post(`http://localhost:5001/remove-discount/${productCode}`) // API call to remove the discount using product_code
+      .post(`http://localhost:5001/remove-discount/${productCode}`) // 
       .then((response) => {
         // Update the products list after discount is removed
         setProducts(products.filter((product) => product.product_code !== productCode));
-        handleUpdate(); // Call the update function to reflect changes
+        handleUpdate(); 
       })
       .catch((error) => {
         console.error('Error removing discount:', error);

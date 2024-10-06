@@ -15,7 +15,7 @@ const AdminHeader = () => {
                         
                         <Dropdown>
                         <Dropdown.Toggle as="p" variant='link' className='admin-text'>
-                                Ma. Leonille  D. Silfavan {/* Admin Name */}
+                                Ma. Leonille  D. Silfavan 
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu style={{marginTop: '35px', width:'200px'}}>

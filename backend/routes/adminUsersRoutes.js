@@ -5,7 +5,7 @@ const db = require('../db');
 // Route to get users reports 
 router.get('/admin-users-report', async (req, res) => {
     try {
-        const query = `SELECT * FROM users`; // Adjust based on your table structure
+        const query = `SELECT * FROM users`; 
         const [results] = await db.execute(query);
 
         res.json({
@@ -20,14 +20,14 @@ router.get('/admin-users-report', async (req, res) => {
 // Route to get users counts
 router.get('/admin-users-count', async (req, res) => {
     try {
-        const query = `SELECT * FROM users`; // Adjust based on your table structure
+        const query = `SELECT * FROM users`; 
         const [results] = await db.execute(query);
 
         // Calculate user counts
         const newUsersCount = results.filter(user => user.role_type === 'user').length;
         const totalEmployeesCount = results.filter(user => user.role_type === 'Admin').length;
-        const activeCustomersCount = results.filter(user => user.status === 'active').length; // Assuming you have a status field
-        const inactiveCustomersCount = results.filter(user => user.status === 'inactive').length; // Assuming you have a status field
+        const activeCustomersCount = results.filter(user => user.status === 'active').length;
+        const inactiveCustomersCount = results.filter(user => user.status === 'inactive').length; 
 
         res.json({
             data: {

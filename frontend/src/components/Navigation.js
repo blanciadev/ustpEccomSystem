@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { cartEventEmitter } from './eventEmitter';
 
@@ -9,7 +9,6 @@ const Navigation = () => {
     const [cartItemCount, setCartItemCount] = useState(0);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
-    const location = useLocation(); // Get the current location
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -20,56 +19,26 @@ const Navigation = () => {
             setIsLoggedIn(true);
             setUsername(storedUsername || '');
             setFirstName(storedFirstName || '');
-            fetchCartItemCount();
         }
 
-        validateTokenAndRedirect();
+        fetchCartItemCount();
         cartEventEmitter.on('cartUpdated', fetchCartItemCount);
         return () => {
             cartEventEmitter.off('cartUpdated', fetchCartItemCount);
         };
     }, []);
 
-    const validateTokenAndRedirect = async () => {
-        const token = localStorage.getItem('token');
-
-        if (!token) {
-            if (location.pathname !== '/') {
-                navigate('/');
-            } else {
-                setIsLoggedIn(false);
-                navigate('/');
-                return;
-            }
-
-        }
-
-        try {
-            const response = await axios.get('http://localhost:5001/validate-token', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (response.status === 200) {
-                setIsLoggedIn(true);
-                setUsername(localStorage.getItem('username') || '');
-                setFirstName(localStorage.getItem('first_name') || '');
-                fetchCartItemCount();
-            }
-        } catch (error) {
-            console.error('Error validating token:', error.response ? error.response.data : error.message);
-            setIsLoggedIn(false);
-            // Check if the current location is not '/home' before redirecting to '/login'
-            if (location.pathname !== '/') {
-                navigate('/login');
-            } else {
-                navigate('/');
-            }
-        }
-    };
-
     const fetchCartItemCount = async () => {
         const token = localStorage.getItem('token');
-        if (!token) return;
-
+        
+        if (!token) {
+            // Fetch cart from localStorage if user is not logged in
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            setCartItemCount(cart.reduce((total, item) => total + item.quantity, 0)); // Count total quantity in cart
+            return;
+        }
+    
+        // Fetch cart from the server if the user is logged in
         try {
             const response = await axios.get('http://localhost:5001/cart-item-count', {
                 headers: { Authorization: `Bearer ${token}` }
@@ -81,7 +50,7 @@ const Navigation = () => {
             console.error('Error fetching cart item count:', error.response ? error.response.data : error.message);
         }
     };
-
+    
     const handleLogout = async () => {
         const token = localStorage.getItem('token');
         if (token) {
@@ -103,11 +72,7 @@ const Navigation = () => {
     };
 
     const handleCartClick = () => {
-        if (isLoggedIn) {
-            navigate('/cart');
-        } else {
-            navigate('/login');
-        }
+        navigate('/cart');
     };
 
     const handleProfileClick = () => {

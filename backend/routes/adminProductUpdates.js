@@ -2,9 +2,6 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 const multer = require('multer');
-const sharp = require('sharp');
-
-// Set up multer for file uploads (in-memory storage)
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
@@ -35,7 +32,7 @@ router.post('/add-product', async (req, res) => {
         console.log('Quantity:', quantity);
         console.log('Expiration Date:', expirationDate);
         console.log('Size:', size);
-        console.log('Image URL:', imageURL); // Ensure image URL is correctly logged
+        console.log('Image URL:', imageURL); 
 
         // Generate unique product code
         const productCode = await generateProductCode();
@@ -147,7 +144,7 @@ router.get('/admin-products', async (req, res) => {
 });
 
 router.get('/admin-products-targeted', async (req, res) => {
-    const { product_code } = req.query; // Extract product_code from the query parameters
+    const { product_code } = req.query; 
 
     try {
         let query = `

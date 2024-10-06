@@ -122,26 +122,32 @@ const Checkout = () => {
 
     setOriginalQuantities(updatedQuantities);
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     setSuccess('');
-
+  
+    const token = localStorage.getItem('token'); 
+    if (!token) {
+      localStorage.setItem('redirectTo', '/checkout'); 
+      navigate('/login'); 
+      return;
+    }
+  
     if (!validateForm()) {
       setLoading(false);
       setError('All fields are required.');
       return;
     }
-
+  
     try {
       if (!customerId || savedProducts.length === 0) {
         setLoading(false);
         setError('Missing customer ID or no products selected.');
         return;
       }
-
+  
       const totalOrderPrice = calculateTotalPrice().toFixed(2);
       const orderData = {
         customer_id: customerId,
@@ -149,7 +155,7 @@ const Checkout = () => {
         order_details: savedProducts.map((product, index) => {
           const discountedPrice = product.price * (1 - (discounts[index] / 100));
           const productTotal = discountedPrice * quantities[index];
-
+  
           return {
             cart_items: product.cart_items_id,
             product_id: product.product_code,
@@ -169,13 +175,13 @@ const Checkout = () => {
         phoneNumber: formData.phoneNumber,
         postalCode: formData.postalCode,
       };
-
+  
       const response = await axios.post('http://localhost:5001/insert-order', orderData, {
-        headers: { Authorization: `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
-
+  
       localStorage.setItem('checkoutOrderData', JSON.stringify(orderData));
-
+  
       if (response.status === 201) {
         setSuccess('Order placed successfully!');
         localStorage.removeItem('selectedProducts');
@@ -188,7 +194,7 @@ const Checkout = () => {
       setLoading(false);
     }
   };
-
+  
 
   const calculateTotalPrice = () => {
     const allValuesEqual = (array) => {
@@ -210,6 +216,7 @@ const Checkout = () => {
 
       // Check if the product has a discounted price (bundled product)
       if (product.discounted_price) {
+
         // Apply the discount to the bundled product
         const effectiveDiscount = allValuesEqual(discounts) ? discounts[0] : discounts || 0;
         const discountMultiplier = (1 - (effectiveDiscount / 100 || 0));
@@ -239,21 +246,21 @@ const Checkout = () => {
         console.log(`(Effective Discount )`, effectiveDiscount);
       }
 
-      // Ensure quantities[index] is a valid number and add flat shipping ($150)
+    
       const quantity = quantities[index] || 0;
-      const shipping = 150;
-      const totalForProduct = effectivePrice * quantity + shipping;
+     
+      const totalForProduct = effectivePrice * quantity ;
 
       // Log total for the product with quantity and shipping
       console.log(`  Quantity: ${quantity}`);
-      console.log(`  Shipping: $${shipping}`);
       console.log(`  Total for ${product.product_name}: $${totalForProduct.toFixed(2)}`);
       console.log("------------------------------");
 
       return acc + totalForProduct;
     }, 0);
 
-    const transactionTotal = productTotal;
+    const shipping = 150;
+    const transactionTotal = productTotal + shipping;
 
     console.log(`Transaction Total: $${transactionTotal.toFixed(2)}`);
     console.log("----- End of Receipt -----");
@@ -324,7 +331,7 @@ const Checkout = () => {
           }}>
             <h3>Order Summary</h3>
             {savedProducts.map((product, index) => {
-              const effectiveDiscount = discounts[0] || 0; // Adjust as necessary for multiple discounts
+              const effectiveDiscount = discounts[0] || 0; 
               const discountedPrice = getDiscountedPrice(product.price, effectiveDiscount);
               const total = (discountedPrice * quantities[index]).toFixed(2);
 
@@ -338,7 +345,7 @@ const Checkout = () => {
                 }}>
                   <div>
                     <h4>{product.product_name}</h4>
-                    <p>Original Price: ${product.price.toFixed(2)} (Discounted Price: ${discountedPrice.toFixed(2)} at {effectiveDiscount}% Off)</p>
+                    <p>Original Price: ₱{product.price.toFixed(2)} (Discounted Price: ₱{discountedPrice.toFixed(2)} at {effectiveDiscount}% Off)</p>
                     <input
                       type='number'
                       min='1'
@@ -348,12 +355,12 @@ const Checkout = () => {
                     />
                     <button onClick={() => handleRemoveProduct(index)}>Remove</button>
                   </div>
-                  <div style={{ fontWeight: 'bold' }}>${total}</div>
+                  <div style={{ fontWeight: 'bold' }}>₱{total}</div>
                 </div>
               );
             })}
 
-            <span>Shipping Fee: P150</span>
+            <span>Shipping Fee: ₱150</span>
             <div className='total-price' style={{
               display: 'flex',
               justifyContent: 'space-between',
@@ -364,7 +371,7 @@ const Checkout = () => {
             }}>
 
               <span>Total Price:</span>
-              <span>${calculateTotalPrice().toFixed(2)}</span>
+              <span>₱{calculateTotalPrice().toFixed(2)}</span>
             </div>
           </div>
         </div>
