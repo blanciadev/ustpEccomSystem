@@ -186,7 +186,7 @@ const Payments = () => {
               )}
             </div>
 
-            <div className='pagination-container'>
+            {/* <div className='pagination-container'>
               <Pagination>
                 <Pagination.First onClick={() => handlePageChange(1)} disabled={currentPage === 1} />
                 <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
@@ -202,7 +202,7 @@ const Payments = () => {
                 <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
                 <Pagination.Last onClick={() => handlePageChange(totalPages)} disabled={currentPage === totalPages} />
               </Pagination>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

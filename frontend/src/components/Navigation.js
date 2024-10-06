@@ -117,7 +117,7 @@ const Navigation = () => {
                         </>
                     ) : (
                         <>
-                            <li><span onClick={handleProfileClick}>Hi! {firstName}</span></li>
+                            <li><span className='cartIcon' onClick={handleProfileClick}><i style={{fontSize:'18pt' }}class='bx bxs-user-circle'></i></span></li>
                             <li><button onClick={handleLogout}>Logout</button></li>
                         </>
                     )}

@@ -173,42 +173,43 @@ const handleAddToCart = async (product) => {
         return <div>{error}</div>;
     }
 
+
     return (
-        <div className='shop-container'>
+        <div className='shop'>
             <Navigation />
 
             {/* Top Picks Section */}
-            <div className='top-picks-section'>
-                <h2>Top Picks</h2>
-                <div className='product-list'>
+            <div className='shop__top-picks'>
+                <h2 className='shop__title'>Top Picks</h2>
+                <div className='shop__product-list'>
                     {topPickedProducts.map((product) => (
-                        <div key={product.product_code} className='product-item' onClick={() => openModal(product)}>
-                            <div className='product-img'>
+                        <div key={product.product_code} className='shop__product-item' onClick={() => openModal(product)}>
+                            <div className='shop__product-img'>
                                 <img
                                     src={product.product_image || 'https://via.placeholder.com/150'}
                                     alt={product.product_name || 'Product Image'}
                                 />
                             </div>
-                            <div className='product-desc'>
-                                <p className='product-name'>{product.product_name || 'No product name'}</p>
-                                <p className='product-quantity'>Quantity: {product.quantity}</p>
-                                <p className='product-price'>Price: ${product.price}</p>
+                            <div className='shop__product-desc'>
+                                <p className='shop__product-name'>{product.product_name || 'No product name'}</p>
+                                <p className='shop__product-quantity'>Quantity: {product.quantity}</p>
+                                <p className='shop__product-price'>Price: ${product.price}</p>
                                 {product.product_status === 'Discounted' && (
-                                    <p className='product-price'>Product Discount: P{product.product_discount}%</p>
+                                    <p className='shop__product-discount'>Product Discount: P{product.product_discount}%</p>
                                 )}
                                 {product.quantity > 0 ? (
                                     <>
                                         <button
-                                            className='add-to-cart-button'
+                                            className='shop__add-to-cart-button'
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 handleAddToCart(product);
                                             }}
                                         >
-                                            Add to Cart
+                                            <i class='bx bxs-cart-alt cart-icon animated-cart-icon' ></i>
                                         </button>
                                         <button
-                                            className='buy-now-button'
+                                            className='shop__buy-now-button'
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 handleBuyNow(product, product.quantity);
@@ -218,9 +219,8 @@ const handleAddToCart = async (product) => {
                                         </button>
                                     </>
                                 ) : (
-                                    <p className='out-of-stock'>Out of Stock</p>
+                                    <p className='shop__out-of-stock'>Out of Stock</p>
                                 )}
-
                             </div>
                         </div>
                     ))}
@@ -229,40 +229,38 @@ const handleAddToCart = async (product) => {
 
             {/* Bundle Section */}
             {recommendedProducts.length > 0 && (
-                <div className='recommendations-section'>
-                    <h2>Discounted Products</h2>
-                    <div className='product-list'>
+                <div className='shop__recommendations'>
+                    <h2 className='shop__title'>Discounted Products</h2>
+                    <div className='shop__product-list'>
                         {recommendedProducts.map((product) => (
-                            <div key={product.product_code} className='product-item' onClick={() => openModal(product)}>
-                                <div className='product-img'>
+                            <div key={product.product_code} className='shop__product-item' onClick={() => openModal(product)}>
+                                <div className='shop__product-img'>
                                     <img
                                         src={product.product_image || 'https://via.placeholder.com/150'}
                                         alt={product.product_name || 'Product Image'}
                                         loading="lazy"
                                     />
                                 </div>
-                                <div className='product-desc'>
-                                    <p className='product-name'>{product.product_name || 'No product name available'}</p>
-                                    <p className='product-quantity'>Quantity: {product.quantity !== undefined ? product.quantity : 'N/A'}</p>
-                                    <p className='product-price'>Price: ${product.price !== undefined ? product.price.toFixed(2) : 'N/A'}</p>
-
+                                <div className='shop__product-desc'>
+                                    <p className='shop__product-name'>{product.product_name || 'No product name available'}</p>
+                                    <p className='shop__product-quantity'>Quantity: {product.quantity !== undefined ? product.quantity : 'N/A'}</p>
+                                    <p className='shop__product-price'>Price: ${product.price !== undefined ? product.price.toFixed(2) : 'N/A'}</p>
                                     {product.product_status === 'Discounted' && (
-                                        <p className='product-discount'>Discount: {product.product_discount}%</p>
+                                        <p className='shop__product-discount'>Discount: {product.product_discount}%</p>
                                     )}
-
                                     {product.quantity > 0 ? (
-                                        <div className='button-group'>
+                                        <div className='shop__button-group'>
                                             <button
-                                                className='add-to-cart-button'
+                                                className='shop__add-to-cart-button'
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     handleAddToCart(product);
                                                 }}
                                             >
-                                                Add to Cart
+                                                <i class='bx bxs-cart-alt cart-icon animated-cart-icon' ></i>
                                             </button>
                                             <button
-                                                className='buy-now-button'
+                                                className='shop__buy-now-button'
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     handleBuyNow(product, product.quantity);
@@ -272,7 +270,7 @@ const handleAddToCart = async (product) => {
                                             </button>
                                         </div>
                                     ) : (
-                                        <p className='out-of-stock'>Out of Stock</p>
+                                        <p className='shop__out-of-stock'>Out of Stock</p>
                                     )}
                                 </div>
                             </div>
@@ -282,9 +280,9 @@ const handleAddToCart = async (product) => {
             )}
 
             {/* Filter Section */}
-            <div className='filter-section'>
-                <label htmlFor='category-filter'>Filter by Category:</label>
-                <select id='category-filter' value={selectedCategory} onChange={handleCategoryChange}>
+            <div className='shop__filter'>
+                <label htmlFor='category-filter' className='shop__filter-label'>Filter by Category:</label>
+                <select id='category-filter' className='shop__filter-select' value={selectedCategory} onChange={handleCategoryChange}>
                     <option value=''>All Categories</option>
                     {categories.map((category) => (
                         <option key={category} value={category}>{category}</option>
@@ -293,37 +291,35 @@ const handleAddToCart = async (product) => {
             </div>
 
             {/* Products List */}
-            <div className='product-list'>
+            <div className='shop__product-list'>
                 {currentProducts.map((product) => (
-                    <div key={product.product_code} className='product-item' onClick={() => openModal(product)}>
-                        <div className='product-img'>
+                    <div key={product.product_code} className='shop__product-item' onClick={() => openModal(product)}>
+                        <div className='shop__product-img'>
                             <img
                                 src={product.product_image || 'https://via.placeholder.com/150'}
                                 alt={product.product_name || 'Product Image'}
                             />
                         </div>
-                        <div className='product-desc'>
-                            <p className='product-name'>{product.product_name || 'No product name'}</p>
-                            <p className='product-quantity'>Quantity: {product.quantity}</p>
-                            <p className='product-price'>Price: P{product.price}</p>
+                        <div className='shop__product-desc'>
+                            <p className='shop__product-name'>{product.product_name || 'No product name'}</p>
+                            <p className='shop__product-quantity'>Quantity: {product.quantity}</p>
+                            <p className='shop__product-price'>Price: P{product.price}</p>
                             {product.product_status === 'Discounted' && (
-                                <p className='product-price'>Product Discount: P{product.product_discount}%</p>
+                                <p className='shop__product-discount'>Product Discount: P{product.product_discount}%</p>
                             )}
-                            {/* <p className='product-brand'>Brand: {product.brand}</p> */}
-
                             {product.quantity > 0 ? (
                                 <>
                                     <button
-                                        className='add-to-cart-button'
+                                        className='shop__add-to-cart-button'
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleAddToCart(product);
                                         }}
                                     >
-                                        Add to Cart
+                                        <i class='bx bxs-cart-alt cart-icon animated-cart-icon' ></i>
                                     </button>
                                     <button
-                                        className='buy-now-button'
+                                        className='shop__buy-now-button'
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleBuyNow(product, product.quantity);
@@ -333,18 +329,17 @@ const handleAddToCart = async (product) => {
                                     </button>
                                 </>
                             ) : (
-                                <p style={{ color: 'red' }}>Out of stock</p>
+                                <p className='shop__out-of-stock'>Out of Stock</p>
                             )}
-
                         </div>
                     </div>
                 ))}
             </div>
 
             {/* Pagination */}
-            <div className='pagination'>
+            <div className='shop__pagination'>
                 {[...Array(Math.ceil(filteredProducts.length / productsPerPage)).keys()].map(number => (
-                    <button key={number + 1} onClick={() => paginate(number + 1)} className={number + 1 === currentPage ? 'active' : ''}>
+                    <button key={number + 1} onClick={() => paginate(number + 1)} className={`shop__pagination-button ${number + 1 === currentPage ? 'shop__pagination-button--active' : ''}`}>
                         {number + 1}
                     </button>
                 ))}
