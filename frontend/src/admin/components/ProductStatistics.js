@@ -1,4 +1,3 @@
-// src/components/ProductStatistics.js
 import React from 'react';
 
 const ProductStatistics = ({

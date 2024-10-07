@@ -150,7 +150,7 @@ const Inventory = () => {
                                             .filter(product => product.product_name.toLowerCase().includes(searchTerm.toLowerCase())) // Implementing search filter
                                             .map((product) => {
                                                 // Determine stock status based on quantity
-                                                let stockStatus = 'Low on Stock'; // Default status
+                                                let stockStatus = 'Low on Stock';
                                                 if (product.quantity > 50) {
                                                     stockStatus = 'Good Stocks';
                                                 } else if (product.quantity > 20) {
@@ -176,23 +176,8 @@ const Inventory = () => {
                     </div>
                 </div>
 
-                {/* Modal for adding products */}
-                <Modal show={showModal} onHide={handleCloseModal}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Add Product</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        {/* Add product form content goes here */}
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button variant="secondary" onClick={handleCloseModal}>
-                            Close
-                        </Button>
-                        <Button variant="primary" onClick={handleCloseModal}>
-                            Save Changes
-                        </Button>
-                    </Modal.Footer>
-                </Modal>
+
+
             </div>
         </div>
     );

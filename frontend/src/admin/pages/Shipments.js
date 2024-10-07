@@ -50,20 +50,19 @@ const Shipments = () => {
           </div>
           <AdminHeader />
         </div>
-        <div className='dash-body'>
+        <div className='body'>
           <div className='admin-ship'>
-            <div className='ship-header'>
-              <div className='ship-search'>
+            <div className='cheader'>
+              <div className='search'>
                 <form>
                   <input type='search' placeholder='Search...' />
-                  <button type='submit'>Search</button>
                 </form>
               </div>
-              <div className='ship-options'>
-                <div className='ship-print'>
+              <div className='options'>
+                <div className='print'>
                   <button>Print Shipments Summary</button>
                 </div>
-                <div className='ship-sort'>
+                <div className='sort'>
                   <label htmlFor='sort'>Sort By</label>
                   <select name='sort' id='sort'>
                     <option value='date'>Date</option>
@@ -110,7 +109,7 @@ const Shipments = () => {
                 </table>
               )}
             </div>
-            <div className='pagination-container'>
+             {/* <div className='pagination-container'>
               <Pagination>
                 <Pagination.First onClick={() => handlePageChange(1)} disabled={currentPage === 1} />
                 <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
@@ -126,7 +125,7 @@ const Shipments = () => {
                 <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
                 <Pagination.Last onClick={() => handlePageChange(totalPages)} disabled={currentPage === totalPages} />
               </Pagination>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

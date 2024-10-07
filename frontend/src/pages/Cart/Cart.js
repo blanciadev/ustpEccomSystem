@@ -177,6 +177,7 @@ const CartContent = () => {
         }
       }
 
+      setCartItems(cartItems.filter(item => item.cart_items_id !== cartItemId));
       // Remove item from the cart (server or localStorage)
       const updatedCart = cartItems.filter(item => item.cart_items_id !== cartItemId);
       setCartItems(updatedCart);
@@ -191,21 +192,21 @@ const CartContent = () => {
   };
 
   return (
-    <div className='cart-con'>
+    <div className='cart'>
       <Navigation />
-      <div className='cart-box'>
-        <h1>Shopping Cart</h1>
+      <div className='cart__box'>
+        <h1 className='cart__title'><i style={{fontSize:'1.7rem', paddingLeft:'5px'}} class='bx bxs-cart-alt' ></i>Shopping Cart</h1>
         {loading ? (
           <p>Loading cart items...</p>
         ) : error ? (
-          <p className="error-message">{error}</p>
+          <p className="cart__error-message">{error}</p>
         ) : cartItems.length === 0 ? (
-          <p className="cart-empty">Your cart is empty!</p>
+          <p className="cart__empty-message">Your cart is empty!</p>
         ) : (
-          <div className='cart-table'>
-            <table>
+          <div className='cart__table'>
+            <table className='cart__table-inner'>
               <thead>
-                <tr>
+                <tr className='cart__table-header'>
                   <th></th>
                   <th>ID</th>
                   <th>Product</th>
@@ -239,8 +240,8 @@ const CartContent = () => {
                 </tr>
               </tfoot>
             </table>
-            <div className='checkout-btncon'>
-              <button className='checkout-btn' onClick={handleCheckout}>
+            <div className='cart__checkout'>
+              <button className='cart__checkout-button' onClick={handleCheckout}>
                 Checkout
               </button>
             </div>

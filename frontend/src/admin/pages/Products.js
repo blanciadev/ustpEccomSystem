@@ -141,6 +141,20 @@ const Products = () => {
                 </div>
 
                 <div className='options'>
+                  
+                  <div className='product-buttons'>
+                    <Button variant="primary" onClick={handleShowAddModal}>
+                        <i class='bx bx-plus'></i>
+                    </Button>
+                    <BundleProduct
+                        show={isBundleProductModalOpen}
+                        handleClose={handleCloseBundleProductModal}
+                        handleUpdate={fetchProduct}
+                    />
+                    <Button variant="primary" onClick={handleShowDiscountProductModal}>
+                        Remove Discount/Bundle
+                    </Button>
+                  </div>
                   <div className='sort'>
                     <label htmlFor="sort">Sort By</label>
                     <select name="sort" id="sort">
@@ -150,19 +164,6 @@ const Products = () => {
                       <option value="customer-id">Customer</option>
                     </select>
                   </div>
-                  <div className='order-add'>
-                    <Button variant="primary" onClick={handleShowAddModal}>
-                      Add Product
-                    </Button>
-                  </div>
-                  <BundleProduct
-                    show={isBundleProductModalOpen}
-                    handleClose={handleCloseBundleProductModal}
-                    handleUpdate={fetchProduct}
-                  />
-                  <Button variant="primary" onClick={handleShowDiscountProductModal}>
-                    Remove Discount/Bundle
-                  </Button>
 
                 </div>
               </div>

@@ -38,13 +38,15 @@ body{
 }
 .nav-container > .logo > a > img{
     width: 50px;
-    height: 50px;
+    height: 49px;
     object-fit: contain;
+    margin: 0%;
 }
 .nav-container > .logo > a > h1{
     font-family: Georgia, 'Times New Roman', Times, serif;
     font-size: 1.5rem;
     font-weight: 500;
+    margin: 0%;
 }
 .nav-container > .navlinks > ul {
     width: 36vw;
@@ -54,6 +56,8 @@ body{
     align-items: center;
     justify-content: space-around;
     text-align: center;
+    margin: 0%;
+    padding: 0%;
 }
 .nav-container > .navlinks > ul > li{
     display: flex;

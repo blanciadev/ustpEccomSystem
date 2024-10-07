@@ -46,7 +46,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                     setRecommendedProducts(recommendationData);
                     setBundleProducts(bundleData);
 
-                    // Select all bundle products when the modal opens
+                    // Select all bundle products when the promodal opens
                     const initialSelection = {};
                     bundleData.forEach(bProduct => {
                         initialSelection[bProduct.product_code] = true; 
@@ -192,14 +192,14 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
 
     if (!isOpen || !product) return null;
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                <button className="modal-close" onClick={onClose}>X</button>
-                <div className="modal-body">
+        <div className="promodal-overlay" onClick={onClose}>
+            <div className="promodal-content" onClick={(e) => e.stopPropagation()}>
+                <button className="promodal-close" onClick={onClose}>X</button>
+                <div className="promodal-body">
                     <img
                         src={product.product_image}
                         alt={product.product_name}
-                        style={{ width: '100%' }}
+                        style={{ width: '50%' }}
                     />
                     <h3>{product.product_name}</h3>
                     <p>{product.description || 'No description available.'}</p>
@@ -264,20 +264,20 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                         ) : error ? (
                             <p>{error}</p>
                         ) : currentRecommendedProducts.length > 0 ? (
-                            <div className="recommended-products-grid">
+                            <div className="recommended-modalproducts-grid">
                                 {currentRecommendedProducts.map((recProduct) => (
-                                    <div key={recProduct.product_id} className="product-card">
+                                    <div key={recProduct.product_id} className="modalproduct-card">
                                         <img
                                             src={recProduct.product_image}
                                             alt={recProduct.product_name}
-                                            className="product-image"
+                                            className="modalproduct-image"
                                         />
-                                        <div className="product-details">
-                                            <span className="product-name">{recProduct.product_name}</span>
-                                            <span className="product-price">P{calculateDiscountedPrice(recProduct.price, recProduct.product_discount)}</span>
+                                        <div className="modalproduct-details">
+                                            <span className="modalproduct-name">{recProduct.product_name}</span>
+                                            <span className="modalproduct-price">P{calculateDiscountedPrice(recProduct.price, recProduct.product_discount)}</span>
 
                                             {recProduct.product_status === 'Discounted' && (
-                                                <span className="product-discount">
+                                                <span className="modalproduct-discount">
                                                     Discounted by: {recProduct.product_discount}%
                                                 </span>
                                             )}

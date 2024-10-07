@@ -58,20 +58,21 @@ const CartProduct = ({
       <td>{cartItemId}</td>
       <td>{productName}</td>
       <td>
-        <button onClick={decrementQuantity}>-</button> {/* Decrement button */}
+        <button className='qtyBtn' onClick={decrementQuantity}>-</button> {/* Decrement button */}
         <input
+          className="qtyInput"
           type="number"
           value={localQuantity}
           min="1"
           onChange={handleQuantityChange} 
           style={{ width: "50px", textAlign: "center" }}
         />
-        <button onClick={incrementQuantity}>+</button> {/* Increment button */}
+        <button className='qtyBtn' onClick={incrementQuantity}>+</button> {/* Increment button */}
       </td>
       <td>₱{price.toFixed(2)}</td>
       <td>₱{(price * localQuantity).toFixed(2)}</td>
       <td>
-        <button onClick={handleRemoveFromCart}>Remove</button> {/* Remove button */}
+        <button className='cart__delBtn' onClick={handleRemoveFromCart}><i class='bx bxs-trash-alt'></i></button> {/* Remove button */}
       </td>
     </tr>
   );
