@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import './modal.css';
-import ToastNotification from './ToastNotification';  // Import ToastNotification
+import ToastNotification from './ToastNotification'; 
 
 
 const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
@@ -10,7 +10,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedBundleProducts, setSelectedBundleProducts] = useState({});
-    const [toastMessage, setToastMessage] = useState(''); // Toast message state
+    const [toastMessage, setToastMessage] = useState(''); 
 
 
     // Pagination state for recommendations

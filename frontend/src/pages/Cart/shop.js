@@ -176,6 +176,7 @@ const handleAddToCart = async (product) => {
                 setToastMessage('');
             }, 3000);
             return;
+            
     } catch (error) {
         console.error('Error adding product to cart:', error.response ? error.response.data : error.message);
     }

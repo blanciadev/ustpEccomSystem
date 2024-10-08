@@ -4,6 +4,13 @@ import PropTypes from 'prop-types';
 const ToastNotification = ({ toastMessage }) => {
   if (!toastMessage) return null; 
 
+  
+//   setToastMessage('message!');
+//   setTimeout(() => {
+//       setToastMessage('');
+//   }, 3000);
+// PUT THIS TO SHOW TOAST
+
   const toastStyles = {
     position: 'fixed',
     top: '20px',
