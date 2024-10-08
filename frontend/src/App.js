@@ -28,6 +28,7 @@ import StickyComponent from './components/StickyComponent';
 import UserProfile from './pages/Transactions/UserProfile';
 import Notification from './pages/Transactions/Notification';
 import DiscountsandVouchers from './pages/Transactions/DiscountsandVouchers';
+import ToastNotification from './components/ToastNotification';
 
 
 function App() {
@@ -72,8 +73,8 @@ function App() {
         <Route path='/forgot-password' element={<ForgotPassword/>}></Route>
         <Route path='/verify' element={<Verification/>}></Route>
         <Route path='/change-password' element={<ChangePassword/>}></Route>
-{/*         
-        <Route path='/sticky' element={<StickyComponent/>}></Route> */}
+        
+         <Route path='/sticky' element={<ToastNotification/>}></Route>
 
 
       </Routes>
