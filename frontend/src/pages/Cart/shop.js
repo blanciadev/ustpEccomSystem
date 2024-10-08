@@ -4,6 +4,7 @@ import './Shop.css';
 import Navigation from '../../components/Navigation';
 import { cartEventEmitter } from '../../components/eventEmitter';
 import ProductModal from '../../components/ProductModal';
+import ToastNotification from '../../components/ToastNotification'; 
 
 const Shop = () => {
     const [products, setProducts] = useState([]);
@@ -18,7 +19,7 @@ const Shop = () => {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [topPickedProducts, setTopPickedProducts] = useState([]);
     const [recommendedProducts, setRecommendedProducts] = useState([]);
-
+    const [toastMessage, setToastMessage] = useState('');
     useEffect(() => {
         const fetchProducts = async () => {
             try {
@@ -84,9 +85,17 @@ const Shop = () => {
 
         localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
 
+        setToastMessage('Redirecting to Checkout Page');
+
+            // Clear toast message after 3 seconds
+            setTimeout(() => {
+                setToastMessage('');
+            }, 3000);
+
         // Redirect to the checkout page
         window.location.href = '/checkout';
         console.log(productData);
+
     };
 
    // Function to generate a unique code for cart_items_id
@@ -122,15 +131,31 @@ const handleAddToCart = async (product) => {
             };
             cart.push(newCartItem);
             console.log('Added new product to cart:', newCartItem);
+            
+            setToastMessage('Added to cart!');
+
+            // Clear toast message after 3 seconds
+            setTimeout(() => {
+                setToastMessage('');
+            }, 3000);
+            return;
         }
 
         // Save the updated cart to localStorage
         localStorage.setItem('cart', JSON.stringify(cart));
         console.log('Cart updated and saved to localStorage:', cart);
-
+        
         // Emit cart update event
         cartEventEmitter.emit('cartUpdated', { product_code: product.product_code, quantity: 1 });
-        return;
+
+        setToastMessage('Added to cart!');
+
+            // Clear toast message after 3 seconds
+            setTimeout(() => {
+                setToastMessage('');
+            }, 3000);
+            return;
+        
     }
 
     try {
@@ -143,6 +168,14 @@ const handleAddToCart = async (product) => {
 
         console.log('Product added to server-side cart');
         cartEventEmitter.emit('cartUpdated', { product_code: product.product_code, quantity: 1 });
+
+        setToastMessage('Added to cart!');
+
+            // Clear toast message after 3 seconds
+            setTimeout(() => {
+                setToastMessage('');
+            }, 3000);
+            return;
     } catch (error) {
         console.error('Error adding product to cart:', error.response ? error.response.data : error.message);
     }
@@ -177,7 +210,7 @@ const handleAddToCart = async (product) => {
     return (
         <div className='shop'>
             <Navigation />
-
+            <ToastNotification toastMessage={toastMessage} />
             {/* Top Picks Section */}
             <div className='shop__top-picks'>
                 <h2 className='shop__title'>Top Picks</h2>
@@ -219,7 +252,7 @@ const handleAddToCart = async (product) => {
                                         </button>
                                     </>
                                 ) : (
-                                    <p className='shop__out-of-stock'>Out of Stock</p>
+                                    <p className='shop__out-of-stock'> <i class='bx bxs-error'></i> Out of Stock</p>
                                 )}
                             </div>
                         </div>
@@ -270,7 +303,7 @@ const handleAddToCart = async (product) => {
                                             </button>
                                         </div>
                                     ) : (
-                                        <p className='shop__out-of-stock'>Out of Stock</p>
+                                        <p className='shop__out-of-stock'><i class='bx bxs-error'></i> Out of Stock</p>
                                     )}
                                 </div>
                             </div>
@@ -329,7 +362,7 @@ const handleAddToCart = async (product) => {
                                     </button>
                                 </>
                             ) : (
-                                <p className='shop__out-of-stock'>Out of Stock</p>
+                                <p className='shop__out-of-stock'><i class='bx bxs-error'></i> Out of Stock</p>
                             )}
                         </div>
                     </div>
