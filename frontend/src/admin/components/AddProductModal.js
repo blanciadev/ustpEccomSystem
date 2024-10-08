@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
+import ToastNotification from '../../components/ToastNotification';
+
 
 const AddProductModal = ({ show, handleClose, handleSubmit }) => {
     const [productName, setProductName] = useState('');
@@ -13,6 +15,8 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
     const [error, setError] = useState('');
     const [size, setSize] = useState('500'); 
     const [customSize, setCustomSize] = useState('');
+    const [toastMessage, setToastMessage] = useState('');
+
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -82,7 +86,12 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
 
             const result = await response.text();
             console.log(result); 
-            handleClose();
+            
+            setToastMessage('Successful!');
+            setTimeout(() => {
+                setToastMessage('');
+                handleClose();
+            }, 2000);
         } catch (error) {
             console.error('Error adding product:', error);
             setError('Failed to add product.');
@@ -96,6 +105,7 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
                 <Modal.Title>Add Product</Modal.Title>
             </Modal.Header>
             <Modal.Body className='mbody two'>
+                <ToastNotification toastMessage={toastMessage} />
                 {error && <div className="alert alert-danger">{error}</div>}
                 <Form onSubmit={handleFormSubmit}>
                     <Form.Group controlId="formProductName">

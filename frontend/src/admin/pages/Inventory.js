@@ -3,11 +3,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '../admin.css';
 import AdminNav from '../components/AdminNav';
 import AdminHeader from '../components/AdminHeader';
-import InventoryCountComponent from '../components/InventoryCountComponent';
 import axios from 'axios';
-import { Modal, Button } from 'react-bootstrap';
 import ProductStatistics from '../components/ProductStatistics';
-import TopProduct from '../components/TopProduct';
 
 const Inventory = () => {
     const [bestSellingCount, setBestSellingCount] = useState(0);
@@ -98,7 +95,7 @@ const Inventory = () => {
                     <AdminHeader />
                 </div>
 
-                <div className="dash-body">
+                <div className="body">
                     <div className="product-con">
                         {/* Product Statistics */}
                         <div className="product-one">
@@ -113,13 +110,12 @@ const Inventory = () => {
                                 discontinuedCount={discontinuedCount}
                                 discontinuedQuantity={discontinuedQuantity}
                             />
-                            <TopProduct />
                         </div>
 
                         {/* Product Table */}
                         <div className="product-two">
-                            <div className="order-header">
-                                <div className="order-search">
+                            <div className="cheader">
+                                <div className="search">
                                     <form onSubmit={handleSearch}>
                                         <input
                                             type="search"
@@ -127,7 +123,6 @@ const Inventory = () => {
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
                                         />
-                                        <button type="submit">Search</button>
                                     </form>
                                 </div>
                             </div>

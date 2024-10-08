@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './modal.css'
 import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
+import ToastNotification from '../../components/ToastNotification';
 
 const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
     const [formData, setFormData] = useState({
@@ -19,6 +20,7 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
     });
     const [error, setError] = useState('');
     const [categories, setCategories] = useState([]);
+    const [toastMessage, setToastMessage] = useState('');
 
     useEffect(() => {
         if (product) {
@@ -68,8 +70,20 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
                     size: formData.size === 'Other' ? formData.custom_size : formData.size
                 };
                 await axios.put(`http://localhost:5001/admin-update-products/${formData.product_code}`, dataToSend);
-                handleUpdate();
-                handleClose();
+
+                setToastMessage('Updated Successfully!'); 
+                console.log("toast start")
+
+                setTimeout(() => {
+                    console.log("toast end")
+                    setToastMessage(''); // Reset toast message
+                    handleUpdate();
+                    handleClose(); 
+                }, 2000);
+
+
+                
+                // handleClose();
             } else {
                 console.error('Product code is undefined');
                 setError('Product code is missing.');
@@ -86,6 +100,7 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
                 <Modal.Title>Update Product</Modal.Title>
             </Modal.Header>
             <Modal.Body className='mbody one'>
+                <ToastNotification toastMessage={toastMessage} />
                 {error && <div className="alert alert-danger">{error}</div>}
                 <Form onSubmit={handleSubmit}>
                     <img src={product.product_image} alt="Product" />

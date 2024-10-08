@@ -24,11 +24,11 @@ import Users from './admin/pages/Users';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword'
 import Verification from './pages/ForgotPassword/Verification'
 import ChangePassword from './pages/ForgotPassword/ChangePassword'
-import StickyComponent from './components/StickyComponent';
 import UserProfile from './pages/Transactions/UserProfile';
 import Notification from './pages/Transactions/Notification';
 import DiscountsandVouchers from './pages/Transactions/DiscountsandVouchers';
-import ToastNotification from './components/ToastNotification';
+import AddUserModal from './admin/components/AddUserModal';
+// import ClientProfileLoader from './Loaders/ClientProfileLoader';
 
 
 function App() {
@@ -74,7 +74,7 @@ function App() {
         <Route path='/verify' element={<Verification/>}></Route>
         <Route path='/change-password' element={<ChangePassword/>}></Route>
         
-         <Route path='/sticky' element={<ToastNotification/>}></Route>
+         <Route path='/sticky' element={<AddUserModal/>}></Route>
 
 
       </Routes>

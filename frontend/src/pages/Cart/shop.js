@@ -5,6 +5,7 @@ import Navigation from '../../components/Navigation';
 import { cartEventEmitter } from '../../components/eventEmitter';
 import ProductModal from '../../components/ProductModal';
 import ToastNotification from '../../components/ToastNotification'; 
+import ClientHomeLoader from '../../Loaders/ClientHomeLoader';
 
 const Shop = () => {
     const [products, setProducts] = useState([]);
@@ -200,7 +201,7 @@ const handleAddToCart = async (product) => {
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <ClientHomeLoader/>
     }
 
     if (error) {
