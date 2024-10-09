@@ -5,12 +5,12 @@ import AdminNav from '../components/AdminNav';
 import AdminHeader from '../components/AdminHeader';
 import UserCountComponent from '../components/UserCountComponent';
 import axios from 'axios';
-import AddUserModal from '../components/AddUserModal'; // Import the modal
+import AddUserModal from '../components/AddUserModal';
 
 const Users = () => {
-    const [users, setUsers] = useState([]); // State to store user data
-    const [loading, setLoading] = useState(true); // State to manage loading state
-    const [error, setError] = useState(null); // State to manage error
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [showModal, setShowModal] = useState(false);
 
     // Function to toggle modal visibility
@@ -22,8 +22,8 @@ const Users = () => {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await axios.get('http://localhost:5001/admin-users-report'); // Adjust the URL as needed
-                setUsers(response.data.data); // Assuming the user data is in the 'data' field
+                const response = await axios.get('http://localhost:5001/admin-users-report');
+                setUsers(response.data.data);
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching users:', error);
@@ -58,7 +58,7 @@ const Users = () => {
                                 </div>
                                 <div className='options'>
                                     <div className='print'>
-                                        <button onClick={toggleModal}>Create Account</button> 
+                                        <button onClick={toggleModal}>Create Account</button>
                                     </div>
                                     <div className='sort'>
                                         <label htmlFor="sort">Sort By</label>

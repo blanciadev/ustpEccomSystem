@@ -1,9 +1,20 @@
-import React from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import '../admin.css';
 
 const AdminNav = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Get the user's role from localStorage
+    const roleType = localStorage.getItem('role');
+
+    // Redirect non-admin users to the home page
+    if (roleType !== 'Admin') {
+      navigate('/');
+    }
+  }, [navigate]);
 
   return (
     <div className='nav-con'>

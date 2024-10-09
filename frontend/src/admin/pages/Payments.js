@@ -5,22 +5,26 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '../admin.css';
 import AdminNav from '../components/AdminNav';
 import AdminHeader from '../components/AdminHeader';
-import PaymentModal from '../components/paymentModal'; // Import the PaymentModal component
+import PaymentModal from '../components/paymentModal';
 
 const Payments = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [orders, setOrders] = useState([]); // Store fetched orders
-  const [loading, setLoading] = useState(false); // Loading state
-  const [totalOrders, setTotalOrders] = useState(0); // Total orders count
-  const [sortBy, setSortBy] = useState('date'); // Sorting state
-  const [statusFilter, setStatusFilter] = useState(''); // Status filter
-  const [showModal, setShowModal] = useState(false); // Modal visibility state
-  const [selectedOrder, setSelectedOrder] = useState(null); // Selected order for the modal
-  const itemsPerPage = 15; // Change this based on your preference
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const itemsPerPage = 15;
+
+  const [statusOptions, setStatusOptions] = useState([
+    'To Ship', 'To Receive', 'Completed', 'Cancelled', 'Return/Refund', 'Pending'
+  ]);
 
   useEffect(() => {
     fetchOrders();
-  }, [currentPage, sortBy, statusFilter]); // Fetch orders when page, sort, or filter changes
+  }, [currentPage, statusFilter, searchTerm]);
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -28,12 +32,13 @@ const Payments = () => {
       const response = await axios.get('http://localhost:5001/admin-order-history', {
         params: {
           status: statusFilter,
+          search: searchTerm,
         },
       });
 
       const ordersData = response.data.orders;
       setOrders(ordersData);
-      setTotalOrders(ordersData.length); // Assuming the total count comes from the response
+      setTotalOrders(ordersData.length);
     } catch (error) {
       console.error('Error fetching order history:', error.message);
     } finally {
@@ -45,12 +50,14 @@ const Payments = () => {
     setCurrentPage(pageNumber);
   };
 
-  const handleSortChange = (e) => {
-    setSortBy(e.target.value);
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
   };
 
   const handleStatusFilterChange = (e) => {
     setStatusFilter(e.target.value);
+    setCurrentPage(1);
   };
 
   const handleUpdateClick = (order) => {
@@ -64,54 +71,26 @@ const Payments = () => {
   };
 
   const handleUpdate = () => {
-    fetchOrders(); // Refresh the orders list
-    handleCloseModal(); // Close the modal
+    fetchOrders();
+    handleCloseModal();
   };
 
   const totalPages = Math.ceil(totalOrders / itemsPerPage);
 
-  // Group orders by order_id and include payment status
-  const groupedOrders = orders.reduce((acc, order) => {
-    if (!acc[order.order_id]) {
-      acc[order.order_id] = {
-        order_id: order.order_id,
-        order_date: order.order_date,
-        order_total: order.order_total,
-        order_status: order.order_status,
-        payment_date: order.payment_date,
-        payment_status: order.payment_status,
-        payment_method: order.payment_method,
-        customer_id: order.customer_id,
-        customer_first_name: order.first_name,
-        customer_last_name: order.last_name,
-        customer_email: order.email,
-        customer_phone: order.phone_number,
-        customer_address: {
-          street_name: order.street_name,
-          region: order.region,
-          postal_code: order.postal_code,
-        },
-        products: [],
-      };
-    }
+  // Filter orders based on the search term
+  const filteredOrders = orders.filter(order => {
+    const orderIdMatch = order.order_id.toString().toLowerCase().includes(searchTerm.toLowerCase());
+    const customerNameMatch = `${order.first_name} ${order.last_name}`.toLowerCase().includes(searchTerm.toLowerCase());
+    return orderIdMatch || customerNameMatch;
+  });
 
-    // Add the current product to the products array
-    acc[order.order_id].products.push({
-      order_details_id: order.order_details_id,
-      payment_date: order.payment_date,
-      product_id: order.product_id,
-      product_name: order.product_name,
-      price: order.price,
-      quantity: order.quantity,
-      item_total: order.total_price,
-      payment_status: order.payment_status,
-      payment_method: order.payment_method,
-    });
+  // Sort the filtered orders to ensure they are at the top
+  const ordersToDisplay = filteredOrders.length > 0
+    ? filteredOrders
+    : orders;
 
-    return acc;
-  }, {});
-
-  const ordersToDisplay = Object.values(groupedOrders).slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  // Paginate the orders to display
+  const paginatedOrders = ordersToDisplay.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
     <div className='dash-con'>
@@ -129,20 +108,25 @@ const Payments = () => {
             <div className='cheader'>
               <div className='search'>
                 <form>
-                  <input type='search' placeholder='Search...' />
+                  <input
+                    type='search'
+                    placeholder='Search by Order ID or Customer...'
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                  />
                 </form>
               </div>
               <div className='options'>
                 <div className='print'>
                   <button>Print Payment Summary</button>
                 </div>
-                <div className='sort'>
-                  <label htmlFor="sort">Sort By</label>
-                  <select name="sort" id="sort" value={sortBy} onChange={handleSortChange}>
-                    <option value="date">Date</option>
-                    <option value="status">Status</option>
-                    <option value="id">ID</option>
-                    <option value="customer-id">Customer</option>
+                <div className='filter'>
+                  <label htmlFor="statusFilter">Filter by Status</label>
+                  <select id="statusFilter" value={statusFilter} onChange={handleStatusFilterChange}>
+                    <option value="">All</option>
+                    {statusOptions.map((status) => (
+                      <option key={status} value={status}>{status}</option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -166,7 +150,7 @@ const Payments = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {ordersToDisplay.map((order, index) => (
+                    {paginatedOrders.map((order, index) => (
                       <tr key={index}>
                         <td><input type='checkbox' /></td>
                         <td>{order.order_id}</td>
@@ -181,12 +165,11 @@ const Payments = () => {
                       </tr>
                     ))}
                   </tbody>
-
                 </table>
               )}
             </div>
 
-            {/* <div className='pagination-container'>
+            <div className='pagination-container'>
               <Pagination>
                 <Pagination.First onClick={() => handlePageChange(1)} disabled={currentPage === 1} />
                 <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
@@ -202,7 +185,7 @@ const Payments = () => {
                 <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
                 <Pagination.Last onClick={() => handlePageChange(totalPages)} disabled={currentPage === totalPages} />
               </Pagination>
-            </div> */}
+            </div>
           </div>
         </div>
       </div>
@@ -211,7 +194,7 @@ const Payments = () => {
           show={showModal}
           handleClose={handleCloseModal}
           order={selectedOrder}
-          handleUpdate={handleUpdate} // Pass handleUpdate to the modal
+          handleUpdate={handleUpdate}
         />
       )}
     </div>

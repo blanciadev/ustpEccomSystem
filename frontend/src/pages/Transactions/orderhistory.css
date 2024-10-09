@@ -107,14 +107,18 @@
     padding: 10px;
     border-top: 1px solid #eee;
 } */
+
+
 /* Scrollbar Styles */
 .order::-webkit-scrollbar {
     width: 8px;
 }
+
 .order::-webkit-scrollbar-thumb {
     background-color: #ccc;
     border-radius: 10px;
 }
+
 /* Media Queries */
 @media (max-width: 768px) {
     .purchase-btncon button {
@@ -142,6 +146,7 @@
         width: 90%;
     }
 }
+
 .cancel-button {
     background-color: #ff4d4d;
     color: white;
@@ -151,7 +156,8 @@
     border-radius: 5px;
     margin-top: 10px;
 }
+
 .cancel-button.disabled {
     opacity: 0.5;
     cursor: not-allowed;
-} 
+}

@@ -71,18 +71,18 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
                 };
                 await axios.put(`http://localhost:5001/admin-update-products/${formData.product_code}`, dataToSend);
 
-                setToastMessage('Updated Successfully!'); 
+                setToastMessage('Updated Successfully!');
                 console.log("toast start")
 
                 setTimeout(() => {
                     console.log("toast end")
-                    setToastMessage(''); // Reset toast message
+                    setToastMessage('');
                     handleUpdate();
-                    handleClose(); 
+                    handleClose();
                 }, 2000);
 
 
-                
+
                 // handleClose();
             } else {
                 console.error('Product code is undefined');

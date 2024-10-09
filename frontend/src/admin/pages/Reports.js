@@ -8,13 +8,14 @@ import ReportSalesComponent from '../components/ReportSalesComponent';
 
 const Reports = () => {
     const [productReports, setProductReports] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
 
     // Fetch product report data when the component mounts
     useEffect(() => {
         const fetchProductReports = async () => {
             try {
                 const response = await axios.get('http://localhost:5001/product-reports-per-month');
-                setProductReports(response.data.data); // Set the fetched data
+                setProductReports(response.data.data);
             } catch (error) {
                 console.error('Error fetching product reports:', error);
             }
@@ -22,6 +23,24 @@ const Reports = () => {
 
         fetchProductReports();
     }, []);
+
+    // Function to handle search input change
+    const handleSearchChange = (event) => {
+        setSearchQuery(event.target.value);
+    };
+
+    // Filtered reports based on the search query
+    const filteredReports = productReports.filter((report) => {
+        const lowerCaseQuery = searchQuery.toLowerCase();
+
+        // Check if the properties exist before using toLowerCase
+        return (
+            (report.period && report.period.toLowerCase().includes(lowerCaseQuery)) ||
+            (report.product_code && report.product_code.toLowerCase().includes(lowerCaseQuery)) ||
+            (report.product_name && report.product_name.toLowerCase().includes(lowerCaseQuery)) ||
+            (report.size && report.size.toLowerCase().includes(lowerCaseQuery))
+        );
+    });
 
     return (
         <div className='dash-con'>
@@ -41,7 +60,12 @@ const Reports = () => {
                             <div className='cheader'>
                                 <div className='search'>
                                     <form>
-                                        <input type='search' placeholder='Search...' />
+                                        <input
+                                            type='search'
+                                            placeholder='Search...'
+                                            value={searchQuery}
+                                            onChange={handleSearchChange}
+                                        />
                                     </form>
                                 </div>
                             </div>
@@ -57,20 +81,20 @@ const Reports = () => {
                                             <th>Product Name</th>
                                             <th>Size</th>
                                             <th>Quantity</th>
-                                            <th>Total Sales (PHP)</th> {/* Update header to reflect Total Sales */}
+                                            <th>Total Sales (PHP)</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {productReports.map((report, index) => (
+                                        {filteredReports.map((report, index) => (
                                             <tr key={index}>
                                                 <td><input type='checkbox' /></td>
                                                 <td>{report.period}</td>
                                                 <td>{report.product_code}</td>
                                                 <td>{report.product_name}</td>
                                                 <td>{report.size}</td>
-                                                <td>{report.total_quantity}</td> {/* Display total quantity */}
-                                                <td>PHP {parseFloat(report.total_sales).toFixed(2)}</td> {/* Display total_sales instead of total_amount */}
+                                                <td>{report.total_quantity}</td>
+                                                <td>PHP {parseFloat(report.total_sales).toFixed(2)}</td>
                                                 <td><button>Export</button></td>
                                             </tr>
                                         ))}
