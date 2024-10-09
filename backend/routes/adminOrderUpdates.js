@@ -30,7 +30,7 @@ router.put('/update-order-status/:orderId', async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
-       
+
         await db.query('COMMIT');
 
         // Respond with success
@@ -47,6 +47,9 @@ router.post('/update-payment-details', async (req, res) => {
     try {
         const { order_id, payment_method, order_status, payment_status } = req.body;
 
+        const order_status_final = 'Completed'
+        console.log('Order Status', order_status);
+
         // Validate input
         if (!order_id || !payment_method || !order_status || !payment_status) {
             return res.status(400).json({ message: 'Missing required fields' });
@@ -60,7 +63,7 @@ router.post('/update-payment-details', async (req, res) => {
         `;
 
         // Execute the query for payment details
-        const [result] = await db.query(query, [payment_method, order_status, payment_status, order_id]);
+        const [result] = await db.query(query, [payment_method, order_status_final, payment_status, order_id]);
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: 'Order not found' });

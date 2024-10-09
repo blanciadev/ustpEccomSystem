@@ -33,7 +33,7 @@ const Checkout = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [hasFetched, setHasFetched] = useState(false);
-  const [toastMessage, setToastMessage] = useState(''); 
+  const [toastMessage, setToastMessage] = useState('');
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -136,27 +136,27 @@ const Checkout = () => {
     setLoading(true);
     setError('');
     setSuccess('');
-  
-    const token = localStorage.getItem('token'); 
+
+    const token = localStorage.getItem('token');
     if (!token) {
-      localStorage.setItem('redirectTo', '/checkout'); 
-      navigate('/login'); 
+      localStorage.setItem('redirectTo', '/checkout');
+      navigate('/login');
       return;
     }
-  
+
     if (!validateForm()) {
       setLoading(false);
       setError('All fields are required.');
       return;
     }
-  
+
     try {
       if (!customerId || savedProducts.length === 0) {
         setLoading(false);
         setError('Missing customer ID or no products selected.');
         return;
       }
-  
+
       const totalOrderPrice = calculateTotalPrice().toFixed(2);
       const orderData = {
         customer_id: customerId,
@@ -164,7 +164,7 @@ const Checkout = () => {
         order_details: savedProducts.map((product, index) => {
           const discountedPrice = product.price * (1 - (discounts[index] / 100));
           const productTotal = discountedPrice * quantities[index];
-  
+
           return {
             cart_items: product.cart_items_id,
             product_id: product.product_code,
@@ -184,27 +184,27 @@ const Checkout = () => {
         phoneNumber: formData.phoneNumber,
         postalCode: formData.postalCode,
       };
-  
+
       const response = await axios.post('http://localhost:5001/insert-order', orderData, {
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
-  
+
       localStorage.setItem('checkoutOrderData', JSON.stringify(orderData));
-  
+
       if (response.status === 201) {
-        
+
         setSuccess('Order placed successfully!');
         localStorage.removeItem('selectedProducts');
 
         setToastMessage('Order Successful!');
-            setTimeout(() => {
-                setToastMessage('');
-                navigate('/user/purchase');
-            }, 3000);
+        setTimeout(() => {
+          setToastMessage('');
+          navigate('/user/purchase');
+        }, 3000);
 
         console.log('toast should display T-T')
 
-        
+
       }
     } catch (error) {
       console.error('Error placing order:', error);
@@ -214,7 +214,7 @@ const Checkout = () => {
     }
 
   };
-  
+
 
   const calculateTotalPrice = () => {
     const allValuesEqual = (array) => {
@@ -236,21 +236,12 @@ const Checkout = () => {
 
       // Check if the product has a discounted price (bundled product)
       if (product.discounted_price) {
-
-        // Apply the discount to the bundled product
         const effectiveDiscount = allValuesEqual(discounts) ? discounts[0] : discounts || 0;
         const discountMultiplier = (1 - (effectiveDiscount / 100 || 0));
         effectivePrice = product.discounted_price * discountMultiplier;
 
         console.log(`  Discounted Price: $${effectivePrice.toFixed(2)}`);
-      } else if (product.price) {
-        console.log("No Discount");
-        effectivePrice = product.price;
-        console.log("---------product Price test ----------");
-        console.log(`(Effective PRICE )`, effectivePrice);
-      }
-      else {
-        // Apply a general discount to non-bundled products if a bundle discount exists
+      } else {
         let effectiveDiscount = generalDiscountExists ? discounts[0] : 0;
         const discountMultiplier = (1 - (effectiveDiscount / 100 || 0));
         effectivePrice = product.price * discountMultiplier;
@@ -266,12 +257,9 @@ const Checkout = () => {
         console.log(`(Effective Discount )`, effectiveDiscount);
       }
 
-    
       const quantity = quantities[index] || 0;
-     
-      const totalForProduct = effectivePrice * quantity ;
+      const totalForProduct = effectivePrice * quantity;
 
-      // Log total for the product with quantity and shipping
       console.log(`  Quantity: ${quantity}`);
       console.log(`  Total for ${product.product_name}: $${totalForProduct.toFixed(2)}`);
       console.log("------------------------------");
@@ -285,8 +273,10 @@ const Checkout = () => {
     console.log(`Transaction Total: $${transactionTotal.toFixed(2)}`);
     console.log("----- End of Receipt -----");
 
-    return Math.round(transactionTotal);
+    // Return the total as a number, not a string
+    return transactionTotal;
   };
+
 
 
 
@@ -298,7 +288,7 @@ const Checkout = () => {
 
   return (
     <div className='checkout-container'>
-        <ToastNotification toastMessage={toastMessage} />
+      <ToastNotification toastMessage={toastMessage} />
       <Navigation />
       <div className='checkout-wrapper'>
         <h1><i class='bx bxs-shopping-bag'></i>Checkout</h1>
@@ -352,7 +342,7 @@ const Checkout = () => {
           }}>
             <h3>Order Summary</h3>
             {savedProducts.map((product, index) => {
-              const effectiveDiscount = discounts[0] || 0; 
+              const effectiveDiscount = discounts[0] || 0;
               const discountedPrice = getDiscountedPrice(product.price, effectiveDiscount);
               const total = (discountedPrice * quantities[index]).toFixed(2);
 
@@ -392,7 +382,7 @@ const Checkout = () => {
             }}>
 
               <span>Total Price:</span>
-              <span>₱{calculateTotalPrice().toFixed(2)}</span>
+              <span>₱{calculateTotalPrice()}</span>
             </div>
           </div>
         </div>

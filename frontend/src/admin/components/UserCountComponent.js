@@ -15,7 +15,7 @@ const UserCountComponent = () => {
         const fetchUserCounts = async () => {
             try {
                 const response = await axios.get('http://localhost:5001/admin-users-count');
-                const users = response.data.data; // Assuming the user data is in the 'data' field
+                const users = response.data.data;
 
                 // Calculate user counts
                 const newUsersCount = users.filter(user => user.role_type === 'user').length;
@@ -42,7 +42,7 @@ const UserCountComponent = () => {
             <div className='new-users'>
                 <div className='qty'>
                     <i className='bx bxs-user-plus'></i>
-                    <h6>{userCounts.newUsers}</h6> {/* Displaying the count */}
+                    <h6>{userCounts.newUsers}</h6>
                 </div>
                 <div>
                     <h6>New Users</h6>
@@ -52,7 +52,7 @@ const UserCountComponent = () => {
             <div className='employees'>
                 <div className='qty'>
                     <i className='bx bxs-user-badge'></i>
-                    <h6>{userCounts.totalEmployees}</h6> {/* Displaying the count */}
+                    <h6>{userCounts.totalEmployees}</h6>
                 </div>
                 <div>
                     <h6>Total Employees</h6>
@@ -62,7 +62,7 @@ const UserCountComponent = () => {
             <div className='active-users'>
                 <div className='qty'>
                     <i className='bx bxs-user'></i>
-                    <h6>{userCounts.activeCustomers}</h6> {/* Displaying the count */}
+                    <h6>{userCounts.activeCustomers}</h6>
                 </div>
                 <div>
                     <h6>Active Customers</h6>
@@ -72,7 +72,7 @@ const UserCountComponent = () => {
             <div className='inactive-users'>
                 <div className='qty'>
                     <i className='bx bxs-user-x'></i>
-                    <h6>{userCounts.inactiveCustomers}</h6> {/* Displaying the count */}
+                    <h6>{userCounts.inactiveCustomers}</h6>
                 </div>
                 <div>
                     <h6>Inactive Customers</h6>

@@ -7,11 +7,10 @@ import AdminNav from '../components/AdminNav';
 import AdminHeader from '../components/AdminHeader';
 import TopProduct from '../components/TopProduct';
 import ProductStatistics from '../components/ProductStatistics';
-import ProductTable from '../components/ProductTable';
 import AddProductModal from '../components/AddProductModal';
-import ProductModal from '../components/UpdateProductModal';
+import UpdateProductModal from '../components/UpdateProductModal';
 import RemoveDiscountProduct from '../components/DiscountProductModal';
-import BundleProduct from '../components/BundleProductModal'; // Import the modal
+import BundleProduct from '../components/BundleProductModal';
 
 const Products = () => {
   // States for product data
@@ -25,49 +24,83 @@ const Products = () => {
   const [discontinuedCount, setDiscontinuedCount] = useState(0);
   const [discontinuedQuantity, setDiscontinuedQuantity] = useState(0);
 
+
+
   // States for products and modal visibility
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [isDiscountProductModalOpen, setIsDiscountProductModalOpen] = useState(false);
-  const [isBundleProductModalOpen, setIsBundleProductModalOpen] = useState(false); // State for BundleProduct modal
+  const [isBundleProductModalOpen, setIsBundleProductModalOpen] = useState(false);
 
-  // Fetch data for product statistics and list
-  const fetchProductData = async () => {
-    try {
-      const response = await axios.get('http://localhost:5001/admin-products-with-interaction');
-      const {
-        total, totalQuantity, lowStockCount, lowStockQuantity, unpopularProducts, outOfStockCount, outOfStockQuantity, discontinuedCount, discontinuedQuantity
-      } = response.data;
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+  const [searchQuery, setSearchQuery] = useState('');
 
-      setBestSellingCount(total);
-      setTotalQuantity(totalQuantity);
-      setLowStockCount(lowStockCount);
-      setLowStockQuantity(lowStockQuantity);
-      setUnpopularProducts(unpopularProducts || []);
-      setOutOfStockCount(outOfStockCount);
-      setOutOfStockQuantity(outOfStockQuantity);
-      setDiscontinuedCount(discontinuedCount);
-      setDiscontinuedQuantity(discontinuedQuantity);
-    } catch (error) {
-      console.error('Error fetching product data:', error);
-    }
-  };
-
+  // Fetch product data from the server
   const fetchProduct = async () => {
     try {
-      const response = await axios.get('http://localhost:5001/products');
+      const response = await axios.get('http://localhost:5001/admin-products');
       setProducts(response.data);
+      setFilteredProducts(response.data);
     } catch (error) {
       console.error('Error fetching product data:', error);
     }
   };
 
   useEffect(() => {
-    fetchProductData();
     fetchProduct();
   }, []);
+
+  const fetchProductStatistics = async () => {
+    try {
+      const response = await axios.get('http://localhost:5001/admin-products-with-interaction');
+      const {
+        total,
+        totalQuantity,
+        lowStockCount,
+        lowStockQuantity,
+        unpopularProducts,
+        outOfStockCount,
+        outOfStockQuantity,
+        discontinuedCount,
+        discontinuedQuantity,
+      } = response.data;
+
+      setBestSellingCount(total);
+      setTotalQuantity(totalQuantity);
+      setLowStockCount(lowStockCount);
+      setLowStockQuantity(lowStockQuantity);
+      setUnpopularProducts(unpopularProducts || 0);
+      setOutOfStockCount(outOfStockCount);
+      setOutOfStockQuantity(outOfStockQuantity);
+      setDiscontinuedCount(discontinuedCount);
+      setDiscontinuedQuantity(discontinuedQuantity);
+    } catch (error) {
+      console.error('Error fetching product statistics:', error);
+    }
+  };
+
+
+  useEffect(() => {
+    const results = products.filter(product => {
+      const matchesSearch =
+        (product.product_name && product.product_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (product.product_code && product.product_code.toLowerCase().includes(searchQuery.toLowerCase())) || // Search by product code
+        (product.description && product.description.toLowerCase().includes(searchQuery.toLowerCase())) || // Search by description
+        (product.category_name && product.category_name.toLowerCase().includes(searchQuery.toLowerCase())); // Search by category name
+
+      return matchesSearch;
+    });
+
+    setFilteredProducts(results);
+    setCurrentPage(1);
+  }, [searchQuery, products]);
+
+
 
   // Add product handler
   const handleAddProduct = async (newProduct) => {
@@ -100,8 +133,12 @@ const Products = () => {
   const handleCloseDiscountProductModal = () => setIsDiscountProductModalOpen(false);
 
   // Handlers for Bundle Product Modal
-  const handleShowBundleProductModal = () => setIsBundleProductModalOpen(true); // Show modal
-  const handleCloseBundleProductModal = () => setIsBundleProductModalOpen(false); // Close modal
+  const handleShowBundleProductModal = () => setIsBundleProductModalOpen(true);
+  const handleCloseBundleProductModal = () => setIsBundleProductModalOpen(false);
+
+  // Pagination calculation
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const paginatedProducts = filteredProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
     <div className='dash-con'>
@@ -136,67 +173,109 @@ const Products = () => {
               <div className='cheader'>
                 <div className='search'>
                   <form>
-                    <input type='search' placeholder="Search products..." />
+                    <input
+                      type='search'
+                      placeholder="Search products..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
                   </form>
                 </div>
 
                 <div className='options'>
-                  
                   <div className='product-buttons'>
                     <Button variant="primary" onClick={handleShowAddModal}>
-                        <i class='bx bx-plus'></i>
+                      <i className='bx bx-plus'></i>
                     </Button>
                     <BundleProduct
-                        show={isBundleProductModalOpen}
-                        handleClose={handleCloseBundleProductModal}
-                        handleUpdate={fetchProduct}
+                      show={isBundleProductModalOpen}
+                      handleClose={handleCloseBundleProductModal}
+                      handleUpdate={fetchProduct}
                     />
                     <Button variant="primary" onClick={handleShowDiscountProductModal}>
-                        Remove Discount/Bundle
+                      Remove Discount/Bundle
                     </Button>
                   </div>
-                  <div className='sort'>
-                    <label htmlFor="sort">Sort By</label>
-                    <select name="sort" id="sort">
-                      <option value="date">Date</option>
-                      <option value="status">Status</option>
-                      <option value="id">ID</option>
-                      <option value="customer-id">Customer</option>
-                    </select>
-                  </div>
-
                 </div>
               </div>
 
-              <ProductTable handleShowProductModal={handleShowProductModal} />
+              {/* Product Table */}
+              <div className='order-table table-responsive'>
+                <table className="table table-hover">
+                  <thead className='bg-light sticky-top'>
+                    <tr>
+                      <th><input type='checkbox' /></th>
+                      <th>Product Code</th>
+                      <th>Product Name</th>
+                      <th>Price</th>
+                      <th>Category</th>
+                      <th>Quantity</th>
+                      <th>Description</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {paginatedProducts.map((product) => (
+                      <tr key={product.product_id}>
+                        <td><input type='checkbox' /></td>
+                        <td>{product.product_code}</td>
+                        <td>{product.product_name}</td>
+                        <td>${product.price}</td>
+                        <td>{product.category_name}</td>
+                        <td>{product.quantity}</td>
+                        <td>{product.description}</td>
+                        <td>
+                          <Button variant="secondary" onClick={() => handleShowProductModal(product)}>
+                            View
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination Controls */}
+              <div className="pagination">
+                <Button
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                >
+                  Previous
+                </Button>
+                <span>Page {currentPage} of {totalPages}</span>
+                <Button
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                >
+                  Next
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Modals */}
       <AddProductModal
         show={showAddModal}
         handleClose={handleCloseAddModal}
-        handleAddProduct={handleAddProduct}
+        handleSave={handleAddProduct}
       />
-
+      {selectedProduct && (
+        <UpdateProductModal
+          show={isProductModalOpen}
+          handleClose={handleCloseProductModal}
+          product={selectedProduct}
+          handleUpdate={fetchProduct}
+        />
+      )}
       <RemoveDiscountProduct
         show={isDiscountProductModalOpen}
         handleClose={handleCloseDiscountProductModal}
-        order={selectedProduct}
         handleUpdate={fetchProduct}
       />
-
-
-
-      {selectedProduct && (
-        <ProductModal
-          show={isProductModalOpen}
-          product={selectedProduct}
-          handleClose={handleCloseProductModal}
-          handleUpdateProduct={fetchProduct}
-        />
-      )}
     </div>
   );
 };

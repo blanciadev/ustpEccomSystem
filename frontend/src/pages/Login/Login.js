@@ -15,24 +15,31 @@ const Login = () => {
         e.preventDefault();
         setError('');
         setLoading(true);
-    
+
         try {
             const response = await axios.post('http://localhost:5001/users-login', { email, password });
-    
+
             if (response.status === 200) {
                 setLoginStatus('Login successful');
                 localStorage.setItem('token', response.data.token);
                 localStorage.setItem('customer_id', response.data.user_id);
                 localStorage.setItem('username', response.data.username);
                 localStorage.setItem('first_name', response.data.first_name);
-    
+                localStorage.setItem('role', response.data.role_type);
+
                 // Check if there's a redirect page stored
                 const redirectTo = localStorage.getItem('redirectTo');
                 if (redirectTo) {
-                    localStorage.removeItem('redirectTo'); // Clean up after redirect
-                    navigate(redirectTo); // Redirect to the saved page (e.g., /checkout)
+                    localStorage.removeItem('redirectTo');
+                    navigate(redirectTo);
                 } else {
-                    navigate('/'); // Default redirect to home page
+                    // Check the role_type and redirect accordingly
+                    const roleType = response.data.role_type;
+                    if (roleType === 'Admin') {
+                        navigate('/admin/dashboard');
+                    } else {
+                        navigate('/');
+                    }
                 }
             }
         } catch (err) {
@@ -47,12 +54,13 @@ const Login = () => {
             setLoading(false);
         }
     };
-    
+
+
 
     return (
         <div className='login-con'>
             <div className='login-box'>
-                
+
                 <div className='login-form'>
                     <h1>Log In</h1>
                     {error && <p className='error'>{error}</p>}
@@ -66,7 +74,7 @@ const Login = () => {
                     </div>
                     <form onSubmit={handleSubmit}>
                         <div className='input'>
-                            <label>Email</label> {/* Changed from Username to Email */}
+                            <label>Email</label>
                             <input
                                 type='email'
                                 placeholder='Enter your email'
@@ -90,14 +98,14 @@ const Login = () => {
                             {loading ? 'Logging in...' : 'Log In'}
                         </button>
                     </form>
-                    
+
                     {loginStatus && <p className='status'>{loginStatus}</p>}
                     <p>Don't have an account? <a href='/signup'>Sign Up</a></p>
                 </div>
                 <div className='login-image'>
-                    <img src='https://res.cloudinary.com/urbanclap/image/upload/t_high_res_template/dpr_2,fl_progressive:steep,q_auto:low,f_auto,c_limit/images/growth/luminosity/1723441265778-917980.jpeg'/>
+                    <img src='https://res.cloudinary.com/urbanclap/image/upload/t_high_res_template/dpr_2,fl_progressive:steep,q_auto:low,f_auto,c_limit/images/growth/luminosity/1723441265778-917980.jpeg' />
                 </div>
-                
+
             </div>
         </div>
     );

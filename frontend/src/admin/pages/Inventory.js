@@ -6,6 +6,8 @@ import AdminHeader from '../components/AdminHeader';
 import axios from 'axios';
 import ProductStatistics from '../components/ProductStatistics';
 
+const ITEMS_PER_PAGE = 10;
+
 const Inventory = () => {
     const [bestSellingCount, setBestSellingCount] = useState(0);
     const [totalQuantity, setTotalQuantity] = useState(0);
@@ -20,6 +22,7 @@ const Inventory = () => {
     const [inventoryItems, setInventoryItems] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
 
     const handleCloseModal = () => setShowModal(false);
     const handleShowModal = () => setShowModal(true);
@@ -79,8 +82,31 @@ const Inventory = () => {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        // You can implement search logic here if necessary
-        // For example, filtering `productNames` based on `searchTerm`
+        setCurrentPage(1);
+    };
+
+    // Filter products based on search term (search across all relevant fields)
+    const filteredProducts = productNames.filter(product => {
+        return (
+            product.product_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            product.product_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            product.category_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            product.price.toString().includes(searchTerm) ||
+            product.quantity.toString().includes(searchTerm)
+        );
+    });
+
+    // Calculate total pages
+    const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+
+    // Get products for the current page
+    const currentProducts = filteredProducts.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
     };
 
     return (
@@ -141,38 +167,46 @@ const Inventory = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {productNames
-                                            .filter(product => product.product_name.toLowerCase().includes(searchTerm.toLowerCase())) // Implementing search filter
-                                            .map((product) => {
-                                                // Determine stock status based on quantity
-                                                let stockStatus = 'Low on Stock';
-                                                if (product.quantity > 50) {
-                                                    stockStatus = 'Good Stocks';
-                                                } else if (product.quantity > 20) {
-                                                    stockStatus = 'Moderately Low';
-                                                }
+                                        {currentProducts.map((product) => {
+                                            // Determine stock status based on quantity
+                                            let stockStatus = 'Low on Stock';
+                                            if (product.quantity > 50) {
+                                                stockStatus = 'Good Stocks';
+                                            } else if (product.quantity > 20) {
+                                                stockStatus = 'Moderately Low';
+                                            }
 
-                                                return (
-                                                    <tr key={product.product_id}>
-                                                        <td>{product.product_id}</td>
-                                                        <td>{product.product_code}</td>
-                                                        <td>{product.product_name}</td>
-                                                        <td>{product.price}</td>
-                                                        <td>{product.quantity}</td>
-                                                        <td>{product.category_name}</td>
-                                                        <td>{stockStatus}</td>
-                                                    </tr>
-                                                );
-                                            })}
+                                            return (
+                                                <tr key={product.product_id}>
+                                                    <td>{product.product_id}</td>
+                                                    <td>{product.product_code}</td>
+                                                    <td>{product.product_name}</td>
+                                                    <td>{product.price}</td>
+                                                    <td>{product.quantity}</td>
+                                                    <td>{product.category_name}</td>
+                                                    <td>{stockStatus}</td>
+                                                </tr>
+                                            );
+                                        })}
                                     </tbody>
                                 </table>
                             </div>
+
+                            {/* Pagination Controls */}
+                            <nav>
+                                <ul className="pagination">
+                                    {[...Array(totalPages)].map((_, index) => (
+                                        <li key={index} className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}>
+                                            <button className="page-link" onClick={() => handlePageChange(index + 1)}>
+                                                {index + 1}
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </nav>
                         </div>
                     </div>
                 </div>
-
-
-
             </div>
         </div>
     );
