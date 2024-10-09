@@ -5,6 +5,7 @@ import Footer from '../../components/Footer';
 import CartProduct from '../../components/CartProduct';
 import cartEventEmitter from '../../components/cartEventEmitter';
 import { useNavigate } from 'react-router-dom';
+import ToastNotification from '../../components/ToastNotification'; 
 
 const CartContent = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -13,6 +14,7 @@ const CartContent = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const [toastMessage, setToastMessage] = useState('');
 
   // Check if user is logged in
   const isLoggedIn = !!localStorage.getItem('token');
@@ -171,6 +173,13 @@ const CartContent = () => {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
+        setToastMessage('Deleted!');
+
+          // Clear toast message after 3 seconds
+          setTimeout(() => {
+              setToastMessage('');
+          }, 3000);
+
 
         if (!response.ok) {
           throw new Error('Failed to remove item from cart');
@@ -194,6 +203,7 @@ const CartContent = () => {
   return (
     <div className='cart'>
       <Navigation />
+      <ToastNotification toastMessage={toastMessage} />
       <div className='cart__box'>
         <h1 className='cart__title'><i style={{fontSize:'1.7rem', paddingLeft:'5px'}} class='bx bxs-cart-alt' ></i>Shopping Cart</h1>
         {loading ? (

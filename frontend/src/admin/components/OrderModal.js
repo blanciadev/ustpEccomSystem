@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './modal.css'
 import axios from 'axios';
+import ToastNotification from '../../components/ToastNotification';
 
 const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
     const [status, setStatus] = useState(order ? order.order_status : ''); // Initialize with current status
     const [loading, setLoading] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
 
     const handleUpdate = async () => {
         setLoading(true);
@@ -17,8 +19,13 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
 
             // Ensure status is not empty
             if (!status) {
-                alert('Please select a valid status');
+                console.log('Please select a valid status');
+                
                 setLoading(false);
+                setToastMessage('Please select a valid status!');
+                setTimeout(() => {
+                    setToastMessage('');
+                }, 2000);
                 return;
             }
 
@@ -26,10 +33,17 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                 status,
                 products
             });
+            setToastMessage('Updated successfully');
+                setTimeout(() => {
+                    setToastMessage('');
+                    handleClose(); 
+                }, 2000);
 
-            alert('Order status updated successfully');
+            
+
+            console.log('Order status updated successfully');
+            
             refreshOrders(); // Call refreshOrders to update the orders list
-            handleClose();
         } catch (error) {
             console.error('Error updating order status:', error.message);
         } finally {
@@ -40,12 +54,14 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
 
     return (
         <div className={`modal fade ${show ? 'show' : ''}`} tabIndex="-1" role="dialog" style={{ display: show ? 'block' : 'none' }}>
-            <div className="modal-dialog modal-dialog-centered" role="document">
+            
+            <div className="modal-dialog modal-dialog-centered modal-lg" role="document">
                 <div className="modal-content">
                     <div className="modal-header">
                         <h5 className="modal-title">Order Details</h5>
                     </div>
                     <div className="modal-body">
+                        <ToastNotification toastMessage={toastMessage} />
                         {order && (
                             <div>
                                 <p><strong>Order ID:</strong> {order.order_id}</p>

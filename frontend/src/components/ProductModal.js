@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import './modal.css';
+import ToastNotification from './ToastNotification'; 
+
 
 const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
     const [recommendedProducts, setRecommendedProducts] = useState([]);
@@ -8,6 +10,8 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedBundleProducts, setSelectedBundleProducts] = useState({});
+    const [toastMessage, setToastMessage] = useState(''); 
+
 
     // Pagination state for recommendations
     const [currentPage, setCurrentPage] = useState(1);
@@ -71,6 +75,13 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         return price;
     };
 
+     // Toast notification function
+     const showToast = (message) => {
+        setToastMessage(message);
+        setTimeout(() => {
+            setToastMessage(''); // Hide toast after 3 seconds
+        }, 3000);
+    };
 
     const handleBuyNowBundle = () => {
         // Prepare selected bundle product data (including discounted price)
@@ -147,6 +158,8 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         // Store selected products in local storage
         localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
 
+        showToast('Redirecting to Checkout Page...');
+
         // Redirect to checkout
         window.location.href = '/checkout';
     };
@@ -165,6 +178,8 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         existingProducts.push(productData);
 
         localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
+
+        showToast('Redirecting to Checkout Page...');
 
         // Redirect to checkout
         window.location.href = '/checkout';
@@ -192,64 +207,96 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
 
     if (!isOpen || !product) return null;
     return (
+
         <div className="promodal-overlay" onClick={onClose}>
             <div className="promodal-content" onClick={(e) => e.stopPropagation()}>
-                <button className="promodal-close" onClick={onClose}>X</button>
                 <div className="promodal-body">
-                    <img
-                        src={product.product_image}
-                        alt={product.product_name}
-                        style={{ width: '50%' }}
-                    />
-                    <h3>{product.product_name}</h3>
-                    <p>{product.description || 'No description available.'}</p>
-                    <p>
-                        Price: P{calculateDiscountedPrice(product.price, product.product_discount)}
-                        {product.product_discount && (
-                            <span style={{ marginLeft: '10px', color: 'green' }}>
-                                (Discount: {product.product_discount}%)
-                            </span>
-                        )}
-                    </p>
-                    <p>Available Quantity: {product.quantity}</p>
+                    <ToastNotification toastMessage={toastMessage} />
+                    <div class="product-image">
+                        <img 
+                            src={product.product_image}
+                            alt="" height="400" width="300"/>
+                        <div class="price-stock">
+                        <p><strong>Price</strong></p>
+                        <p className='price-value'>
+                            ₱{calculateDiscountedPrice(product.price, product.product_discount)}
+                            {product.product_discount && (
+                                <span style={{ marginLeft: '10px', color: 'green' }}>
+                                    (Discount: {product.product_discount}%)
+                                </span>
+                            )}
+                        </p>
+                        <p><strong>Stocks</strong></p>
+                        <p>{product.quantity}</p>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <p>HAIRCARE • Shampoo</p>
+                        <h3>{product.product_name}</h3>
+                        <p><strong>Description:</strong>
+                        {product.description || 'No description available.'}
+                        </p>
+                        <p><strong>Hair Type:</strong>
+                        Suitable for virgin and colored hair.{/**/}
+                        </p>
+                        <p><strong>Hair Texture:</strong>
+                        Works for straight, wavy, or curly hair.
+                        </p>
+                        <p><strong>Effect/Target Problems:</strong>
+                        Treats dandruff, reduces scalp irritation, and soothes sensitive scalps.
+                        </p>
+                        <div class="quantity">
+                        <p><strong>Quantity</strong></p>
+                        <div className='quantity-buttons'> 
+                            <button>-</button>
+                            <input type="text" value="1" style={{width:'70px', border:'1px solid gray', outline:'none', borderRadius:'0'}}/>
+                            <button>+</button>
+                        </div>
+                        
+                        </div>
+                        <div class="buttons">
+                            {product.quantity > 0 ? (
+                                <>
+                                    <button onClick={() => onAddToCart(product)}><i class="bx bx-cart"></i>Add to Cart</button>
+                                    <button onClick={() => handleBuyNow(product)}
+                                                    style={{ marginLeft: '10px' }}
+                                                >Buy Now</button>
+                                </>
+                            ) : (
+                                <p style={{ color: 'red' }}>Out of stock</p>
+                            )}
+                        </div>
+                        </div>
+                    
 
-                    {product.quantity > 0 ? (
-                        <>
-                            <button onClick={() => onAddToCart(product)}>Add to Cart</button>
-                            <button
-                                onClick={() => handleBuyNow(product)}
-                                style={{ marginLeft: '10px' }}
-                            >
-                                Buy Now
-                            </button>
-                        </>
-                    ) : (
-                        <p style={{ color: 'red' }}>Out of stock</p>
-                    )}
 
-                    <button onClick={onClose} style={{ marginLeft: '10px' }}>Close</button>
+                    <button onClick={onClose} className='promodal-close-btn'>Close</button>
 
+                   
                     {/* Bundle Section */}
                     {bundleProducts.length > 0 && (
+                        
                         <div className="bundle-section">
                             <h4>Available Bundle</h4>
-                            <ul>
+                            <p>Save money, avail discounted items</p>
+                            <div>
                                 {bundleProducts.map((bProduct) => (
-                                    <li key={bProduct.product_code}>
-                                        <label>
+                                    <div key={bProduct.product_code}>
+                                        
                                             <input
                                                 type="checkbox"
                                                 checked={selectedBundleProducts[bProduct.product_code] || false}
                                                 onChange={() => handleBundleProductSelect(bProduct.product_code)}
                                             />
+                                            <label>
                                             {bProduct.product_name} - P{calculateDiscountedPrice(bProduct.price, bProduct.discount)}
                                             <span style={{ marginLeft: '10px', color: 'red' }}>
                                                 (Discount: {bProduct.discount}%)
                                             </span>
-                                        </label>
-                                    </li>
+                                            </label>
+                                    </div>
                                 ))}
-                            </ul>
+                            </div>
                             <button onClick={handleBuyNowBundle} className="buy-now-btn">
                                 Buy Selected Products Now
                             </button>

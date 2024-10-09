@@ -4,6 +4,7 @@ import Navigation from '../../components/Navigation';
 import Footer from '../../components/Footer';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import ToastNotification from '../../components/ToastNotification';
 
 const Checkout = () => {
   const location = useLocation();
@@ -32,6 +33,7 @@ const Checkout = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [hasFetched, setHasFetched] = useState(false);
+  const [toastMessage, setToastMessage] = useState(''); 
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -118,10 +120,17 @@ const Checkout = () => {
 
     if (updatedProducts.length === 0) {
       localStorage.removeItem('selectedProducts');
+      setToastMessage('Redirecting to Cart');
+            setTimeout(() => {
+                setToastMessage('');
+                
+      navigate('/cart')
+            }, 3000);
     }
 
     setOriginalQuantities(updatedQuantities);
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -183,9 +192,19 @@ const Checkout = () => {
       localStorage.setItem('checkoutOrderData', JSON.stringify(orderData));
   
       if (response.status === 201) {
+        
         setSuccess('Order placed successfully!');
         localStorage.removeItem('selectedProducts');
-        navigate('/order-success');
+
+        setToastMessage('Order Successful!');
+            setTimeout(() => {
+                setToastMessage('');
+                navigate('/user/purchase');
+            }, 3000);
+
+        console.log('toast should display T-T')
+
+        
       }
     } catch (error) {
       console.error('Error placing order:', error);
@@ -193,6 +212,7 @@ const Checkout = () => {
     } finally {
       setLoading(false);
     }
+
   };
   
 
@@ -278,9 +298,10 @@ const Checkout = () => {
 
   return (
     <div className='checkout-container'>
+        <ToastNotification toastMessage={toastMessage} />
       <Navigation />
       <div className='checkout-wrapper'>
-        <h1>Checkout</h1>
+        <h1><i class='bx bxs-shopping-bag'></i>Checkout</h1>
         <div className='checkout-content'>
           <div className='checkout-address'>
             <h3>Delivery Address</h3>

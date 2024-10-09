@@ -10,8 +10,8 @@ const pool = mysql.createPool({
     password: '',
 
     // PORT KURT 
-    port: '3307',
-    password: 'root',
+    // port: '3307',
+    // password: 'root',
 
     database: 'ustpecom',
     waitForConnections: true,

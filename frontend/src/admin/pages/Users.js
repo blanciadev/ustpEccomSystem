@@ -5,11 +5,18 @@ import AdminNav from '../components/AdminNav';
 import AdminHeader from '../components/AdminHeader';
 import UserCountComponent from '../components/UserCountComponent';
 import axios from 'axios';
+import AddUserModal from '../components/AddUserModal'; // Import the modal
 
 const Users = () => {
     const [users, setUsers] = useState([]); // State to store user data
     const [loading, setLoading] = useState(true); // State to manage loading state
     const [error, setError] = useState(null); // State to manage error
+    const [showModal, setShowModal] = useState(false);
+
+    // Function to toggle modal visibility
+    const toggleModal = () => {
+        setShowModal(!showModal);
+    };
 
     // Fetch user data from backend
     useEffect(() => {
@@ -51,7 +58,7 @@ const Users = () => {
                                 </div>
                                 <div className='options'>
                                     <div className='print'>
-                                        <button>Create Account</button>
+                                        <button onClick={toggleModal}>Create Account</button> 
                                     </div>
                                     <div className='sort'>
                                         <label htmlFor="sort">Sort By</label>
@@ -107,6 +114,8 @@ const Users = () => {
                     </div>
                 </div>
             </div>
+
+            <AddUserModal show={showModal} onClose={toggleModal} />
         </div>
     );
 };

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
+import ToastNotification from '../../components/ToastNotification';
 
 const PaymentModal = ({ show, handleClose, order, handleUpdate }) => {
   const [paymentMethod, setPaymentMethod] = useState('');
   const [orderStatus, setOrderStatus] = useState('');
   const [paymentStatus, setPaymentStatus] = useState('');
+  const [toastMessage, setToastMessage] = useState('');
 
   useEffect(() => {
     if (order) {
@@ -24,9 +26,19 @@ const PaymentModal = ({ show, handleClose, order, handleUpdate }) => {
         payment_status: paymentStatus,
       });
       console.log('Saved payment details:', { paymentMethod, orderStatus, paymentStatus });
-      handleUpdate(); // Notify parent to refresh the orders list
-      handleClose();  // Close the modal after saving
+     
+      
+      setToastMessage('Updated successfully');
+      setTimeout(() => {
+          setToastMessage('');
+          handleClose(); 
+          handleUpdate(); // Notify parent to refresh the orders list
+      }, 2000);
     } catch (error) {
+      setToastMessage('Error Occurred!', error.message);
+      setTimeout(() => {
+          setToastMessage('');
+      }, 2000);
       console.error('Error saving payment details:', error.message);
     }
   };
@@ -37,6 +49,7 @@ const PaymentModal = ({ show, handleClose, order, handleUpdate }) => {
         <Modal.Title>Update Payment Details</Modal.Title>
       </Modal.Header>
       <Modal.Body>
+      <ToastNotification toastMessage={toastMessage} />
         <Form>
           <Form.Group controlId="formPaymentMethod">
             <Form.Label>Payment Method</Form.Label>

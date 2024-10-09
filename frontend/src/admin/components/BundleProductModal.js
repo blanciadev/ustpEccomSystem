@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Form, Table, Pagination, Alert, Spinner } from 'react-bootstrap';
 import axios from 'axios';
+import ToastNotification from '../../components/ToastNotification';
 
 const BundleProductModal = () => {
     const [show, setShow] = useState(false);
@@ -11,6 +12,7 @@ const BundleProductModal = () => {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState(null);
     const [error, setError] = useState(null);
+    const [toastMessage, setToastMessage] = useState('');
 
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
@@ -71,14 +73,31 @@ const BundleProductModal = () => {
             // Create the bundle and get the response
             await axios.post('http://localhost:5001/bundles', bundleData);
 
-            setMessage('Bundle created successfully!'); // Set success message
+            setToastMessage('Bundle Created!'); 
+
+            setTimeout(() => {
+    
+                setToastMessage(''); // Reset toast message
+                handleClose(); 
+            }, 2000);
+
+            // setMessage('Bundle created successfully!'); // Set success message
+            
             setSelectedProducts([]); // Clear selected products after submission
+
+            
+
         } catch (error) {
             console.error('Error creating bundle:', error);
-            setError('Failed to create bundle. Please try again.'); // Set error message
+            setToastMessage('Error Occured!');
+            setTimeout(() => {
+                setToastMessage('');
+                handleClose();
+            }, 2000);
+            // setError('Failed to create bundle. Please try again.'); // Set error message
         } finally {
             setLoading(false); // Reset loading state
-            handleClose(); // Close the modal
+            //handleClose(); // Close the modal
         }
     };
 
@@ -134,6 +153,7 @@ const BundleProductModal = () => {
                     <Modal.Title>Create a Bundle</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    <ToastNotification toastMessage={toastMessage} />
                     <Form onSubmit={handleBundleSubmit}>
                         {/* Loading Indicator */}
                         {loading && <Spinner animation="border" variant="primary" />}

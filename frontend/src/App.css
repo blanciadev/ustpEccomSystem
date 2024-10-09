@@ -27,6 +27,9 @@ body{
     border-bottom: 1px solid black;
     width: 98vw;
     height: 50px;
+    align-content: center;
+    flex-wrap: wrap;
+    flex-direction: row;
 }
 .nav-container > .logo > a {
     text-decoration: none;
@@ -64,6 +67,16 @@ body{
     align-items: center;
     justify-content: center;
     width: 90px;
+}
+.nav-container > .navlinks > ul > li > button{
+    height: 70%;
+    padding: 7px 15px;
+    background-color: #e94b70;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 .nav-container > .navlinks > ul > li > a{
     display: flex;

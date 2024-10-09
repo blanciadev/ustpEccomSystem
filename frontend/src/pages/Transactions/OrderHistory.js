@@ -3,6 +3,7 @@ import axios from 'axios';
 import Navigation from '../../components/Navigation';
 import './orderhistory.css';
 import UserSideNav from '../../components/UserSideNav';
+import AdminSkeleton from '../../Loaders/AdminSkeleton';
 
 const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
@@ -55,7 +56,7 @@ const OrderHistory = () => {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <AdminSkeleton/>
   if (error) return <p>Error: {error}</p>;
 
   return (

@@ -8,6 +8,7 @@ import './modal.css';
 import './productList.css'; // Import the new CSS file
 import { useNavigate } from 'react-router-dom'; 
 import { v4 as uuidv4 } from 'uuid';
+import ToastNotification from './ToastNotification'; 
 
 
 const PAGE_SIZE = 4;
@@ -49,6 +50,7 @@ const ProductList = ({ stickyComponents }) => {
     const [currentPage, setCurrentPage] = useState(0);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [toastMessage, setToastMessage] = useState(''); 
 
     const handleStickySubmit = async (formData) => {
         setLoading(true);
@@ -143,6 +145,8 @@ function generateCartItemId() {
                 };
                 cart.push(newCartItem);
                 console.log('Added new product to cart:', newCartItem); // Log the newly added product
+
+                
             }
 
             // Save updated cart to localStorage
@@ -152,6 +156,12 @@ function generateCartItemId() {
             // Emit cart update event to refresh the cart count
             cartEventEmitter.emit('cartUpdated');
             console.log('Emitted cartUpdated event'); // Log event emission
+
+            setToastMessage('Added to Cart!');
+
+            setTimeout(() => {
+                setToastMessage('');
+            }, 3000);
             return;
         }
 
@@ -171,6 +181,11 @@ function generateCartItemId() {
             // Emit cart update event to refresh the cart count
             cartEventEmitter.emit('cartUpdated');
             console.log('Emitted cartUpdated event after server response'); // Log event emission
+            setToastMessage('Added to Cart!');
+            setTimeout(() => {
+                setToastMessage('');
+            }, 3000);
+            return;
         } catch (error) {
             if (error.response && error.response.status === 401) {
                 console.log('Unauthorized, redirecting to login'); // Log unauthorized error
@@ -191,6 +206,8 @@ function generateCartItemId() {
         const existingProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
         existingProducts.push(productData);
         localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
+        setToastMessage('Redirecting to Checkout Page');
+
         window.location.href = '/checkout';
     };
 
@@ -206,6 +223,7 @@ function generateCartItemId() {
 
     return (
         <div className='product-list'>
+            <ToastNotification toastMessage={toastMessage} />
             <StickyComponent onSubmit={handleStickySubmit} />
             <h2>Top Products</h2>
             <div className='product-list-container'>
