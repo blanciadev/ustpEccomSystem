@@ -41,6 +41,15 @@
 .promodal-body  button{
     background-color: rgb(255, 114, 138);
 }
+.product-image{
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: center;
+}
 .product-image img{
     object-fit: contain;
 }
@@ -183,6 +192,11 @@
     text-align: center;
     background-color: #f9f9f9;
     transition: transform 0.2s;
+    height: 350px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
 }
 
 .modalproduct-card:hover {
@@ -198,6 +212,9 @@
 
 .modalproduct-details {
     margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .modalproduct-name {

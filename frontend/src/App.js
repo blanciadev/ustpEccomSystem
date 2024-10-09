@@ -28,6 +28,7 @@ import UserProfile from './pages/Transactions/UserProfile';
 import Notification from './pages/Transactions/Notification';
 import DiscountsandVouchers from './pages/Transactions/DiscountsandVouchers';
 import AddUserModal from './admin/components/AddUserModal';
+import ToastNotification from './components/ToastNotification';
 // import ClientProfileLoader from './Loaders/ClientProfileLoader';
 
 
@@ -74,7 +75,7 @@ function App() {
         <Route path='/verify' element={<Verification/>}></Route>
         <Route path='/change-password' element={<ChangePassword/>}></Route>
         
-         <Route path='/sticky' element={<AddUserModal/>}></Route>
+         <Route path='/sticky' element={<ToastNotification/>}></Route>
 
 
       </Routes>

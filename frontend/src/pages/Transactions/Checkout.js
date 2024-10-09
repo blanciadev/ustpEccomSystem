@@ -120,6 +120,12 @@ const Checkout = () => {
 
     if (updatedProducts.length === 0) {
       localStorage.removeItem('selectedProducts');
+      setToastMessage('Redirecting to Cart');
+            setTimeout(() => {
+                setToastMessage('');
+                
+      navigate('/cart')
+            }, 3000);
     }
 
     setOriginalQuantities(updatedQuantities);
@@ -295,7 +301,7 @@ const Checkout = () => {
         <ToastNotification toastMessage={toastMessage} />
       <Navigation />
       <div className='checkout-wrapper'>
-        <h1>Checkout</h1>
+        <h1><i class='bx bxs-shopping-bag'></i>Checkout</h1>
         <div className='checkout-content'>
           <div className='checkout-address'>
             <h3>Delivery Address</h3>

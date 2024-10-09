@@ -210,7 +210,6 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
 
         <div className="promodal-overlay" onClick={onClose}>
             <div className="promodal-content" onClick={(e) => e.stopPropagation()}>
-                <button className="promodal-close" onClick={onClose}>X</button>
                 <div className="promodal-body">
                     <ToastNotification toastMessage={toastMessage} />
                     <div class="product-image">
@@ -219,7 +218,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                             alt="" height="400" width="300"/>
                         <div class="price-stock">
                         <p><strong>Price</strong></p>
-                        <p>
+                        <p className='price-value'>
                             ₱{calculateDiscountedPrice(product.price, product.product_discount)}
                             {product.product_discount && (
                                 <span style={{ marginLeft: '10px', color: 'green' }}>
@@ -229,7 +228,6 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                         </p>
                         <p><strong>Stocks</strong></p>
                         <p>{product.quantity}</p>
-                        
                         </div>
                     </div>
                     <div class="product-info">
