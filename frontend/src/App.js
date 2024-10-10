@@ -27,9 +27,7 @@ import ChangePassword from './pages/ForgotPassword/ChangePassword'
 import UserProfile from './pages/Transactions/UserProfile';
 import Notification from './pages/Transactions/Notification';
 import DiscountsandVouchers from './pages/Transactions/DiscountsandVouchers';
-import AddUserModal from './admin/components/AddUserModal';
 import ToastNotification from './components/ToastNotification';
-// import ClientProfileLoader from './Loaders/ClientProfileLoader';
 
 
 function App() {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { cartEventEmitter } from './eventEmitter';
+import '../App.css'
 
 const Navigation = () => {
     const [username, setUsername] = useState('');
@@ -9,7 +10,9 @@ const Navigation = () => {
     const [cartItemCount, setCartItemCount] = useState(0);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
-
+    const [showNotifications, setShowNotifications] = useState(false);
+    
+    
     useEffect(() => {
         const token = localStorage.getItem('token');
         const storedUsername = localStorage.getItem('username');
@@ -51,6 +54,10 @@ const Navigation = () => {
         }
     };
     
+    const toggleNotifications = () => {
+        setShowNotifications(!showNotifications);
+    };
+
     const handleLogout = async () => {
         const token = localStorage.getItem('token');
         if (token) {
@@ -76,12 +83,11 @@ const Navigation = () => {
     };
 
     const handleProfileClick = () => {
-        navigate('/user/purchase');
+        navigate('/user/profile');
     };
 
     const commonLinks = [
         { id: 1, page: "Shop", link: "/shop" },
-        { id: 2, page: "About Us", link: "/about-us" },
         { id: 3, page: `Cart (${cartItemCount})`, link: "#" }
     ];
 
@@ -110,6 +116,68 @@ const Navigation = () => {
                             <a href={data.link} onClick={data.id === 3 ? handleCartClick : undefined}>{data.page}</a>
                         </li>
                     ))}
+                    {/* Makeit only appear if a user logged in */}
+                    <li>
+                        <div className="notification-bell" onClick={toggleNotifications}>
+                            <i className={`bx ${showNotifications ? 'bx-bell' : 'bxs-bell'}`}  style={{ fontSize: '18pt' }}></i>
+                                <span className="notification-count"></span>
+                            {showNotifications && (
+                                <div className={`notification-dropdown ${showNotifications ? 'show' : ''}`}>
+                                    <h5>Notifications</h5>
+                                        <ul>
+                                            <li>
+                                                <a href='#'>
+                                                    <h6>Your Payment is being Shipped</h6>
+                                                    <p>
+                                                        Some Information
+                                                    </p>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href='#'>
+                                                    <h6>Your Payment is being Shipped</h6>
+                                                    <p>
+                                                        Some Information
+                                                    </p>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href='#'>
+                                                    <h6>Your Payment is being Shipped</h6>
+                                                    <p>
+                                                        Some Information
+                                                    </p>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href='#'>
+                                                    <h6>Your Payment is being Shipped</h6>
+                                                    <p>
+                                                        Some Information
+                                                    </p>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href='#'>
+                                                    <h6>Your Payment is being Shipped</h6>
+                                                    <p>
+                                                        Some Information
+                                                    </p>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href='#'>
+                                                    <h6>Your Payment is being Shipped</h6>
+                                                    <p>
+                                                        Some Information
+                                                    </p>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                </div>
+                            )}
+                        </div>
+                    </li>
                     {!isLoggedIn ? (
                         <>
                             <li><a href='/signup'>Sign Up</a></li>

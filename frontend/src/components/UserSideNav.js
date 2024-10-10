@@ -25,18 +25,6 @@ const UserSideNav = () => {
         >
           Order History
         </a>
-        <a
-          href='/user/notifications'
-          className={location.pathname === '/user/notifications' ? 'active-link' : ''}
-        >
-          Notifications
-        </a>
-        <a
-          href='/user/discounts+vouchers'
-          className={location.pathname === '/user/discounts+vouchers' ? 'active-link' : ''}
-        >
-          Discounts and Vouchers
-        </a>
       </div>
     </div>
   );

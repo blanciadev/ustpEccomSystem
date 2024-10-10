@@ -82,8 +82,5 @@ const ToastNotification = ({toastMessage}) => {
   );
 };
 
-ToastNotification.propTypes = {
-  toastMessage: PropTypes.string.isRequired,
-};
 
 export default ToastNotification;
