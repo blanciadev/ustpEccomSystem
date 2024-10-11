@@ -11,7 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 import ToastNotification from './ToastNotification'; 
 
 
-const PAGE_SIZE = 4;
+const PAGE_SIZE = 6;
 
 const ProductCard = React.memo(({ product, onAddToCart, onBuyNow, onProductClick }) => {
     if (!product) return <div>Product data is not available</div>;

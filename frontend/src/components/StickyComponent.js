@@ -38,7 +38,7 @@ const StickyComponent = ({ onSubmit }) => {
   };
 
   return (
-    <>
+    <div>
       {/* Sticky Button */}
       <div className={`sticky-card ${isClicked ? 'clicked' : ''}`} onClick={handleClick}>
         <p>Find Your Perfect Haircare Match</p>
@@ -53,38 +53,42 @@ const StickyComponent = ({ onSubmit }) => {
             <div className='forms'>
               {/* Form */}
               <form onSubmit={handleSubmit}>
-                <p>Hair Type:</p>
-                <div className='input'>
-                  <input
-                    type='radio'
-                    id='straight'
-                    value='straight'
-                    name='hairType'
-                    onChange={handleInputChange}
-                  />
-                  <label htmlFor='straight'>Straight</label>
-                </div>
-                <div className='input'>
-                  <input
-                    type='radio'
-                    id='wavy'
-                    value='wavy'
-                    name='hairType'
-                    onChange={handleInputChange}
-                  />
-                  <label htmlFor='wavy'>Wavy</label>
-                </div>
-                <div className='input'>
-                  <input
-                    type='radio'
-                    id='curly'
-                    value='curly'
-                    name='hairType'
-                    onChange={handleInputChange}
-                  />
-                  <label htmlFor='curly'>Curly</label>
+                <div>
+                    <p>Hair Type:</p>
+                    <div className='input'>
+                    <input
+                        type='radio'
+                        id='straight'
+                        value='straight'
+                        name='hairType'
+                        onChange={handleInputChange}
+                    />
+                    <label htmlFor='straight'>Straight</label>
+                    </div>
+                    <div className='input'>
+                    <input
+                        type='radio'
+                        id='wavy'
+                        value='wavy'
+                        name='hairType'
+                        onChange={handleInputChange}
+                    />
+                    <label htmlFor='wavy'>Wavy</label>
+                    </div>
+                    <div className='input'>
+                    <input
+                        type='radio'
+                        id='curly'
+                        value='curly'
+                        name='hairType'
+                        onChange={handleInputChange}
+                    />
+                    <label htmlFor='curly'>Curly</label>
+                    </div>
+
                 </div>
 
+                <div>
                 {/* Rebonded Section */}
                 <p>Rebonded:</p>
                 <div className='input'>
@@ -107,7 +111,8 @@ const StickyComponent = ({ onSubmit }) => {
                   />
                   <label htmlFor='rebondedNo'>No</label>
                 </div>
-
+                </div>
+                <div>
                 <p>Texture:</p>
                 <div className='input'>
                   <input
@@ -159,7 +164,8 @@ const StickyComponent = ({ onSubmit }) => {
                   />
                   <label htmlFor='normal'>Normal</label>
                 </div>
-
+                </div>
+                <div>
                 <p>Virgin:</p>
                 <div className='input'>
                   <input
@@ -181,7 +187,7 @@ const StickyComponent = ({ onSubmit }) => {
                   />
                   <label htmlFor='virginNo'>No</label>
                 </div>
-
+                </div>
 
                 <button type='submit'>Find Products</button>
               </form>
@@ -189,7 +195,7 @@ const StickyComponent = ({ onSubmit }) => {
           </Card.Body>
         </Card>
       </div>
-    </>
+    </div>
   );
 };
 

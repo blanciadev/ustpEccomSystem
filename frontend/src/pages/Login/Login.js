@@ -61,6 +61,9 @@ const Login = () => {
         <div className='login-con'>
             <div className='login-box'>
 
+                <div className='login-image'>
+                    <img src='https://res.cloudinary.com/urbanclap/image/upload/t_high_res_template/dpr_2,fl_progressive:steep,q_auto:low,f_auto,c_limit/images/growth/luminosity/1723441265778-917980.jpeg' />
+                </div>
                 <div className='login-form'>
                     <h1>Log In</h1>
                     {error && <p className='error'>{error}</p>}
@@ -102,9 +105,7 @@ const Login = () => {
                     {loginStatus && <p className='status'>{loginStatus}</p>}
                     <p>Don't have an account? <a href='/signup'>Sign Up</a></p>
                 </div>
-                <div className='login-image'>
-                    <img src='https://res.cloudinary.com/urbanclap/image/upload/t_high_res_template/dpr_2,fl_progressive:steep,q_auto:low,f_auto,c_limit/images/growth/luminosity/1723441265778-917980.jpeg' />
-                </div>
+                
 
             </div>
         </div>

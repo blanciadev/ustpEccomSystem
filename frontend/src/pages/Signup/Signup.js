@@ -63,6 +63,10 @@ const Signup = () => {
   return (
     <div className='signup-con'>
       <div className='signup-box'>
+      <div className='signup-image'>
+          <img src='https://res.cloudinary.com/urbanclap/image/upload/t_high_res_template/dpr_2,fl_progressive:steep,q_auto:low,f_auto,c_limit/images/growth/luminosity/1723441265778-917980.jpeg'/>
+                
+        </div>
         <div className='signup-form'>
           <h1>Sign Up</h1>
           {error && <p className='error'>{error}</p>}
@@ -140,10 +144,6 @@ const Signup = () => {
           </form>
           
           <p>Have an account? <a href='/login'>Log In</a></p>
-        </div>
-        <div className='signup-image'>
-          <img src='https://res.cloudinary.com/urbanclap/image/upload/t_high_res_template/dpr_2,fl_progressive:steep,q_auto:low,f_auto,c_limit/images/growth/luminosity/1723441265778-917980.jpeg'/>
-                
         </div>
       </div>
     </div>

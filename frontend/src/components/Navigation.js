@@ -10,11 +10,13 @@ const Navigation = () => {
     const [cartItemCount, setCartItemCount] = useState(0);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
     useEffect(() => {
         const token = localStorage.getItem('token');
         const storedUsername = localStorage.getItem('username');
         const storedFirstName = localStorage.getItem('first_name');
+        window.addEventListener('resize', handleResize);
 
         if (token) {
             setIsLoggedIn(true);
@@ -26,6 +28,7 @@ const Navigation = () => {
         cartEventEmitter.on('cartUpdated', fetchCartItemCount);
         return () => {
             cartEventEmitter.off('cartUpdated', fetchCartItemCount);
+            window.removeEventListener('resize', handleResize);
         };
     }, []);
 
@@ -85,26 +88,48 @@ const Navigation = () => {
         { id: 3, page: `Cart (${cartItemCount})`, link: "#" }
     ];
 
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
+    const handleResize = () => {
+        setIsMobile(window.innerWidth <= 768);  // Update state based on screen width
+      };
+
+      
     return (
         <div className='nav-container'>
             <div className='logo'>
                 <a href='/'>
                     <img src='https://us.123rf.com/450wm/dmrgraphic/dmrgraphic2105/dmrgraphic210500421/169019761-hair-woman-and-face-logo-and-symbols.jpg?ver=6' alt='Logo' />
-                    <h1>N&B Beauty Vault</h1>
+                    {isMobile ? (
+                                        <p></p> // Text for mobile view
+                                    ) : (
+                                        <h1>N&B Beauty Vault</h1> // Icon for larger screen 
+                                    )}
+                   
                 </a>
             </div>
 
             <div className='searchbar'>
                 <form>
-                    <input type='search' placeholder='Search Product' />
-                    <button type='submit'>
-                        <i className='bx bx-search' style={{ color: '#ffffff' }}></i>
-                    </button>
+                    <input type='search' placeholder='Search...' />
+                    
                 </form>
             </div>
 
+            <button class="menu-toggle" onClick={toggleMenu}>
+                {isMenuOpen ? (
+                    <i class='bx bx-x'></i>
+                ) : (
+                    <i class='bx bx-menu'></i>
+                )}
+                
+            </button>
+
             <div className='navlinks'>
-                <ul>
+                <ul className={`linklist ${isMenuOpen ? "active" : ""}`}>
                     {commonLinks.map((data) => (
                         <li key={data.id}>
                             <a href={data.link} onClick={data.id === 3 ? handleCartClick : undefined}>{data.page}</a>
@@ -118,7 +143,15 @@ const Navigation = () => {
                         </>
                     ) : (
                         <>
-                            <li><span className='cartIcon' onClick={handleProfileClick}><i style={{ fontSize: '18pt' }} className='bx bxs-user-circle'></i></span></li>
+                            <li>
+                                <span className='cartIcon' onClick={handleProfileClick}>
+                                    {isMobile ? (
+                                        <p style={{fontWeight:'500'}}>Profile</p> // Text for mobile view
+                                    ) : (
+                                        <i style={{ fontSize: '18pt', cursor: 'pointer' }} className="bx bxs-user-circle"></i> // Icon for larger screen 
+                                    )}
+                                </span>
+                            </li>
                             <li><button onClick={handleLogout}>Logout</button></li>
                         </>
                     )}
