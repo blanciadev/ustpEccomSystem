@@ -10,9 +10,7 @@ const Navigation = () => {
     const [cartItemCount, setCartItemCount] = useState(0);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
-    const [showNotifications, setShowNotifications] = useState(false);
-    
-    
+
     useEffect(() => {
         const token = localStorage.getItem('token');
         const storedUsername = localStorage.getItem('username');
@@ -33,14 +31,14 @@ const Navigation = () => {
 
     const fetchCartItemCount = async () => {
         const token = localStorage.getItem('token');
-        
+
         if (!token) {
             // Fetch cart from localStorage if user is not logged in
             const cart = JSON.parse(localStorage.getItem('cart')) || [];
-            setCartItemCount(cart.reduce((total, item) => total + item.quantity, 0)); // Count total quantity in cart
+            setCartItemCount(cart.reduce((total, item) => total + item.quantity, 0));
             return;
         }
-    
+
         // Fetch cart from the server if the user is logged in
         try {
             const response = await axios.get('http://localhost:5001/cart-item-count', {
@@ -52,10 +50,6 @@ const Navigation = () => {
         } catch (error) {
             console.error('Error fetching cart item count:', error.response ? error.response.data : error.message);
         }
-    };
-    
-    const toggleNotifications = () => {
-        setShowNotifications(!showNotifications);
     };
 
     const handleLogout = async () => {
@@ -83,7 +77,7 @@ const Navigation = () => {
     };
 
     const handleProfileClick = () => {
-        navigate('/user/profile');
+        navigate('/user');
     };
 
     const commonLinks = [
@@ -116,68 +110,7 @@ const Navigation = () => {
                             <a href={data.link} onClick={data.id === 3 ? handleCartClick : undefined}>{data.page}</a>
                         </li>
                     ))}
-                    {/* Makeit only appear if a user logged in */}
-                    <li>
-                        <div className="notification-bell" onClick={toggleNotifications}>
-                            <i className={`bx ${showNotifications ? 'bx-bell' : 'bxs-bell'}`}  style={{ fontSize: '18pt' }}></i>
-                                <span className="notification-count"></span>
-                            {showNotifications && (
-                                <div className={`notification-dropdown ${showNotifications ? 'show' : ''}`}>
-                                    <h5>Notifications</h5>
-                                        <ul>
-                                            <li>
-                                                <a href='#'>
-                                                    <h6>Your Payment is being Shipped</h6>
-                                                    <p>
-                                                        Some Information
-                                                    </p>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href='#'>
-                                                    <h6>Your Payment is being Shipped</h6>
-                                                    <p>
-                                                        Some Information
-                                                    </p>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href='#'>
-                                                    <h6>Your Payment is being Shipped</h6>
-                                                    <p>
-                                                        Some Information
-                                                    </p>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href='#'>
-                                                    <h6>Your Payment is being Shipped</h6>
-                                                    <p>
-                                                        Some Information
-                                                    </p>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href='#'>
-                                                    <h6>Your Payment is being Shipped</h6>
-                                                    <p>
-                                                        Some Information
-                                                    </p>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href='#'>
-                                                    <h6>Your Payment is being Shipped</h6>
-                                                    <p>
-                                                        Some Information
-                                                    </p>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                </div>
-                            )}
-                        </div>
-                    </li>
+
                     {!isLoggedIn ? (
                         <>
                             <li><a href='/signup'>Sign Up</a></li>
@@ -185,7 +118,7 @@ const Navigation = () => {
                         </>
                     ) : (
                         <>
-                            <li><span className='cartIcon' onClick={handleProfileClick}><i style={{fontSize:'18pt' }}class='bx bxs-user-circle'></i></span></li>
+                            <li><span className='cartIcon' onClick={handleProfileClick}><i style={{ fontSize: '18pt' }} className='bx bxs-user-circle'></i></span></li>
                             <li><button onClick={handleLogout}>Logout</button></li>
                         </>
                     )}

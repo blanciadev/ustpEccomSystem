@@ -87,6 +87,7 @@ router.post('/insert-order', async (req, res) => {
         total_price,
         fullName,
         phoneNumber,
+        streetname,
         address,
         region,
         postalCode,
@@ -106,6 +107,7 @@ router.post('/insert-order', async (req, res) => {
         if (!fullName) missingFields.push('fullName');
         if (!phoneNumber) missingFields.push('phoneNumber');
         if (!address) missingFields.push('address');
+        if (!streetname) missingFields.push('streetname');
         if (!region) missingFields.push('region');
         if (!postalCode) missingFields.push('postalCode');
         if (!paymentMethod) missingFields.push('paymentMethod');
@@ -146,7 +148,7 @@ router.post('/insert-order', async (req, res) => {
         console.log('------------------------------------');
         console.log('Order inserted with result:', orderResult);
 
-        const cartItemsUpdateIds = []; 
+        const cartItemsUpdateIds = [];
 
         // Loop through order_details
         for (const detail of order_details) {
@@ -173,7 +175,7 @@ router.post('/insert-order', async (req, res) => {
             console.log('Inserted order detail:', { order_id, product_id, quantity, totalprice, formattedPaymentDate, payment_method, payment_status });
 
             // Add cart_items to cartItemsUpdateIds for status update
-            cartItemsUpdateIds.push(cart_items); 
+            cartItemsUpdateIds.push(cart_items);
             console.log('Added cart_items_id to cartItemsUpdateIds:', cart_items);
             console.log('------------------------------------');
 
@@ -194,7 +196,7 @@ router.post('/insert-order', async (req, res) => {
             }
         }
 
-      
+
         console.log('Final cartItemsUpdateIds:', cartItemsUpdateIds);
 
         // Update status for cart items directly without checking if they are in process
@@ -228,9 +230,9 @@ router.post('/insert-order', async (req, res) => {
 
         // Insert into shipment table
         await db.query(`
-            INSERT INTO shipment (order_id, customer_id, shipment_date, address, city, shipment_status, phoneNumber, postalCode)
-            VALUES (?, ?, NOW(), ?, ?, 'Pending', ?, ?)
-        `, [order_id, customer_id, address, region, phoneNumber, postalCode]);
+            INSERT INTO shipment (order_id, customer_id, shipment_date, streetname, address, city, shipment_status, phoneNumber, postalCode)
+            VALUES (?, ?, NOW(), ?,?, ?, 'Pending', ?, ?)
+        `, [order_id, customer_id, streetname, address, region, phoneNumber, postalCode]);
         console.log('----------------- 215 INSERT SHIPMENT -------------------');
         console.log('Inserted shipment details for order ID:', order_id);
 
@@ -258,8 +260,8 @@ router.post('/insert-order', async (req, res) => {
 // Route to update customer details based on customer_id
 router.post('/update-customer-details/:customer_id', authenticateToken, async (req, res) => {
     try {
-        const user = req.user; 
-        const { address, region, postal_code, phone_number } = req.body; 
+        const user = req.user;
+        const { address, region, postal_code, phone_number } = req.body;
         const { customer_id } = req.params;
 
         console.log(`Request received to update customer details for ID: ${customer_id}`);
@@ -312,7 +314,7 @@ router.post('/update-customer-details/:customer_id', authenticateToken, async (r
 // Route to get order history for a user with optional status filter
 router.get('/order-history', authenticateToken, async (req, res) => {
     try {
-        const { customer_id } = req.user; 
+        const { customer_id } = req.user;
         const { status } = req.query;
 
         // Base query to fetch order history along with product details
@@ -382,10 +384,84 @@ router.get('/order-history', authenticateToken, async (req, res) => {
 });
 
 
+
+// Route to get order history for a user with optional status filter
+router.get('/order-history-display', authenticateToken, async (req, res) => {
+    try {
+        const { customer_id } = req.user;
+        const { status } = req.query;
+
+        // Base query to fetch order history along with product details
+        let query = `
+            SELECT
+                o.order_id, 
+                o.order_date, 
+                od.order_update, 
+                o.total_price AS order_total, 
+                od.product_id, 
+                p.product_name, 
+                p.price,
+                od.quantity, 
+                od.order_status,
+                od.total_price AS item_total, 
+                od.payment_method
+            FROM
+                \`order\` o
+            INNER JOIN
+                \`order_details\` od
+            ON 
+                o.order_id = od.order_id
+            INNER JOIN
+                \`product\` p
+            ON 
+                od.product_id = p.product_code
+            WHERE
+                o.customer_id = ?
+        `;
+
+        // Append filter condition if status is provided
+        if (status) {
+            query += ` AND od.order_status = ?`;
+        }
+
+        query += ` ORDER BY o.order_date DESC`;
+
+        // Execute query
+        const [orders] = await db.query(query, status ? [customer_id, status] : [customer_id]);
+
+        // Process the results to group products by order_id
+        const groupedOrders = orders.reduce((acc, order) => {
+            if (!acc[order.order_id]) {
+                acc[order.order_id] = {
+                    order_id: order.order_id,
+                    order_date: order.order_date,
+                    order_total: order.order_total,
+                    order_status: order.order_status,
+                    products: []
+                };
+            }
+            acc[order.order_id].products.push({
+                product_name: order.product_name,
+                price: order.price,
+                quantity: order.quantity,
+                item_total: order.item_total
+            });
+            return acc;
+        }, {});
+
+
+        res.json(Object.values(groupedOrders));
+
+    } catch (error) {
+        console.error('Error fetching order history:', error.message);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
 // Route to cancel an order
 router.post('/cancel-order', authenticateToken, async (req, res) => {
     try {
-        const { order_id } = req.body; 
+        const { order_id } = req.body;
 
         // Update order status to 'Cancelled'
         await db.query(`

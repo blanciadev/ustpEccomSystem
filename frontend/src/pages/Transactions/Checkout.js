@@ -23,6 +23,7 @@ const Checkout = () => {
   const [formData, setFormData] = useState({
     fullName: '',
     phoneNumber: '',
+    streetname: '',
     address: '',
     region: '',
     postalCode: '',
@@ -104,8 +105,8 @@ const Checkout = () => {
   };
 
   const validateForm = () => {
-    const { fullName, phoneNumber, address, region, postalCode, paymentMethod } = formData;
-    return fullName && phoneNumber && address && region && postalCode && paymentMethod;
+    const { fullName, phoneNumber, streetname, address, region, postalCode, paymentMethod } = formData;
+    return fullName && phoneNumber && streetname && address && region && postalCode && paymentMethod;
   };
 
   const handleRemoveProduct = (index) => {
@@ -121,11 +122,11 @@ const Checkout = () => {
     if (updatedProducts.length === 0) {
       localStorage.removeItem('selectedProducts');
       setToastMessage('Redirecting to Cart');
-            setTimeout(() => {
-                setToastMessage('');
-                
-      navigate('/cart')
-            }, 3000);
+      setTimeout(() => {
+        setToastMessage('');
+
+        navigate('/cart')
+      }, 3000);
     }
 
     setOriginalQuantities(updatedQuantities);
@@ -178,6 +179,7 @@ const Checkout = () => {
         order_date: new Date().toISOString(),
         shipment_date: new Date().toISOString(),
         address: formData.address,
+        streetname: formData.streetname,
         region: formData.region,
         shipment_status: 'Pending',
         paymentMethod: formData.paymentMethod,
@@ -295,10 +297,11 @@ const Checkout = () => {
         <div className='checkout-content'>
           <div className='checkout-address'>
             <h3>Delivery Address</h3>
+
             <form className='address-form' onSubmit={handleSubmit}>
               {error && <p className='error-message'>{error}</p>}
               {success && <p className='success-message'>{success}</p>}
-              {['fullName', 'phoneNumber', 'address', 'region', 'postalCode'].map(field => (
+              {['fullName', 'phoneNumber', 'streetname', 'address', 'region', 'postalCode'].map(field => (
                 <div className='form-group' key={field}>
                   <label htmlFor={field}>{field.replace(/([A-Z])/g, ' $1').toUpperCase()}</label>
                   <input

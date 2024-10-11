@@ -19,10 +19,15 @@ const OrderHistory = () => {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           },
           params: {
-            status: statusFilter // Add status filter to request
+            status: statusFilter
           }
         });
-        setOrders(response.data);
+        // Assuming the response is an array
+        if (Array.isArray(response.data)) {
+          setOrders(response.data);
+        } else {
+          setOrders([]); // Fallback if the response is not an array
+        }
       } catch (err) {
         setError(err.message);
       } finally {
@@ -31,7 +36,7 @@ const OrderHistory = () => {
     };
 
     fetchOrders();
-  }, [statusFilter]); // Fetch orders when statusFilter changes
+  }, [statusFilter]);
 
   const handleStatusClick = (status) => {
     setStatusFilter(status);
@@ -56,7 +61,7 @@ const OrderHistory = () => {
     }
   };
 
-  if (loading) return <AdminSkeleton/>
+  if (loading) return <AdminSkeleton />
   if (error) return <p>Error: {error}</p>;
 
   return (
@@ -92,14 +97,19 @@ const OrderHistory = () => {
                       <p>Order Status: {order.order_status}</p> {/* Display order status */}
                       <div>
                         <h5>Product Details</h5>
-                        {order.products.map((product, index) => (
-                          <div key={index} className="product-details">
-                            <p>Product Name: {product.product_name}</p>
-                            <p>Price: P{product.price ? product.price.toFixed(2) : '0.00'}</p>
-                            <p>Quantity: {product.quantity}</p>
-                            <p>Item Total: P{product.item_total ? product.item_total.toFixed(2) : '0.00'}</p>
-                          </div>
-                        ))}
+                        {/* Check if order.products exists and is an array */}
+                        {Array.isArray(order.products) && order.products.length > 0 ? (
+                          order.products.map((product, index) => (
+                            <div key={index} className="product-details">
+                              <p>Product Name: {product.product_name}</p>
+                              <p>Price: P{product.price ? product.price.toFixed(2) : '0.00'}</p>
+                              <p>Quantity: {product.quantity}</p>
+                              <p>Item Total: P{product.item_total ? product.item_total.toFixed(2) : '0.00'}</p>
+                            </div>
+                          ))
+                        ) : (
+                          <p>No product details available.</p> // Fallback if no products are available
+                        )}
                       </div>
                       <button
                         onClick={() => handleCancelOrder(order.order_id)}

@@ -20,7 +20,7 @@ router.put('/update-order-status/:orderId', async (req, res) => {
 
         // Update the order status in the order_details table
         const result = await db.query(
-            'UPDATE order_details SET order_status = ? WHERE order_id = ?',
+            'UPDATE order_details SET order_status = ?, order_update = NOW() WHERE order_id = ?',
             [status, orderId]
         );
 
@@ -58,7 +58,7 @@ router.post('/update-payment-details', async (req, res) => {
         // SQL query to update the payment details
         const query = `
             UPDATE order_details
-            SET payment_method = ?, order_status = ?, payment_status = ?
+            SET payment_method = ?, order_status = ?, order_update = NOW() , payment_status = ?
             WHERE order_id = ?
         `;
 

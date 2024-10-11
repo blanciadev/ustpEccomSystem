@@ -31,10 +31,10 @@ import ToastNotification from './components/ToastNotification';
 
 
 function App() {
-  const [loginStatus, setLoginStatus] = useState('');  // Store login status
-  const [error, setError] = useState('');  // Store error message (if any)
+  const [loginStatus, setLoginStatus] = useState('');
+  const [error, setError] = useState('');
 
-  
+
   return (
     <BrowserRouter>
       <Routes>
@@ -51,29 +51,29 @@ function App() {
         <Route path='/admin/dashboard' element={<Dashboard />}></Route>
         <Route path='/shop' element={<Shop />}></Route>
 
-        <Route path="/cart" element={<Cart/>}/>
-        <Route path="/checkout" element={<Checkout/>}/>
-        <Route path="/user/purchase" element={<OrderHistory/>}/>
-        <Route path="/user" element={<UserProfile/>}/>
-        <Route path="/user/notifications" element={<Notification/>}/>
-        <Route path="/user/discounts+vouchers" element={<DiscountsandVouchers/>}/>
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/user/purchase" element={<OrderHistory />} />
+        <Route path="/user" element={<UserProfile />} />
+        <Route path="/user/notifications" element={<Notification />} />
+        <Route path="/user/discounts/vouchers" element={<DiscountsandVouchers />} />
 
 
-        <Route path='/admin/dashboard' element={<Dashboard/>}></Route>
-        <Route path='/admin/orders' element={<Orders/>}></Route>
-        <Route path='/admin/payments' element={<Payments/>}></Route>
-        <Route path='/admin/shipments' element={<Shipments/>}></Route>
-        <Route path='/admin/products' element={<Products/>}></Route>
-        <Route path='/admin/inventory' element={<Inventory/>}></Route>
-        <Route path='/admin/reports' element={<Reports/>}></Route>
-        <Route path='/admin/manage-users' element={<Users/>}></Route>
+        <Route path='/admin/dashboard' element={<Dashboard />}></Route>
+        <Route path='/admin/orders' element={<Orders />}></Route>
+        <Route path='/admin/payments' element={<Payments />}></Route>
+        <Route path='/admin/shipments' element={<Shipments />}></Route>
+        <Route path='/admin/products' element={<Products />}></Route>
+        <Route path='/admin/inventory' element={<Inventory />}></Route>
+        <Route path='/admin/reports' element={<Reports />}></Route>
+        <Route path='/admin/manage-users' element={<Users />}></Route>
 
-        
-        <Route path='/forgot-password' element={<ForgotPassword/>}></Route>
-        <Route path='/verify' element={<Verification/>}></Route>
-        <Route path='/change-password' element={<ChangePassword/>}></Route>
-        
-         <Route path='/sticky' element={<ToastNotification/>}></Route>
+
+        <Route path='/forgot-password' element={<ForgotPassword />}></Route>
+        <Route path='/verify' element={<Verification />}></Route>
+        <Route path='/change-password' element={<ChangePassword />}></Route>
+
+        <Route path='/sticky' element={<ToastNotification />}></Route>
 
 
       </Routes>

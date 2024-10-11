@@ -63,5 +63,70 @@ router.post('/users-login', async (req, res) => {
 
 
 
+// Endpoint to fetch and update user details
+router.route('/users-details')
+    // Fetch user details
+    .post(async (req, res) => {
+        const { customer_id } = req.body;
+
+        if (!customer_id) {
+            return res.status(400).json({ message: 'Customer ID is required.' });
+        }
+
+        try {
+            const [userDetails] = await db.query('SELECT * FROM users WHERE customer_id = ?', [customer_id]);
+            if (userDetails.length === 0) {
+                return res.status(404).json({ message: 'User not found.' });
+            }
+
+            res.status(200).json(userDetails[0]); // Return the first user detail
+        } catch (error) {
+            console.error('Error fetching user details:', error);
+            res.status(500).json({ message: 'Server error' });
+        }
+    })
+
+    // Update user details
+    .put(async (req, res) => {
+        const { customer_id, first_name, last_name, email, phone_number, street_name, region, postal_code, address, role_type } = req.body;
+
+        if (!customer_id) {
+            return res.status(400).json({ message: 'Customer ID is required.' });
+        }
+
+        // Validate required fields (add more as necessary)
+        if (!first_name || !last_name || !email) {
+            return res.status(400).json({ message: 'First name, last name, and email are required.' });
+        }
+
+        try {
+            const result = await db.query(
+                `UPDATE users SET 
+                first_name = ?, 
+                last_name = ?, 
+                email = ?, 
+                phone_number = ?, 
+                street_name = ?, 
+                region = ?, 
+                postal_code = ?, 
+                address = ?, 
+                role_type = ? 
+                WHERE customer_id = ?`,
+                [first_name, last_name, email, phone_number, street_name, region, postal_code, address, role_type, customer_id]
+            );
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ message: 'User not found.' });
+            }
+
+            res.status(200).json({ message: 'User details updated successfully.' });
+        } catch (error) {
+            console.error('Error updating user details:', error);
+            res.status(500).json({ message: 'Server error' });
+        }
+    });
+
+
+
 
 module.exports = router;
