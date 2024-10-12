@@ -22,7 +22,6 @@
     margin-bottom: 30px;
     display: flex;
     flex-direction: column;
-    
   }
   
   .cart__table-inner {
@@ -34,15 +33,14 @@
   .cart__table-header th {
     text-align: left;
     padding: 10px;
-    /* background-color: #333;
-    color: #fff; */
   }
   
   .cart__table tbody td {
     padding: 15px 10px;
     border-bottom: 1px solid #e6e6e6;
   }
-  .cart__table tbody td:nth-child(4){
+  
+  .cart__table tbody td:nth-child(4) {
     width: 160px;
     display: flex;
     align-content: center;
@@ -58,35 +56,35 @@
     font-size: 18px;
     font-weight: bold;
   }
-  .cart__table .qtyInput[type="number"]::-webkit-inner-spin-button,
-  .cart__table .qtyInput[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
+  
   .qtyInput[type="number"] {
     -moz-appearance: textfield;
   }
-  .qtyInput{
-        font-size: 16px;
-        padding: 5px;
-        border: 1px solid #000000; 
-        border-radius: 5px; 
-        text-align: center;
+  
+  .qtyInput {
+    font-size: 16px;
+    padding: 5px;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    text-align: center;
   }
-  .qtyBtn{
-        background-color: #fff4fa; 
-        border:none;
-        border-radius: 7px;
-        margin: 0 5px;
-        padding: 5px 10px;
-        font-size: 16px;
-        cursor: pointer;
-        color: #000000; 
+  
+  .qtyBtn {
+    background-color: #fff4fa;
+    border: none;
+    border-radius: 7px;
+    margin: 0 5px;
+    padding: 5px 10px;
+    font-size: 16px;
+    cursor: pointer;
+    color: #000000;
   }
+  
   .qtyBtn:hover {
-    background-color: #ff99cc; 
+    background-color: #ff99cc;
   }
-  .cart__delBtn{
+  
+  .cart__delBtn {
     background-color: rgb(224, 30, 30);
     border-radius: 25%;
   }
@@ -141,6 +139,20 @@
       background: #f9f9f9;
       border-radius: 8px;
       box-shadow: 0 1px 8px rgba(0, 0, 0, 0.05);
+    }
+  
+    tbody td {
+      padding: 10px 0;
+      display: flex;
+      justify-content: space-between;
+    }
+  
+    tbody td:before {
+      content: attr(data-label);
+      font-weight: bold;
+      text-transform: uppercase;
+      padding-right: 10px;
+      color: #333;
     }
   }
   

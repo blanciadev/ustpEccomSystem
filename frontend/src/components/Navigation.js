@@ -31,6 +31,7 @@ const Navigation = () => {
             window.removeEventListener('resize', handleResize);
         };
     }, []);
+    
 
     const fetchCartItemCount = async () => {
         const token = localStorage.getItem('token');
@@ -140,6 +141,7 @@ const Navigation = () => {
                         <>
                             <li><a href='/signup'>Sign Up</a></li>
                             <li><a href='/login'>Login</a></li>
+                            
                         </>
                     ) : (
                         <>

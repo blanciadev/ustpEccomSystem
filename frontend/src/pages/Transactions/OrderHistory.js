@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Navigation from '../../components/Navigation';
-import './orderhistory.css';
 import UserSideNav from '../../components/UserSideNav';
 import AdminSkeleton from '../../Loaders/AdminSkeleton';
 
@@ -10,8 +9,13 @@ const OrderHistory = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [statusFilter, setStatusFilter] = useState(''); // State to manage filter
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
+    
+    window.addEventListener('resize', handleResize);
+
+    
     const fetchOrders = async () => {
       try {
         const response = await axios.get('http://localhost:5001/order-history', {
@@ -34,8 +38,12 @@ const OrderHistory = () => {
         setLoading(false);
       }
     };
+    
 
     fetchOrders();
+    return () => {
+        window.removeEventListener('resize', handleResize);
+    }
   }, [statusFilter]);
 
   const handleStatusClick = (status) => {
@@ -60,6 +68,10 @@ const OrderHistory = () => {
       setError(err.message);
     }
   };
+  
+  const handleResize = () => {
+    setIsMobile(window.innerWidth <= 768);  // Update state based on screen width
+  };
 
   if (loading) return <AdminSkeleton />
   if (error) return <p>Error: {error}</p>;
@@ -78,12 +90,53 @@ const OrderHistory = () => {
             </div>
             <div className='purchase-body'>
               <div className='purchase-btncon'>
-                <button onClick={() => handleStatusClick('')}>All</button>
-                <button onClick={() => handleStatusClick('To Ship')}>To Ship</button>
-                <button onClick={() => handleStatusClick('To Receive')}>To Receive</button>
-                <button onClick={() => handleStatusClick('Completed')}>Completed</button>
-                <button onClick={() => handleStatusClick('Cancelled')}>Cancelled</button>
-                <button onClick={() => handleStatusClick('Return/Refund')}>Return/Refund</button>
+                <button onClick={() => handleStatusClick('')}>
+                    All
+                </button>
+                <button onClick={() => handleStatusClick('To Ship')}>
+                    {isMobile ? (
+                        <i class='bx bxs-truck'></i>
+                    ) : (
+                        'To Ship'
+                    )
+                   
+                   }</button>
+                <button onClick={() => handleStatusClick('To Receive')}>
+                    {isMobile ? (
+                        <i class='bx bxs-receipt' ></i>
+                    ) : (
+                        'To Receive'
+                    )
+                   
+                   }
+                    </button>
+                <button onClick={() => handleStatusClick('Completed')}>
+                    {isMobile ? (
+                        <i class='bx bx-check' ></i>
+                    ) : (
+                        'Completed'
+                    )
+                   
+                   }
+                </button>
+                <button onClick={() => handleStatusClick('Cancelled')}>
+                    {isMobile ? (
+                        <i class='bx bx-x'></i>
+                    ) : (
+                        'Cancelled'
+                    )
+                   
+                   }
+                </button>
+                <button onClick={() => handleStatusClick('Return/Refund')}>
+                {isMobile ? (
+                        <i class='bx bx-revision'></i>
+                    ) : (
+                        'Return / Refund'
+                    )
+                   
+                   }
+                </button>
               </div>
               <div className='order'>
                 {orders.length === 0 ? (

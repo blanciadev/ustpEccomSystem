@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navigation from '../../components/Navigation';
 import UserSideNav from '../../components/UserSideNav';
-import './UserProfile.css'; // Make sure to create this CSS file for styling
+import './UserProfile.css';
+import ProfileImageUpload from '../../components/ProfileImageUpload';
+import ToastNotification from '../../components/ToastNotification'; 
 
 const UserProfile = () => {
   const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isEditing, setIsEditing] = useState(false); // State to handle editing mode
+  const [isEditing, setIsEditing] = useState(false); 
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -19,11 +21,14 @@ const UserProfile = () => {
     postal_code: '',
     role_type: ''
   });
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [toastMessage, setToastMessage] = useState('');
 
   useEffect(() => {
     const fetchUserDetails = async () => {
       const token = localStorage.getItem('token');
       const customerId = localStorage.getItem('customer_id');
+      window.addEventListener('resize', handleResize);
 
       try {
         const response = await axios.post('http://localhost:5001/users-details', { customer_id: customerId }, {
@@ -39,6 +44,9 @@ const UserProfile = () => {
     };
 
     fetchUserDetails();
+    return () => {
+        window.removeEventListener('resize', handleResize);
+    }
   }, []);
 
   const handleInputChange = (e) => {
@@ -67,7 +75,15 @@ const UserProfile = () => {
       });
 
       // Notify user of success
-      alert(response.data.message);
+      setToastMessage('Updated Successfully!');
+
+          // Clear toast message after 3 seconds
+          setTimeout(() => {
+              setToastMessage('');
+          }, 3000);
+
+
+      console.log(response.data.message);
       setUserDetails((prevDetails) => ({
         ...prevDetails,
         ...formData, // Update userDetails with the edited data
@@ -78,28 +94,35 @@ const UserProfile = () => {
       alert('Failed to update user details. Please try again.'); // Notify user of failure
     }
   };
+  const handleResize = () => {
+    setIsMobile(window.innerWidth <= 768);  // Update state based on screen width
+  };
 
   return (
     <div className='order-con'>
       <Navigation />
+      <ToastNotification toastMessage={toastMessage} />
       <div className='order-box'>
         <div className='user'>
           <UserSideNav />
         </div>
         <div className='purchase'>
-          <div className='purchase-box'>
+          <div className='purchase-box2'>
             <div className='purchase-header'>
               <h2>User Profile</h2>
               <button onClick={handleEditToggle} className='edit-button'>
                 {isEditing ? 'Cancel' : 'Edit'}
               </button>
             </div>
+            <ProfileImageUpload/>
             {loading ? (
-              <p>Loading...</p>
+              <div className='cskeleton-item' style={{gridColumn:'span 2'}}></div>
             ) : userDetails ? (
+                
               <div className='user-details'>
                 {isEditing ? (
-                  <form onSubmit={handleSubmit} className='edit-form'>
+                  <form onSubmit={handleSubmit} className='edit-user'>
+                    <label>First Name</label>
                     <input
                       type='text'
                       name='first_name'
@@ -108,6 +131,7 @@ const UserProfile = () => {
                       placeholder='First Name'
                       required
                     />
+                    <label>Last Name</label>
                     <input
                       type='text'
                       name='last_name'
@@ -116,6 +140,7 @@ const UserProfile = () => {
                       placeholder='Last Name'
                       required
                     />
+                    <label>Email</label>
                     <input
                       type='email'
                       name='email'
@@ -124,6 +149,7 @@ const UserProfile = () => {
                       placeholder='Email'
                       required
                     />
+                    <label>Phone Number</label>
                     <input
                       type='text'
                       name='phone_number'
@@ -132,6 +158,7 @@ const UserProfile = () => {
                       placeholder='Phone Number'
                       required
                     />
+                    <label>Address</label>
                     <input
                       type='text'
                       name='address'
@@ -140,6 +167,7 @@ const UserProfile = () => {
                       placeholder='Address'
                       required
                     />
+                    <label>Street Name</label>
                     <input
                       type='text'
                       name='street_name'
@@ -148,6 +176,7 @@ const UserProfile = () => {
                       placeholder='Street Name'
                       required
                     />
+                    <label>Region</label>
                     <input
                       type='text'
                       name='region'
@@ -156,6 +185,7 @@ const UserProfile = () => {
                       placeholder='Region'
                       required
                     />
+                    <label>Postal Code</label>
                     <input
                       type='text'
                       name='postal_code'
@@ -164,16 +194,16 @@ const UserProfile = () => {
                       placeholder='Postal Code'
                       required
                     />
-                    <button type='submit' className='save-button'>Save Changes</button>
+                    <button type='submit' className='save-button'>{isMobile ? (<i class='bx bxs-save' ></i>):('Save Changes')}</button>
                   </form>
                 ) : (
-                  <div>
-                    <p><strong>First Name:</strong> {userDetails.first_name}</p>
-                    <p><strong>Last Name:</strong> {userDetails.last_name}</p>
-                    <p><strong>Email:</strong> {userDetails.email}</p>
-                    <p><strong>Phone Number:</strong> {userDetails.phone_number}</p>
-                    <p><strong>Address:</strong> {userDetails.address}, {userDetails.street_name}, {userDetails.region} {userDetails.postal_code}</p>
-                    <p><strong>Role:</strong> {userDetails.role_type}</p>
+                  <div className='userDetails'>
+                    <p><strong>First Name:</strong></p> <p>{userDetails.first_name}</p>
+                    <p><strong>Last Name:</strong></p> <p> {userDetails.last_name}</p>
+                    <p><strong>Email:</strong></p> <p> {userDetails.email}</p>
+                    <p><strong>Phone Number:</strong></p> <p> {userDetails.phone_number}</p>
+                    <p><strong>Address:</strong></p> <p> {userDetails.address}, {userDetails.street_name}, {userDetails.region} {userDetails.postal_code}</p>
+                    <p><strong>Role:</strong></p> <p> {userDetails.role_type}</p>
                   </div>
                 )}
               </div>
