@@ -4,12 +4,12 @@ import Navigation from '../../components/Navigation';
 import UserSideNav from '../../components/UserSideNav';
 import './UserProfile.css';
 import ProfileImageUpload from '../../components/ProfileImageUpload';
-import ToastNotification from '../../components/ToastNotification'; 
+import ToastNotification from '../../components/ToastNotification';
 
 const UserProfile = () => {
   const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isEditing, setIsEditing] = useState(false); 
+  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -34,8 +34,17 @@ const UserProfile = () => {
         const response = await axios.post('http://localhost:5001/users-details', { customer_id: customerId }, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        
+        // Update state with user details and form data
         setUserDetails(response.data);
         setFormData(response.data); // Set form data for editing
+
+        // If profile_img is a blob or base64 string, set it for the image
+        if (response.data.profile_img) {
+          const imgBlob = new Blob([new Uint8Array(response.data.profile_img.data)], { type: 'image/jpeg' }); // Adjust type as necessary
+          const imgUrl = URL.createObjectURL(imgBlob);
+          setFormData((prev) => ({ ...prev, profile_img: imgUrl })); // Set img URL in formData
+        }
       } catch (error) {
         console.error('Error fetching user details:', error.response ? error.response.data : error.message);
       } finally {
@@ -45,8 +54,8 @@ const UserProfile = () => {
 
     fetchUserDetails();
     return () => {
-        window.removeEventListener('resize', handleResize);
-    }
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   const handleInputChange = (e) => {
@@ -77,11 +86,10 @@ const UserProfile = () => {
       // Notify user of success
       setToastMessage('Updated Successfully!');
 
-          // Clear toast message after 3 seconds
-          setTimeout(() => {
-              setToastMessage('');
-          }, 3000);
-
+      // Clear toast message after 3 seconds
+      setTimeout(() => {
+        setToastMessage('');
+      }, 3000);
 
       console.log(response.data.message);
       setUserDetails((prevDetails) => ({
@@ -94,6 +102,7 @@ const UserProfile = () => {
       alert('Failed to update user details. Please try again.'); // Notify user of failure
     }
   };
+
   const handleResize = () => {
     setIsMobile(window.innerWidth <= 768);  // Update state based on screen width
   };
@@ -114,12 +123,19 @@ const UserProfile = () => {
                 {isEditing ? 'Cancel' : 'Edit'}
               </button>
             </div>
-            <ProfileImageUpload/>
+            <ProfileImageUpload />
             {loading ? (
-              <div className='cskeleton-item' style={{gridColumn:'span 2'}}></div>
+              <div className='cskeleton-item' style={{ gridColumn: 'span 2' }}></div>
             ) : userDetails ? (
-                
               <div className='user-details'>
+                {/* Display profile image from backend */}
+                <div className='profile-image'>
+                  {formData.profile_img ? (
+                    <img src={formData.profile_img} alt="Profile" className="user-profile-image" />
+                  ) : (
+                    <img src="https://static.vecteezy.com/system/resources/previews/026/434/409/non_2x/default-avatar-profile-icon-social-media-user-photo-vector.jpg" alt="Default Profile" />
+                  )}
+                </div>
                 {isEditing ? (
                   <form onSubmit={handleSubmit} className='edit-user'>
                     <label>First Name</label>
@@ -194,16 +210,18 @@ const UserProfile = () => {
                       placeholder='Postal Code'
                       required
                     />
-                    <button type='submit' className='save-button'>{isMobile ? (<i class='bx bxs-save' ></i>):('Save Changes')}</button>
+                    <button type='submit' className='save-button'>
+                      {isMobile ? <i className='bx bxs-save'></i> : 'Save Changes'}
+                    </button>
                   </form>
                 ) : (
                   <div className='userDetails'>
-                    <p><strong>First Name:</strong></p> <p>{userDetails.first_name}</p>
-                    <p><strong>Last Name:</strong></p> <p> {userDetails.last_name}</p>
-                    <p><strong>Email:</strong></p> <p> {userDetails.email}</p>
-                    <p><strong>Phone Number:</strong></p> <p> {userDetails.phone_number}</p>
-                    <p><strong>Address:</strong></p> <p> {userDetails.address}, {userDetails.street_name}, {userDetails.region} {userDetails.postal_code}</p>
-                    <p><strong>Role:</strong></p> <p> {userDetails.role_type}</p>
+                    <p><strong>First Name:</strong> {userDetails.first_name}</p>
+                    <p><strong>Last Name:</strong> {userDetails.last_name}</p>
+                    <p><strong>Email:</strong> {userDetails.email}</p>
+                    <p><strong>Phone Number:</strong> {userDetails.phone_number}</p>
+                    <p><strong>Address:</strong> {userDetails.address}, {userDetails.street_name}, {userDetails.region} {userDetails.postal_code}</p>
+                    <p><strong>Role:</strong> {userDetails.role_type}</p>
                   </div>
                 )}
               </div>

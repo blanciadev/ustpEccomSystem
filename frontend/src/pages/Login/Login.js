@@ -26,6 +26,7 @@ const Login = () => {
                 localStorage.setItem('username', response.data.username);
                 localStorage.setItem('first_name', response.data.first_name);
                 localStorage.setItem('role', response.data.role_type);
+                localStorage.setItem('profile_img', response.data.profile_img);
 
                 // Check if there's a redirect page stored
                 const redirectTo = localStorage.getItem('redirectTo');

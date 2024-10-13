@@ -53,6 +53,7 @@ router.post('/users-login', async (req, res) => {
             username: user.username,
             first_name: user.first_name,
             role_type: user.role_type
+            
         });
     } catch (err) {
         // Log only the message
