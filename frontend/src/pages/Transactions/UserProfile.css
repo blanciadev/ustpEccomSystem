@@ -73,6 +73,7 @@
     grid-template-rows: 10% 85%;
     justify-content: center;
     align-content: center;
+    gap: 5px;
 
  }
 .purchase-header {
@@ -95,7 +96,7 @@
     justify-content: center;
 }
 .profile-image-preview img{
-    width: 200px;
+    width: 50%;
     height: auto;
     border-radius: 4px;
     border: 1px solid rgba(82, 82, 82, 0.466);
@@ -133,6 +134,15 @@
     border-radius: 4px;
     cursor: pointer;
 }
+
+.upload-spinner{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+}
 @media (max-width:768px){
     
     .user-details{
@@ -152,9 +162,9 @@
         width: 50%;
     }
     .purchase-box2{
-        height: auto;
+        height: 100%;
         grid-template-rows: 8% 27% 65%;
-        padding: 5px 0;
+        padding: 5px 3px;
     }
 
 }

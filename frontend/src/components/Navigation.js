@@ -189,7 +189,7 @@ const Navigation = () => {
                             <li>
                                 <span className='cartIcon' onClick={handleProfileClick}>
                                     {isMobile ? (
-                                        <p style={{ fontWeight: '500' }}></p>
+                                        <p style={{ fontWeight: '400' }}>Profile</p>
                                     ) : (
                                         <img
                                             src={profileImg || 'https://static.vecteezy.com/system/resources/previews/026/434/409/non_2x/default-avatar-profile-icon-social-media-user-photo-vector.jpg'}

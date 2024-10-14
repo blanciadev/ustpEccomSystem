@@ -201,3 +201,10 @@
     font-size: 14px;
     margin: 4px 0;
 }
+
+@media (max-width:425px){
+    .shop__product-list{
+        justify-content: center;
+        grid-template-columns: 300px;
+    }
+}
