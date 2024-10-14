@@ -83,11 +83,11 @@
     padding: 10px 0;
 }
 .profile-image-upload{
-    width: 100%;
-    display: grid;
-    grid-template-rows: 90% 10%;
-    justify-items: center;
-    align-items: center;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: space-around;
 
 }
 .profile-image-preview{
@@ -95,15 +95,12 @@
     justify-content: center;
 }
 .profile-image-preview img{
-    width: 90%;
+    width: 200px;
     height: auto;
     border-radius: 4px;
     border: 1px solid rgba(82, 82, 82, 0.466);
 }
-.user-details{
-    grid-column: span 2;
-}
-.user-details div{
+.user-details .userDetails{
     height: 100%;
     display: grid;
     grid-template-rows: repeat(7, 10%);
@@ -115,7 +112,7 @@
  .user-details .edit-user{
     height: 100%;
     display: grid;
-    grid-template-rows: repeat(7, 25px);
+    grid-template-rows: repeat(7, 20px);
     grid-template-columns: 30% 1fr;
     align-content: space-between;
     align-items: center;
@@ -138,24 +135,33 @@
 }
 @media (max-width:768px){
     
+    .user-details{
+        grid-column: span 2;
+    }
     .user-details div, .user-details form{
         grid-area: 3 / 1 / 4 / 3;
     }
     .profile-image-upload{
         grid-area: 2 / 1 / 3 / 3;
-        grid-template-rows: 2fr 1fr
+        display: contents;
     }
-    .profile-image-preview img{
-        width: 30%;
+    .profile-image-preview{
+    width: auto;
+    }
+    .image-upload{
+        width: 50%;
     }
     .purchase-box2{
         height: auto;
-        grid-template-rows: 10% 35% 55%;
-        padding: 10px 0;
+        grid-template-rows: 8% 27% 65%;
+        padding: 5px 0;
     }
 
 }
 @media  (max-width:425px){
+    .purchase-box2{
+        grid-template-rows: 10% 30% 60%;
+    }
     .user-details div{
         width: 100%;
         height: max-content;
@@ -175,7 +181,7 @@
         
         grid-column: 2 / 3;
         width: 0%;
-        height: 100%;
+        height: 90%;
         display: flex;
         /* padding: 20px; */
         color: white;
@@ -186,6 +192,27 @@
         align-items: center;
         flex-wrap: wrap;
 
+    }
+    .edit-user label{
+        margin: 0%;
+        font-size: .7em;
+    }
+    .profile-image-upload{
+        display: flex;        
+        flex-direction: column;
+        align-content: center;
+        justify-content: space-around;
+        align-items: center;
+    }
+    .profile-image-preview{
+        width: 40%;
+    }
+    .profile-image-preview img{
+            
+        width: 70%;
+    }
+    .image-upload{
+        width: 70%;
     }
 
 }

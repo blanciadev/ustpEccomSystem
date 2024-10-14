@@ -4,7 +4,7 @@ import { Button, Modal, Spinner } from 'react-bootstrap';
 import { getCroppedImg } from './cropImageHelper'; // Ensure this returns a Blob
 import axios from 'axios';
 
-function ProfileImageUpload() {
+function ProfileImageUpload({ formData }) {
     const [imageSrc, setImageSrc] = useState(null);
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
@@ -91,7 +91,15 @@ function ProfileImageUpload() {
                 </div>
             )}
             {!isUploading && (
-                <>
+                <>  
+                    <div className='profile-image-preview'>
+                        {formData.profile_img ? (
+                            <img src={formData.profile_img} alt="Profile" className="user-profile-image" />
+                        ) : (
+                            <img src="https://static.vecteezy.com/system/resources/previews/026/434/409/non_2x/default-avatar-profile-icon-social-media-user-photo-vector.jpg" alt="Default Profile" />
+                        )}
+                    </div>
+                        
                     <div className="image-upload">
                         <input type="file" accept="image/jpeg, image/jpg, image/png" onChange={handleFileChange} />
                     </div>

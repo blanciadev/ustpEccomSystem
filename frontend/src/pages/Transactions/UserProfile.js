@@ -123,19 +123,13 @@ const UserProfile = () => {
                 {isEditing ? 'Cancel' : 'Edit'}
               </button>
             </div>
-            <ProfileImageUpload />
+            <ProfileImageUpload formData={formData} />
             {loading ? (
               <div className='cskeleton-item' style={{ gridColumn: 'span 2' }}></div>
             ) : userDetails ? (
               <div className='user-details'>
                 {/* Display profile image from backend */}
-                <div className='profile-image'>
-                  {formData.profile_img ? (
-                    <img src={formData.profile_img} alt="Profile" className="user-profile-image" />
-                  ) : (
-                    <img src="https://static.vecteezy.com/system/resources/previews/026/434/409/non_2x/default-avatar-profile-icon-social-media-user-photo-vector.jpg" alt="Default Profile" />
-                  )}
-                </div>
+                
                 {isEditing ? (
                   <form onSubmit={handleSubmit} className='edit-user'>
                     <label>First Name</label>
@@ -216,12 +210,12 @@ const UserProfile = () => {
                   </form>
                 ) : (
                   <div className='userDetails'>
-                    <p><strong>First Name:</strong> {userDetails.first_name}</p>
-                    <p><strong>Last Name:</strong> {userDetails.last_name}</p>
-                    <p><strong>Email:</strong> {userDetails.email}</p>
-                    <p><strong>Phone Number:</strong> {userDetails.phone_number}</p>
-                    <p><strong>Address:</strong> {userDetails.address}, {userDetails.street_name}, {userDetails.region} {userDetails.postal_code}</p>
-                    <p><strong>Role:</strong> {userDetails.role_type}</p>
+                    <p><strong>First Name:</strong></p><p>{userDetails.first_name}</p>
+                    <p><strong>Last Name:</strong></p><p>{userDetails.last_name}</p>
+                    <p><strong>Email:</strong></p><p>{userDetails.email}</p>
+                    <p><strong>Phone Number:</strong></p><p>{userDetails.phone_number}</p>
+                    <p><strong>Address:</strong></p><p>{userDetails.address}, {userDetails.street_name}, {userDetails.region} {userDetails.postal_code}</p>
+                    {/* <p><strong>Role:</strong></p><p>{userDetails.role_type}</p> */}
                   </div>
                 )}
               </div>
