@@ -29,8 +29,7 @@ export const getCroppedImg = (imageSrc, croppedAreaPixels) => {
           reject(new Error('Canvas is empty'));
           return;
         }
-        
-        // Optional: Convert blob to ArrayBuffer for LONG BLOB storage
+
         const reader = new FileReader();
         reader.onload = () => {
           // Convert ArrayBuffer to a new Blob
@@ -38,7 +37,7 @@ export const getCroppedImg = (imageSrc, croppedAreaPixels) => {
           const longBlob = new Blob([arrayBuffer], { type: 'image/jpeg' });
           resolve(longBlob); // Resolve with the LONG BLOB
         };
-        
+
         // Read the blob as an ArrayBuffer
         reader.readAsArrayBuffer(blob);
       }, 'image/jpeg');

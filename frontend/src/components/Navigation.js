@@ -18,7 +18,7 @@ const Navigation = () => {
         const storedUsername = localStorage.getItem('username');
         const storedFirstName = localStorage.getItem('first_name');
         const customerId = localStorage.getItem('customer_id'); // Assuming customer_id is stored in localStorage
-        
+
         window.addEventListener('resize', handleResize);
 
         if (token) {
@@ -30,7 +30,7 @@ const Navigation = () => {
 
         fetchCartItemCount();
         cartEventEmitter.on('cartUpdated', fetchCartItemCount);
-        
+
         return () => {
             cartEventEmitter.off('cartUpdated', fetchCartItemCount);
             window.removeEventListener('resize', handleResize);
@@ -38,58 +38,45 @@ const Navigation = () => {
     }, []);
 
     const fetchUserDetails = async (customerId) => {
-        if (!customerId) return; // Do nothing if customer_id is not available
+        if (!customerId) return; // Do nothing if customerId is not provided
         const token = localStorage.getItem('token');
-    
+
         try {
             const response = await axios.post('http://localhost:5001/users-details', { customer_id: customerId }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-    
-            if (response.status === 200) {
-                const userData = response.data;
-    
-                // Debugging statement to log the entire userData response
-                console.log('User Data Response:', userData);
-    
-                // Check if profile_img exists and log its value
-                if (userData.profile_img) {
-                    console.log('Profile Image (before conversion):', userData.profile_img); // Log the raw profile image data
-                    
-                    // Create a base64 string from the binary data using FileReader
-                    const base64String = await convertToBase64(userData.profile_img);
-                    setProfileImg(`data:image/png;base64,${base64String}`); // Set the profile image as a base64 string
-                    
-                    // Debugging statement to log the base64 string
-                    console.log('Profile Image (base64):', `data:image/png;base64,${base64String}`);
+
+            const userData = response.data; // Access the response data
+
+            // Check if profile image exists and handle appropriately
+            if (userData && userData.profile_img) {
+                if (typeof userData.profile_img === 'string') {
+                    // If profile_img is a base64 string, display it directly
+                    setProfileImg(`data:image/jpeg;base64,${userData.profile_img}`);
+                } else if (userData.profile_img.data) {
+                    // If profile_img is binary (Buffer), convert it to base64
+                    const base64String = btoa(
+                        new Uint8Array(userData.profile_img.data).reduce((data, byte) => data + String.fromCharCode(byte), '')
+                    );
+                    setProfileImg(`data:image/jpeg;base64,${base64String}`);
                 } else {
-                    console.log('No profile image found for the user.'); // Log if no profile image is available
+                    // Handle unexpected profile_img format
+                    console.error('Unexpected profile image format:', userData.profile_img);
+                    setProfileImg(''); // Fallback to empty if there's an issue
                 }
+            } else {
+                // No profile image found, using a default image
+                console.log('No profile image found, using default image.');
+                setProfileImg('https://static.vecteezy.com/system/resources/previews/026/434/409/non_2x/default-avatar-profile-icon-social-media-user-photo-vector.jpg');
             }
         } catch (error) {
             console.error('Error fetching user details:', error.response ? error.response.data : error.message);
         }
     };
-    
-    // Helper function to convert binary data to base64
-    const convertToBase64 = (binaryData) => {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            const blob = new Blob([binaryData]); // Convert binary data to a Blob
-    
-            reader.onloadend = () => {
-                const base64data = reader.result.split(',')[1]; // Get the base64 part
-                resolve(base64data); // Resolve the promise with the base64 data
-            };
-            reader.onerror = (error) => {
-                reject(error); // Reject the promise if there's an error
-            };
-    
-            reader.readAsDataURL(blob); // Start reading the Blob as a data URL
-        });
-    };
-    
-    
+
+
+
+
 
     const fetchCartItemCount = async () => {
         const token = localStorage.getItem('token');
@@ -202,18 +189,12 @@ const Navigation = () => {
                             <li>
                                 <span className='cartIcon' onClick={handleProfileClick}>
                                     {isMobile ? (
-                                        <p style={{ fontWeight: '500' }}></p> // Text for mobile view
+                                        <p style={{ fontWeight: '500' }}></p>
                                     ) : (
-                                        // Use img to display user's profile image for larger screen
-                                        <img 
-                                            src={profileImg} 
-                                            alt="Profile" 
-                                            style={{ 
-                                                width: '30px', 
-                                                height: '30px', 
-                                                borderRadius: '50%', 
-                                                cursor: 'pointer' 
-                                            }} 
+                                        <img
+                                            src={profileImg || 'https://static.vecteezy.com/system/resources/previews/026/434/409/non_2x/default-avatar-profile-icon-social-media-user-photo-vector.jpg'}
+                                            alt="Profile Image"  // Added alt text for accessibility
+                                            style={{ width: '40px', height: '40px', borderRadius: '50%' }}  // Styling the image for a better UI
                                         />
                                     )}
                                 </span>
