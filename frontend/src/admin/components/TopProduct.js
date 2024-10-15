@@ -30,37 +30,38 @@ const TopProduct = () => {
         </div>
       </div>
 
-      <div className="top-product__table-wrapper">
-        <table className="top-product__table">
-          <thead class="bg-light sticky-top">
+      <div className="table-responsive top-product__table-wrapper">
+        <table className="table top-product__table">
+            <thead className="bg-light sticky-top">
             <tr className="top-product__table-header">
-              <th>#</th>
-              <th>Product</th>
-              <th>Progress</th>
-              <th>Available</th>
+                <th>#</th>
+                <th>Product</th>
+                <th>Progress</th>
+                <th>Available</th>
             </tr>
-          </thead>
-          <tbody>
+            </thead>
+            <tbody>
             {sortedData.map((item, index) => (
-              <tr key={item.id} className="top-product__table-row">
-                <td>{index + 1}</td>
+                <tr key={item.id} className="top-product__table-row">
+                <td><strong>{index + 1}</strong></td>
                 <td>{item.product}</td>
                 <td>
-                  <div className="top-product__progress-bar-container">
+                    <div className="top-product__progress-bar-container">
                     <div
-                      className="top-product__progress-bar"
-                      style={{
-                        width: `${(item.cart_quantity / item.available_quantity) * 1}%`,
-                      }}
+                        className="top-product__progress-bar"
+                        style={{
+                        width: `${(item.cart_quantity / item.available_quantity) * 100}%`,
+                        }}
                     />
-                  </div>
+                    </div>
                 </td>
                 <td>{item.available_quantity}</td>
-              </tr>
+                </tr>
             ))}
-          </tbody>
+            </tbody>
         </table>
-      </div>
+    </div>
+
     </div>
   );
 };
