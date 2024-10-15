@@ -25,8 +25,6 @@ import ForgotPassword from './pages/ForgotPassword/ForgotPassword'
 import Verification from './pages/ForgotPassword/Verification'
 import ChangePassword from './pages/ForgotPassword/ChangePassword'
 import UserProfile from './pages/Transactions/UserProfile';
-import Notification from './pages/Transactions/Notification';
-import DiscountsandVouchers from './pages/Transactions/DiscountsandVouchers';
 import ToastNotification from './components/ToastNotification';
 
 
@@ -55,8 +53,6 @@ function App() {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/user/purchase" element={<OrderHistory />} />
         <Route path="/user" element={<UserProfile />} />
-        <Route path="/user/notifications" element={<Notification />} />
-        <Route path="/user/discounts/vouchers" element={<DiscountsandVouchers />} />
 
 
         <Route path='/admin/dashboard' element={<Dashboard />}></Route>

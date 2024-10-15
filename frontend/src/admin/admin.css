@@ -1062,3 +1062,37 @@ table td button,
             border-radius: 100px;
         }
 }
+
+@media (max-width:425px) {
+    .nav-links a{
+        width: 56%;
+        padding: 10px;
+    }
+    .dash-header .header-title {
+        font-size: 20px;
+    }
+    .header-user{
+        font-size: small;
+    }
+    .dash-body{
+        grid-template-rows: 300px 200px 200px 200px 200px 200px 400px;
+    }
+    .summ{
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        justify-items: center;
+        gap: 2px;
+    }
+    .summ > div{
+        width: 95%;
+    }
+    .avg-orders{
+        grid-area: 5/1/6/3
+    }
+    .order-processing{
+        grid-area: 6/1/7/3
+    }
+    .top-product{
+        grid-area: 7/1/8/3
+    }
+}
