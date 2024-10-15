@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { cartEventEmitter } from './eventEmitter';
 import '../App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import ToastNotification from './ToastNotification';
 
 const Navigation = () => {
     const [username, setUsername] = useState('');
@@ -12,7 +14,8 @@ const Navigation = () => {
     const navigate = useNavigate();
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [profileImg, setProfileImg] = useState('');
-
+    const [showLogoutModal, setShowLogoutModal] = useState(false); 
+    const [toastMessage, setToastMessage] = useState('');
     useEffect(() => {
         const token = localStorage.getItem('token');
         const storedUsername = localStorage.getItem('username');
@@ -117,6 +120,11 @@ const Navigation = () => {
         localStorage.clear();
         setUsername('');
         setFirstName('');
+        setToastMessage('Logged Out!');
+
+            setTimeout(() => {
+              setToastMessage('');
+            }, 3000);
         setIsLoggedIn(false);
         navigate('/login');
     };
@@ -146,6 +154,8 @@ const Navigation = () => {
 
     return (
         <div className='nav-container'>
+            
+            <ToastNotification toastMessage={toastMessage}/>
             <div className='logo'>
                 <a href='/'>
                     <img src='https://us.123rf.com/450wm/dmrgraphic/dmrgraphic2105/dmrgraphic210500421/169019761-hair-woman-and-face-logo-and-symbols.jpg?ver=6' alt='Logo' />
@@ -199,11 +209,36 @@ const Navigation = () => {
                                     )}
                                 </span>
                             </li>
-                            <li><button onClick={handleLogout}>Logout</button></li>
+                            <li><button onClick={() => setShowLogoutModal(true)}>Logout</button></li>
                         </>
                     )}
                 </ul>
             </div>
+            <div
+                className={`modal fade ${showLogoutModal ? 'show' : ''}`}
+                id="logoutModal"
+                tabIndex="-1"
+                role="dialog"
+                aria-labelledby="logoutModalLabel"
+                aria-hidden="true"
+                style={{ display: showLogoutModal ? 'block' : 'none', backgroundColor: 'rgba(0,0,0,0.5)' }}  // Ensure background dimming
+            >
+                <div className="modal-dialog" role="document">
+                    <div className="modal-content">
+                    <div className="modal-header">
+                        <h5 className="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                    </div>
+                    <div className="modal-body">
+                        <p>Are you sure you want to log out?</p>
+                    </div>
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-secondary" onClick={() => setShowLogoutModal(false)}>Cancel</button>
+                        <button type="button" className="btn btn-danger" onClick={handleLogout}>Logout</button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     );
 };
