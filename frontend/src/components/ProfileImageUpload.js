@@ -3,6 +3,7 @@ import Cropper from 'react-easy-crop';
 import { Button, Modal, Spinner } from 'react-bootstrap';
 import { getCroppedImg } from './cropImageHelper'; // Ensure this returns a Blob
 import axios from 'axios';
+import ToastNotification from './ToastNotification';
 
 function ProfileImageUpload({ formData }) {
     const [imageSrc, setImageSrc] = useState(null);
@@ -12,6 +13,7 @@ function ProfileImageUpload({ formData }) {
     const [isUploading, setIsUploading] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [croppedImage, setCroppedImage] = useState(null);
+    const [toastMessage, setToastMessage] = useState('');
 
     // Handle file input
     const handleFileChange = (e) => {
@@ -63,10 +65,21 @@ function ProfileImageUpload({ formData }) {
                 },
             });
 
-            alert('Profile image uploaded successfully!');
+            setToastMessage('Image Upload Successfull!');
+
+            setTimeout(() => {
+              setToastMessage('');
+            }, 3000);
+
         } catch (error) {
             console.error('Error uploading image:', error.response ? error.response.data : error.message);
-            alert(`Error uploading image: ${error.response?.data?.message || error.message}`);
+            console.log(`Error uploading image: ${error.response?.data?.message || error.message}`);
+            setToastMessage(`Error uploading image: ${error.response?.data?.message || error.message}`);
+
+            setTimeout(() => {
+              setToastMessage('');
+            }, 3000);
+            
         } finally {
             setIsUploading(false);
             setShowModal(false); // Close modal after upload or error
@@ -84,6 +97,7 @@ function ProfileImageUpload({ formData }) {
 
     return (
         <div className="profile-image-upload">
+            <ToastNotification/>
             {isUploading && (
                 <div className="upload-spinner">
                     <Spinner animation="border" role="status" />

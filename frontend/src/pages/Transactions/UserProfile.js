@@ -214,7 +214,7 @@ const UserProfile = () => {
                     <p><strong>Last Name:</strong></p><p>{userDetails.last_name}</p>
                     <p><strong>Email:</strong></p><p>{userDetails.email}</p>
                     <p><strong>Phone Number:</strong></p><p>{userDetails.phone_number}</p>
-                    <p><strong>Address:</strong></p><p>{userDetails.address}, {userDetails.street_name}, {userDetails.region} {userDetails.postal_code}</p>
+                    <p><strong>Address:</strong></p><p>{userDetails.address} {userDetails.street_name} {userDetails.region} {userDetails.postal_code}</p>
                     {/* <p><strong>Role:</strong></p><p>{userDetails.role_type}</p> */}
                   </div>
                 )}
