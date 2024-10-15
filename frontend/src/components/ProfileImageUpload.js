@@ -79,7 +79,7 @@ function ProfileImageUpload({ formData }) {
             setTimeout(() => {
               setToastMessage('');
             }, 3000);
-            
+
         } finally {
             setIsUploading(false);
             setShowModal(false); // Close modal after upload or error
@@ -97,7 +97,7 @@ function ProfileImageUpload({ formData }) {
 
     return (
         <div className="profile-image-upload">
-            <ToastNotification/>
+            <ToastNotification toastMessage={toastMessage}/>
             {isUploading && (
                 <div className="upload-spinner">
                     <Spinner animation="border" role="status" />
