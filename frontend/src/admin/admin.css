@@ -23,10 +23,17 @@
 
 }
 
-.highlighted-row {
+/* .highlighted-row {
     background-color: #ffef96;
+} */
+.highlighted-term{
+    background-color: yellow;
+    display: inline;
+    padding: 0;
+    margin: 0;
+    white-space: nowrap; /* Prevent breaking highlighted text */
+    line-height: inherit;
 }
-
 .nav-img {
     width: 100%;
     height: 15%;
@@ -127,32 +134,6 @@
     justify-content: flex-end;
     /* background-color: brown; */
     padding: 0px 10px;
-}
-
-.noti {
-    width: 15%;
-    height: 100%;
-    /* background-color: rgb(52, 103, 103); */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.noti .bell-con {
-    width: 70%;
-    height: 70%;
-    color: hotpink;
-    font-size: 1.5rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    transition: ease-in 0.5s;
-}
-
-.noti .bell-con:hover {
-    background-color: #ff60b2ca;
-    color: white;
 }
 
 .admin-profile {
@@ -812,7 +793,10 @@ table td button,
     background-color: rgb(255, 128, 193);
     border: none;
     border-radius: 5px;
-}
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
+    }
 
 .order-table img {
     display: block;
@@ -994,6 +978,10 @@ table td button,
     justify-content: center;
 
 }
+.order-table td{
+    white-space: nowrap;
+    
+}
 @media (max-width:768px){
     .dash-body{
         height: auto;
@@ -1050,6 +1038,8 @@ table td button,
           font-weight: bold;
           flex-basis: 40%;
           text-align: left;
+          display: inline; 
+          padding-right: 10px;
         }
       
         .top-product__table td:nth-child(1)::before { content: "Product Ranking"; }
@@ -1061,6 +1051,33 @@ table td button,
             width: 35%;
             border-radius: 100px;
         }
+        .body{
+            height: auto;
+           padding: 10px 0;
+        }
+        .order-table table thead{
+            display: none;
+        }
+        .order-table table td::before {
+            content: attr(data-label);
+            font-weight: bold;
+            flex-basis: 40%;
+            text-align: left;
+          }
+        
+          .order-table table td:nth-child(1)::before { content: " "; }
+          .order-table table td:nth-child(2)::before { content: "Order ID"; flex-basis: 90%; }
+          .order-table table td:nth-child(3)::before { content: "Customer"; }
+          .order-table table td:nth-child(4)::before { content: "Order Date"; flex-basis: 85%;}
+          .order-table table td:nth-child(5)::before { content: "Order Status"; }
+          .order-table table td:nth-child(6)::before { content: "Payment Status"; }
+          
+          .sort select,.order-filter select{
+            width: 100%;
+          }
+          .order-filter label{
+            font-size: 0.85rem;
+          }
 }
 
 @media (max-width:425px) {
@@ -1094,5 +1111,34 @@ table td button,
     }
     .top-product{
         grid-area: 7/1/8/3
+    }
+    .options{
+        width: 65%;
+        gap: 5px;
+    }
+    .sort,.order-filter{
+        width: 40%;
+        font-size: .85rem;
+    }
+    .print{
+        width: 20%;
+    }
+    .order-table tbody{
+        width: 100%;
+    }
+    .order-table tbody > tr{
+        padding: 0;
+        width: 100%;
+    }
+    .order-table tbody tr td{
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+    }
+    .order-table table{
+        width: 100%;
+    }
+    .order-table table tr td input{
+        align-self: flex-start;
     }
 }

@@ -16,6 +16,7 @@ const Orders = () => {
   ]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalShow, setModalShow] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 425);
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,7 +36,17 @@ const Orders = () => {
 
   useEffect(() => {
     fetchOrders();
+    
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+        window.removeEventListener('resize', handleResize);
+    };
   }, [status, searchTerm, sortBy]);
+
+  const handleResize = () => {
+    setIsMobile(window.innerWidth <= 425);  // Update state based on screen width
+};
 
   const handleOpenModal = (order) => {
     setSelectedOrder(order);
@@ -59,7 +70,7 @@ const Orders = () => {
     const parts = text.split(new RegExp(`(${searchTerm})`, 'gi'));
     return parts.map((part, index) =>
       part.toLowerCase() === searchTerm.toLowerCase() ? (
-        <span key={index} style={{ backgroundColor: 'yellow' }}>{part}</span>
+        <span key={index} className='highlighted-term'>{part}</span>
       ) : part
     );
   };
@@ -135,7 +146,14 @@ const Orders = () => {
 
               <div className='options'>
                 <div className='print'>
-                  <button>Print Order Summary</button>
+                  <button>
+                    {isMobile ? (
+                        <i class='bx bx-printer'></i>
+                    ):(
+                        'Print Order Summary'
+                    )
+                    }
+                  </button>
                 </div>
                 <div className='sort'>
                   <label htmlFor='sort'>Sort By:</label>

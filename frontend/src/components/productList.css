@@ -63,7 +63,6 @@
 
 .product-card button:hover {
     background-color: rgb(223, 95, 116);
-    /* Darker green on hover */
 }
 
 .pagination {
@@ -224,7 +223,7 @@ button:hover {
 }
 
 .pagination button:hover:not(.active) {
-    background-color: #9c0f0f;
+    background-color: #b9b9b9;
 }
 
 @media (max-width:768px) {

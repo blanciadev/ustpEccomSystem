@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './Login.css'
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import ToastNotification from '../../components/ToastNotification';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const [loginStatus, setLoginStatus] = useState('');
     const navigate = useNavigate();
+    const [toastMessage, setToastMessage] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -45,10 +47,28 @@ const Login = () => {
             }
         } catch (err) {
             if (err.response) {
+                setToastMessage(err.response.data.message || 'An error occurred during login');
+
+                // Clear toast message after 3 seconds
+                setTimeout(() => {
+                    setToastMessage('');
+                }, 3000);
                 setError(err.response.data.message || 'An error occurred during login');
             } else if (err.request) {
+                setToastMessage('No response received from the server');
+
+                // Clear toast message after 3 seconds
+                setTimeout(() => {
+                    setToastMessage('');
+                }, 3000);
                 setError('No response received from the server');
             } else {
+                setToastMessage('Error setting up the request: ' + err.message);
+
+                // Clear toast message after 3 seconds
+                setTimeout(() => {
+                    setToastMessage('');
+                }, 3000);
                 setError('Error setting up the request: ' + err.message);
             }
         } finally {
@@ -67,7 +87,9 @@ const Login = () => {
                 </div>
                 <div className='login-form'>
                     <h1>Log In</h1>
-                    {error && <p className='error'>{error}</p>}
+                    
+                    <ToastNotification toastMessage={toastMessage} />
+                    {/* {error && <p className='error'>{error}</p>} */}
                     <div className='login-google'>
                         <form>
                             <div>
