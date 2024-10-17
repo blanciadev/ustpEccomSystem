@@ -612,7 +612,7 @@
 
 .order-table,
 .payment-table,
-.ship-table {
+.ship-table,.report-table,.users-table{
     width: 100%;
     height: 80%;
     overflow-y: auto;
@@ -1008,6 +1008,23 @@ table td button,.order-table td button,.prod-table td button{
 }
 
 @media (max-width:768px){
+    .user-counts{
+        display: grid; 
+        grid-template-columns: 50% 50%;
+        grid-template-rows: auto;
+        justify-content: space-between;
+        
+    }
+    .user-counts>div {
+        width: 98%;
+    }
+    .user-counts > div> .qty{
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        flex-direction: row;
+        gap: 5px;
+    }
     .dash-body{
         height: auto;
         gap: 10px;
@@ -1040,7 +1057,7 @@ table td button,.order-table td button,.prod-table td button{
     .top-product{
         grid-area: 6/1/7/3
     }
-        .top-product__table thead,.modal-body form table thead, .inv-table table thead, .report-table table thead{
+        .top-product__table thead,.modal-body form table thead, .inv-table table thead, .report-table table thead,.users-table table thead{
           display: none; 
         }
       
@@ -1058,7 +1075,11 @@ table td button,.order-table td button,.prod-table td button{
           text-align: left;
         }
       
-        .top-product__table td::before,.modal-body form table td::before,.inv-table table td::before,.report-table table td::before {
+        .top-product__table td::before,
+        .modal-body form table td::before,
+        .inv-table table td::before,
+        .report-table table td::before,
+        .users-table table td::before {
           content: attr(data-label);
           font-weight: bold;
           flex-basis: 40%;
@@ -1084,6 +1105,13 @@ table td button,.order-table td button,.prod-table td button{
         .report-table table td:nth-child(5)::before { content: "Size"; }
         .report-table table td:nth-child(6)::before { content: "Quantity"; }
         .report-table  table td:nth-child(7)::before { content: "Total Sales(Php)"; }
+
+        .users-table table td:nth-child(1)::before{ content: " "; } 
+        .users-table table td:nth-child(2)::before { content: "User ID"; flex-basis: 90%; }
+        .users-table table td:nth-child(3)::before { content: "First Name"; }
+        .users-table table td:nth-child(4)::before { content: "Last Name"; }
+        .users-table table td:nth-child(5)::before { content: "User Type"; }
+        .users-table table td:nth-child(6)::before { content: "Status"; }
 
         .nav-links a{
             width: 35%;

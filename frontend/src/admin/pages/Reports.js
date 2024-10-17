@@ -132,11 +132,17 @@ const Reports = () => {
                             {/* Conditional rendering for loading, no data, and table */}
                             <div className='report-table'>
                                 {loading ? (
-                                    <p>Loading reports...</p>
+                                    <tr>
+                                    <td colSpan="8" className="text-center">Loading...</td>
+                                    </tr>
                                 ) : error ? (
-                                    <p>Error loading data. Please try again later.</p>
+                                    <tr>
+                                    <td colSpan="8" className="text-center">Error loading data. Please try again later.</td>
+                                    </tr>
                                 ) : filteredReports.length === 0 ? (
-                                    <p>No reports found for the selected filters.</p>
+                                    <tr>
+                                    <td colSpan="8" className="text-center">No reports found for the selected filters.</td>
+                                    </tr>
                                 ) : (
                                     <table className='table table-hover'>
                                         <thead className='bg-light sticky-top'>

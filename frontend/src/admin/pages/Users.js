@@ -12,6 +12,7 @@ const Users = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showModal, setShowModal] = useState(false);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 425);
 
     // Function to toggle modal visibility
     const toggleModal = () => {
@@ -33,7 +34,16 @@ const Users = () => {
         };
 
         fetchUsers();
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
     }, []);
+
+    const handleResize = () => {
+        setIsMobile(window.innerWidth <= 425);  // Update state based on screen width
+        };
 
     return (
         <div className='dash-con'>
@@ -58,7 +68,7 @@ const Users = () => {
                                 </div>
                                 <div className='options'>
                                     <div className='print'>
-                                        <button onClick={toggleModal}>Create Account</button>
+                                        <button onClick={toggleModal}>{ isMobile ? (<i class='bx bxs-user-plus'></i>):('Create Account')}</button>
                                     </div>
                                     <div className='sort'>
                                         <label htmlFor="sort">Sort By</label>
@@ -72,7 +82,7 @@ const Users = () => {
                                 </div>
                             </div>
 
-                            <div className='order-table'>
+                            <div className='users-table'>
                                 <table className='table table-hover'>
                                     <thead className='bg-light sticky-top'>
                                         <tr>
