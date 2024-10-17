@@ -4,6 +4,12 @@ import PropTypes from 'prop-types';
 const ToastNotification = ({toastMessage}) => {
   const [isVisible, setIsVisible] = useState(false);
 
+
+
+
+
+
+  
   useEffect(() => {
     if (toastMessage) {
       setIsVisible(true);
@@ -31,7 +37,8 @@ const ToastNotification = ({toastMessage}) => {
     borderBottom: '1px solid grey',
     borderRight: '1px solid grey',
     borderRadius: '10px',
-    display: 'flex',
+    display: 'grid',
+    gridTemplateColumns: '5% 95%',
     alignItems: 'center',
     margin: '0',
     zIndex: 2000,

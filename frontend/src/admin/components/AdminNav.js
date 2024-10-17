@@ -5,9 +5,11 @@ import '../admin.css';
 const AdminNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 769);
 
   useEffect(() => {
+
+    window.addEventListener('resize', handleResize);
     // Get the user's role from localStorage
     const roleType = localStorage.getItem('role');
 
@@ -21,7 +23,7 @@ const AdminNav = () => {
   }, [navigate]);
 
   const handleResize = () => {
-    setIsMobile(window.innerWidth <= 768);  // Update state based on screen width
+    setIsMobile(window.innerWidth <= 769);  // Update state based on screen width
   };
 
   return (
@@ -41,7 +43,7 @@ const AdminNav = () => {
             <i class="bx bxs-dashboard"></i>
          ):(
             <i class="bx bxs-dashboard"></i>,
-          <span>Dashboard</span>
+            <span>Dashboard</span>
          )
         }   
         

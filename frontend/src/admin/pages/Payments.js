@@ -21,11 +21,20 @@ const Payments = () => {
   const [statusOptions, setStatusOptions] = useState([
     'To Ship', 'To Receive', 'Completed', 'Cancelled', 'Return/Refund', 'Pending'
   ]);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 425);
 
   useEffect(() => {
     fetchOrders();
-  }, [currentPage, statusFilter, searchTerm]);
+    window.addEventListener('resize', handleResize);
 
+    return () => {
+        window.removeEventListener('resize', handleResize);
+    };
+  }, [currentPage, statusFilter, searchTerm]);
+  
+  const handleResize = () => {
+    setIsMobile(window.innerWidth <= 425);  // Update state based on screen width
+    };
   const fetchOrders = async () => {
     setLoading(true);
     try {
@@ -118,7 +127,14 @@ const Payments = () => {
               </div>
               <div className='options'>
                 <div className='print'>
-                  <button>Print Payment Summary</button>
+                  <button>
+                    {isMobile ? (
+                        <i class='bx bx-printer'></i>
+                    ):(
+                        'Print Payment Summary'
+                    )
+                    }
+                  </button>
                 </div>
                 <div className='filter'>
                   <label htmlFor="statusFilter">Filter by Status</label>
@@ -169,23 +185,21 @@ const Payments = () => {
               )}
             </div>
 
-            <div className='pagination-container'>
-              <Pagination>
-                <Pagination.First onClick={() => handlePageChange(1)} disabled={currentPage === 1} />
-                <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
-                {[...Array(totalPages).keys()].map(pageNumber => (
-                  <Pagination.Item
-                    key={pageNumber + 1}
-                    active={pageNumber + 1 === currentPage}
-                    onClick={() => handlePageChange(pageNumber + 1)}
-                  >
-                    {pageNumber + 1}
-                  </Pagination.Item>
-                ))}
-                <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
-                <Pagination.Last onClick={() => handlePageChange(totalPages)} disabled={currentPage === totalPages} />
-              </Pagination>
-            </div>
+            <div className='pagination'>
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                >
+                  Previous
+                </button>
+                <span>Page {currentPage} of {totalPages}</span>
+                <button
+                  disabled={currentPage === totalPages}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                >
+                  Next
+                </button>
+              </div>
           </div>
         </div>
       </div>

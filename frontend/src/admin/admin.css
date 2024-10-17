@@ -1055,10 +1055,10 @@ table td button,
             height: auto;
            padding: 10px 0;
         }
-        .order-table table thead{
+        .order-table table thead,.payment-table table thead{
             display: none;
         }
-        .order-table table td::before {
+        .order-table table td::before,.payment-table table td::before{
             content: attr(data-label);
             font-weight: bold;
             flex-basis: 40%;
@@ -1072,6 +1072,14 @@ table td button,
           .order-table table td:nth-child(5)::before { content: "Order Status"; }
           .order-table table td:nth-child(6)::before { content: "Payment Status"; }
           
+          .payment-table  table td:nth-child(1)::before { content: " "; }
+          .payment-table  table td:nth-child(2)::before { content: "Order ID"; flex-basis: 90%; }
+          .payment-table  table td:nth-child(3)::before { content: "Customer"; }
+          .payment-table  table td:nth-child(4)::before { content: "Payment Date"; flex-basis: 85%;}
+          .payment-table  table td:nth-child(5)::before { content: "Payment Method"; }
+          .payment-table  table td:nth-child(6)::before { content: "Shipment Status"; }
+          .payment-table  table td:nth-child(7)::before { content: "Payment Status"; }
+
           .sort select,.order-filter select{
             width: 100%;
           }
