@@ -17,6 +17,7 @@ const BundleProductModal = () => {
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 6;
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
     const handleClose = () => {
         setShow(false);
@@ -49,7 +50,16 @@ const BundleProductModal = () => {
         }, 0);
 
         setCustomPrice(total.toFixed(2)); // Set custom price to state
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
     }, [selectedProducts, discount]); // Recalculate whenever selectedProducts or discount changes
+
+    const handleResize = () => {
+        setIsMobile(window.innerWidth <= 768);  // Update state based on screen width
+        };
 
     // Handle form submission (selected products)
     const handleBundleSubmit = async (e) => {
@@ -145,7 +155,12 @@ const BundleProductModal = () => {
     return (
         <>
             <Button variant="primary" onClick={handleShow}>
-                Bundle Products
+                {isMobile ? (
+                        <i class='bx bxs-discount'></i>
+                    ):(
+                        'Print Payment Summary'
+                    )
+                }
             </Button>
 
             <Modal show={show} onHide={handleClose}>

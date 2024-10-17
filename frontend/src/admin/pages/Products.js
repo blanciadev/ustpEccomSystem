@@ -34,6 +34,7 @@ const Products = () => {
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [isDiscountProductModalOpen, setIsDiscountProductModalOpen] = useState(false);
   const [isBundleProductModalOpen, setIsBundleProductModalOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 425);
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -53,8 +54,17 @@ const Products = () => {
 
   useEffect(() => {
     fetchProduct();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+        window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
+  const handleResize = () => {
+    setIsMobile(window.innerWidth <= 425);  // Update state based on screen width
+    };
+    
   const fetchProductStatistics = async () => {
     try {
       const response = await axios.get('http://localhost:5001/admin-products-with-interaction');
@@ -154,7 +164,6 @@ const Products = () => {
 
         <div className='body'>
           <div className='product-con'>
-            <div className='product-one'>
               <ProductStatistics
                 bestSellingCount={bestSellingCount}
                 totalQuantity={totalQuantity}
@@ -167,7 +176,6 @@ const Products = () => {
                 discontinuedQuantity={discontinuedQuantity}
               />
               <TopProduct />
-            </div>
 
             <div className='product-two'>
               <div className='cheader'>
@@ -193,14 +201,14 @@ const Products = () => {
                       handleUpdate={fetchProduct}
                     />
                     <Button variant="primary" onClick={handleShowDiscountProductModal}>
-                      Remove Discount/Bundle
+                       {isMobile ? (<i class='bx bxs-trash'></i>):('Remove Bundle')}
                     </Button>
                   </div>
                 </div>
               </div>
 
               {/* Product Table */}
-              <div className='order-table table-responsive'>
+              <div className='prod-table table-responsive'>
                 <table className="table table-hover">
                   <thead className='bg-light sticky-top'>
                     <tr>

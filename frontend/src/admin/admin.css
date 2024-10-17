@@ -629,10 +629,9 @@
                  -2px -2px 5px #c2c2c2;
     border-radius: 10px; */
     padding: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    display: grid;
+    grid-template-columns: 35% 65%;
+    grid-template-rows: 30% 70%;
     gap: 15px;
 }
 
@@ -645,16 +644,12 @@
     justify-content: center;
 }
 
-.product-one .top-products {
-    width: 50%;
-    height: 100%;
-    /* background-color: brown; */
-    display: flex;
-    justify-content: space-between;
+.product-con .top-product {
+    grid-area: 1/2/2/3;
 }
 
 .product-qty {
-    width: 97%;
+    width: 100%;
     height: 100%;
     display: flex;
     flex-wrap: wrap;
@@ -667,6 +662,10 @@
     height: 46%;
     border-radius: 7px;
     padding: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: space-around;
+    align-items: center;
 }
 
 .product-qty .qty {
@@ -686,8 +685,13 @@
 .qty h6 {
     margin: 0%;
     font-weight: 700;
+    font-size: 0.9rem !important;
     /* background-color: #3697ff; */
 
+}
+.product-qty > div > div > h6{
+    margin: 0%;
+    font-size: 0.65rem;
 }
 
 .product-qty .best-selling,
@@ -752,8 +756,9 @@
 }
 
 .product-two {
+    grid-column: span 2;
     width: 100%;
-    height: 70%;
+    height: 100%;
     background: #ffffff;
     border-left: 5px solid rgb(217, 30, 123);
     box-shadow: 2px 2px 5px #f1f1f1,
@@ -787,8 +792,7 @@ table td {
     /* Optional: Add border for clarity */
 }
 
-table td button,
-.order-table td button {
+table td button,.order-table td button,.prod-table td button{
     padding: 5px 10px;
     background-color: rgb(255, 128, 193);
     border: none;
@@ -1015,7 +1019,7 @@ table td button,
     .top-product{
         grid-area: 6/1/7/3
     }
-        .top-product__table thead {
+        .top-product__table thead,.modal-body form table thead  {
           display: none; 
         }
       
@@ -1033,7 +1037,7 @@ table td button,
           text-align: left;
         }
       
-        .top-product__table td::before {
+        .top-product__table td::before,.modal-body form table td::before {
           content: attr(data-label);
           font-weight: bold;
           flex-basis: 40%;
@@ -1047,6 +1051,11 @@ table td button,
         .top-product__table td:nth-child(3)::before { content: "Progress"; }
         .top-product__table td:nth-child(4)::before { content: "Available"; }
 
+        .modal-body form table td:nth-child(1)::before{ content: " "; } 
+        .modal-body form table td:nth-child(2)::before{ content: "Product"; } 
+        .modal-body form table td:nth-child(3)::before{ content: "Price"; } 
+        .modal-body form table td:nth-child(4)::before{ content: "Category"; } 
+
         .nav-links a{
             width: 35%;
             border-radius: 100px;
@@ -1055,10 +1064,10 @@ table td button,
             height: auto;
            padding: 10px 0;
         }
-        .order-table table thead,.payment-table table thead,.ship-table table thead{
+        .order-table table thead,.payment-table table thead,.ship-table table thead,.prod-table table thead{
             display: none;
         }
-        .order-table table td::before,.payment-table table td::before,.ship-table table td::before{
+        .order-table table td::before,.payment-table table td::before,.ship-table table td::before,.prod-table table td::before{
             content: attr(data-label);
             font-weight: bold;
             flex-basis: 40%;
@@ -1090,12 +1099,39 @@ table td button,
           .ship-table  table td:nth-child(8)::before { content: "Postal Code"; }
           .ship-table  table td:nth-child(9)::before { content: "Shipment Status"; }
 
+          .prod-table  table td:nth-child(1)::before { content: " "; }
+          .prod-table  table td:nth-child(2)::before { content: "Product Code"; flex-basis: 90%; }
+          .prod-table  table td:nth-child(3)::before { content: "Product Name"; }
+          .prod-table  table td:nth-child(4)::before { content: "Price"; flex-basis: 85%;}
+          .prod-table  table td:nth-child(5)::before { content: "Category"; }
+          .prod-table  table td:nth-child(6)::before { content: "Quantity"; }
+          .prod-table  table td:nth-child(7)::before { content: "Description"; }
+
           .sort select,.order-filter select{
             width: 100%;
           }
           .order-filter label{
             font-size: 0.85rem;
           }
+          .product-con{
+            grid-template-columns: 100%;
+            grid-template-rows: 15% 25% 60%;
+          }
+          .product-con .top-product{
+            grid-area: 2 / 1 / 3 / 2;
+            width: 100%;
+            height: 100%;
+          }
+          .product-qty > div{
+            justify-content: space-evenly;
+        }
+        .product-two {
+            width: 97%;
+            align-content: space-around;
+        }
+        .modal-content{
+            width: 100%;
+        }
 }
 
 @media (max-width:425px) {
