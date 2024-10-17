@@ -17,6 +17,7 @@ const Shipments = () => {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('date');
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 425);
 
   useEffect(() => {
     const fetchShipments = async () => {
@@ -35,7 +36,18 @@ const Shipments = () => {
     };
 
     fetchShipments();
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+        window.removeEventListener('resize', handleResize);
+    };
   }, []);
+  
+  const handleResize = () => {
+    setIsMobile(window.innerWidth <= 425);  // Update state based on screen width
+    };
+
 
   // Filter shipments based on search term
   const filteredShipments = shipments.filter(shipment =>
@@ -92,7 +104,14 @@ const Shipments = () => {
               </div>
               <div className='options'>
                 <div className='print'>
-                  <button>Print Shipments Summary</button>
+                  <button>
+                  {isMobile ? (
+                        <i class='bx bx-printer'></i>
+                    ):(
+                        'Print Shipments Summary'
+                    )
+                    }
+                  </button>
                 </div>
                 <div className='sort'>
                   <label htmlFor='sort'>Sort By</label>

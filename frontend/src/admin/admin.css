@@ -1055,10 +1055,10 @@ table td button,
             height: auto;
            padding: 10px 0;
         }
-        .order-table table thead,.payment-table table thead{
+        .order-table table thead,.payment-table table thead,.ship-table table thead{
             display: none;
         }
-        .order-table table td::before,.payment-table table td::before{
+        .order-table table td::before,.payment-table table td::before,.ship-table table td::before{
             content: attr(data-label);
             font-weight: bold;
             flex-basis: 40%;
@@ -1079,6 +1079,16 @@ table td button,
           .payment-table  table td:nth-child(5)::before { content: "Payment Method"; }
           .payment-table  table td:nth-child(6)::before { content: "Shipment Status"; }
           .payment-table  table td:nth-child(7)::before { content: "Payment Status"; }
+
+          .ship-table  table td:nth-child(1)::before { content: " "; }
+          .ship-table  table td:nth-child(2)::before { content: "Shipment ID"; flex-basis: 90%; }
+          .ship-table  table td:nth-child(3)::before { content: "Order ID"; }
+          .ship-table  table td:nth-child(4)::before { content: "Shipment Date"; flex-basis: 85%;}
+          .ship-table  table td:nth-child(5)::before { content: "Address"; }
+          .ship-table  table td:nth-child(6)::before { content: "City"; }
+          .ship-table  table td:nth-child(7)::before { content: "Phone Number"; }
+          .ship-table  table td:nth-child(8)::before { content: "Postal Code"; }
+          .ship-table  table td:nth-child(9)::before { content: "Shipment Status"; }
 
           .sort select,.order-filter select{
             width: 100%;
