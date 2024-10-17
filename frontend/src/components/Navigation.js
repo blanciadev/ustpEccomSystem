@@ -167,11 +167,11 @@ const Navigation = () => {
                 </a>
             </div>
 
-            <div className='searchbar'>
+            {/* <div className='searchbar'>
                 <form>
                     <input type='search' placeholder='Search...' />
                 </form>
-            </div>
+            </div> */}
 
             <button className="menu-toggle" onClick={toggleMenu}>
                 {isMenuOpen ? (

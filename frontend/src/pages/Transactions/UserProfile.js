@@ -35,15 +35,13 @@ const UserProfile = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         
-        // Update state with user details and form data
         setUserDetails(response.data);
-        setFormData(response.data); // Set form data for editing
+        setFormData(response.data);
 
-        // If profile_img is a blob or base64 string, set it for the image
         if (response.data.profile_img) {
-          const imgBlob = new Blob([new Uint8Array(response.data.profile_img.data)], { type: 'image/jpeg' }); // Adjust type as necessary
+          const imgBlob = new Blob([new Uint8Array(response.data.profile_img.data)], { type: 'image/jpeg' });
           const imgUrl = URL.createObjectURL(imgBlob);
-          setFormData((prev) => ({ ...prev, profile_img: imgUrl })); // Set img URL in formData
+          setFormData((prev) => ({ ...prev, profile_img: imgUrl }));
         }
       } catch (error) {
         console.error('Error fetching user details:', error.response ? error.response.data : error.message);
@@ -72,10 +70,9 @@ const UserProfile = () => {
     const token = localStorage.getItem('token');
     const customerId = localStorage.getItem('customer_id');
 
-    // Prepare the formData including the customer ID
     const updatedData = {
       customer_id: customerId,
-      ...formData, // Assuming formData contains first_name, last_name, email, etc.
+      ...formData,
     };
 
     try {
@@ -83,10 +80,8 @@ const UserProfile = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Notify user of success
       setToastMessage('Updated Successfully!');
 
-      // Clear toast message after 3 seconds
       setTimeout(() => {
         setToastMessage('');
       }, 3000);
@@ -94,17 +89,21 @@ const UserProfile = () => {
       console.log(response.data.message);
       setUserDetails((prevDetails) => ({
         ...prevDetails,
-        ...formData, // Update userDetails with the edited data
+        ...formData,
       }));
-      setIsEditing(false); // Exit editing mode
+      setIsEditing(false);
     } catch (error) {
       console.error('Error updating user details:', error.response ? error.response.data : error.message);
-      alert('Failed to update user details. Please try again.'); // Notify user of failure
+      alert('Failed to update user details. Please try again.');
     }
+    setTimeout(() => {
+      setToastMessage('');
+      window.location.href = '/user'; 
+  }, 50);
   };
 
   const handleResize = () => {
-    setIsMobile(window.innerWidth <= 768);  // Update state based on screen width
+    setIsMobile(window.innerWidth <= 768);  
   };
 
   return (
@@ -128,8 +127,6 @@ const UserProfile = () => {
               <div className='cskeleton-item' style={{ gridColumn: 'span 2' }}></div>
             ) : userDetails ? (
               <div className='user-details'>
-                {/* Display profile image from backend */}
-                
                 {isEditing ? (
                   <form onSubmit={handleSubmit} className='edit-user'>
                     <label>First Name</label>
@@ -215,7 +212,6 @@ const UserProfile = () => {
                     <p><strong>Email:</strong></p><p>{userDetails.email}</p>
                     <p><strong>Phone Number:</strong></p><p>{userDetails.phone_number}</p>
                     <p><strong>Address:</strong></p><p>{userDetails.address} {userDetails.street_name} {userDetails.region} {userDetails.postal_code}</p>
-                    {/* <p><strong>Role:</strong></p><p>{userDetails.role_type}</p> */}
                   </div>
                 )}
               </div>
