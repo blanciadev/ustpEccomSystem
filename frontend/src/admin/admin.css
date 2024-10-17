@@ -1040,7 +1040,7 @@ table td button,.order-table td button,.prod-table td button{
     .top-product{
         grid-area: 6/1/7/3
     }
-        .top-product__table thead,.modal-body form table thead, .inv-table table thead {
+        .top-product__table thead,.modal-body form table thead, .inv-table table thead, .report-table table thead{
           display: none; 
         }
       
@@ -1058,7 +1058,7 @@ table td button,.order-table td button,.prod-table td button{
           text-align: left;
         }
       
-        .top-product__table td::before,.modal-body form table td::before,.inv-table table td::before {
+        .top-product__table td::before,.modal-body form table td::before,.inv-table table td::before,.report-table table td::before {
           content: attr(data-label);
           font-weight: bold;
           flex-basis: 40%;
@@ -1076,6 +1076,14 @@ table td button,.order-table td button,.prod-table td button{
         .modal-body form table td:nth-child(2)::before{ content: "Product"; } 
         .modal-body form table td:nth-child(3)::before{ content: "Price"; } 
         .modal-body form table td:nth-child(4)::before{ content: "Category"; } 
+
+        .report-table table td:nth-child(1)::before{ content: " "; } 
+        .report-table table td:nth-child(2)::before { content: "Period"; flex-basis: 90%; }
+        .report-table table td:nth-child(3)::before { content: "Product Code"; }
+        .report-table table td:nth-child(4)::before { content: "Product Name"; }
+        .report-table table td:nth-child(5)::before { content: "Size"; }
+        .report-table table td:nth-child(6)::before { content: "Quantity"; }
+        .report-table  table td:nth-child(7)::before { content: "Total Sales(Php)"; }
 
         .nav-links a{
             width: 35%;
@@ -1161,6 +1169,16 @@ table td button,.order-table td button,.prod-table td button{
         .modal-content{
             width: 100%;
         }
+        .report-sales{
+        grid-template-columns: 100%;
+        grid-template-rows: 200px 200px;
+        }
+        .report-sales .avg-orders{
+            grid-area: 2/1/3/2;
+        }
+        .todays-sales{
+            width: 100%;
+        }
 }
 
 @media (max-width:425px) {
@@ -1177,8 +1195,7 @@ table td button,.order-table td button,.prod-table td button{
     .dash-body{
         grid-template-rows: 300px 200px 200px 200px 200px 200px 400px;
     }
-    .summ{
-        display: grid;
+    .todays-sales > .summ,.summ{
         grid-template-columns: repeat(3, 1fr);
         justify-items: center;
         gap: 2px;

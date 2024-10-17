@@ -37,7 +37,7 @@ const SalesSummaryComponent = () => {
                     <div>
                         <i className='bx bxs-bar-chart-square'></i>
                     </div>
-                    <h6>P{salesData.total_sales}</h6> {/* total sales */}
+                    <h6>₱{salesData.total_sales}</h6> {/* total sales */}
                     <p><strong>Total Sales</strong></p>
                 </div>
 

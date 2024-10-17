@@ -9,15 +9,31 @@ import ReportSalesComponent from '../components/ReportSalesComponent';
 const Reports = () => {
     const [productReports, setProductReports] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [selectedMonth, setSelectedMonth] = useState('');
+    const [selectedYear, setSelectedYear] = useState('');
+    const [loading, setLoading] = useState(true); // New loading state
+    const [error, setError] = useState(false); // New error state
+    const currentYear = new Date().getFullYear();
+    
+    // Generate a continuous range of years and reverse it to show the latest first
+    const years = [];
+    for (let year = 2000; year <= currentYear; year++) {
+        years.push(year);
+    }
+    years.reverse(); // This will sort the years from latest to oldest
 
     // Fetch product report data when the component mounts
     useEffect(() => {
         const fetchProductReports = async () => {
+            setLoading(true);
             try {
                 const response = await axios.get('http://localhost:5001/product-reports-per-month');
                 setProductReports(response.data.data);
             } catch (error) {
                 console.error('Error fetching product reports:', error);
+                setError(true);
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -28,18 +44,32 @@ const Reports = () => {
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
     };
+    
+    // Handle month and year selection change
+    const handleMonthChange = (event) => {
+        setSelectedMonth(event.target.value);
+    };
 
-    // Filtered reports based on the search query
+    const handleYearChange = (event) => {
+        setSelectedYear(event.target.value);
+    };
+
+    // Filter reports based on search query, selected month, and selected year
     const filteredReports = productReports.filter((report) => {
         const lowerCaseQuery = searchQuery.toLowerCase();
+        const reportDate = new Date(report.period); // Assuming report.period is in a date format
 
         // Check if the properties exist before using toLowerCase
-        return (
+        const matchesSearchQuery =
             (report.period && report.period.toLowerCase().includes(lowerCaseQuery)) ||
             (report.product_code && report.product_code.toLowerCase().includes(lowerCaseQuery)) ||
             (report.product_name && report.product_name.toLowerCase().includes(lowerCaseQuery)) ||
-            (report.size && report.size.toLowerCase().includes(lowerCaseQuery))
-        );
+            (report.size && report.size.toLowerCase().includes(lowerCaseQuery));
+
+        const matchesMonth = selectedMonth ? reportDate.getMonth() === parseInt(selectedMonth) : true;
+        const matchesYear = selectedYear ? reportDate.getFullYear() === parseInt(selectedYear) : true;
+
+        return matchesSearchQuery && matchesMonth && matchesYear;
     });
 
     return (
@@ -68,38 +98,75 @@ const Reports = () => {
                                         />
                                     </form>
                                 </div>
+                                <div className='options'>
+                                    <div className='col'>
+                                        <select value={selectedMonth} onChange={handleMonthChange} className='form-select'>
+                                            <option value=''>Select Month</option>
+                                            <option value='0'>January</option>
+                                            <option value='1'>February</option>
+                                            <option value='2'>March</option>
+                                            <option value='3'>April</option>
+                                            <option value='4'>May</option>
+                                            <option value='5'>June</option>
+                                            <option value='6'>July</option>
+                                            <option value='7'>August</option>
+                                            <option value='8'>September</option>
+                                            <option value='9'>October</option>
+                                            <option value='10'>November</option>
+                                            <option value='11'>December</option>
+                                        </select>
+                                    </div>
+                                    <div className='col'>
+                                        <select value={selectedYear} onChange={handleYearChange} className='form-select'>
+                                            <option value=''>Select Year</option>
+                                            {years.map((year) => (
+                                                <option key={year} value={year}>
+                                                    {year}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
 
-                            {/* ORDER TABLE WILL BE THE PRODUCT DETAILS */}
-                            <div className='order-table'>
-                                <table className='table table-hover'>
-                                    <thead className='bg-light sticky-top'>
-                                        <tr>
-                                            <th><input type='checkbox' /></th>
-                                            <th>Period</th>
-                                            <th>Product Code</th>
-                                            <th>Product Name</th>
-                                            <th>Size</th>
-                                            <th>Quantity</th>
-                                            <th>Total Sales (PHP)</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {filteredReports.map((report, index) => (
-                                            <tr key={index}>
-                                                <td><input type='checkbox' /></td>
-                                                <td>{report.period}</td>
-                                                <td>{report.product_code}</td>
-                                                <td>{report.product_name}</td>
-                                                <td>{report.size}</td>
-                                                <td>{report.total_quantity}</td>
-                                                <td>PHP {parseFloat(report.total_sales).toFixed(2)}</td>
-                                                <td><button>Export</button></td>
+                            {/* Conditional rendering for loading, no data, and table */}
+                            <div className='report-table'>
+                                {loading ? (
+                                    <p>Loading reports...</p>
+                                ) : error ? (
+                                    <p>Error loading data. Please try again later.</p>
+                                ) : filteredReports.length === 0 ? (
+                                    <p>No reports found for the selected filters.</p>
+                                ) : (
+                                    <table className='table table-hover'>
+                                        <thead className='bg-light sticky-top'>
+                                            <tr>
+                                                <th><input type='checkbox' /></th>
+                                                <th>Period</th>
+                                                <th>Product Code</th>
+                                                <th>Product Name</th>
+                                                <th>Size</th>
+                                                <th>Quantity</th>
+                                                <th>Total Sales (PHP)</th>
+                                                <th>Action</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            {filteredReports.map((report, index) => (
+                                                <tr key={index}>
+                                                    <td><input type='checkbox' /></td>
+                                                    <td>{report.period}</td>
+                                                    <td>{report.product_code}</td>
+                                                    <td>{report.product_name}</td>
+                                                    <td>{report.size}</td>
+                                                    <td>{report.total_quantity}</td>
+                                                    <td>PHP {parseFloat(report.total_sales).toFixed(2)}</td>
+                                                    <td><button>Export</button></td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                )}
                             </div>
                         </div>
                     </div>
