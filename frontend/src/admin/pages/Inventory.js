@@ -60,6 +60,7 @@ const Inventory = () => {
         try {
             const response = await axios.get('http://localhost:5001/admin-products');
             setProductNames(response.data);
+            console.log('Product Names:', response.data); // Debugging
         } catch (error) {
             console.error('Error fetching product names:', error);
         }
@@ -69,6 +70,7 @@ const Inventory = () => {
         try {
             const response = await axios.get('http://localhost:5001/admin-inventory');
             setInventoryItems(response.data);
+            console.log('Inventory Items:', response.data); // Debugging
         } catch (error) {
             console.error('Error fetching inventory items:', error);
         }
@@ -115,28 +117,26 @@ const Inventory = () => {
             <div className="dash-board">
                 <div className="dash-header">
                     <div className="header-title">
-                        <i className="bx bxs-spa"></i>
-                        <h1>Products</h1>
+                        <i className="bx bxs-clipboard"></i>
+                        <h1>Inventory</h1>
                     </div>
                     <AdminHeader />
                 </div>
 
                 <div className="body">
-                    <div className="product-con">
+                    <div className="inventory-con">
                         {/* Product Statistics */}
-                        <div className="product-one">
-                            <ProductStatistics
-                                bestSellingCount={bestSellingCount}
-                                totalQuantity={totalQuantity}
-                                lowStockCount={lowStockCount}
-                                lowStockQuantity={lowStockQuantity}
-                                unpopularProducts={unpopularProducts}
-                                outOfStockCount={outOfStockCount}
-                                outOfStockQuantity={outOfStockQuantity}
-                                discontinuedCount={discontinuedCount}
-                                discontinuedQuantity={discontinuedQuantity}
-                            />
-                        </div>
+                        <ProductStatistics
+                            bestSellingCount={bestSellingCount}
+                            totalQuantity={totalQuantity}
+                            lowStockCount={lowStockCount}
+                            lowStockQuantity={lowStockQuantity}
+                            unpopularProducts={unpopularProducts}
+                            outOfStockCount={outOfStockCount}
+                            outOfStockQuantity={outOfStockQuantity}
+                            discontinuedCount={discontinuedCount}
+                            discontinuedQuantity={discontinuedQuantity}
+                        />
 
                         {/* Product Table */}
                         <div className="product-two">
@@ -153,9 +153,9 @@ const Inventory = () => {
                                 </div>
                             </div>
 
-                            <div className="order-table table-responsive">
+                            <div className="inv-table table-responsive">
                                 <table className="table table-hover">
-                                    <thead>
+                                    <thead className='bg-light sticky-top'>
                                         <tr>
                                             <th>Product ID</th>
                                             <th>Code</th>
@@ -170,10 +170,14 @@ const Inventory = () => {
                                         {currentProducts.map((product) => {
                                             // Determine stock status based on quantity
                                             let stockStatus = 'Low on Stock';
-                                            if (product.quantity > 50) {
+                                            let isLowStock = false;
+
+                                            if (product.quantity > 100) {
                                                 stockStatus = 'Good Stocks';
                                             } else if (product.quantity > 20) {
                                                 stockStatus = 'Moderately Low';
+                                            } else {
+                                                isLowStock = true;
                                             }
 
                                             return (
@@ -182,7 +186,10 @@ const Inventory = () => {
                                                     <td>{product.product_code}</td>
                                                     <td>{product.product_name}</td>
                                                     <td>{product.price}</td>
-                                                    <td>{product.quantity}</td>
+
+                                                    {/* Apply blinking background if low on stock */}
+                                                    <td className={isLowStock ? 'blinking' : ''}>{product.quantity}</td>
+
                                                     <td>{product.category_name}</td>
                                                     <td>{stockStatus}</td>
                                                 </tr>

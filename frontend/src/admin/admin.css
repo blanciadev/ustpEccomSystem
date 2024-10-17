@@ -666,6 +666,7 @@
     flex-wrap: wrap;
     align-content: space-around;
     align-items: center;
+    justify-content: space-around;
 }
 
 .product-qty .qty {
@@ -766,8 +767,8 @@
     border-radius: 10px;
     padding: 10px;
     display: flex;
-    flex-wrap: wrap;
     justify-content: center;
+    flex-direction: column;
 }
 
 .table-responsive {
@@ -986,6 +987,26 @@ table td button,.order-table td button,.prod-table td button{
     white-space: nowrap;
     
 }
+.inventory-con{
+    width: 100%;
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 30% 70%;
+    height: 100%;
+    padding: 10px;
+    gap: 10px 0;
+}
+
+
+.blinking {
+    background-color: red !important;
+    animation: blink 1s linear infinite !important;
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
 @media (max-width:768px){
     .dash-body{
         height: auto;
@@ -1019,7 +1040,7 @@ table td button,.order-table td button,.prod-table td button{
     .top-product{
         grid-area: 6/1/7/3
     }
-        .top-product__table thead,.modal-body form table thead  {
+        .top-product__table thead,.modal-body form table thead, .inv-table table thead {
           display: none; 
         }
       
@@ -1037,7 +1058,7 @@ table td button,.order-table td button,.prod-table td button{
           text-align: left;
         }
       
-        .top-product__table td::before,.modal-body form table td::before {
+        .top-product__table td::before,.modal-body form table td::before,.inv-table table td::before {
           content: attr(data-label);
           font-weight: bold;
           flex-basis: 40%;
@@ -1088,6 +1109,14 @@ table td button,.order-table td button,.prod-table td button{
           .payment-table  table td:nth-child(5)::before { content: "Payment Method"; }
           .payment-table  table td:nth-child(6)::before { content: "Shipment Status"; }
           .payment-table  table td:nth-child(7)::before { content: "Payment Status"; }
+
+          .inv-table  table td:nth-child(1)::before { content: "#"; }
+          .inv-table  table td:nth-child(2)::before { content: "Product Code"; flex-basis: 90%; }
+          .inv-table  table td:nth-child(3)::before { content: "Name"; }
+          .inv-table  table td:nth-child(4)::before { content: "Price"; flex-basis: 85%;}
+          .inv-table  table td:nth-child(5)::before { content: "Quantity"; }
+          .inv-table  table td:nth-child(6)::before { content: "Category"; }
+          .inv-table  table td:nth-child(7)::before { content: "Status"; }
 
           .ship-table  table td:nth-child(1)::before { content: " "; }
           .ship-table  table td:nth-child(2)::before { content: "Shipment ID"; flex-basis: 90%; }
