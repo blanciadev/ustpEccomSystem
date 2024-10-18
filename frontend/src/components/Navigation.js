@@ -5,6 +5,7 @@ import { cartEventEmitter } from './eventEmitter';
 import '../App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ToastNotification from './ToastNotification';
+// import '../assets/logo.png'
 
 const Navigation = () => {
     const [username, setUsername] = useState('');
@@ -158,7 +159,7 @@ const Navigation = () => {
             <ToastNotification toastMessage={toastMessage}/>
             <div className='logo'>
                 <a href='/'>
-                    <img src='https://us.123rf.com/450wm/dmrgraphic/dmrgraphic2105/dmrgraphic210500421/169019761-hair-woman-and-face-logo-and-symbols.jpg?ver=6' alt='Logo' />
+                    <img src='https://scontent.fcgy2-2.fna.fbcdn.net/v/t39.30808-6/309663016_472407468238901_2439729538350357694_n.png?_nc_cat=103&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeHkaWoh0NeJOgZZ6d3YXYb1oX31niLe-56hffWeIt77noexsEmKXN3bXRjYsP7inglwvA8imWTOstpqXY8AVb1V&_nc_ohc=f5YixnsisdIQ7kNvgGtmFvf&_nc_zt=23&_nc_ht=scontent.fcgy2-2.fna&_nc_gid=AEQqzBrO4GzSWrnFE7-E_kE&oh=00_AYAfTV-I96cqn2FCrQRTLel7NfNELFSAzsewGkSEwBSmSA&oe=671787EB' alt='Logo' />
                     {isMobile ? (
                         <p></p> // Text for mobile view
                     ) : (
