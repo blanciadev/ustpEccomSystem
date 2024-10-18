@@ -39,9 +39,10 @@ router.post('/users-login', async (req, res) => {
         const token = crypto.randomBytes(64).toString('hex');
 
         // Store the token in the database
-        await db.query('INSERT INTO tokens (user_id, token, expires_at) VALUES (?, ?, ?)', [
+        await db.query('INSERT INTO tokens (user_id, token, token_status, expires_at) VALUES (?, ?,?, ?)', [
             user.customer_id,
             token,
+            'Active',
             new Date(Date.now() + TOKEN_EXPIRATION_TIME)
         ]);
 
@@ -53,7 +54,7 @@ router.post('/users-login', async (req, res) => {
             username: user.username,
             first_name: user.first_name,
             role_type: user.role_type
-            
+
         });
     } catch (err) {
         // Log only the message

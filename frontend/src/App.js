@@ -27,10 +27,12 @@ import ChangePassword from './pages/ForgotPassword/ChangePassword'
 import UserProfile from './pages/Transactions/UserProfile';
 import ToastNotification from './components/ToastNotification';
 
+import { GoogleLogin } from '@react-oauth/google';
 
 function App() {
   const [loginStatus, setLoginStatus] = useState('');
   const [error, setError] = useState('');
+
 
 
   return (
