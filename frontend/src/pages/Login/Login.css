@@ -105,6 +105,7 @@
 .login-image{
     width: 95%;
     height: 98%;
+    padding: 10px;
     /* background-color: cadetblue; */
 }
 .login-image img{
