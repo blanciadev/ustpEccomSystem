@@ -59,7 +59,7 @@ const BundleProductModal = () => {
 
     const handleResize = () => {
         setIsMobile(window.innerWidth <= 768);  // Update state based on screen width
-        };
+    };
 
     // Handle form submission (selected products)
     const handleBundleSubmit = async (e) => {
@@ -83,19 +83,19 @@ const BundleProductModal = () => {
             // Create the bundle and get the response
             await axios.post('http://localhost:5001/bundles', bundleData);
 
-            setToastMessage('Bundle Created!'); 
+            setToastMessage('Bundle Created!');
 
             setTimeout(() => {
-    
+
                 setToastMessage(''); // Reset toast message
-                handleClose(); 
+                handleClose();
             }, 2000);
 
             // setMessage('Bundle created successfully!'); // Set success message
-            
+
             setSelectedProducts([]); // Clear selected products after submission
 
-            
+
 
         } catch (error) {
             console.error('Error creating bundle:', error);
@@ -156,10 +156,10 @@ const BundleProductModal = () => {
         <>
             <Button variant="primary" onClick={handleShow}>
                 {isMobile ? (
-                        <i class='bx bxs-discount'></i>
-                    ):(
-                        'Print Payment Summary'
-                    )
+                    <i class='bx bxs-discount'></i>
+                ) : (
+                    'Bundle A Product '
+                )
                 }
             </Button>
 
@@ -251,7 +251,7 @@ const BundleProductModal = () => {
                         </Form.Group>
 
                         {/* Total Price */}
-                        <h5>Total Price: ${customPrice}</h5>
+                        <h5>Total Price: P{customPrice}</h5>
 
                         <Button variant="primary" type="submit">
                             Create Bundle

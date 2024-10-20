@@ -6,6 +6,7 @@ import '../admin.css';
 import AdminNav from '../components/AdminNav';
 import AdminHeader from '../components/AdminHeader';
 import PaymentModal from '../components/paymentModal';
+import { saveAs } from 'file-saver';
 
 const Payments = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -28,13 +29,13 @@ const Payments = () => {
     window.addEventListener('resize', handleResize);
 
     return () => {
-        window.removeEventListener('resize', handleResize);
+      window.removeEventListener('resize', handleResize);
     };
   }, [currentPage, statusFilter, searchTerm]);
-  
+
   const handleResize = () => {
-    setIsMobile(window.innerWidth <= 425);  // Update state based on screen width
-    };
+    setIsMobile(window.innerWidth <= 425);
+  };
   const fetchOrders = async () => {
     setLoading(true);
     try {
@@ -84,6 +85,24 @@ const Payments = () => {
     handleCloseModal();
   };
 
+  const handlePrintOrders = async () => {
+    try {
+      const response = await axios.get('http://localhost:5001/admin-order-history', {
+        params: { exportToExcel: 'true' },
+        responseType: 'blob',  // Important for file download
+      });
+
+      const blob = new Blob([response.data], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      saveAs(blob, 'order_summary.xlsx');  // Download file
+
+    } catch (error) {
+      console.error('Error exporting orders to Excel:', error.message);
+    }
+  };
+
+
   const totalPages = Math.ceil(totalOrders / itemsPerPage);
 
   // Filter orders based on the search term
@@ -127,13 +146,12 @@ const Payments = () => {
               </div>
               <div className='options'>
                 <div className='print'>
-                  <button>
+                  <button onClick={handlePrintOrders}>
                     {isMobile ? (
-                        <i class='bx bx-printer'></i>
-                    ):(
-                        'Print Payment Summary'
-                    )
-                    }
+                      <i className='bx bx-printer'></i>
+                    ) : (
+                      'Export Order Record'
+                    )}
                   </button>
                 </div>
                 <div className='filter'>
@@ -186,20 +204,20 @@ const Payments = () => {
             </div>
 
             <div className='pagination'>
-                <button
-                  disabled={currentPage === 1}
-                  onClick={() => handlePageChange(currentPage - 1)}
-                >
-                  Previous
-                </button>
-                <span>Page {currentPage} of {totalPages}</span>
-                <button
-                  disabled={currentPage === totalPages}
-                  onClick={() => handlePageChange(currentPage + 1)}
-                >
-                  Next
-                </button>
-              </div>
+              <button
+                disabled={currentPage === 1}
+                onClick={() => handlePageChange(currentPage - 1)}
+              >
+                Previous
+              </button>
+              <span>Page {currentPage} of {totalPages}</span>
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => handlePageChange(currentPage + 1)}
+              >
+                Next
+              </button>
+            </div>
           </div>
         </div>
       </div>

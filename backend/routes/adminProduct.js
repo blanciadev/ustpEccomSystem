@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const ExcelJS = require('exceljs');
+
 
 router.get('/admin-products-with-interaction', async (req, res) => {
     try {
@@ -159,7 +161,6 @@ router.get('/top-products', async (req, res) => {
 
 
 
-// Route to retrieve all shipments
 router.get('/shipments', async (req, res) => {
     console.log('Received request to fetch all shipments.');
 
@@ -170,6 +171,49 @@ router.get('/shipments', async (req, res) => {
         if (shipments.length === 0) {
             console.log('No shipments found.');
             return res.status(404).json({ error: 'No shipments found' });
+        }
+
+        // Check if the request is for exporting data to Excel
+        if (req.query.export === 'true') {
+            console.log('Preparing to export shipments to Excel.');
+
+            // Create a new Excel workbook and worksheet
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Shipments');
+
+            // Define columns for the worksheet
+            worksheet.columns = [
+                { header: 'Shipment ID', key: 'shipment_id', width: 15 },
+                { header: 'Order ID', key: 'order_id', width: 15 },
+                { header: 'Shipment Date', key: 'shipment_date', width: 20 },
+                { header: 'Address', key: 'address', width: 30 },
+                { header: 'City', key: 'city', width: 20 },
+                { header: 'Phone Number', key: 'phoneNumber', width: 15 },
+                { header: 'Postal Code', key: 'postalCode', width: 15 },
+                { header: 'Shipment Status', key: 'shipment_status', width: 20 },
+            ];
+
+            // Add rows to the worksheet
+            shipments.forEach(shipment => {
+                worksheet.addRow({
+                    shipment_id: shipment.shipment_id,
+                    order_id: shipment.order_id,
+                    shipment_date: shipment.shipment_date, // Ensure the date format is correct
+                    address: shipment.address,
+                    city: shipment.city,
+                    phoneNumber: shipment.phoneNumber,
+                    postalCode: shipment.postalCode,
+                    shipment_status: shipment.shipment_status,
+                });
+            });
+
+            // Set response headers to indicate a file attachment
+            res.setHeader('Content-Disposition', 'attachment; filename=shipments.xlsx');
+            res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+            // Write the Excel file to the response
+            await workbook.xlsx.write(res);
+            return res.end();
         }
 
         console.log('Retrieved shipments:', shipments);
@@ -201,8 +245,8 @@ router.get('/sales-for-today', async (req, res) => {
         // Ensure salesData is an object
         const salesData = results[0] || {};
         res.json({
-            total_sales: salesData.total_completed_sales || 0, 
-            total_orders: salesData.total_completed_orders || 0, 
+            total_sales: salesData.total_completed_sales || 0,
+            total_orders: salesData.total_completed_orders || 0,
             total_products_sold: salesData.total_products_sold || 0,
         });
     } catch (error) {

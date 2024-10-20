@@ -5,6 +5,8 @@ import AdminNav from '../components/AdminNav';
 import AdminHeader from '../components/AdminHeader';
 import axios from 'axios';
 import OrderModal from '../components/OrderModal';
+import { saveAs } from 'file-saver';
+
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -36,17 +38,17 @@ const Orders = () => {
 
   useEffect(() => {
     fetchOrders();
-    
+
     window.addEventListener('resize', handleResize);
 
     return () => {
-        window.removeEventListener('resize', handleResize);
+      window.removeEventListener('resize', handleResize);
     };
   }, [status, searchTerm, sortBy]);
 
   const handleResize = () => {
     setIsMobile(window.innerWidth <= 425);  // Update state based on screen width
-};
+  };
 
   const handleOpenModal = (order) => {
     setSelectedOrder(order);
@@ -117,6 +119,23 @@ const Orders = () => {
     setCurrentPage(pageNumber);
   };
 
+  const handlePrintOrders = async () => {
+    try {
+      const response = await axios.get('http://localhost:5001/admin-order-history', {
+        params: { exportToExcel: 'true' },
+        responseType: 'blob',  // Important for file download
+      });
+
+      const blob = new Blob([response.data], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      saveAs(blob, 'order_summary.xlsx');  // Download file
+
+    } catch (error) {
+      console.error('Error exporting orders to Excel:', error.message);
+    }
+  };
+
   const paginatedOrders = sortedFilteredOrders.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
@@ -146,13 +165,12 @@ const Orders = () => {
 
               <div className='options'>
                 <div className='print'>
-                  <button>
+                  <button onClick={handlePrintOrders}>
                     {isMobile ? (
-                        <i class='bx bx-printer'></i>
-                    ):(
-                        'Print Order Summary'
-                    )
-                    }
+                      <i className='bx bx-printer'></i>
+                    ) : (
+                      'Export Order Record'
+                    )}
                   </button>
                 </div>
                 <div className='sort'>
@@ -165,7 +183,6 @@ const Orders = () => {
                   >
                     <option value='date'>Date</option>
                     <option value='status'>Status</option>
-                    <option value='id'>ID</option>
                     <option value='customer-id'>Customer ID</option>
                   </select>
                 </div>
@@ -197,25 +214,26 @@ const Orders = () => {
                     <th>Order Date</th>
                     <th>Status</th>
                     <th>Payment Status</th>
+                    <th>Total</th>
                     <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {paginatedOrders.map(order => (
-                    <tr
-                      key={order.order_id}
-                      className={isRowHighlighted(order) ? 'highlighted-row' : ''}
-                    >
+                    <tr key={order.order_id} className={isRowHighlighted(order) ? 'highlighted-row' : ''}>
                       <td><input type='checkbox' /></td>
                       <td>{highlightText(order.order_id.toString(), searchTerm)}</td>
                       <td>{highlightText(`${order.customer_first_name} ${order.customer_last_name}`, searchTerm)}</td>
                       <td>{highlightText(new Date(order.order_date).toLocaleDateString(), searchTerm)}</td>
                       <td>{highlightText(order.order_status, searchTerm)}</td>
                       <td>{highlightText(order.payment_status, searchTerm)}</td>
+                      <td>{highlightText(order.order_total, searchTerm)}</td>  {/* Display the total price from order_total */}
                       <td><button onClick={() => handleOpenModal(order)}>View</button></td>
                     </tr>
                   ))}
                 </tbody>
+
+
               </table>
               {/* Pagination Controls */}
               <div className='pagination'>

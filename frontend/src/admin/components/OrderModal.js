@@ -20,7 +20,7 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
             // Ensure status is not empty
             if (!status) {
                 console.log('Please select a valid status');
-                
+
                 setLoading(false);
                 setToastMessage('Please select a valid status!');
                 setTimeout(() => {
@@ -34,15 +34,15 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                 products
             });
             setToastMessage('Updated successfully');
-                setTimeout(() => {
-                    setToastMessage('');
-                    handleClose(); 
-                }, 2000);
+            setTimeout(() => {
+                setToastMessage('');
+                handleClose();
+            }, 2000);
 
-            
+
 
             console.log('Order status updated successfully');
-            
+
             refreshOrders(); // Call refreshOrders to update the orders list
         } catch (error) {
             console.error('Error updating order status:', error.message);
@@ -54,7 +54,7 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
 
     return (
         <div className={`modal fade ${show ? 'show' : ''}`} tabIndex="-1" role="dialog" style={{ display: show ? 'block' : 'none' }}>
-            
+
             <div className="modal-dialog modal-dialog-centered modal-lg" role="document">
                 <div className="modal-content">
                     <div className="modal-header">
@@ -83,7 +83,7 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                                         <option value="Pending">Pending</option>
                                     </select>
                                 </div>
-                                <br/>
+                                <br />
                                 <h5>Products:</h5>
                                 <table className="table">
                                     <thead>
@@ -91,21 +91,29 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                                             <th>Product Name</th>
                                             <th>Price</th>
                                             <th>Quantity</th>
+                                            <th>Shipping</th>
                                             <th>Total</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {order.products.map((product, index) => (
-                                            <tr key={index}>
+                                        {order.products.map((product, index) => {
+                                            const productTotal = product.price ? (product.price * product.quantity) : 0;
+                                            const shippingCost = 150;
+                                            const totalWithShipping = productTotal + shippingCost;
 
-                                                <td>{product.product_name}</td>
-                                                <td>P{product.price ? product.price.toFixed(2) : 'N/A'}</td>
-                                                <td>{product.quantity}</td>
-                                                <td>P{(product.price && product.quantity ? (product.price * product.quantity).toFixed(2) : 'N/A')}</td>
-                                            </tr>
-                                        ))}
+                                            return (
+                                                <tr key={index}>
+                                                    <td>{product.product_name}</td>
+                                                    <td>P{product.price ? product.price.toFixed(2) : 'N/A'}</td>
+                                                    <td>{product.quantity}</td>
+                                                    <td>P{shippingCost.toFixed(2)}</td>
+                                                    <td>P{totalWithShipping.toFixed(2)}</td>
+                                                </tr>
+                                            );
+                                        })}
                                     </tbody>
                                 </table>
+
                             </div>
                         )}
                     </div>

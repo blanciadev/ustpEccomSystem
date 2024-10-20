@@ -10,9 +10,9 @@ const RemoveDiscountProduct = ({ show, handleClose, order, handleUpdate }) => {
   useEffect(() => {
     if (show) {
       axios
-        .get('http://localhost:5001/products-disable-bundle') 
+        .get('http://localhost:5001/products-disable-bundle')
         .then((response) => {
-          setProducts(response.data); 
+          setProducts(response.data);
         })
         .catch((error) => {
           console.error('Error fetching products:', error);
@@ -27,7 +27,7 @@ const RemoveDiscountProduct = ({ show, handleClose, order, handleUpdate }) => {
       .then((response) => {
         // Update the products list after discount is removed
         setProducts(products.filter((product) => product.product_code !== productCode));
-        handleUpdate(); 
+        handleUpdate();
       })
       .catch((error) => {
         console.error('Error removing discount:', error);
@@ -59,7 +59,7 @@ const RemoveDiscountProduct = ({ show, handleClose, order, handleUpdate }) => {
                 <td>{product.product_code}</td>
                 <td>{product.product_name}</td>
                 <td>{product.category_name}</td>
-                <td>${product.price.toFixed(2)}</td>
+                <td>P{product.price.toFixed(2)}</td>
                 <td>{product.product_discount}%</td>
                 <td>
                   <Button

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Pagination from 'react-bootstrap/Pagination';
+import { saveAs } from 'file-saver';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../admin.css';
 import AdminNav from '../components/AdminNav';
@@ -40,14 +41,13 @@ const Shipments = () => {
     window.addEventListener('resize', handleResize);
 
     return () => {
-        window.removeEventListener('resize', handleResize);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
-  
+
   const handleResize = () => {
     setIsMobile(window.innerWidth <= 425);  // Update state based on screen width
-    };
-
+  };
 
   // Filter shipments based on search term
   const filteredShipments = shipments.filter(shipment =>
@@ -78,6 +78,27 @@ const Shipments = () => {
 
   const currentShipments = sortedShipments.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
+  const exportToExcel = async () => {
+    try {
+      const response = await fetch('http://localhost:5001/shipments?export=true', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to export shipments');
+      }
+
+      const blob = await response.blob();
+      const fileName = 'shipments.xlsx';
+      saveAs(blob, fileName); // Use file-saver to save the file
+    } catch (error) {
+      console.error('Error exporting to Excel:', error.message);
+    }
+  };
+
   return (
     <div className='dash-con'>
       <AdminNav />
@@ -104,13 +125,12 @@ const Shipments = () => {
               </div>
               <div className='options'>
                 <div className='print'>
-                  <button>
-                  {isMobile ? (
-                        <i class='bx bx-printer'></i>
-                    ):(
-                        'Print Shipments Summary'
-                    )
-                    }
+                  <button onClick={exportToExcel}>
+                    {isMobile ? (
+                      <i className='bx bx-download'></i>
+                    ) : (
+                      'Export Shipments to Excel'
+                    )}
                   </button>
                 </div>
                 <div className='sort'>
@@ -169,13 +189,9 @@ const Shipments = () => {
               <Pagination>
                 <Pagination.First onClick={() => handlePageChange(1)} disabled={currentPage === 1} />
                 <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
-                {[...Array(totalPages).keys()].map(pageNumber => (
-                  <Pagination.Item
-                    key={pageNumber + 1}
-                    active={pageNumber + 1 === currentPage}
-                    onClick={() => handlePageChange(pageNumber + 1)}
-                  >
-                    {pageNumber + 1}
+                {[...Array(totalPages)].map((_, index) => (
+                  <Pagination.Item key={index + 1} active={currentPage === index + 1} onClick={() => handlePageChange(index + 1)}>
+                    {index + 1}
                   </Pagination.Item>
                 ))}
                 <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />

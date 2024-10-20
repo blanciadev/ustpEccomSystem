@@ -3,7 +3,6 @@ const router = express.Router();
 const db = require('../db');
 
 
-
 // Route to update order status
 router.put('/update-order-status/:orderId', async (req, res) => {
     const { orderId } = req.params;
@@ -18,10 +17,16 @@ router.put('/update-order-status/:orderId', async (req, res) => {
         // Begin transaction to ensure consistency
         await db.query('START TRANSACTION');
 
-        // Update the order status in the order_details table
+        // Define payment status
+        let paymentStatus = null;
+        if (status === 'Completed') {
+            paymentStatus = 'Order Paid';
+        }
+
+        // Update the order status and payment status in the order_details table
         const result = await db.query(
-            'UPDATE order_details SET order_status = ?, order_update = NOW() WHERE order_id = ?',
-            [status, orderId]
+            'UPDATE order_details SET order_status = ?, payment_status = ?, order_update = NOW() WHERE order_id = ?',
+            [status, paymentStatus, orderId]
         );
 
         // Check if the order was found and updated
@@ -30,11 +35,11 @@ router.put('/update-order-status/:orderId', async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
-
+        // Commit transaction
         await db.query('COMMIT');
 
         // Respond with success
-        res.status(200).json({ message: 'Order status and product quantities updated successfully' });
+        res.status(200).json({ message: 'Order status updated successfully' });
     } catch (error) {
         // Rollback transaction in case of error
         await db.query('ROLLBACK');
@@ -42,6 +47,7 @@ router.put('/update-order-status/:orderId', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 });
+
 
 router.post('/update-payment-details', async (req, res) => {
     try {

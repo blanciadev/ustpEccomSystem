@@ -14,7 +14,7 @@ const Reports = () => {
     const [loading, setLoading] = useState(true); // New loading state
     const [error, setError] = useState(false); // New error state
     const currentYear = new Date().getFullYear();
-    
+
     // Generate a continuous range of years and reverse it to show the latest first
     const years = [];
     for (let year = 2000; year <= currentYear; year++) {
@@ -44,7 +44,7 @@ const Reports = () => {
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
     };
-    
+
     // Handle month and year selection change
     const handleMonthChange = (event) => {
         setSelectedMonth(event.target.value);
@@ -98,6 +98,9 @@ const Reports = () => {
                                         />
                                     </form>
                                 </div>
+                                <button>
+                                    Export Data
+                                </button>
                                 <div className='options'>
                                     <div className='col'>
                                         <select value={selectedMonth} onChange={handleMonthChange} className='form-select'>
@@ -133,15 +136,15 @@ const Reports = () => {
                             <div className='report-table'>
                                 {loading ? (
                                     <tr>
-                                    <td colSpan="8" className="text-center">Loading...</td>
+                                        <td colSpan="8" className="text-center">Loading...</td>
                                     </tr>
                                 ) : error ? (
                                     <tr>
-                                    <td colSpan="8" className="text-center">Error loading data. Please try again later.</td>
+                                        <td colSpan="8" className="text-center">Error loading data. Please try again later.</td>
                                     </tr>
                                 ) : filteredReports.length === 0 ? (
                                     <tr>
-                                    <td colSpan="8" className="text-center">No reports found for the selected filters.</td>
+                                        <td colSpan="8" className="text-center">No reports found for the selected filters.</td>
                                     </tr>
                                 ) : (
                                     <table className='table table-hover'>

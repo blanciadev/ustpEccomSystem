@@ -57,14 +57,14 @@ const Products = () => {
     window.addEventListener('resize', handleResize);
 
     return () => {
-        window.removeEventListener('resize', handleResize);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
   const handleResize = () => {
     setIsMobile(window.innerWidth <= 425);  // Update state based on screen width
-    };
-    
+  };
+
   const fetchProductStatistics = async () => {
     try {
       const response = await axios.get('http://localhost:5001/admin-products-with-interaction');
@@ -164,18 +164,18 @@ const Products = () => {
 
         <div className='body'>
           <div className='product-con'>
-              <ProductStatistics
-                bestSellingCount={bestSellingCount}
-                totalQuantity={totalQuantity}
-                lowStockCount={lowStockCount}
-                lowStockQuantity={lowStockQuantity}
-                unpopularProducts={unpopularProducts}
-                outOfStockCount={outOfStockCount}
-                outOfStockQuantity={outOfStockQuantity}
-                discontinuedCount={discontinuedCount}
-                discontinuedQuantity={discontinuedQuantity}
-              />
-              <TopProduct />
+            <ProductStatistics
+              bestSellingCount={bestSellingCount}
+              totalQuantity={totalQuantity}
+              lowStockCount={lowStockCount}
+              lowStockQuantity={lowStockQuantity}
+              unpopularProducts={unpopularProducts}
+              outOfStockCount={outOfStockCount}
+              outOfStockQuantity={outOfStockQuantity}
+              discontinuedCount={discontinuedCount}
+              discontinuedQuantity={discontinuedQuantity}
+            />
+            <TopProduct />
 
             <div className='product-two'>
               <div className='cheader'>
@@ -201,7 +201,7 @@ const Products = () => {
                       handleUpdate={fetchProduct}
                     />
                     <Button variant="primary" onClick={handleShowDiscountProductModal}>
-                       {isMobile ? (<i class='bx bxs-trash'></i>):('Remove Bundle')}
+                      {isMobile ? (<i class='bx bxs-trash'></i>) : ('Remove Bundle')}
                     </Button>
                   </div>
                 </div>
@@ -229,7 +229,7 @@ const Products = () => {
                         <td><input type='checkbox' /></td>
                         <td>{product.product_code}</td>
                         <td>{product.product_name}</td>
-                        <td>${product.price}</td>
+                        <td>P{product.price}</td>
                         <td>{product.category_name}</td>
                         <td>{product.quantity}</td>
                         <td>{product.description}</td>
