@@ -163,7 +163,8 @@ const BundleProductModal = () => {
                 }
             </Button>
 
-            <Modal show={show} onHide={handleClose}>
+
+            <Modal className='modal-xl' show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
                     <Modal.Title>Create a Bundle</Modal.Title>
                 </Modal.Header>

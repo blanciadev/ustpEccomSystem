@@ -98,9 +98,7 @@ const Reports = () => {
                                         />
                                     </form>
                                 </div>
-                                <button>
-                                    Export Data
-                                </button>
+                                
                                 <div className='options'>
                                     <div className='col'>
                                         <select value={selectedMonth} onChange={handleMonthChange} className='form-select'>
@@ -129,6 +127,9 @@ const Reports = () => {
                                             ))}
                                         </select>
                                     </div>
+                                    <button>
+                                        <i class='bx bx-export'></i>
+                                    </button>
                                 </div>
                             </div>
 
@@ -157,7 +158,6 @@ const Reports = () => {
                                                 <th>Size</th>
                                                 <th>Quantity</th>
                                                 <th>Total Sales (PHP)</th>
-                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -170,7 +170,6 @@ const Reports = () => {
                                                     <td>{report.size}</td>
                                                     <td>{report.total_quantity}</td>
                                                     <td>PHP {parseFloat(report.total_sales).toFixed(2)}</td>
-                                                    <td><button>Export</button></td>
                                                 </tr>
                                             ))}
                                         </tbody>
