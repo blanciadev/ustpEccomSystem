@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import '../admin.css';
 import Dropdown from 'react-bootstrap/Dropdown';
 import axios from 'axios';
@@ -8,6 +8,7 @@ const AdminHeader = () => {
     // Retrieve user data from localStorage
     const username = localStorage.getItem('username') || 'User';
     const firstName = localStorage.getItem('first_name') || '';
+    const [showLogoutModal, setShowLogoutModal] = useState(false); 
     const navigate = useNavigate();
 
     // Handle logout function
@@ -59,9 +60,33 @@ const AdminHeader = () => {
                     <Dropdown.Menu style={{ marginTop: '35px', width: '200px' }}>
                         <Dropdown.Item href='#/profile'>Profile</Dropdown.Item>
                         <Dropdown.Item href='#/settings'>Settings</Dropdown.Item>
-                        <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
+                        <Dropdown.Item onClick={() => setShowLogoutModal(true)}>Logout</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
+            </div>
+            <div
+                className={`modal fade ${showLogoutModal ? 'show' : ''}`}
+                id="logoutModal"
+                tabIndex="-1"
+                role="dialog"
+                aria-labelledby="logoutModalLabel"
+                aria-hidden="true"
+                style={{ display: showLogoutModal ? 'block' : 'none', backgroundColor: 'rgba(0,0,0,0.5)' }}  // Ensure background dimming
+            >
+                <div className="modal-dialog" role="document">
+                    <div className="modal-content">
+                    <div className="modal-header">
+                        <h5 className="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                    </div>
+                    <div className="modal-body">
+                        <p>Are you sure you want to log out?</p>
+                    </div>
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-secondary" onClick={() => setShowLogoutModal(false)}>Cancel</button>
+                        <button type="button" className="btn btn-danger" onClick={handleLogout}>Logout</button>
+                    </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
