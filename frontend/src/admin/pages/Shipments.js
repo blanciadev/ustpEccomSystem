@@ -46,7 +46,7 @@ const Shipments = () => {
   }, []);
 
   const handleResize = () => {
-    setIsMobile(window.innerWidth <= 425);  // Update state based on screen width
+    setIsMobile(window.innerWidth <= 425);
   };
 
   // Filter shipments based on search term
@@ -60,12 +60,10 @@ const Shipments = () => {
     shipment.shipment_status.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Sort shipments based on selected criteria
   const sortedShipments = filteredShipments.sort((a, b) => {
     if (sortBy === 'status') {
       return a.shipment_status.localeCompare(b.shipment_status);
     }
-    // Default sort by shipment date
     return new Date(a.shipment_date) - new Date(b.shipment_date);
   });
 
@@ -93,7 +91,7 @@ const Shipments = () => {
 
       const blob = await response.blob();
       const fileName = 'shipments.xlsx';
-      saveAs(blob, fileName); // Use file-saver to save the file
+      saveAs(blob, fileName);
     } catch (error) {
       console.error('Error exporting to Excel:', error.message);
     }

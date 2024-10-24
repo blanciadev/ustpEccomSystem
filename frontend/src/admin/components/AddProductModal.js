@@ -10,10 +10,10 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
     const [price, setPrice] = useState('');
     const [quantity, setQuantity] = useState('');
     const [expirationDate, setExpirationDate] = useState('');
-    const [imageURL, setImageURL] = useState(''); 
+    const [imageURL, setImageURL] = useState('');
     const [categories, setCategories] = useState([]);
     const [error, setError] = useState('');
-    const [size, setSize] = useState('500'); 
+    const [size, setSize] = useState('500');
     const [customSize, setCustomSize] = useState('');
     const [toastMessage, setToastMessage] = useState('');
 
@@ -44,22 +44,18 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
     const handleFormSubmit = async (e) => {
         e.preventDefault();
 
-        // Check if all required fields are filled
         if (!productName || !description || !category || !price || !quantity || !imageURL) {
             setError('Please fill out all required fields.');
             return;
         }
 
-        // Validate custom size if 'Other' is selected
         if (size === 'Other' && !customSize) {
             setError('Please provide a custom size.');
             return;
         }
 
-        // Log the image URL for debugging
         console.log('Image URL before submission:', imageURL);
 
-        // Construct the product data object
         const productData = {
             productName,
             description,
@@ -67,7 +63,7 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
             price,
             quantity,
             expirationDate,
-            imageURL, // Should not be undefined
+            imageURL,
             size: size === 'Other' ? customSize : size
         };
 
@@ -85,8 +81,8 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
             }
 
             const result = await response.text();
-            console.log(result); 
-            
+            console.log(result);
+
             setToastMessage('Successful!');
             setTimeout(() => {
                 setToastMessage('');
@@ -223,13 +219,13 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
                             required
                         />
                     </Form.Group>
-                    
+
                     <Button variant="primary" type="submit">
                         Add Product
                     </Button>
                 </Form>
             </Modal.Body>
-            
+
         </Modal>
     );
 };

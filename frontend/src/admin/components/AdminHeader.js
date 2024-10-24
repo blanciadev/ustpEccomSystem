@@ -1,17 +1,17 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import '../admin.css';
 import Dropdown from 'react-bootstrap/Dropdown';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const AdminHeader = () => {
-    // Retrieve user data from localStorage
+
     const username = localStorage.getItem('username') || 'User';
     const firstName = localStorage.getItem('first_name') || '';
-    const [showLogoutModal, setShowLogoutModal] = useState(false); 
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
     const navigate = useNavigate();
 
-    // Handle logout function
+
     const handleLogout = async () => {
         const token = localStorage.getItem('token');
 
@@ -28,14 +28,13 @@ const AdminHeader = () => {
             });
 
             if (response.status === 200) {
-                // Clear user data from localStorage
                 localStorage.removeItem('token');
                 localStorage.removeItem('customer_id');
                 localStorage.removeItem('username');
                 localStorage.removeItem('first_name');
                 localStorage.removeItem('role');
 
-                // Redirect to login page
+
                 navigate('/login');
             }
         } catch (error) {
@@ -45,7 +44,7 @@ const AdminHeader = () => {
 
     return (
         <div className='header-user'>
-            
+
             <div className='admin-profile'>
                 <img
                     src='https://t3.ftcdn.net/jpg/06/17/13/26/360_F_617132669_YptvM7fIuczaUbYYpMe3VTLimwZwzlWf.jpg'
@@ -75,16 +74,16 @@ const AdminHeader = () => {
             >
                 <div className="modal-dialog" role="document">
                     <div className="modal-content">
-                    <div className="modal-header">
-                        <h5 className="modal-title" id="logoutModalLabel">Confirm Logout</h5>
-                    </div>
-                    <div className="modal-body">
-                        <p>Are you sure you want to log out?</p>
-                    </div>
-                    <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary" onClick={() => setShowLogoutModal(false)}>Cancel</button>
-                        <button type="button" className="btn btn-danger" onClick={handleLogout}>Logout</button>
-                    </div>
+                        <div className="modal-header">
+                            <h5 className="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                        </div>
+                        <div className="modal-body">
+                            <p>Are you sure you want to log out?</p>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-secondary" onClick={() => setShowLogoutModal(false)}>Cancel</button>
+                            <button type="button" className="btn btn-danger" onClick={handleLogout}>Logout</button>
+                        </div>
                     </div>
                 </div>
             </div>

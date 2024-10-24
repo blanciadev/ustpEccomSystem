@@ -26,18 +26,18 @@ const PaymentModal = ({ show, handleClose, order, handleUpdate }) => {
         payment_status: paymentStatus,
       });
       console.log('Saved payment details:', { paymentMethod, orderStatus, paymentStatus });
-     
-      
+
+
       setToastMessage('Updated successfully');
       setTimeout(() => {
-          setToastMessage('');
-          handleClose(); 
-          handleUpdate(); // Notify parent to refresh the orders list
+        setToastMessage('');
+        handleClose();
+        handleUpdate();
       }, 2000);
     } catch (error) {
       setToastMessage('Error Occurred!', error.message);
       setTimeout(() => {
-          setToastMessage('');
+        setToastMessage('');
       }, 2000);
       console.error('Error saving payment details:', error.message);
     }
@@ -49,7 +49,7 @@ const PaymentModal = ({ show, handleClose, order, handleUpdate }) => {
         <Modal.Title>Update Payment Details</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-      <ToastNotification toastMessage={toastMessage} />
+        <ToastNotification toastMessage={toastMessage} />
         <Form>
           <Form.Group controlId="formPaymentMethod">
             <Form.Label>Payment Method</Form.Label>

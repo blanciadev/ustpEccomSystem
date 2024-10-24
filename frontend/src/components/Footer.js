@@ -6,7 +6,6 @@ const Footer = () => {
     <footer className="footer d-flex justify-content-center align-items-center">
       <Container className="text-center">
         <Row className="justify-content-center footer-content py-4">
-          {/* About Us Section */}
           <Col md={2}>
             <h5>ABOUT US</h5>
             <ul className="list-unstyled">
@@ -18,7 +17,6 @@ const Footer = () => {
             </ul>
           </Col>
 
-          {/* Customer Care Section */}
           <Col md={2}>
             <h5>CUSTOMER CARE</h5>
             <ul className="list-unstyled">
@@ -28,19 +26,16 @@ const Footer = () => {
             </ul>
           </Col>
 
-          {/* Beauty Pass Rewards Section */}
           <Col md={2}>
             <h5>BEAUTY PASS REWARDS</h5>
             <Button variant="outline-dark" href="/explore-benefits">Explore Benefits</Button>
           </Col>
 
-          
 
-          {/* Social Icons Section */}
           <Col md={2}>
             <h5>CONNECT WITH US</h5>
             <div className="social-icons">
-            <a href="https://www.facebook.com/nandbcorp?mibextid=kFxxJD" target="_blank" rel="noopener noreferrer">
+              <a href="https://www.facebook.com/nandbcorp?mibextid=kFxxJD" target="_blank" rel="noopener noreferrer">
                 <i className='bx bxl-facebook bx-md'></i>
               </a>
               <a href="https://www.instagram.com/nandbbeauty?igsh=MW5pd3Rndzl6YzkzeA==" target="_blank" rel="noopener noreferrer">

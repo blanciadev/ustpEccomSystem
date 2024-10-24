@@ -8,7 +8,7 @@ const AddUserModal = ({ show, onClose }) => {
     email: '',
     phoneNumber: '',
     userType: '',
-    password: '' // Add password to form data
+    password: ''
   });
 
   const [error, setError] = useState(null);
@@ -32,12 +32,12 @@ const AddUserModal = ({ show, onClose }) => {
         email: formData.email,
         phoneNumber: formData.phoneNumber,
         userType: formData.userType,
-        password: formData.password // Include password in the submission request
+        password: formData.password
       });
 
       if (response.status === 201) {
         alert('User created successfully');
-        onClose(); // Close the modal after successful submission
+        onClose();
       }
     } catch (error) {
       setError('Failed to create user');
@@ -63,7 +63,7 @@ const AddUserModal = ({ show, onClose }) => {
           </div>
           <div className="modal-body">
             <form onSubmit={handleSubmit}>
-              <input type="hidden" /> {/* for id number */}
+              <input type="hidden" />
               <div className="form-group">
                 <label htmlFor="fName">First Name</label>
                 <input

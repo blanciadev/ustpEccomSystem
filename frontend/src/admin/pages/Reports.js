@@ -11,18 +11,16 @@ const Reports = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedMonth, setSelectedMonth] = useState('');
     const [selectedYear, setSelectedYear] = useState('');
-    const [loading, setLoading] = useState(true); // New loading state
-    const [error, setError] = useState(false); // New error state
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
     const currentYear = new Date().getFullYear();
 
-    // Generate a continuous range of years and reverse it to show the latest first
     const years = [];
     for (let year = 2000; year <= currentYear; year++) {
         years.push(year);
     }
-    years.reverse(); // This will sort the years from latest to oldest
+    years.reverse();
 
-    // Fetch product report data when the component mounts
     useEffect(() => {
         const fetchProductReports = async () => {
             setLoading(true);
@@ -57,7 +55,7 @@ const Reports = () => {
     // Filter reports based on search query, selected month, and selected year
     const filteredReports = productReports.filter((report) => {
         const lowerCaseQuery = searchQuery.toLowerCase();
-        const reportDate = new Date(report.period); // Assuming report.period is in a date format
+        const reportDate = new Date(report.period);
 
         // Check if the properties exist before using toLowerCase
         const matchesSearchQuery =
@@ -98,7 +96,7 @@ const Reports = () => {
                                         />
                                     </form>
                                 </div>
-                                
+
                                 <div className='options'>
                                     <div className='col'>
                                         <select value={selectedMonth} onChange={handleMonthChange} className='form-select'>

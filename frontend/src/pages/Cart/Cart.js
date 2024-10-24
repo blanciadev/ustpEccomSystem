@@ -5,7 +5,7 @@ import Footer from '../../components/Footer';
 import CartProduct from '../../components/CartProduct';
 import cartEventEmitter from '../../components/cartEventEmitter';
 import { useNavigate } from 'react-router-dom';
-import ToastNotification from '../../components/ToastNotification'; 
+import ToastNotification from '../../components/ToastNotification';
 
 const CartContent = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -16,7 +16,6 @@ const CartContent = () => {
   const navigate = useNavigate();
   const [toastMessage, setToastMessage] = useState('');
 
-  // Check if user is logged in
   const isLoggedIn = !!localStorage.getItem('token');
 
   useEffect(() => {
@@ -24,7 +23,6 @@ const CartContent = () => {
       setLoading(true);
       try {
         if (isLoggedIn) {
-          // Fetch cart from the server if user is logged in
           const response = await fetch('http://localhost:5001/cart', {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -39,7 +37,6 @@ const CartContent = () => {
             setError(data.message || 'Failed to fetch cart items');
           }
         } else {
-          // Get cart items from localStorage for guest users
           const localCart = JSON.parse(localStorage.getItem('cart')) || [];
           setCartItems(localCart);
         }
@@ -109,9 +106,8 @@ const CartContent = () => {
   const updateCartQuantity = async (cartItemId, newQuantity) => {
     try {
       console.log(`Attempting to update quantity for cart item ID: ${cartItemId} to new quantity: ${newQuantity}`);
-      
+
       if (isLoggedIn) {
-        // Update cart on the server for logged-in users
         const response = await fetch(`http://localhost:5001/cart-update-quantity`, {
           method: 'POST',
           headers: {
@@ -123,34 +119,32 @@ const CartContent = () => {
             newQuantity: newQuantity,
           }),
         });
-  
+
         console.log(`Server response status: ${response.status}`);
-  
+
         if (!response.ok) {
           const errorData = await response.json();
           console.error('Error from server:', errorData);
           throw new Error('Failed to update quantity');
         }
-  
+
         console.log('Quantity updated successfully on the server');
       } else {
-        // Update cart in localStorage for guest users
         const updatedItems = cartItems.map((item) => {
           console.log(`Checking item: `, item);
-  
-          // Make sure cart_items_id matches cartItemId
+
           if (item.cart_items_id === cartItemId) {
-            const updatedItem = { 
-              ...item, 
-              quantity: newQuantity, 
-              sub_total: item.price * newQuantity 
+            const updatedItem = {
+              ...item,
+              quantity: newQuantity,
+              sub_total: item.price * newQuantity
             };
             console.log(`Updated item: `, updatedItem);
             return updatedItem;
           }
-          return item; // Return the item unchanged if it doesn't match
+          return item;
         });
-  
+
         setCartItems(updatedItems);
         localStorage.setItem('cart', JSON.stringify(updatedItems));
         console.log('Local storage updated with new cart items:', updatedItems);
@@ -160,13 +154,12 @@ const CartContent = () => {
       setError('Error updating quantity. Please try again later.');
     }
   };
-  
-  
+
+
 
   const removeFromCart = async (cartItemId) => {
     try {
       if (isLoggedIn) {
-        // Remove item from the server cart for logged-in users
         const response = await fetch(`http://localhost:5001/cart-delete/${cartItemId}`, {
           method: 'DELETE',
           headers: {
@@ -175,10 +168,9 @@ const CartContent = () => {
         });
         setToastMessage('Deleted!');
 
-          // Clear toast message after 3 seconds
-          setTimeout(() => {
-              setToastMessage('');
-          }, 3000);
+        setTimeout(() => {
+          setToastMessage('');
+        }, 3000);
 
 
         if (!response.ok) {
@@ -187,12 +179,10 @@ const CartContent = () => {
       }
 
       setCartItems(cartItems.filter(item => item.cart_items_id !== cartItemId));
-      // Remove item from the cart (server or localStorage)
       const updatedCart = cartItems.filter(item => item.cart_items_id !== cartItemId);
       setCartItems(updatedCart);
-      
+
       if (!isLoggedIn) {
-        // Update cart in localStorage for guest users
         localStorage.setItem('cart', JSON.stringify(updatedCart));
       }
     } catch (err) {
@@ -205,7 +195,7 @@ const CartContent = () => {
       <Navigation />
       <ToastNotification toastMessage={toastMessage} />
       <div className='cart__box'>
-        <h1 className='cart__title'><i style={{fontSize:'1.7rem', paddingLeft:'5px'}} class='bx bxs-cart-alt' ></i>Shopping Cart</h1>
+        <h1 className='cart__title'><i style={{ fontSize: '1.7rem', paddingLeft: '5px' }} class='bx bxs-cart-alt' ></i>Shopping Cart</h1>
         {loading ? (
           <p>Loading cart items...</p>
         ) : error ? (
@@ -239,7 +229,7 @@ const CartContent = () => {
                     isSelected={!!selectedItems[item.product_code]}
                     toggleItemSelection={toggleItemSelection}
                     updateQuantity={updateCartQuantity}
-                    removeFromCart={removeFromCart} 
+                    removeFromCart={removeFromCart}
                   />
                 ))}
               </tbody>

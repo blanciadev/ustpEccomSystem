@@ -13,7 +13,7 @@ const ProductStatistics = ({
             <div className='best-selling'>
                 <div className='qty'>
                     <i className='bx bxs-spa'></i>
-                    <h6>{bestSellingCount}</h6> {/* Displaying the count */}
+                    <h6>{bestSellingCount}</h6>
                 </div>
                 <div>
                     <h6>Best Selling</h6>
@@ -23,7 +23,7 @@ const ProductStatistics = ({
             <div className='in-stock'>
                 <div className='qty'>
                     <i className='bx bxs-spa'></i>
-                    <h6>{totalQuantity}</h6> {/* Displaying the total quantity */}
+                    <h6>{totalQuantity}</h6>
                 </div>
                 <div>
                     <h6>Total Stocks</h6>
@@ -33,7 +33,7 @@ const ProductStatistics = ({
             <div className='low-stock'>
                 <div className='qty'>
                     <i className='bx bxs-spa'></i>
-                    <h6>{lowStockCount}</h6> {/* Displaying the low stock count */}
+                    <h6>{lowStockCount}</h6>
                 </div>
                 <div>
                     <h6>Low Stock</h6>
@@ -43,7 +43,7 @@ const ProductStatistics = ({
             <div className='unpopular'>
                 <div className='qty'>
                     <i className='bx bxs-spa'></i>
-                    <h6>{unpopularProducts.length}</h6> {/* Displaying the count of unpopular products */}
+                    <h6>{unpopularProducts.length}</h6>
                 </div>
                 <div>
                     <h6>Unpopular</h6>
@@ -54,7 +54,7 @@ const ProductStatistics = ({
             <div className='out-of-stock'>
                 <div className='qty'>
                     <i className='bx bxs-spa'></i>
-                    <h6>{outOfStockCount}</h6> {/* Displaying the count of out-of-stock items */}
+                    <h6>{outOfStockCount}</h6>
                 </div>
                 <div>
                     <h6>Out of Stock</h6>

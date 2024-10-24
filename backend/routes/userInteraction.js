@@ -11,16 +11,14 @@ router.get('/products-interaction', async (req, res) => {
             error: 'Product code and customer ID are required'
         });
     }
-    const interaction_type = 'view'; // Define interaction type
+    const interaction_type = 'view';
 
     try {
-        // Insert a new view interaction
         await db.query(`
             INSERT INTO user_product_interactions (customer_id, product_code, interaction_type, created_at, updated_at)
             VALUES (?, ?, ?, NOW(), NOW())
         `, [customerId, product_code, interaction_type]);
 
-        // Send a success response
         return res.status(200).json({ message: 'Product interaction recorded successfully' });
     } catch (error) {
         console.error('Error updating product interaction:', error);

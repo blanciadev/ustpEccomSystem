@@ -89,13 +89,13 @@ const Payments = () => {
     try {
       const response = await axios.get('http://localhost:5001/admin-order-history', {
         params: { exportToExcel: 'true' },
-        responseType: 'blob',  // Important for file download
+        responseType: 'blob',
       });
 
       const blob = new Blob([response.data], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
-      saveAs(blob, 'order_summary.xlsx');  // Download file
+      saveAs(blob, 'order_summary.xlsx');
 
     } catch (error) {
       console.error('Error exporting orders to Excel:', error.message);
@@ -105,19 +105,16 @@ const Payments = () => {
 
   const totalPages = Math.ceil(totalOrders / itemsPerPage);
 
-  // Filter orders based on the search term
   const filteredOrders = orders.filter(order => {
     const orderIdMatch = order.order_id.toString().toLowerCase().includes(searchTerm.toLowerCase());
     const customerNameMatch = `${order.first_name} ${order.last_name}`.toLowerCase().includes(searchTerm.toLowerCase());
     return orderIdMatch || customerNameMatch;
   });
 
-  // Sort the filtered orders to ensure they are at the top
   const ordersToDisplay = filteredOrders.length > 0
     ? filteredOrders
     : orders;
 
-  // Paginate the orders to display
   const paginatedOrders = ordersToDisplay.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (

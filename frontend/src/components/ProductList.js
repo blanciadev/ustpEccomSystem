@@ -5,10 +5,10 @@ import ProductModal from './ProductModal';
 import StickyComponent from './StickyComponent';
 import { cartEventEmitter } from './eventEmitter';
 import './modal.css';
-import './productList.css'; // Import the new CSS file
-import { useNavigate } from 'react-router-dom'; 
+import './productList.css';
+import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-import ToastNotification from './ToastNotification'; 
+import ToastNotification from './ToastNotification';
 
 
 const PAGE_SIZE = 6;
@@ -50,7 +50,7 @@ const ProductList = ({ stickyComponents }) => {
     const [currentPage, setCurrentPage] = useState(0);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [toastMessage, setToastMessage] = useState(''); 
+    const [toastMessage, setToastMessage] = useState('');
 
     const handleStickySubmit = async (formData) => {
         setLoading(true);
@@ -103,59 +103,50 @@ const ProductList = ({ stickyComponents }) => {
         fetchProducts();
     }, []);
 
-  
-// Function to generate a unique code for cart_items_id
-function generateCartItemId() {
-    return 'CART-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
-}
 
-    // Handle "Add to Cart" button click
+    function generateCartItemId() {
+        return 'CART-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+    }
     const handleAddToCart = async (product) => {
         const token = localStorage.getItem('token');
         const customerId = localStorage.getItem('customer_id');
 
-        console.log('Product:', product); // Log product details
-        console.log('Token:', token); // Log token
-        console.log('Customer ID:', customerId); // Log customer ID
+        console.log('Product:', product);
+        console.log('Token:', token);
+        console.log('Customer ID:', customerId);
 
         if (!token || !customerId) {
-            // User is not logged in; use localStorage for cart
-            console.log('User not logged in, using localStorage for cart'); // Log when user is not logged in
+            console.log('User not logged in, using localStorage for cart');
             const cart = JSON.parse(localStorage.getItem('cart')) || [];
-            console.log('Current cart from localStorage:', cart); // Log current cart from localStorage
+            console.log('Current cart from localStorage:', cart);
 
-            // Check if the product already exists in the cart
             const existingProductIndex = cart.findIndex(item => item.product_code === product.product_code);
-            console.log('Existing product index:', existingProductIndex); // Log product index if found
+            console.log('Existing product index:', existingProductIndex);
 
             if (existingProductIndex !== -1) {
-                // Increase quantity for existing product
                 cart[existingProductIndex].quantity += 1;
-                cart[existingProductIndex].sub_total = cart[existingProductIndex].price * cart[existingProductIndex].quantity; // Update sub_total
-                console.log('Increased quantity for existing product:', cart[existingProductIndex]); // Log updated product with increased quantity
+                cart[existingProductIndex].sub_total = cart[existingProductIndex].price * cart[existingProductIndex].quantity;
+                console.log('Increased quantity for existing product:', cart[existingProductIndex]);
             } else {
-                // Add new product to the cart
-                const newCartItem = { 
-                    cart_items_id: generateCartItemId(), // Generate a unique ID for local storage cart items
-                    product_code: product.product_code, 
-                    quantity: 1, 
-                    product_name: product.product_name, 
+
+                const newCartItem = {
+                    cart_items_id: generateCartItemId(),
+                    product_code: product.product_code,
+                    quantity: 1,
+                    product_name: product.product_name,
                     price: product.price,
-                    sub_total: product.price // Initial sub_total is price
+                    sub_total: product.price
                 };
                 cart.push(newCartItem);
-                console.log('Added new product to cart:', newCartItem); // Log the newly added product
+                console.log('Added new product to cart:', newCartItem);
 
-                
             }
 
-            // Save updated cart to localStorage
             localStorage.setItem('cart', JSON.stringify(cart));
-            console.log('Updated cart saved to localStorage:', cart); // Log the updated cart
+            console.log('Updated cart saved to localStorage:', cart);
 
-            // Emit cart update event to refresh the cart count
             cartEventEmitter.emit('cartUpdated');
-            console.log('Emitted cartUpdated event'); // Log event emission
+            console.log('Emitted cartUpdated event');
 
             setToastMessage('Added to Cart!');
 
@@ -165,9 +156,8 @@ function generateCartItemId() {
             return;
         }
 
-        // If the user is logged in, add the item to the server-side cart
         try {
-            console.log('User is logged in, adding item to server-side cart'); // Log when user is logged in
+            console.log('User is logged in, adding item to server-side cart');
             const response = await axios.post('http://localhost:5001/add-to-cart', {
                 customer_id: customerId,
                 product_code: product.product_code,
@@ -176,11 +166,10 @@ function generateCartItemId() {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            console.log('Response from server:', response.data); // Log server response
+            console.log('Response from server:', response.data);
 
-            // Emit cart update event to refresh the cart count
             cartEventEmitter.emit('cartUpdated');
-            console.log('Emitted cartUpdated event after server response'); // Log event emission
+            console.log('Emitted cartUpdated event after server response');
             setToastMessage('Added to Cart!');
             setTimeout(() => {
                 setToastMessage('');
@@ -188,8 +177,8 @@ function generateCartItemId() {
             return;
         } catch (error) {
             if (error.response && error.response.status === 401) {
-                console.log('Unauthorized, redirecting to login'); // Log unauthorized error
-                navigate('/login'); // Redirect to login page if unauthorized
+                console.log('Unauthorized, redirecting to login');
+                navigate('/login');
             } else {
                 console.error('Error adding product to cart:', error.response ? error.response.data : error.message); // Log the error details
             }
@@ -258,7 +247,7 @@ function generateCartItemId() {
 };
 
 ProductList.propTypes = {
-    // stickyComponents: PropTypes.array.isRequired,
+
 };
 
 export default ProductList;

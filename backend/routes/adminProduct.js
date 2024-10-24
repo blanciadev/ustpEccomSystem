@@ -6,7 +6,7 @@ const ExcelJS = require('exceljs');
 
 router.get('/admin-products-with-interaction', async (req, res) => {
     try {
-        // Define thresholds for low stock and low interaction
+
         const LOW_STOCK_THRESHOLD = 10;
         const LOW_INTERACTION_THRESHOLD = 1;
 
@@ -108,10 +108,7 @@ router.get('/admin-products-with-interaction', async (req, res) => {
 
 router.get('/top-products', async (req, res) => {
     try {
-        // Define the maximum percentage for the progress bar
         const MAX_PROGRESS = 100;
-
-        // Query to get the products with their available quantity and total cart interaction quantity
         const [topProducts] = await db.query(`
             SELECT
                 p.product_code AS id, 
@@ -138,7 +135,6 @@ router.get('/top-products', async (req, res) => {
         // Send response with top products data
         res.json({
             products: topProducts.map(product => {
-                // Calculate the progress based on cart quantity and available quantity
                 const progress = product.available_quantity > 0
                     ? Math.min((product.cart_quantity / product.available_quantity) * MAX_PROGRESS, MAX_PROGRESS)
                     : 0;
@@ -165,7 +161,7 @@ router.get('/shipments', async (req, res) => {
     console.log('Received request to fetch all shipments.');
 
     try {
-        // Execute the query to fetch all shipments
+
         const [shipments] = await db.query('SELECT * FROM shipment');
 
         if (shipments.length === 0) {
@@ -173,15 +169,13 @@ router.get('/shipments', async (req, res) => {
             return res.status(404).json({ error: 'No shipments found' });
         }
 
-        // Check if the request is for exporting data to Excel
+
         if (req.query.export === 'true') {
             console.log('Preparing to export shipments to Excel.');
 
-            // Create a new Excel workbook and worksheet
             const workbook = new ExcelJS.Workbook();
             const worksheet = workbook.addWorksheet('Shipments');
 
-            // Define columns for the worksheet
             worksheet.columns = [
                 { header: 'Shipment ID', key: 'shipment_id', width: 15 },
                 { header: 'Order ID', key: 'order_id', width: 15 },
@@ -193,12 +187,12 @@ router.get('/shipments', async (req, res) => {
                 { header: 'Shipment Status', key: 'shipment_status', width: 20 },
             ];
 
-            // Add rows to the worksheet
+
             shipments.forEach(shipment => {
                 worksheet.addRow({
                     shipment_id: shipment.shipment_id,
                     order_id: shipment.order_id,
-                    shipment_date: shipment.shipment_date, // Ensure the date format is correct
+                    shipment_date: shipment.shipment_date,
                     address: shipment.address,
                     city: shipment.city,
                     phoneNumber: shipment.phoneNumber,
@@ -207,7 +201,7 @@ router.get('/shipments', async (req, res) => {
                 });
             });
 
-            // Set response headers to indicate a file attachment
+
             res.setHeader('Content-Disposition', 'attachment; filename=shipments.xlsx');
             res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 

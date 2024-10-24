@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import './Signup.css';
 
 const Signup = () => {
@@ -12,12 +12,11 @@ const Signup = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic validation
     if (!firstName || !lastName || !email || !address || !phoneNumber || !password || !confirmPassword) {
       setError('All fields are required');
       return;
@@ -51,7 +50,6 @@ const Signup = () => {
         setPassword('');
         setConfirmPassword('');
 
-        // Redirect to login page after successful signup
         navigate('/login');
       }
     } catch (error) {
@@ -63,9 +61,9 @@ const Signup = () => {
   return (
     <div className='signup-con'>
       <div className='signup-box'>
-      <div className='signup-image'>
-          <img src='https://res.cloudinary.com/urbanclap/image/upload/t_high_res_template/dpr_2,fl_progressive:steep,q_auto:low,f_auto,c_limit/images/growth/luminosity/1723441265778-917980.jpeg'/>
-                
+        <div className='signup-image'>
+          <img src='https://res.cloudinary.com/urbanclap/image/upload/t_high_res_template/dpr_2,fl_progressive:steep,q_auto:low,f_auto,c_limit/images/growth/luminosity/1723441265778-917980.jpeg' />
+
         </div>
         <div className='signup-form'>
           <h1>Sign Up</h1>
@@ -92,7 +90,7 @@ const Signup = () => {
                   required
                 />
               </div>
-          </div>
+            </div>
             <div className='input'>
               <label>Email</label>
               <input
@@ -121,28 +119,28 @@ const Signup = () => {
               />
             </div>
             <div className='two-column'>
-            <div className='input'>
-              <label>Password</label>
-              <input
-                type='password'
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <div className='input'>
-              <label>Confirm Password</label>
-              <input
-                type='password'
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
-            </div>
+              <div className='input'>
+                <label>Password</label>
+                <input
+                  type='password'
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <div className='input'>
+                <label>Confirm Password</label>
+                <input
+                  type='password'
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+              </div>
             </div>
             <button type='submit'>Sign Up</button>
           </form>
-          
+
           <p>Have an account? <a href='/login'>Log In</a></p>
         </div>
       </div>

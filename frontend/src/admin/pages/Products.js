@@ -13,7 +13,6 @@ import RemoveDiscountProduct from '../components/DiscountProductModal';
 import BundleProduct from '../components/BundleProductModal';
 
 const Products = () => {
-  // States for product data
   const [bestSellingCount, setBestSellingCount] = useState(0);
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [lowStockCount, setLowStockCount] = useState(0);
@@ -24,9 +23,6 @@ const Products = () => {
   const [discontinuedCount, setDiscontinuedCount] = useState(0);
   const [discontinuedQuantity, setDiscontinuedQuantity] = useState(0);
 
-
-
-  // States for products and modal visibility
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -36,12 +32,10 @@ const Products = () => {
   const [isBundleProductModalOpen, setIsBundleProductModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 425);
 
-  // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Fetch product data from the server
   const fetchProduct = async () => {
     try {
       const response = await axios.get('http://localhost:5001/admin-products');
@@ -62,7 +56,7 @@ const Products = () => {
   }, []);
 
   const handleResize = () => {
-    setIsMobile(window.innerWidth <= 425);  // Update state based on screen width
+    setIsMobile(window.innerWidth <= 425);
   };
 
   const fetchProductStatistics = async () => {
@@ -111,8 +105,6 @@ const Products = () => {
   }, [searchQuery, products]);
 
 
-
-  // Add product handler
   const handleAddProduct = async (newProduct) => {
     try {
       await axios.post('http://localhost:5001/admin-products', newProduct);
@@ -244,7 +236,6 @@ const Products = () => {
                 </table>
               </div>
 
-              {/* Pagination Controls */}
               <div className="pagination">
                 <Button
                   disabled={currentPage === 1}

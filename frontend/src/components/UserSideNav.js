@@ -43,7 +43,6 @@ const UserSideNav = () => {
 
         console.log('Profile Image Data:', data.profile_img);
 
-        // Check if profile_img is valid
         if (data.profile_img) {
 
           if (data.profile_img.data) {

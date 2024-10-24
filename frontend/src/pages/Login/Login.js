@@ -31,13 +31,11 @@ const Login = () => {
                 localStorage.setItem('role', response.data.role_type);
                 localStorage.setItem('profile_img', response.data.profile_img);
 
-                // Check if there's a redirect page stored
                 const redirectTo = localStorage.getItem('redirectTo');
                 if (redirectTo) {
                     localStorage.removeItem('redirectTo');
                     navigate(redirectTo);
                 } else {
-                    // Check the role_type and redirect accordingly
                     const roleType = response.data.role_type;
                     if (roleType === 'Admin') {
                         navigate('/admin/dashboard');
@@ -50,7 +48,6 @@ const Login = () => {
             if (err.response) {
                 setToastMessage(err.response.data.message || 'An error occurred during login');
 
-                // Clear toast message after 3 seconds
                 setTimeout(() => {
                     setToastMessage('');
                 }, 3000);
@@ -58,7 +55,6 @@ const Login = () => {
             } else if (err.request) {
                 setToastMessage('No response received from the server');
 
-                // Clear toast message after 3 seconds
                 setTimeout(() => {
                     setToastMessage('');
                 }, 3000);
@@ -66,7 +62,6 @@ const Login = () => {
             } else {
                 setToastMessage('Error setting up the request: ' + err.message);
 
-                // Clear toast message after 3 seconds
                 setTimeout(() => {
                     setToastMessage('');
                 }, 3000);
@@ -89,7 +84,6 @@ const Login = () => {
 
                 console.log('User Info:', userData);
 
-                // If the user is registered, store the required information in localStorage
                 if (userStatus === 'registered') {
                     setLoginStatus('Login successful');
                     localStorage.setItem('token', token);
@@ -99,11 +93,9 @@ const Login = () => {
                     localStorage.setItem('role', response.data.role_type);
                     localStorage.setItem('profile_img', response.data.profile_img);
 
-                    // Redirect to the homepage if the user is registered
                     navigate('/');
                     console.log(token);
                 } else {
-                    // Redirect to signup page if the user is not registered
                     navigate('/signup');
                 }
             }
@@ -111,7 +103,6 @@ const Login = () => {
             console.error('Error during Google login:', err);
             setToastMessage('Failed to login with Google. Please try again.');
 
-            // Clear toast message after 3 seconds
             setTimeout(() => {
                 setToastMessage('');
             }, 3000);
@@ -132,7 +123,7 @@ const Login = () => {
                     <ToastNotification toastMessage={toastMessage} />
                     <div className='login-google'>
                         <GoogleLogin
-                            onSuccess={handleGoogleLogin} // Handle success response
+                            onSuccess={handleGoogleLogin}
                             onError={(error) => console.error('Google login error:', error)} // Handle error response
                         />
                         <div><p>Or Login with N&B</p></div>

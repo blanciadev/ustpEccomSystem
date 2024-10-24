@@ -1,16 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
-const { addToQueue } = require('./queue'); // Adjust path as needed
+const { addToQueue } = require('./queue');
 
 
-// Helper function to convert ISO 8601 to MySQL DATETIME format
 const convertToMySQLDateTime = (isoDate) => {
     const date = new Date(isoDate);
     return date.toISOString().slice(0, 19).replace('T', ' ');
 };
 
-// Middleware to authenticate and get user information from token
+
 const authenticateToken = async (req, res, next) => {
     const token = req.headers['authorization']?.split(' ')[1];
 
@@ -19,7 +18,6 @@ const authenticateToken = async (req, res, next) => {
     }
 
     try {
-        // Fetch the token from the database
         const [rows] = await db.query('SELECT * FROM tokens WHERE token = ?', [token]);
 
         if (rows.length === 0) {
@@ -27,19 +25,18 @@ const authenticateToken = async (req, res, next) => {
         }
 
         const tokenData = rows[0];
-        // Check if the token is expired
+
         if (new Date(tokenData.expires_at) < new Date()) {
             return res.status(401).json({ message: 'Token expired' });
         }
 
-        // Fetch user details based on the token
-        const [userRows] = await db.query('SELECT * FROM users WHERE customer_id = ?', [tokenData.user_id]);
 
+        const [userRows] = await db.query('SELECT * FROM users WHERE customer_id = ?', [tokenData.user_id]);
         if (userRows.length === 0) {
             return res.status(401).json({ message: 'User not found' });
         }
 
-        req.user = userRows[0]; // Attach user info to request
+        req.user = userRows[0];
         next();
     } catch (error) {
         console.error('Authentication error:', error.message);
@@ -66,10 +63,8 @@ const generateOrderId = async () => {
     let isUnique = false;
 
     while (!isUnique) {
-        // Generate a random 6-digit number
         orderId = Math.floor(100000 + Math.random() * 900000);
 
-        // Check if the order ID already exists
         const [result] = await db.query('SELECT COUNT(*) AS count FROM `order` WHERE `order_id` = ?', [orderId]);
         isUnique = result[0].count === 0;
     }
@@ -121,12 +116,10 @@ router.post('/insert-order', async (req, res) => {
         const formattedOrderDate = convertToMySQLDateTime(order_date);
         console.log('Formatted order_date:', formattedOrderDate);
 
-        // Start transaction
         console.log('Starting transaction...');
         console.log('---------------- 124 START TRANSACTION --------------------');
         await db.query('START TRANSACTION');
 
-        // Check if customer exists
         const [customerResult] = await db.query('SELECT COUNT(*) AS count FROM `users` WHERE `customer_id` = ?', [customer_id]);
         console.log('Customer check result:', customerResult);
         if (customerResult[0].count === 0) {
@@ -135,12 +128,10 @@ router.post('/insert-order', async (req, res) => {
             return res.status(400).json({ error: 'Customer does not exist' });
         }
 
-        // Generate a unique order ID
         const order_id = await generateOrderId();
         console.log('------------------------------------');
         console.log('New order ID generated:', order_id);
 
-        // Insert new order
         const [orderResult] = await db.query(`
             INSERT INTO \`order\` (order_id, customer_id, order_date, total_price)
             VALUES (?, ?, ?, ?)
@@ -150,11 +141,10 @@ router.post('/insert-order', async (req, res) => {
 
         const cartItemsUpdateIds = [];
 
-        // Loop through order_details
+
         for (const detail of order_details) {
             const { product_id, quantity, totalprice, payment_date, payment_method, payment_status, cart_items } = detail;
 
-            // Validate fields
             if (!product_id || !quantity || !totalprice || !payment_method || !payment_status) {
                 console.log('------------ 156 ERROR ------------');
                 console.log('Invalid order detail:', detail);
@@ -162,10 +152,8 @@ router.post('/insert-order', async (req, res) => {
                 return res.status(400).json({ error: 'Invalid order detail' });
             }
 
-            // If payment_date is optional, handle it conditionally
             const formattedPaymentDate = payment_date ? convertToMySQLDateTime(payment_date) : null;
 
-            // Insert into order details table
             await db.query(`
                 INSERT INTO \`order_details\` (order_id, product_id, quantity, total_price, payment_date, payment_method, payment_status, order_status, order_date) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending', NOW())
@@ -174,12 +162,10 @@ router.post('/insert-order', async (req, res) => {
             console.log('------------------- 170 INSERT ORDER DETAILS -----------------');
             console.log('Inserted order detail:', { order_id, product_id, quantity, totalprice, formattedPaymentDate, payment_method, payment_status });
 
-            // Add cart_items to cartItemsUpdateIds for status update
             cartItemsUpdateIds.push(cart_items);
             console.log('Added cart_items_id to cartItemsUpdateIds:', cart_items);
             console.log('------------------------------------');
 
-            // Update product quantity
             const updateQuantityQuery = `
                 UPDATE \`product\`
                 SET quantity = quantity - ?
@@ -199,7 +185,6 @@ router.post('/insert-order', async (req, res) => {
 
         console.log('Final cartItemsUpdateIds:', cartItemsUpdateIds);
 
-        // Update status for cart items directly without checking if they are in process
         if (cartItemsUpdateIds.length > 0) {
             console.log('Updating cart items status to "Order In Process"...');
 
@@ -215,7 +200,6 @@ router.post('/insert-order', async (req, res) => {
             const result = await db.query(statusQuery, [...cartItemsUpdateIds, customer_id]);
             console.log('Update result:', result);
 
-            // Check if any rows were affected
             if (result.affectedRows > 0) {
                 console.log('------------------ 200 SUCCESSFULL UPDATE ------------------');
                 console.log(`Successfully updated ${result.affectedRows} cart item(s) to "Order In Process".`);
@@ -227,8 +211,6 @@ router.post('/insert-order', async (req, res) => {
         }
 
 
-
-        // Insert into shipment table
         await db.query(`
             INSERT INTO shipment (order_id, customer_id, shipment_date, streetname, address, city, shipment_status, phoneNumber, postalCode)
             VALUES (?, ?, NOW(), ?,?, ?, 'Pending', ?, ?)
@@ -236,7 +218,6 @@ router.post('/insert-order', async (req, res) => {
         console.log('----------------- 215 INSERT SHIPMENT -------------------');
         console.log('Inserted shipment details for order ID:', order_id);
 
-        // Commit transaction
         await db.query('COMMIT');
         console.log('Transaction committed successfully');
 
@@ -251,12 +232,6 @@ router.post('/insert-order', async (req, res) => {
 
 
 
-
-
-
-
-
-
 // Route to update customer details based on customer_id
 router.post('/update-customer-details/:customer_id', authenticateToken, async (req, res) => {
     try {
@@ -266,18 +241,15 @@ router.post('/update-customer-details/:customer_id', authenticateToken, async (r
 
         console.log(`Request received to update customer details for ID: ${customer_id}`);
 
-        // Ensure the required fields are provided
         if (!address || !region || !postal_code || !phone_number) {
             console.log('Validation error: All fields are required');
             return res.status(400).json({ message: 'All fields are required' });
         }
 
-        // Check if customer details exist
         const [customerDetails] = await db.query('SELECT * FROM users WHERE customer_id = ?', [customer_id]);
         console.log(`Customer details found: ${JSON.stringify(customerDetails)}`);
 
         if (customerDetails.length > 0) {
-            // If customer details exist, update the fields
             const updateQuery = `
                 UPDATE users 
                 SET street_name = ?, region = ?, postal_code = ?, phone_number = ?
@@ -317,7 +289,6 @@ router.get('/order-history', authenticateToken, async (req, res) => {
         const { customer_id } = req.user;
         const { status } = req.query;
 
-        // Base query to fetch order history along with product details
         let query = `
             SELECT
                 o.order_id, 
@@ -344,17 +315,14 @@ router.get('/order-history', authenticateToken, async (req, res) => {
                 o.customer_id = ?
         `;
 
-        // Append filter condition if status is provided
         if (status) {
             query += ` AND od.order_status = ?`;
         }
 
         query += ` ORDER BY o.order_date DESC`;
 
-        // Execute query
         const [orders] = await db.query(query, status ? [customer_id, status] : [customer_id]);
 
-        // Process the results to group products by order_id
         const groupedOrders = orders.reduce((acc, order) => {
             if (!acc[order.order_id]) {
                 acc[order.order_id] = {
@@ -391,7 +359,6 @@ router.get('/order-history-display', authenticateToken, async (req, res) => {
         const { customer_id } = req.user;
         const { status } = req.query;
 
-        // Base query to fetch order history along with product details
         let query = `
             SELECT
                 o.order_id, 
@@ -419,17 +386,14 @@ router.get('/order-history-display', authenticateToken, async (req, res) => {
                 o.customer_id = ?
         `;
 
-        // Append filter condition if status is provided
         if (status) {
             query += ` AND od.order_status = ?`;
         }
 
         query += ` ORDER BY o.order_date DESC`;
 
-        // Execute query
         const [orders] = await db.query(query, status ? [customer_id, status] : [customer_id]);
 
-        // Process the results to group products by order_id
         const groupedOrders = orders.reduce((acc, order) => {
             if (!acc[order.order_id]) {
                 acc[order.order_id] = {
@@ -463,7 +427,6 @@ router.post('/cancel-order', authenticateToken, async (req, res) => {
     try {
         const { order_id } = req.body;
 
-        // Update order status to 'Cancelled'
         await db.query(`
             UPDATE \`order_details\`
             SET order_status = 'Cancelled'

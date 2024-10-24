@@ -71,7 +71,7 @@ router.get('/admin-order-history', async (req, res) => {
     try {
         const { status, searchTerm, exportToExcel, page = 1 } = req.query;
         const pageSize = 10;  // Define the number of results per page
-        const offset = (page - 1) * pageSize;  // Calculate the offset for pagination
+        const offset = (page - 1) * pageSize;
 
         let query = `
         SELECT
@@ -94,7 +94,7 @@ router.get('/admin-order-history', async (req, res) => {
             users.region, 
             users.postal_code, 
             order_details.order_status, 
-            \`order\`.total_price AS order_total_price -- Selecting the total price from the order table
+            \`order\`.total_price AS order_total_price 
         FROM
             \`order\`
         INNER JOIN order_details ON \`order\`.order_id = order_details.order_id
@@ -132,7 +132,7 @@ router.get('/admin-order-history', async (req, res) => {
                 acc[order.order_id] = {
                     order_id: order.order_id,
                     order_date: order.order_date,
-                    order_total: order.order_total_price,  // Using the total price from the order table
+                    order_total: order.order_total_price,
                     order_status: order.order_status,
                     payment_date: order.payment_date,
                     payment_status: order.payment_status,
@@ -159,7 +159,7 @@ router.get('/admin-order-history', async (req, res) => {
                 product_name: order.product_name,
                 price: order.price,
                 quantity: order.quantity,
-                item_total: order.total_price,  // Individual item total from order_details
+                item_total: order.total_price,
                 payment_status: order.payment_status,
                 payment_method: order.payment_method,
             });
@@ -235,7 +235,7 @@ router.get('/admin-order-history-component', async (req, res) => {
             INNER JOIN 
                 order_details ON \`order\`.order_id = order_details.order_id
             WHERE 
-                DATE(\`order\`.order_date) = CURDATE()  -- Filter orders by today's date from the order_date column
+                DATE(\`order\`.order_date) = CURDATE()  
             GROUP BY 
                 order_details.order_status
         `;
@@ -346,7 +346,7 @@ router.get('/sales', async (req, res) => {
                 MONTH(order_date)               
         `);
 
-        res.json({ insights: rows });  // Send the result back to the frontend
+        res.json({ insights: rows });
     } catch (error) {
         console.error('Error fetching sales data:', error.message);
         res.status(500).json({ message: 'Internal server error' });
@@ -373,7 +373,7 @@ router.get('/payment-insight', async (req, res) => {
         const result = await db.query(query);
         console.log(result);
 
-        // Check if result is nested and extract data accordingly
+
         const monthlyCounts = Array.isArray(result) && result.length > 0
             ? result[0].map(row => ({
                 month: row.order_month,

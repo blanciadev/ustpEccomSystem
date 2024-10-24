@@ -60,7 +60,7 @@ const Inventory = () => {
         try {
             const response = await axios.get('http://localhost:5001/admin-products');
             setProductNames(response.data);
-            console.log('Product Names:', response.data); // Debugging
+            console.log('Product Names:', response.data);
         } catch (error) {
             console.error('Error fetching product names:', error);
         }
@@ -70,7 +70,7 @@ const Inventory = () => {
         try {
             const response = await axios.get('http://localhost:5001/admin-inventory');
             setInventoryItems(response.data);
-            console.log('Inventory Items:', response.data); // Debugging
+            console.log('Inventory Items:', response.data);
         } catch (error) {
             console.error('Error fetching inventory items:', error);
         }
@@ -87,7 +87,6 @@ const Inventory = () => {
         setCurrentPage(1);
     };
 
-    // Filter products based on search term (search across all relevant fields)
     const filteredProducts = productNames.filter(product => {
         return (
             product.product_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -98,10 +97,8 @@ const Inventory = () => {
         );
     });
 
-    // Calculate total pages
     const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
 
-    // Get products for the current page
     const currentProducts = filteredProducts.slice(
         (currentPage - 1) * ITEMS_PER_PAGE,
         currentPage * ITEMS_PER_PAGE
@@ -125,7 +122,6 @@ const Inventory = () => {
 
                 <div className="body">
                     <div className="inventory-con">
-                        {/* Product Statistics */}
                         <ProductStatistics
                             bestSellingCount={bestSellingCount}
                             totalQuantity={totalQuantity}
@@ -138,7 +134,6 @@ const Inventory = () => {
                             discontinuedQuantity={discontinuedQuantity}
                         />
 
-                        {/* Product Table */}
                         <div className="product-two">
                             <div className="cheader">
                                 <div className="search">
@@ -168,7 +163,6 @@ const Inventory = () => {
                                     </thead>
                                     <tbody>
                                         {currentProducts.map((product) => {
-                                            // Determine stock status based on quantity
                                             let stockStatus = 'Low on Stock';
                                             let isLowStock = false;
 
@@ -187,7 +181,6 @@ const Inventory = () => {
                                                     <td>{product.product_name}</td>
                                                     <td>{product.price}</td>
 
-                                                    {/* Apply blinking background if low on stock */}
                                                     <td className={isLowStock ? 'blinking' : ''}>{product.quantity}</td>
 
                                                     <td>{product.category_name}</td>
@@ -199,7 +192,6 @@ const Inventory = () => {
                                 </table>
                             </div>
 
-                            {/* Pagination Controls */}
                             <nav>
                                 <ul className="pagination">
                                     {[...Array(totalPages)].map((_, index) => (

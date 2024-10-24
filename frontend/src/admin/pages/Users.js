@@ -13,16 +13,14 @@ const Users = () => {
     const [error, setError] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 425);
-    const [searchTerm, setSearchTerm] = useState(''); // State for search input
-    const [currentPage, setCurrentPage] = useState(1); // State for pagination
-    const recordsPerPage = 10; // Set records per page
+    const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const recordsPerPage = 10;
 
-    // Function to toggle modal visibility
     const toggleModal = () => {
         setShowModal(!showModal);
     };
 
-    // Fetch user data from backend
     useEffect(() => {
         const fetchUsers = async () => {
             try {
@@ -45,7 +43,7 @@ const Users = () => {
     }, []);
 
     const handleResize = () => {
-        setIsMobile(window.innerWidth <= 425);  // Update state based on screen width
+        setIsMobile(window.innerWidth <= 425);
     };
 
     // Filter users based on the search term
@@ -90,8 +88,8 @@ const Users = () => {
                                         <input
                                             type='search'
                                             placeholder='Search...'
-                                            value={searchTerm} // Bind input to searchTerm state
-                                            onChange={(e) => setSearchTerm(e.target.value)} // Update searchTerm on input change
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
                                         />
                                     </form>
                                 </div>
@@ -147,7 +145,6 @@ const Users = () => {
                                     </tbody>
                                 </table>
 
-                                {/* Pagination Component */}
                                 <nav>
                                     <ul className='pagination'>
                                         {Array.from({ length: totalPages }, (_, index) => (

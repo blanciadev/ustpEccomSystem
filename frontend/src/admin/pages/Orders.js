@@ -20,11 +20,11 @@ const Orders = () => {
   const [modalShow, setModalShow] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 425);
 
-  // Pagination states
+
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
-  // Fetch orders data from API
+
   const fetchOrders = async () => {
     try {
       const response = await axios.get('http://localhost:5001/admin-order-history', {
@@ -47,7 +47,7 @@ const Orders = () => {
   }, [status, searchTerm, sortBy]);
 
   const handleResize = () => {
-    setIsMobile(window.innerWidth <= 425);  // Update state based on screen width
+    setIsMobile(window.innerWidth <= 425);
   };
 
   const handleOpenModal = (order) => {
@@ -65,7 +65,6 @@ const Orders = () => {
     fetchOrders();
   };
 
-  // Function to highlight the matching part of the text
   const highlightText = (text, searchTerm) => {
     if (!searchTerm) return text;
 
@@ -77,7 +76,6 @@ const Orders = () => {
     );
   };
 
-  // Function to check if an order row contains the search term
   const isRowHighlighted = (order) => {
     const fieldsToCheck = [
       order.order_id.toString(),
@@ -90,10 +88,8 @@ const Orders = () => {
     return fieldsToCheck.some(field => field.toLowerCase().includes(searchTerm.toLowerCase()));
   };
 
-  // Filtered orders based on search term and status
   const filteredOrders = orders.filter(order => isRowHighlighted(order));
 
-  // Sort orders based on the selected criteria
   const sortOrders = (orders) => {
     return [...orders].sort((a, b) => {
       if (sortBy === 'date') {
@@ -109,10 +105,8 @@ const Orders = () => {
     });
   };
 
-  // Combine filtered and sorted orders
   const sortedFilteredOrders = sortOrders(filteredOrders);
 
-  // Pagination functions
   const totalPages = Math.ceil(sortedFilteredOrders.length / pageSize);
 
   const handlePageChange = (pageNumber) => {
@@ -123,13 +117,13 @@ const Orders = () => {
     try {
       const response = await axios.get('http://localhost:5001/admin-order-history', {
         params: { exportToExcel: 'true' },
-        responseType: 'blob',  // Important for file download
+        responseType: 'blob',
       });
 
       const blob = new Blob([response.data], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
-      saveAs(blob, 'order_summary.xlsx');  // Download file
+      saveAs(blob, 'order_summary.xlsx');
 
     } catch (error) {
       console.error('Error exporting orders to Excel:', error.message);

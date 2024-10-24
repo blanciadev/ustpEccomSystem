@@ -11,10 +11,9 @@ const ChangePassword = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    //check if both passwords match
     if (password === confirmPassword) {
       console.log('Password successfully changed!');
-      navigate('/login'); // Redirect to login page after success
+      navigate('/login');
     } else {
       console.log('Passwords do not match');
     }

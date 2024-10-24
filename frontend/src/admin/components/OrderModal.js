@@ -13,11 +13,11 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
         setLoading(true);
         try {
             const products = order.products.map((product) => ({
-                product_id: product.product_id, // Make sure this is defined
+                product_id: product.product_id,
                 quantity: product.quantity,
             }));
 
-            // Ensure status is not empty
+
             if (!status) {
                 console.log('Please select a valid status');
 
@@ -43,7 +43,7 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
 
             console.log('Order status updated successfully');
 
-            refreshOrders(); // Call refreshOrders to update the orders list
+            refreshOrders();
         } catch (error) {
             console.error('Error updating order status:', error.message);
         } finally {

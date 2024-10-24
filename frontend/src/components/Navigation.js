@@ -14,13 +14,13 @@ const Navigation = () => {
     const navigate = useNavigate();
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [profileImg, setProfileImg] = useState('');
-    const [showLogoutModal, setShowLogoutModal] = useState(false); 
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     useEffect(() => {
         const token = localStorage.getItem('token');
         const storedUsername = localStorage.getItem('username');
         const storedFirstName = localStorage.getItem('first_name');
-        const customerId = localStorage.getItem('customer_id'); // Assuming customer_id is stored in localStorage
+        const customerId = localStorage.getItem('customer_id');
 
         window.addEventListener('resize', handleResize);
 
@@ -28,7 +28,7 @@ const Navigation = () => {
             setIsLoggedIn(true);
             setUsername(storedUsername || '');
             setFirstName(storedFirstName || '');
-            fetchUserDetails(customerId); // Fetch user details from the backend
+            fetchUserDetails(customerId);
         }
 
         fetchCartItemCount();
@@ -41,7 +41,7 @@ const Navigation = () => {
     }, []);
 
     const fetchUserDetails = async (customerId) => {
-        if (!customerId) return; // Do nothing if customerId is not provided
+        if (!customerId) return;
         const token = localStorage.getItem('token');
 
         try {
@@ -49,26 +49,22 @@ const Navigation = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            const userData = response.data; // Access the response data
+            const userData = response.data;
 
-            // Check if profile image exists and handle appropriately
+
             if (userData && userData.profile_img) {
                 if (typeof userData.profile_img === 'string') {
-                    // If profile_img is a base64 string, display it directly
                     setProfileImg(`data:image/jpeg;base64,${userData.profile_img}`);
                 } else if (userData.profile_img.data) {
-                    // If profile_img is binary (Buffer), convert it to base64
                     const base64String = btoa(
                         new Uint8Array(userData.profile_img.data).reduce((data, byte) => data + String.fromCharCode(byte), '')
                     );
                     setProfileImg(`data:image/jpeg;base64,${base64String}`);
                 } else {
-                    // Handle unexpected profile_img format
                     console.error('Unexpected profile image format:', userData.profile_img);
-                    setProfileImg(''); // Fallback to empty if there's an issue
+                    setProfileImg('');
                 }
             } else {
-                // No profile image found, using a default image
                 console.log('No profile image found, using default image.');
                 setProfileImg('https://static.vecteezy.com/system/resources/previews/026/434/409/non_2x/default-avatar-profile-icon-social-media-user-photo-vector.jpg');
             }
@@ -85,13 +81,11 @@ const Navigation = () => {
         const token = localStorage.getItem('token');
 
         if (!token) {
-            // Fetch cart from localStorage if user is not logged in
             const cart = JSON.parse(localStorage.getItem('cart')) || [];
             setCartItemCount(cart.reduce((total, item) => total + item.quantity, 0));
             return;
         }
 
-        // Fetch cart from the server if the user is logged in
         try {
             const response = await axios.get('http://localhost:5001/cart-item-count', {
                 headers: { Authorization: `Bearer ${token}` }
@@ -122,9 +116,9 @@ const Navigation = () => {
         setFirstName('');
         setToastMessage('Logged Out!');
 
-            setTimeout(() => {
-              setToastMessage('');
-            }, 3000);
+        setTimeout(() => {
+            setToastMessage('');
+        }, 3000);
         setIsLoggedIn(false);
         navigate('/login');
     };
@@ -149,20 +143,20 @@ const Navigation = () => {
     };
 
     const handleResize = () => {
-        setIsMobile(window.innerWidth <= 768);  // Update state based on screen width
+        setIsMobile(window.innerWidth <= 768);
     };
 
     return (
         <div className='nav-container'>
-            
-            <ToastNotification toastMessage={toastMessage}/>
+
+            <ToastNotification toastMessage={toastMessage} />
             <div className='logo'>
                 <a href='/'>
                     <img src='https://scontent.fcgy2-2.fna.fbcdn.net/v/t39.30808-6/309663016_472407468238901_2439729538350357694_n.png?_nc_cat=103&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeHkaWoh0NeJOgZZ6d3YXYb1oX31niLe-56hffWeIt77noexsEmKXN3bXRjYsP7inglwvA8imWTOstpqXY8AVb1V&_nc_ohc=f5YixnsisdIQ7kNvgGtmFvf&_nc_zt=23&_nc_ht=scontent.fcgy2-2.fna&_nc_gid=AEQqzBrO4GzSWrnFE7-E_kE&oh=00_AYAfTV-I96cqn2FCrQRTLel7NfNELFSAzsewGkSEwBSmSA&oe=671787EB' alt='Logo' />
                     {isMobile ? (
-                        <p></p> // Text for mobile view
+                        <p></p>
                     ) : (
-                        <h1>N&B Beauty Vault</h1> // Icon for larger screen 
+                        <h1>N&B Beauty Vault</h1>
                     )}
                 </a>
             </div>
@@ -203,7 +197,7 @@ const Navigation = () => {
                                     ) : (
                                         <img
                                             src={profileImg || 'https://static.vecteezy.com/system/resources/previews/026/434/409/non_2x/default-avatar-profile-icon-social-media-user-photo-vector.jpg'}
-                                            alt="Profile Image"  // Added alt text for accessibility
+                                            alt="Profile Image"
                                             style={{ width: '40px', height: '40px', borderRadius: '50%' }}  // Styling the image for a better UI
                                         />
                                     )}
@@ -225,16 +219,16 @@ const Navigation = () => {
             >
                 <div className="modal-dialog" role="document">
                     <div className="modal-content">
-                    <div className="modal-header">
-                        <h5 className="modal-title" id="logoutModalLabel">Confirm Logout</h5>
-                    </div>
-                    <div className="modal-body">
-                        <p>Are you sure you want to log out?</p>
-                    </div>
-                    <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary" onClick={() => setShowLogoutModal(false)}>Cancel</button>
-                        <button type="button" className="btn btn-danger" onClick={handleLogout}>Logout</button>
-                    </div>
+                        <div className="modal-header">
+                            <h5 className="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                        </div>
+                        <div className="modal-body">
+                            <p>Are you sure you want to log out?</p>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-secondary" onClick={() => setShowLogoutModal(false)}>Cancel</button>
+                            <button type="button" className="btn btn-danger" onClick={handleLogout}>Logout</button>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import './modal.css';
-import ToastNotification from './ToastNotification'; 
+import ToastNotification from './ToastNotification';
 
 
 const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
@@ -10,19 +10,16 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedBundleProducts, setSelectedBundleProducts] = useState({});
-    const [toastMessage, setToastMessage] = useState(''); 
+    const [toastMessage, setToastMessage] = useState('');
 
-
-    // Pagination state for recommendations
     const [currentPage, setCurrentPage] = useState(1);
-    const [productsPerPage] = useState(3); 
+    const [productsPerPage] = useState(3);
 
     useEffect(() => {
         if (product) {
             setLoading(true);
             setError(null);
 
-            // Fetch recommendations and bundle products
             Promise.all([
                 fetch('http://localhost:5001/products-recommendations', {
                     method: 'POST',
@@ -50,10 +47,9 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                     setRecommendedProducts(recommendationData);
                     setBundleProducts(bundleData);
 
-                    // Select all bundle products when the promodal opens
                     const initialSelection = {};
                     bundleData.forEach(bProduct => {
-                        initialSelection[bProduct.product_code] = true; 
+                        initialSelection[bProduct.product_code] = true;
                     });
                     setSelectedBundleProducts(initialSelection);
 
@@ -67,7 +63,6 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         }
     }, [product]);
 
-    // Calculate price after discount for individual product
     const calculateDiscountedPrice = (price, discount) => {
         if (discount && discount > 0) {
             return price - (price * discount) / 100;
@@ -75,16 +70,14 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         return price;
     };
 
-     // Toast notification function
-     const showToast = (message) => {
+    const showToast = (message) => {
         setToastMessage(message);
         setTimeout(() => {
-            setToastMessage(''); // Hide toast after 3 seconds
+            setToastMessage('');
         }, 3000);
     };
 
     const handleBuyNowBundle = () => {
-        // Prepare selected bundle product data (including discounted price)
         const selectedProducts = Object.entries(selectedBundleProducts)
             .filter(([_, value]) => value)
             .map(([key]) => {
@@ -105,12 +98,10 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
             })
             .filter(Boolean);
 
-        // Calculate the total discount from the selected bundle products
         const totalBundleDiscount = selectedProducts.reduce((acc, product) => {
             return acc + (product.discount || 0);
         }, 0);
 
-        // Create the original product entry and apply discount if applicable
         const originalProduct = {
             ...product,
             quantity: 1,
@@ -119,33 +110,28 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
             discounted_price: calculateDiscountedPrice(product.price, Math.min(totalBundleDiscount, product.product_discount || 0)), // Apply the discount
         };
 
-        // Ensure at least one product is selected
         if (selectedProducts.length === 0 && originalProduct.discount <= 0) {
             alert('Please select at least one product from the bundle.');
             return;
         }
 
-        // Add the original product if it's not already included
         if (!selectedProducts.some(item => item.product_code === originalProduct.product_code)) {
             selectedProducts.push(originalProduct);
         }
 
-        // Handle unbundled products (if any) selected by the user
         const unbundledProducts = JSON.parse(localStorage.getItem('unbundledProducts')) || [];
         unbundledProducts.forEach(product => {
             const unbundledDiscount = product.product_discount || 0;
             const discountedPrice = calculateDiscountedPrice(product.price, unbundledDiscount);
 
-            // Push the unbundled product with discount information
             selectedProducts.push({
                 ...product,
                 quantity: 1,
                 original_price: product.price,
                 discount: unbundledDiscount,
-                discounted_price: discountedPrice, // Calculate discount for unbundled products
+                discounted_price: discountedPrice,
             });
 
-            // Log for debugging/verification (optional)
             console.log(`Unbundled Product: ${product.product_name}`);
             console.log(`  Original Price: $${product.price}`);
             console.log(`  Discount: ${unbundledDiscount}%`);
@@ -155,19 +141,15 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         const existingProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
         existingProducts.push(...selectedProducts);
 
-        // Store selected products in local storage
         localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
 
         showToast('Redirecting to Checkout Page...');
 
-        // Redirect to checkout
         window.location.href = '/checkout';
     };
 
 
-    // Handle Buy Now action for individual product
     const handleBuyNow = (product) => {
-        // const discountedPrice = calculateDiscountedPrice(product.price, product.product_discount);
         const productData = {
             ...product,
             quantity: 1,
@@ -181,27 +163,23 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
 
         showToast('Redirecting to Checkout Page...');
 
-        // Redirect to checkout
         window.location.href = '/checkout';
     };
 
-    // Get current products for pagination (individual product recommendations)
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const currentRecommendedProducts = recommendedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
 
-    // Pagination controls for recommendations
     const totalPages = Math.ceil(recommendedProducts.length / productsPerPage);
 
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
 
-    // Handle selection of individual bundle products
     const handleBundleProductSelect = (productCode) => {
         setSelectedBundleProducts(prevState => ({
             ...prevState,
-            [productCode]: !prevState[productCode], 
+            [productCode]: !prevState[productCode],
         }));
     };
 
@@ -213,87 +191,87 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                 <div className="promodal-body">
                     <ToastNotification toastMessage={toastMessage} />
                     <div class="product-image">
-                        <img 
+                        <img
                             src={product.product_image}
-                            alt="" height="400" width="300"/>
+                            alt="" height="400" width="300" />
                         <div class="price-stock">
-                        <p><strong>Price</strong></p>
-                        <p className='price-value'>
-                            ₱{calculateDiscountedPrice(product.price, product.product_discount)}
-                            {product.product_discount && (
-                                <span style={{ marginLeft: '10px', color: 'green' }}>
-                                    (Discount: {product.product_discount}%)
-                                </span>
-                            )}
-                        </p>
-                        <p><strong>Stocks</strong></p>
-                        <p>{product.quantity}</p>
+                            <p><strong>Price</strong></p>
+                            <p className='price-value'>
+                                ₱{calculateDiscountedPrice(product.price, product.product_discount)}
+                                {product.product_discount && (
+                                    <span style={{ marginLeft: '10px', color: 'green' }}>
+                                        (Discount: {product.product_discount}%)
+                                    </span>
+                                )}
+                            </p>
+                            <p><strong>Stocks</strong></p>
+                            <p>{product.quantity}</p>
                         </div>
                     </div>
                     <div class="product-info">
                         <p>HAIRCARE • Shampoo</p>
                         <h3>{product.product_name}</h3>
                         <p><strong>Description:</strong>
-                        {product.description || 'No description available.'}
+                            {product.description || 'No description available.'}
                         </p>
                         <p><strong>Hair Type:</strong>
-                        Suitable for virgin and colored hair.{/**/}
+                            Suitable for virgin and colored hair.
                         </p>
                         <p><strong>Hair Texture:</strong>
-                        Works for straight, wavy, or curly hair.
+                            Works for straight, wavy, or curly hair.
                         </p>
                         <p><strong>Effect/Target Problems:</strong>
-                        Treats dandruff, reduces scalp irritation, and soothes sensitive scalps.
+                            Treats dandruff, reduces scalp irritation, and soothes sensitive scalps.
                         </p>
                         <div class="quantity">
-                        <p><strong>Quantity</strong></p>
-                        <div className='quantity-buttons'> 
-                            <button>-</button>
-                            <input type="text" value="1" style={{width:'70px', border:'1px solid gray', outline:'none', borderRadius:'0'}}/>
-                            <button>+</button>
-                        </div>
-                        
+                            <p><strong>Quantity</strong></p>
+                            <div className='quantity-buttons'>
+                                <button>-</button>
+                                <input type="text" value="1" style={{ width: '70px', border: '1px solid gray', outline: 'none', borderRadius: '0' }} />
+                                <button>+</button>
+                            </div>
+
                         </div>
                         <div class="buttons">
                             {product.quantity > 0 ? (
                                 <>
                                     <button onClick={() => onAddToCart(product)}><i class="bx bx-cart"></i>Add to Cart</button>
                                     <button onClick={() => handleBuyNow(product)}
-                                                    style={{ marginLeft: '10px' }}
-                                                >Buy Now</button>
+                                        style={{ marginLeft: '10px' }}
+                                    >Buy Now</button>
                                 </>
                             ) : (
                                 <p style={{ color: 'red' }}>Out of stock</p>
                             )}
                         </div>
-                        </div>
-                    
+                    </div>
+
 
 
                     <button onClick={onClose} className='promodal-close-btn'>Close</button>
 
-                   
+
                     {/* Bundle Section */}
                     {bundleProducts.length > 0 && (
-                        
+
                         <div className="bundle-section">
                             <h4>Available Bundle</h4>
                             <p>Save money, avail discounted items</p>
                             <div>
                                 {bundleProducts.map((bProduct) => (
                                     <div key={bProduct.product_code}>
-                                        
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedBundleProducts[bProduct.product_code] || false}
-                                                onChange={() => handleBundleProductSelect(bProduct.product_code)}
-                                            />
-                                            <label>
+
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedBundleProducts[bProduct.product_code] || false}
+                                            onChange={() => handleBundleProductSelect(bProduct.product_code)}
+                                        />
+                                        <label>
                                             {bProduct.product_name} - P{calculateDiscountedPrice(bProduct.price, bProduct.discount)}
                                             <span style={{ marginLeft: '10px', color: 'red' }}>
                                                 (Discount: {bProduct.discount}%)
                                             </span>
-                                            </label>
+                                        </label>
                                     </div>
                                 ))}
                             </div>

@@ -31,6 +31,7 @@ const AdminUsersRoutes = require('./routes/AdminUsersRoutes.js');
 const token = require('./routes/tokenValidation.js');
 const customerData = require('./routes/customerData.js');
 const handleLogout = require('./routes/handlelogout.js');
+const nodemailer = require('./routes/NodeMailer.js');
 
 app.use(cors());
 
@@ -149,8 +150,12 @@ app.use('/', customerData);
 app.use('/', AdminUsersRoutes);
 app.use('/', handleLogout);
 app.use('/', token);
+app.use('/', nodemailer);
+
 
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+

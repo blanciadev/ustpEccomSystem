@@ -11,13 +11,12 @@ router.post('/users-signup', async (req, res) => {
     }
 
     try {
-        // Check if the email already exists
         const [existingEmail] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
         if (existingEmail.length > 0) {
             return res.status(400).json({ message: 'Email already exists' });
         }
 
-        // Insert the new users into the database
+
         const result = await db.query(
             'INSERT INTO users (first_name, last_name, email, address, phone_number, password) VALUES (?, ?, ?, ?, ?, ?)',
             [firstName, lastName, email, address, phoneNumber, password]
@@ -33,11 +32,8 @@ router.post('/users-signup', async (req, res) => {
 // admin Signup Route
 router.post('/admin-signup', async (req, res) => {
     const { firstName, lastName, email, phoneNumber, password, userType } = req.body;
-
-    // Debugging: Log the incoming request body
     console.log('Incoming request body:', req.body);
 
-    // Initialize an array to collect missing fields
     let missingFields = [];
 
     // Check for each required field
@@ -48,7 +44,6 @@ router.post('/admin-signup', async (req, res) => {
     if (!password) missingFields.push('password');
     if (!userType) missingFields.push('userType');
 
-    // If there are missing fields, return a 400 error with the list of missing fields
     if (missingFields.length > 0) {
         console.log('Missing required fields:', missingFields);
         return res.status(400).json({ message: 'Missing required fields', fields: missingFields });
@@ -56,7 +51,6 @@ router.post('/admin-signup', async (req, res) => {
 
 
     try {
-        // Check if the email already exists
         console.log('Checking if email already exists:', email);
         const [existingEmail] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
         console.log('Existing email query result:', existingEmail);
@@ -66,7 +60,6 @@ router.post('/admin-signup', async (req, res) => {
             return res.status(400).json({ message: 'Email already exists' });
         }
 
-        // Insert the new user into the database with the userType
         console.log('Inserting new user into the database:', {
             firstName,
             lastName,
@@ -92,7 +85,3 @@ router.post('/admin-signup', async (req, res) => {
 module.exports = router;
 
 
-
-
-
-module.exports = router;

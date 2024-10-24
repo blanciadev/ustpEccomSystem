@@ -46,23 +46,23 @@ router.post('/add-to-cart', authenticateToken, async (req, res) => {
     if (!quantity || quantity <= 0) return res.status(400).json({ error: 'A valid quantity greater than 0 is required' });
 
     try {
-        // Check if the product exists in the system
+
         const [[product]] = await db.query('SELECT product_id FROM product WHERE product_code = ?', [product_code]);
         if (!product) return res.status(404).json({ error: 'Product not found' });
 
-        // Ensure the cart exists for the user
+
         const [[existingCart]] = await db.query('SELECT cart_id FROM cart WHERE customer_id = ?', [user_id]);
         let cart_id;
 
         if (!existingCart) {
-            // Create a new cart for the user if it doesn't exist
+
             const [result] = await db.query('INSERT INTO cart (customer_id) VALUES (?)', [user_id]);
             cart_id = result.insertId;
         } else {
             cart_id = existingCart.cart_id;
         }
 
-        // Check if the product already exists in the cart
+
         const [[existingCartItem]] = await db.query(
             'SELECT cart_id, status, quantity FROM cart_items WHERE cart_id = ? AND customer_id = ? AND product_code = ? AND status = "Order Pending"',
             [cart_id, user_id, product_code]
@@ -89,7 +89,7 @@ router.post('/add-to-cart', authenticateToken, async (req, res) => {
             // No existing cart item, so insert a new entry
             console.log(`No existing cart item for product ${product_code}. Inserting into cart.`);
 
-            const cart_items_id = generateCartItemId(); // Generate unique code
+            const cart_items_id = generateCartItemId();
 
             const [insertResult] = await db.query(
                 'INSERT INTO cart_items (cart_items_id, cart_id, customer_id, product_code, quantity, status) VALUES (?, ?, ?, ?, ?, "Order Pending")',
@@ -105,7 +105,7 @@ router.post('/add-to-cart', authenticateToken, async (req, res) => {
             }
         }
 
-        // Log user interaction in user_product_interactions
+
         const interactionQuery = `
             INSERT INTO user_product_interactions (customer_id, product_code, interaction_type)
             VALUES (?, ?, 'cart')
@@ -136,10 +136,10 @@ router.get('/cart-item-count', authenticateToken, async (req, res) => {
             WHERE customer_id = ? AND status = 'Order Pending'
         `, [user_id]);
 
-        // Check if query result is valid and has rows
+
         const itemCount = rows && rows[0] && rows[0].itemCount ? rows[0].itemCount : 0;
 
-        // Respond with the count of items in the cart
+
         res.status(200).json({ itemCount });
     } catch (err) {
         console.error('Error fetching cart item count:', err.message);
@@ -182,7 +182,7 @@ router.get('/cart', authenticateToken, async (req, res) => {
 
         res.status(200).json({
             items: rows.map(item => ({
-                cart_items_id: item.cart_items_id, 
+                cart_items_id: item.cart_items_id,
                 product_id: item.product_id,
                 product_code: item.product_code,
                 product_name: item.product_name,

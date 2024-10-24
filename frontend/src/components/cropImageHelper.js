@@ -35,7 +35,7 @@ export const getCroppedImg = (imageSrc, croppedAreaPixels) => {
           // Convert ArrayBuffer to a new Blob
           const arrayBuffer = reader.result;
           const longBlob = new Blob([arrayBuffer], { type: 'image/jpeg' });
-          resolve(longBlob); // Resolve with the LONG BLOB
+          resolve(longBlob);
         };
 
         // Read the blob as an ArrayBuffer

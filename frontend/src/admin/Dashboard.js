@@ -10,12 +10,9 @@ import AverageOrders from './components/AverageOrders';
 import OrderProcessing from './components/OrderProcessing';
 import TopProduct from './components/TopProduct';
 import AdminHeader from './components/AdminHeader';
-// import AdminSkeleton from '../Loaders/AdminSkeleton';
 
 const Dashboard = () => {
-    
-//   if (loading) return <AdminSkeleton/>
-//   if (error) return <p>Error: {error}</p>;
+
 
     return (
         <div className='dash-con'>
@@ -31,13 +28,13 @@ const Dashboard = () => {
 
                 </div>
                 <div className='dash-body'>
-                        <OrderSummary />
-                        <CustomerInsight />
-                        <SalesOrders />
-                        <PaymentInsight />
-                        <AverageOrders />
-                        <OrderProcessing />
-                        <TopProduct />
+                    <OrderSummary />
+                    <CustomerInsight />
+                    <SalesOrders />
+                    <PaymentInsight />
+                    <AverageOrders />
+                    <OrderProcessing />
+                    <TopProduct />
                 </div>
             </div>
         </div>

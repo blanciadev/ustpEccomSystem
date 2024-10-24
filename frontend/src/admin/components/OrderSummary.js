@@ -32,7 +32,7 @@ const OrderSummary = () => {
                     <div>
                         <i className='bx bxs-package'></i>
                     </div>
-                    <h6>{orderCounts.Completed || 0}</h6> {/* number of COMPLETED orders */}
+                    <h6>{orderCounts.Completed || 0}</h6>
                     <p><strong>Completed</strong></p>
                 </div>
 
@@ -40,7 +40,7 @@ const OrderSummary = () => {
                     <div>
                         <i className='bx bx-time'></i>
                     </div>
-                    <h6>{orderCounts['To Process'] || 0}</h6> {/* number of PENDING orders */}
+                    <h6>{orderCounts['To Process'] || 0}</h6>
                     <p><strong>To Process</strong></p>
                 </div>
 
@@ -48,7 +48,7 @@ const OrderSummary = () => {
                     <div>
                         <i className='bx bxs-truck'></i>
                     </div>
-                    <h6>{orderCounts['To Ship'] || 0}</h6> {/* number of To Ship orders */}
+                    <h6>{orderCounts['To Ship'] || 0}</h6>
                     <p><strong>To Ship</strong></p>
                 </div>
 
@@ -56,7 +56,7 @@ const OrderSummary = () => {
                     <div>
                         <i className='bx bxs-x-circle'></i>
                     </div>
-                    <h6>{orderCounts.Cancelled || 0}</h6> {/* number of CANCELLED orders */}
+                    <h6>{orderCounts.Cancelled || 0}</h6>
                     <p><strong>Cancelled</strong></p>
                 </div>
 
@@ -64,7 +64,7 @@ const OrderSummary = () => {
                     <div>
                         <i className='bx bx-reset'></i>
                     </div>
-                    <h6>{orderCounts.Returned || 0}</h6> {/* number of RETURNED orders */}
+                    <h6>{orderCounts.Returned || 0}</h6>
                     <p><strong>Returned</strong></p>
                 </div>
             </div>

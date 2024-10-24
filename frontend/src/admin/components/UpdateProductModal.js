@@ -39,7 +39,6 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
             });
         }
 
-        // Fetch categories
         const fetchCategories = async () => {
             try {
                 const response = await axios.get('http://localhost:5001/categories');
@@ -81,9 +80,6 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
                     handleClose();
                 }, 2000);
 
-
-
-                // handleClose();
             } else {
                 console.error('Product code is undefined');
                 setError('Product code is missing.');

@@ -4,15 +4,13 @@ const db = require('../db');
 const multer = require('multer');
 const sharp = require('sharp');
 const path = require('path');
-
-
-
-// Set up Multer to store images in memory
 const storage = multer.memoryStorage();
+
+
 
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
+    limits: { fileSize: 5 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
         const filetypes = /jpeg|jpg|png/;
         const mimetype = filetypes.test(file.mimetype);
@@ -65,16 +63,12 @@ router.post('/upload-profile-image', upload.single('profile_img'), async (req, r
     }
 
     try {
-        // Log processing the image for DB insertion
+
         console.log('Processing the uploaded image for customer ID:', customer_id);
-
-        // Directly use the image buffer from multer
         const imageBuffer = req.file.buffer;
-
-        // Log the buffer size to ensure it's valid
         console.log('Image buffer size:', imageBuffer.length);
 
-        // Insert image into MySQL as LONG BLOB
+
         const sql = 'UPDATE users SET profile_img = ? WHERE customer_id = ?';
         console.log('Executing SQL query:', sql);
 
@@ -146,41 +140,40 @@ router.get('/get-customer-details', async (req, res) => {
 router.post('/users-details', (req, res) => {
     const { customer_id } = req.body;
     const sql = 'SELECT * FROM users WHERE customer_id = ?';
-  
+
     db.query(sql, [customer_id], (err, result) => {
-      // Handle database errors
-      if (err) {
-        console.error('Database query error:', err); // Log the error for debugging
-        return res.status(500).send({ error: 'Error fetching user details.' });
-      }
-  
-      // Check if user was found
-      if (result.length === 0) {
-        return res.status(404).send({ error: 'User not found.' });
-      }
-  
-      // Convert the profile_img from BLOB to Base64 if it exists
-      if (result[0].profile_img) {
-        // Ensure profile_img is a Buffer before conversion
-        if (Buffer.isBuffer(result[0].profile_img)) {
-          const profileImgBase64 = result[0].profile_img.toString('base64'); // Convert to Base64
-          result[0].profile_img = profileImgBase64;
-        } else {
-          console.warn('Profile image is not a Buffer:', result[0].profile_img);
-          result[0].profile_img = null; // Set to null if it's not in the expected format
+
+        if (err) {
+            console.error('Database query error:', err);
+            return res.status(500).send({ error: 'Error fetching user details.' });
         }
-      } else {
-        result[0].profile_img = null; // Fallback if no image is found
-      }
-  
-      // Log the final user details to debug
-      console.log('User Details:', result[0]);
-  
-      // Return user details
-      res.status(200).send(result[0]);
+
+        // Check if user was found
+        if (result.length === 0) {
+            return res.status(404).send({ error: 'User not found.' });
+        }
+
+        if (result[0].profile_img) {
+
+            if (Buffer.isBuffer(result[0].profile_img)) {
+                const profileImgBase64 = result[0].profile_img.toString('base64');
+                result[0].profile_img = profileImgBase64;
+            } else {
+                console.warn('Profile image is not a Buffer:', result[0].profile_img);
+                result[0].profile_img = null;
+            }
+        } else {
+            result[0].profile_img = null;
+        }
+
+        // Log the final user details to debug
+        console.log('User Details:', result[0]);
+
+        // Return user details
+        res.status(200).send(result[0]);
     });
-  });
-  
+});
+
 
 
 module.exports = router;

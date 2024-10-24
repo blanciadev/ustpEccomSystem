@@ -4,7 +4,7 @@ const db = require('../db');
 const crypto = require('crypto');
 
 
-const TOKEN_EXPIRATION_TIME = 3600000; // 1 hour
+const TOKEN_EXPIRATION_TIME = 3600000;
 
 router.post('/users-login', async (req, res) => {
     const { email, password } = req.body;
@@ -14,7 +14,6 @@ router.post('/users-login', async (req, res) => {
     }
 
     try {
-        // Fetch user data from the database
         const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
 
         if (rows.length === 0) {
@@ -67,7 +66,6 @@ router.post('/users-login', async (req, res) => {
 
 // Endpoint to fetch and update user details
 router.route('/users-details')
-    // Fetch user details
     .post(async (req, res) => {
         const { customer_id } = req.body;
 
@@ -81,7 +79,7 @@ router.route('/users-details')
                 return res.status(404).json({ message: 'User not found.' });
             }
 
-            res.status(200).json(userDetails[0]); // Return the first user detail
+            res.status(200).json(userDetails[0]);
         } catch (error) {
             console.error('Error fetching user details:', error);
             res.status(500).json({ message: 'Server error' });

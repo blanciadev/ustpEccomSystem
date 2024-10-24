@@ -10,14 +10,12 @@ const UserCountComponent = () => {
         inactiveCustomers: 0,
     });
 
-    // Fetch user data from backend when the component mounts
     useEffect(() => {
         const fetchUserCounts = async () => {
             try {
                 const response = await axios.get('http://localhost:5001/admin-users-count');
                 const users = response.data.data;
 
-                // Calculate user counts
                 const newUsersCount = users.filter(user => user.role_type === 'user').length;
                 const totalEmployeesCount = users.filter(user => user.role_type === 'employee').length;
                 const activeCustomersCount = users.filter(user => user.status === 'active').length; // Assuming you have a status field

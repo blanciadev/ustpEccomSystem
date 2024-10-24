@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Table } from 'react-bootstrap';
 import axios from 'axios';
-import './DiscountProducts.css'; // Optional: Custom CSS for additional styling
+import './DiscountProducts.css';
 
 const RemoveDiscountProduct = ({ show, handleClose, order, handleUpdate }) => {
   const [products, setProducts] = useState([]);
 
-  // Fetch the products when the modal is shown
   useEffect(() => {
     if (show) {
       axios
@@ -20,12 +19,10 @@ const RemoveDiscountProduct = ({ show, handleClose, order, handleUpdate }) => {
     }
   }, [show]);
 
-  // Function to remove the discount from the product using product_code
   const handleRemoveDiscount = (productCode) => {
     axios
-      .post(`http://localhost:5001/remove-discount/${productCode}`) // 
+      .post(`http://localhost:5001/remove-discount/${productCode}`)
       .then((response) => {
-        // Update the products list after discount is removed
         setProducts(products.filter((product) => product.product_code !== productCode));
         handleUpdate();
       })

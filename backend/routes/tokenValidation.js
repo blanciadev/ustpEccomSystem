@@ -17,8 +17,8 @@ const authenticateToken = async (req, res, next) => {
             return res.status(401).json({ message: 'Invalid or expired token' });
         }
 
-        req.user_id = rows[0].user_id; // Attach user_id to request object
-        next(); // Proceed to the next middleware/route
+        req.user_id = rows[0].user_id;
+        next();
     } catch (err) {
         console.error('Token Validation Backend Error:', err.message);
         res.status(500).json({ message: 'Internal server error' });
@@ -27,7 +27,6 @@ const authenticateToken = async (req, res, next) => {
 
 // Route to validate token
 router.get('/validate-token', authenticateToken, (req, res) => {
-    // If we reach this point, the token is valid
     res.json({ message: 'Token is valid', user_id: req.user_id });
 });
 

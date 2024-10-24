@@ -4,7 +4,6 @@ import '../admin.css';
 const TopProduct = () => {
   const [data, setData] = useState([]);
 
-  // Fetch top products data from the backend
   useEffect(() => {
     const fetchTopProducts = async () => {
       try {
@@ -19,7 +18,6 @@ const TopProduct = () => {
     fetchTopProducts();
   }, []);
 
-  // Sort data by cart_quantity (descending)
   const sortedData = [...data].sort((a, b) => b.cart_quantity - a.cart_quantity);
 
   return (
@@ -32,35 +30,35 @@ const TopProduct = () => {
 
       <div className="table-responsive top-product__table-wrapper">
         <table className="table top-product__table">
-            <thead className="bg-light sticky-top">
+          <thead className="bg-light sticky-top">
             <tr className="top-product__table-header">
-                <th>#</th>
-                <th>Product</th>
-                <th>Progress</th>
-                <th>Available</th>
+              <th>#</th>
+              <th>Product</th>
+              <th>Progress</th>
+              <th>Available</th>
             </tr>
-            </thead>
-            <tbody>
+          </thead>
+          <tbody>
             {sortedData.map((item, index) => (
-                <tr key={item.id} className="top-product__table-row">
+              <tr key={item.id} className="top-product__table-row">
                 <td><strong>{index + 1}</strong></td>
                 <td>{item.product}</td>
                 <td>
-                    <div className="top-product__progress-bar-container">
+                  <div className="top-product__progress-bar-container">
                     <div
-                        className="top-product__progress-bar"
-                        style={{
+                      className="top-product__progress-bar"
+                      style={{
                         width: `${(item.cart_quantity / item.available_quantity) * 100}%`,
-                        }}
+                      }}
                     />
-                    </div>
+                  </div>
                 </td>
                 <td>{item.available_quantity}</td>
-                </tr>
+              </tr>
             ))}
-            </tbody>
+          </tbody>
         </table>
-    </div>
+      </div>
 
     </div>
   );

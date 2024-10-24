@@ -8,14 +8,14 @@ const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [statusFilter, setStatusFilter] = useState(''); // State to manage filter
+  const [statusFilter, setStatusFilter] = useState('');
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
-    
+
     window.addEventListener('resize', handleResize);
 
-    
+
     const fetchOrders = async () => {
       try {
         const response = await axios.get('http://localhost:5001/order-history', {
@@ -26,11 +26,10 @@ const OrderHistory = () => {
             status: statusFilter
           }
         });
-        // Assuming the response is an array
         if (Array.isArray(response.data)) {
           setOrders(response.data);
         } else {
-          setOrders([]); // Fallback if the response is not an array
+          setOrders([]);
         }
       } catch (err) {
         setError(err.message);
@@ -38,11 +37,11 @@ const OrderHistory = () => {
         setLoading(false);
       }
     };
-    
+
 
     fetchOrders();
     return () => {
-        window.removeEventListener('resize', handleResize);
+      window.removeEventListener('resize', handleResize);
     }
   }, [statusFilter]);
 
@@ -68,7 +67,7 @@ const OrderHistory = () => {
       setError(err.message);
     }
   };
-  
+
   const handleResize = () => {
     setIsMobile(window.innerWidth <= 768);  // Update state based on screen width
   };
@@ -91,51 +90,51 @@ const OrderHistory = () => {
             <div className='purchase-body'>
               <div className='purchase-btncon'>
                 <button onClick={() => handleStatusClick('')}>
-                    All
+                  All
                 </button>
                 <button onClick={() => handleStatusClick('To Ship')}>
-                    {isMobile ? (
-                        <i class='bx bxs-truck'></i>
-                    ) : (
-                        'To Ship'
-                    )
-                   
-                   }</button>
+                  {isMobile ? (
+                    <i class='bx bxs-truck'></i>
+                  ) : (
+                    'To Ship'
+                  )
+
+                  }</button>
                 <button onClick={() => handleStatusClick('To Receive')}>
-                    {isMobile ? (
-                        <i class='bx bxs-receipt' ></i>
-                    ) : (
-                        'To Receive'
-                    )
-                   
-                   }
-                    </button>
+                  {isMobile ? (
+                    <i class='bx bxs-receipt' ></i>
+                  ) : (
+                    'To Receive'
+                  )
+
+                  }
+                </button>
                 <button onClick={() => handleStatusClick('Completed')}>
-                    {isMobile ? (
-                        <i class='bx bx-check' ></i>
-                    ) : (
-                        'Completed'
-                    )
-                   
-                   }
+                  {isMobile ? (
+                    <i class='bx bx-check' ></i>
+                  ) : (
+                    'Completed'
+                  )
+
+                  }
                 </button>
                 <button onClick={() => handleStatusClick('Cancelled')}>
-                    {isMobile ? (
-                        <i class='bx bx-x'></i>
-                    ) : (
-                        'Cancelled'
-                    )
-                   
-                   }
+                  {isMobile ? (
+                    <i class='bx bx-x'></i>
+                  ) : (
+                    'Cancelled'
+                  )
+
+                  }
                 </button>
                 <button onClick={() => handleStatusClick('Return/Refund')}>
-                {isMobile ? (
-                        <i class='bx bx-revision'></i>
-                    ) : (
-                        'Return / Refund'
-                    )
-                   
-                   }
+                  {isMobile ? (
+                    <i class='bx bx-revision'></i>
+                  ) : (
+                    'Return / Refund'
+                  )
+
+                  }
                 </button>
               </div>
               <div className='order'>

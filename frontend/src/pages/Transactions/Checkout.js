@@ -230,13 +230,11 @@ const Checkout = () => {
 
     console.log("----- Receipt -----");
 
-    // Flag to check if a general discount exists
     const generalDiscountExists = allValuesEqual(discounts) && discounts[0] > 0;
 
     const productTotal = savedProducts.reduce((acc, product, index) => {
       let effectivePrice = 0;
 
-      // Check if the product has a discounted price (bundled product)
       if (product.discounted_price) {
         const effectiveDiscount = allValuesEqual(discounts) ? discounts[0] : discounts || 0;
         const discountMultiplier = (1 - (effectiveDiscount / 100 || 0));
@@ -275,7 +273,6 @@ const Checkout = () => {
     console.log(`Transaction Total: $${transactionTotal.toFixed(2)}`);
     console.log("----- End of Receipt -----");
 
-    // Return the total as a number, not a string
     return transactionTotal;
   };
 
