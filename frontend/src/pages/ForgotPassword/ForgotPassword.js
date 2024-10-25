@@ -15,11 +15,12 @@ const RequestResetPassword = () => {
 
     try {
       const response = await axios.post('http://localhost:5001/request-reset-password', { email });
+      localStorage.setItem('resetEmail', email);
       setMessage(response.data.message);
       navigate('/verify');
     } catch (error) {
       console.error('Error sending reset token:', error);
-      setMessage('Error sending reset token. Please try again later.');
+      setMessage('Wrong Email');
     } finally {
       setLoading(false); // Stop loading
     }

@@ -77,7 +77,7 @@ const findResetToken = async (email, token) => {
 
 const updateUserPassword = async (email, newPassword) => {
     const query = 'UPDATE users SET password = ? WHERE email = ?'; // Assuming Users table exists
-    await db.execute(query, [newPassword, email]); // Update the password directly
+    await db.execute(query, [newPassword, email]);
 };
 
 const deleteResetToken = async (email) => {
@@ -85,35 +85,57 @@ const deleteResetToken = async (email) => {
     await db.execute(query, [email]);
 };
 
+
 router.post('/verify-reset-token', async (req, res) => {
-    const { email, token, newPassword } = req.body;
+    const { email, token } = req.body;
+
+    if (!email || !token) {
+        return res.status(400).json({ message: 'Missing email or token' });
+    }
 
     try {
-        // Step 1: Find the reset token in the PasswordResets table
         const resetRecord = await findResetToken(email, token);
 
         if (!resetRecord) {
             return res.status(400).json({ message: 'Invalid token or email' });
         }
 
-        // Step 2: Check if the token has expired
         const currentTime = Date.now();
         if (currentTime > new Date(resetRecord.tokenExpiry).getTime()) {
             return res.status(400).json({ message: 'Token has expired' });
         }
 
-        // Step 3: Update the user's password directly (no hashing)
-        await updateUserPassword(email, newPassword);
-
-        // Step 4: Delete the token from PasswordResets table after successful password reset
-        await deleteResetToken(email);
-
-        res.status(200).json({ message: 'Password updated successfully' });
+        // Verification successful
+        res.status(200).json({ success: true, message: 'Token verified successfully' });
     } catch (error) {
         console.error('Error verifying reset token: ', error);
-        res.status(500).json({ error: 'Failed to verify token or reset password' });
+        res.status(500).json({ error: 'Failed to verify token' });
     }
 });
 
+// password update route
+router.post('/password-reset', async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ message: 'Email and password are required' });
+    }
+
+    try {
+        // Check if the email exists in the database
+        const [existingUser] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+        if (existingUser.length === 0) {
+            return res.status(404).json({ message: 'User with this email does not exist' });
+        }
+
+        // Update the password for the user with the given email
+        await db.query('UPDATE users SET password = ? WHERE email = ?', [password, email]);
+
+        res.status(200).json({ message: 'Password updated successfully' });
+    } catch (err) {
+        console.error('Error updating password:', err.message);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
 module.exports = router;

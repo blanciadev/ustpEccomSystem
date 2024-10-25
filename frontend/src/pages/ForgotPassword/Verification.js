@@ -51,9 +51,16 @@ const Verification = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
+    // Retrieve the stored email
+    const email = localStorage.getItem('resetEmail');
+    if (!email) {
+      setMessage('Email is missing. Please restart the reset process.');
+      setIsSubmitting(false);
+      return;
+    }
+
     // Combine the code into a single token
     const token = code.join('');
-
     if (token.length !== 6) {
       setMessage('Please enter a valid 6-digit token.');
       setIsSubmitting(false);
@@ -62,7 +69,7 @@ const Verification = () => {
 
     try {
       // Send token to the backend for verification
-      const response = await axios.post('http://localhost:5001/verify-token', { token });
+      const response = await axios.post('http://localhost:5001/verify-reset-token', { email, token });
 
       // Handle success (redirect to reset password page or similar)
       if (response.data.success) {
@@ -80,6 +87,7 @@ const Verification = () => {
       setIsSubmitting(false);
     }
   };
+
 
   // Handle resend token request
   const handleResendCode = async () => {
