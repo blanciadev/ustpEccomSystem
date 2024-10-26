@@ -2,26 +2,30 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Forgot.css';
+import ToastNotification from '../../components/ToastNotification';
+import Navigation from '../../components/Navigation';
 
 const ChangePassword = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [message, setMessage] = useState('');
+  const [toastMessage, setToastMessage] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      setMessage('Passwords do not match');
+      setToastMessage('Passwords do not match');
+      setTimeout(() => setToastMessage(''), 3000);
       return;
     }
 
     // Retrieve email from local storage
     const email = localStorage.getItem('resetEmail');
     if (!email) {
-      setMessage('Email is missing. Please restart the reset process.');
+      setToastMessage('Email is missing. Please restart the reset process.');
+      setTimeout(() => setToastMessage(''), 3000);
       return;
     }
 
@@ -31,20 +35,26 @@ const ChangePassword = () => {
 
       // Handle success or error response
       if (response.data.message === 'Password updated successfully') {
-        setMessage('Password successfully changed!');
-        setTimeout(() => navigate('/login'), 2000);
+        setToastMessage('Password successfully changed!');
+        setTimeout(() => {
+            setToastMessage('');
+            navigate('/login');
+          }, 3000);
       } else {
-        setMessage(response.data.message || 'Failed to update password.');
+        setToastMessage(response.data.message || 'Failed to update password.');
+        setTimeout(() => setToastMessage(''), 3000);
       }
     } catch (error) {
       console.error('Error updating password:', error);
-      setMessage('An error occurred. Please try again.');
+      setToastMessage('An error occurred. Please try again.');
+      setTimeout(() => setToastMessage(''), 3000);
     }
   };
 
   return (
     <div className="cp-con">
-      <div className="cp-box">
+        <Navigation/>
+        <ToastNotification toastMessage={toastMessage}/>
         <div className="cp-form">
           <h1>Change Password</h1>
           <form onSubmit={handleSubmit}>
@@ -77,10 +87,8 @@ const ChangePassword = () => {
             </div>
 
             <button type="submit">Submit</button>
-            {message && <p>{message}</p>}
           </form>
         </div>
-      </div>
     </div>
   );
 };
