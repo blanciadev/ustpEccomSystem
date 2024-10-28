@@ -221,7 +221,7 @@ const Orders = () => {
                       <td>{highlightText(new Date(order.order_date).toLocaleDateString(), searchTerm)}</td>
                       <td>{highlightText(order.order_status, searchTerm)}</td>
                       <td>{highlightText(order.payment_status, searchTerm)}</td>
-                      <td>{highlightText(order.order_total, searchTerm)}</td>  {/* Display the total price from order_total */}
+                      <td>P{highlightText(order.order_total, searchTerm)}</td>
                       <td><button onClick={() => handleOpenModal(order)}>View</button></td>
                     </tr>
                   ))}

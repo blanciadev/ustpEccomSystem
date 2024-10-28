@@ -67,6 +67,7 @@ router.put('/admin-update-products/:product_code', async (req, res) => {
     }
 });
 
+
 router.get('/admin-order-history', async (req, res) => {
     try {
         const { status, searchTerm, exportToExcel, page = 1 } = req.query;
@@ -79,7 +80,8 @@ router.get('/admin-order-history', async (req, res) => {
             product.product_name, 
             order_details.order_details_id, 
             order_details.product_id, 
-            order_details.payment_date, 
+            order_details.order_date, 
+            order_details.order_update,
             order_details.payment_method, 
             order_details.total_price, 
             order_details.quantity, 
@@ -134,7 +136,8 @@ router.get('/admin-order-history', async (req, res) => {
                     order_date: order.order_date,
                     order_total: order.order_total_price,
                     order_status: order.order_status,
-                    payment_date: order.payment_date,
+                    order_date: order.order_date,
+                    order_update: order.order_update,
                     payment_status: order.payment_status,
                     payment_method: order.payment_method,
                     customer_id: order.customer_id,
@@ -177,7 +180,7 @@ router.get('/admin-order-history', async (req, res) => {
             // Add column headers
             worksheet.columns = [
                 { header: 'Order ID', key: 'order_id', width: 10 },
-                { header: 'Customer Name', key: 'customer_name', width: 25 },
+                { header: 'Customer ID', key: 'customer_id', width: 25 },
                 { header: 'Order Date', key: 'order_date', width: 15 },
                 { header: 'Order Status', key: 'order_status', width: 15 },
                 { header: 'Payment Status', key: 'payment_status', width: 15 },
@@ -218,6 +221,58 @@ router.get('/admin-order-history', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 });
+
+
+router.post('/admin-order-payment-export', async (req, res) => {
+    try {
+        const ordersData = req.body.orders;
+
+        // Log ordersData to check the format and content
+        console.log('Received ordersData:', ordersData);
+
+
+        if (!ordersData || !Array.isArray(ordersData)) {
+            return res.status(400).json({ message: 'Invalid data provided for export.' });
+        }
+
+        // Proceed with creating the Excel file if data is valid
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Orders');
+
+        worksheet.columns = [
+            { header: 'Order ID', key: 'order_id', width: 10 },
+            { header: 'Customer ID', key: 'customer_id', width: 25 },
+            { header: 'Payment Date', key: 'order_update', width: 15 },
+            { header: 'Payment Method', key: 'payment_method', width: 15 },
+            { header: 'Payment Status', key: 'payment_status', width: 15 },
+        ];
+
+        // Populate rows with data
+        ordersData.forEach(order => {
+            worksheet.addRow({
+                order_id: order.order_id,
+                customer_id: order.customer_id,
+                order_update: order.order_update ? new Date(order.order_update).toLocaleDateString() : 'N/A',
+                payment_method: order.payment_method,
+                payment_status: order.payment_status,
+
+            });
+
+        });
+
+        // Send the Excel file
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=orders.xlsx');
+
+        await workbook.xlsx.write(res);
+        res.end();
+    } catch (error) {
+        console.error('Error generating Excel file:', error.message);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+});
+
+
 
 
 

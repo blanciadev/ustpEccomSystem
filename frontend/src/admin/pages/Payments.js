@@ -36,6 +36,7 @@ const Payments = () => {
   const handleResize = () => {
     setIsMobile(window.innerWidth <= 425);
   };
+
   const fetchOrders = async () => {
     setLoading(true);
     try {
@@ -49,12 +50,16 @@ const Payments = () => {
       const ordersData = response.data.orders;
       setOrders(ordersData);
       setTotalOrders(ordersData.length);
+
+      // Store orders data in local storage
+      localStorage.setItem('ordersData', JSON.stringify(ordersData));
     } catch (error) {
       console.error('Error fetching order history:', error.message);
     } finally {
       setLoading(false);
     }
   };
+
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -85,22 +90,33 @@ const Payments = () => {
     handleCloseModal();
   };
 
-  const handlePrintOrders = async () => {
+  const exportToExcel = async () => {
+    setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5001/admin-order-history', {
-        params: { exportToExcel: 'true' },
-        responseType: 'blob',
-      });
+      const ordersData = JSON.parse(localStorage.getItem('ordersData'));
 
-      const blob = new Blob([response.data], {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      });
-      saveAs(blob, 'order_summary.xlsx');
+      const response = await axios.post(
+        'http://localhost:5001/admin-order-payment-export',
+        { orders: ordersData },
+        { responseType: 'blob' } // This ensures response is treated as a file
+      );
 
+      // Create a link to download the file
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'orders.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } catch (error) {
-      console.error('Error exporting orders to Excel:', error.message);
+      console.error('Error exporting to Excel:', error.message);
+    } finally {
+      setLoading(false);
     }
   };
+
+
 
 
   const totalPages = Math.ceil(totalOrders / itemsPerPage);
@@ -143,7 +159,7 @@ const Payments = () => {
               </div>
               <div className='options'>
                 <div className='print'>
-                  <button onClick={handlePrintOrders}>
+                  <button onClick={exportToExcel}>
                     {isMobile ? (
                       <i className='bx bx-printer'></i>
                     ) : (
@@ -186,7 +202,9 @@ const Payments = () => {
                         <td><input type='checkbox' /></td>
                         <td>{order.order_id}</td>
                         <td>{order.customer_id}</td>
-                        <td>{new Date(order.payment_date).toLocaleDateString()}</td> {/* Displaying payment_date */}
+                        <td>
+                          {order.order_update ? new Date(order.order_update).toLocaleDateString() : 'N/A'}
+                        </td>
                         <td>{order.payment_method}</td>
                         <td>{order.order_status}</td>
                         <td>{order.payment_status}</td>
