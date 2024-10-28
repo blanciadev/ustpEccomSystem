@@ -1,17 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db'); // Your database connection setup
+const db = require('../db');
 
 const nodemailer = require('nodemailer');
-const crypto = require('crypto'); // To generate a token
+const crypto = require('crypto');
 
-// Function to find user by email using raw SQL
 const findUserByEmail = async (email) => {
     const [rows] = await db.execute('SELECT email FROM users WHERE email = ?', [email]);
     return rows.length > 0 ? rows[0] : null;
 };
 
-// Function to save reset token and expiry in the PasswordResets table using raw SQL
 const saveResetToken = async (email, token, tokenExpiry) => {
     await db.execute('INSERT INTO PasswordResets (email, token, tokenExpiry) VALUES (?, ?, ?)', [email, token, tokenExpiry]);
 };
@@ -22,31 +20,31 @@ router.post('/request-reset-password', async (req, res) => {
     try {
         console.log('Received reset password request for email:', email);
 
-        // Step 1: Find user by email using raw SQL
+
         const user = await findUserByEmail(email);
         if (!user) {
             console.log('User not found for email:', email);
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Step 2: Generate a 6-digit token
+
         const token = crypto.randomInt(100000, 999999).toString();
         console.log('Generated reset token:', token);
 
-        // Step 3: Set an expiration time for the token (1 hour from now)
-        const tokenExpiry = new Date(Date.now() + 3600000); // 1 hour expiration
+
+        const tokenExpiry = new Date(Date.now() + 3600000);
         console.log('Token expiry set to:', tokenExpiry);
 
-        // Step 4: Save the token and expiry in the PasswordResets table
+
         await saveResetToken(email, token, tokenExpiry);
         console.log(`Reset token saved for user: ${email}`);
 
-        // Step 5: Set up Nodemailer transporter
+
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
                 user: 'xzhampp@gmail.com',
-                pass: 'xcni sdig vxfv zrxn', // Make sure to use environment variables for sensitive data
+                pass: 'xcni sdig vxfv zrxn',
             },
         });
 
@@ -72,11 +70,11 @@ router.post('/request-reset-password', async (req, res) => {
 const findResetToken = async (email, token) => {
     const query = 'SELECT * FROM PasswordResets WHERE email = ? AND token = ?';
     const [results] = await db.execute(query, [email, token]);
-    return results[0]; // Return the first result or undefined
+    return results[0];
 };
 
 const updateUserPassword = async (email, newPassword) => {
-    const query = 'UPDATE users SET password = ? WHERE email = ?'; // Assuming Users table exists
+    const query = 'UPDATE users SET password = ? WHERE email = ?';
     await db.execute(query, [newPassword, email]);
 };
 
@@ -122,13 +120,11 @@ router.post('/password-reset', async (req, res) => {
     }
 
     try {
-        // Check if the email exists in the database
         const [existingUser] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
         if (existingUser.length === 0) {
             return res.status(404).json({ message: 'User with this email does not exist' });
         }
 
-        // Update the password for the user with the given email
         await db.query('UPDATE users SET password = ? WHERE email = ?', [password, email]);
 
         res.status(200).json({ message: 'Password updated successfully' });
