@@ -99,7 +99,7 @@ const Products = () => {
 
       return matchesSearch;
     });
-
+    fetchProductStatistics();
     setFilteredProducts(results);
     setCurrentPage(1);
   }, [searchQuery, products]);

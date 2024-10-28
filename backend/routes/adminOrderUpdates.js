@@ -19,6 +19,8 @@ router.put('/update-order-status/:orderId', async (req, res) => {
         let paymentStatus = null;
         if (status === 'Completed') {
             paymentStatus = 'Order Paid';
+        } else {
+            paymentStatus = 'Pending';
         }
 
         const result = await db.query(

@@ -5,6 +5,7 @@ import '../admin.css';
 import AdminNav from '../components/AdminNav';
 import AdminHeader from '../components/AdminHeader';
 import ReportSalesComponent from '../components/ReportSalesComponent';
+import { saveAs } from 'file-saver';
 
 const Reports = () => {
     const [productReports, setProductReports] = useState([]);
@@ -24,11 +25,22 @@ const Reports = () => {
     useEffect(() => {
         const fetchProductReports = async () => {
             setLoading(true);
+            setError(false); // Reset error state on each fetch attempt
             try {
                 const response = await axios.get('http://localhost:5001/product-reports-per-month');
-                setProductReports(response.data.data);
+
+                // Check if the response contains data
+                if (response.data && response.data.data) {
+                    setProductReports(response.data.data);
+
+                    // Store the data in localStorage
+                    localStorage.setItem('productReports', JSON.stringify(response.data.data));
+                } else {
+                    console.warn("No data found in response.");
+                    setProductReports([]);
+                }
             } catch (error) {
-                console.error('Error fetching product reports:', error);
+                console.error('Error fetching product reports:', error.message || error);
                 setError(true);
             } finally {
                 setLoading(false);
@@ -69,6 +81,35 @@ const Reports = () => {
 
         return matchesSearchQuery && matchesMonth && matchesYear;
     });
+
+
+    const exportReport = async (month, year) => {
+        try {
+            // Retrieve data from localStorage
+            const storedReports = JSON.parse(localStorage.getItem('productReports'));
+
+            if (!storedReports || storedReports.length === 0) {
+                alert('No data found in localStorage to export.');
+                return;
+            }
+
+            // Send the data to the backend to generate the report
+            const response = await axios.post('http://localhost:5001/product-reports-export', {
+                month,
+                year,
+                data: storedReports
+            }, {
+                responseType: 'blob'
+            });
+
+            const fileName = `product-report-${month}-${year}.xlsx`;
+            saveAs(new Blob([response.data]), fileName);
+        } catch (error) {
+            console.error('Error exporting report:', error.message);
+            alert('Failed to export report. Please try again.');
+        }
+    };
+
 
     return (
         <div className='dash-con'>
@@ -125,8 +166,8 @@ const Reports = () => {
                                             ))}
                                         </select>
                                     </div>
-                                    <button>
-                                        <i class='bx bx-export'></i>
+                                    <button onClick={() => exportReport(selectedMonth, selectedYear)}>
+                                        <i class='bx bx-export'></i> Export Report
                                     </button>
                                 </div>
                             </div>
@@ -153,7 +194,6 @@ const Reports = () => {
                                                 <th>Period</th>
                                                 <th>Product Code</th>
                                                 <th>Product Name</th>
-                                                <th>Size</th>
                                                 <th>Quantity</th>
                                                 <th>Total Sales (PHP)</th>
                                             </tr>
@@ -165,7 +205,6 @@ const Reports = () => {
                                                     <td>{report.period}</td>
                                                     <td>{report.product_code}</td>
                                                     <td>{report.product_name}</td>
-                                                    <td>{report.size}</td>
                                                     <td>{report.total_quantity}</td>
                                                     <td>PHP {parseFloat(report.total_sales).toFixed(2)}</td>
                                                 </tr>
