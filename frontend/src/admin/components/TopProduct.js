@@ -34,7 +34,7 @@ const TopProduct = () => {
             <tr className="top-product__table-header">
               <th>#</th>
               <th>Product</th>
-              <th>Progress</th>
+              <th>Popularity</th>
               <th>Available</th>
             </tr>
           </thead>
@@ -48,7 +48,7 @@ const TopProduct = () => {
                     <div
                       className="top-product__progress-bar"
                       style={{
-                        width: `${(item.cart_quantity / item.available_quantity) * 100}%`,
+                        width: `${(item.cart_quantity / item.available_quantity) * 1}%`,
                       }}
                     />
                   </div>

@@ -221,7 +221,7 @@ const Products = () => {
                         <td><input type='checkbox' /></td>
                         <td>{product.product_code}</td>
                         <td>{product.product_name}</td>
-                        <td>P{product.price}</td>
+                        <td>₱ {product.price}</td>
                         <td>{product.category_name}</td>
                         <td>{product.quantity}</td>
                         <td>{product.description}</td>

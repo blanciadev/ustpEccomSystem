@@ -167,7 +167,7 @@ const Payments = () => {
                     )}
                   </button>
                 </div>
-                <div className='filter'>
+                <div className='order-filter'>
                   <label htmlFor="statusFilter">Filter by Status</label>
                   <select id="statusFilter" value={statusFilter} onChange={handleStatusFilterChange}>
                     <option value="">All</option>
