@@ -7,28 +7,25 @@ const BundleProductModal = () => {
     const [show, setShow] = useState(false);
     const [products, setProducts] = useState([]);
     const [selectedProducts, setSelectedProducts] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState(null);
     const [customPrice, setCustomPrice] = useState(0);
     const [discount, setDiscount] = useState('');
     const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState(null);
-    const [error, setError] = useState(null);
     const [toastMessage, setToastMessage] = useState('');
-
-
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 6;
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
     const handleClose = () => {
         setShow(false);
-        setMessage(null);
-        setError(null);
+        setSelectedCategory(null);
+        setSelectedProducts([]);
     };
+
     const handleShow = () => {
         fetchProducts();
         setShow(true);
     };
-
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -41,7 +38,6 @@ const BundleProductModal = () => {
             setLoading(false);
         }
     };
-
 
     useEffect(() => {
         const total = selectedProducts.reduce((acc, product) => {
@@ -61,7 +57,6 @@ const BundleProductModal = () => {
         setIsMobile(window.innerWidth <= 768);
     };
 
-
     const handleBundleSubmit = async (e) => {
         e.preventDefault();
 
@@ -69,7 +64,6 @@ const BundleProductModal = () => {
             ...product,
             discountedPrice: (product.originalPrice - (product.originalPrice * discount / 100)).toFixed(2),
         }));
-
 
         const bundleData = {
             selectedProducts: discountedProducts,
@@ -79,25 +73,15 @@ const BundleProductModal = () => {
         setLoading(true);
 
         try {
-
             await axios.post('http://localhost:5001/bundles', bundleData);
-
             setToastMessage('Bundle Created!');
-
             setTimeout(() => {
-
                 setToastMessage('');
                 handleClose();
             }, 2000);
-
-
-            setSelectedProducts([]);
-
-
-
         } catch (error) {
             console.error('Error creating bundle:', error);
-            setToastMessage('Error Occured!');
+            setToastMessage('Error Occurred!');
             setTimeout(() => {
                 setToastMessage('');
                 handleClose();
@@ -107,14 +91,14 @@ const BundleProductModal = () => {
         }
     };
 
-
-    // Handle product selection toggle
     const handleProductSelection = (product) => {
-        const updatedProduct = {
-            ...product,
-            originalPrice: product.price,
-        };
+        if (!selectedCategory) {
+            setSelectedCategory(product.category_name);
+        }
 
+        if (product.category_name !== selectedCategory) return;
+
+        const updatedProduct = { ...product, originalPrice: product.price };
         setSelectedProducts((prevSelected) => {
             if (prevSelected.some((p) => p.product_id === product.product_id)) {
                 return prevSelected.filter((p) => p.product_id !== product.product_id);
@@ -124,25 +108,29 @@ const BundleProductModal = () => {
         });
     };
 
-    // Pagination Logic
-    const totalPages = Math.ceil(products.length / itemsPerPage);
+    const filteredProducts = selectedCategory
+        ? products.filter(product => product.category_name === selectedCategory)
+        : products;
+
+    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
     const indexOfLastProduct = currentPage * itemsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
-    const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
+    const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
 
-    // Handle page change
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
 
-    // Remove product from bundle
     const handleRemoveProduct = (productId) => {
-        setSelectedProducts((prevSelected) =>
-            prevSelected.filter((product) => product.product_id !== productId)
-        );
+        setSelectedProducts((prevSelected) => {
+            const updatedSelected = prevSelected.filter((product) => product.product_id !== productId);
+            if (updatedSelected.length === 0) {
+                setSelectedCategory(null);
+            }
+            return updatedSelected;
+        });
     };
 
-    // Calculate discounted price for each product
     const getDiscountedPrice = (product) => {
         const discountedPrice = product.originalPrice - (product.originalPrice * discount / 100);
         return discountedPrice.toFixed(2);
@@ -152,13 +140,11 @@ const BundleProductModal = () => {
         <>
             <Button variant="primary" onClick={handleShow}>
                 {isMobile ? (
-                    <i class='bx bxs-discount'></i>
+                    <i className='bx bxs-discount'></i>
                 ) : (
                     'Bundle A Product '
-                )
-                }
+                )}
             </Button>
-
 
             <Modal className='modal-xl' show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
@@ -167,9 +153,7 @@ const BundleProductModal = () => {
                 <Modal.Body>
                     <ToastNotification toastMessage={toastMessage} />
                     <Form onSubmit={handleBundleSubmit}>
-
                         {loading && <Spinner animation="border" variant="primary" />}
-
 
                         <Table striped bordered hover>
                             <thead>
@@ -200,6 +184,17 @@ const BundleProductModal = () => {
                             </tbody>
                         </Table>
 
+                        <Pagination>
+                            {[...Array(totalPages).keys()].map((page) => (
+                                <Pagination.Item
+                                    key={page + 1}
+                                    active={page + 1 === currentPage}
+                                    onClick={() => handlePageChange(page + 1)}
+                                >
+                                    {page + 1}
+                                </Pagination.Item>
+                            ))}
+                        </Pagination>
 
                         <h5>Selected Products</h5>
                         <Table striped bordered hover>
@@ -232,12 +227,11 @@ const BundleProductModal = () => {
                             </tbody>
                         </Table>
 
-
                         <Form.Group className="mb-3">
                             <Form.Label>Discount (%)</Form.Label>
                             <Form.Select
                                 value={discount}
-                                onChange={(e) => setDiscount(e.target.value)} // Just set discount value
+                                onChange={(e) => setDiscount(e.target.value)}
                             >
                                 <option value="">Select a discount</option>
                                 <option value="5">5%</option>
@@ -247,30 +241,12 @@ const BundleProductModal = () => {
                             </Form.Select>
                         </Form.Group>
 
-
                         <h5>Total Price: P{customPrice}</h5>
 
                         <Button variant="primary" type="submit">
                             Create Bundle
                         </Button>
-
-
-                        {message && <Alert variant="success">{message}</Alert>}
-                        {error && <Alert variant="danger">{error}</Alert>}
                     </Form>
-
-
-                    <Pagination>
-                        {[...Array(totalPages).keys()].map((page) => (
-                            <Pagination.Item
-                                key={page + 1}
-                                active={page + 1 === currentPage}
-                                onClick={() => handlePageChange(page + 1)}
-                            >
-                                {page + 1}
-                            </Pagination.Item>
-                        ))}
-                    </Pagination>
                 </Modal.Body>
             </Modal>
         </>

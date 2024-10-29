@@ -82,25 +82,26 @@ router.post('/product-bundles', async (req, res) => {
         // Query to find bundles that contain products in the same category, excluding the given product_code
         const [bundles] = await db.query(
             `SELECT
-                b.bundle_id, 
-                b.discount, 
-                bp.product_code, 
-                bp.discounted_price, 
-                p.product_name, 
-                p.price,
-                (bp.discounted_price - (bp.discounted_price * b.discount / 100)) AS final_price
-            FROM
-                bundles AS b
-                JOIN
-                bundle_products AS bp
-                ON 
-                    b.bundle_id = bp.bundle_id
-                JOIN
-                product AS p
-                ON 
-                    bp.product_code = p.product_code
-            WHERE 
-                p.category_id = ?`,
+	b.bundle_id, 
+	b.discount, 
+	bp.product_code, 
+	bp.discounted_price, 
+	p.product_name, 
+	p.price, 
+	(bp.discounted_price - (bp.discounted_price * b.discount / 100)) AS final_price, 
+	p.product_image
+FROM
+	bundles AS b
+	JOIN
+	bundle_products AS bp
+	ON 
+		b.bundle_id = bp.bundle_id
+	JOIN
+	product AS p
+	ON 
+		bp.product_code = p.product_code
+WHERE
+	p.category_id =  ?`,
             [category_id, product_code]
         );
 

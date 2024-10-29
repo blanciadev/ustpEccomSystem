@@ -35,8 +35,6 @@ const authenticateToken = async (req, res, next) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 };
-
-
 // Logout endpoint
 router.post('/logout', authenticateToken, async (req, res) => {
     const token = req.headers['authorization']?.split(' ')[1];
@@ -46,7 +44,8 @@ router.post('/logout', authenticateToken, async (req, res) => {
     }
 
     try {
-        await db.query('UPDATE tokens SET token_status = ?, expires_at = NOW() WHERE token = ?', ['Deactivated', token]);
+        await db.query('DELETE FROM tokens WHERE token = ?', [token]);
+        console.error('Deleting token');
         res.status(200).json({ message: 'Logged out successfully.' });
     } catch (error) {
         console.error('Error during logout:', error.message);

@@ -12,6 +12,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
     const [selectedBundleProducts, setSelectedBundleProducts] = useState({});
     const [toastMessage, setToastMessage] = useState('');
 
+    const [quantity, setQuantity] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
     const [productsPerPage] = useState(3);
 
@@ -152,7 +153,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
     const handleBuyNow = (product) => {
         const productData = {
             ...product,
-            quantity: 1,
+            quantity,
 
         };
 
@@ -183,6 +184,16 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         }));
     };
 
+    // Function to increase quantity
+    const incrementQuantity = () => {
+        setQuantity((prevQuantity) => prevQuantity + 1);
+    };
+
+    // Function to decrease quantity
+    const decrementQuantity = () => {
+        setQuantity((prevQuantity) => (prevQuantity > 1 ? prevQuantity - 1 : 1));
+    };
+
     if (!isOpen || !product) return null;
     return (
 
@@ -209,12 +220,12 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                         </div>
                     </div>
                     <div class="product-info">
-                        <p>HAIRCARE • Shampoo</p>
+                        {/* <p>HAIRCARE • Shampoo</p> */}<br></br>
                         <h3>{product.product_name}</h3>
-                        <p><strong>Description:</strong>
+                        <p><strong>Description: </strong>
                             {product.description || 'No description available.'}
                         </p>
-                        <p><strong>Hair Type:</strong>
+                        {/* <p><strong>Hair Type:</strong>
                             Suitable for virgin and colored hair.
                         </p>
                         <p><strong>Hair Texture:</strong>
@@ -222,23 +233,31 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                         </p>
                         <p><strong>Effect/Target Problems:</strong>
                             Treats dandruff, reduces scalp irritation, and soothes sensitive scalps.
-                        </p>
-                        <div class="quantity">
+                        </p> */}
+                        <br></br>
+                        <div className="quantity">
                             <p><strong>Quantity</strong></p>
                             <div className='quantity-buttons'>
-                                <button>-</button>
-                                <input type="text" value="1" style={{ width: '70px', border: '1px solid gray', outline: 'none', borderRadius: '0' }} />
-                                <button>+</button>
+                                <button onClick={decrementQuantity}>-</button>
+                                <input
+                                    type="text"
+                                    value={quantity}
+                                    readOnly
+                                    style={{ width: '70px', border: '1px solid gray', outline: 'none', borderRadius: '0' }}
+                                />
+                                <button onClick={incrementQuantity}>+</button>
                             </div>
-
                         </div>
                         <div class="buttons">
                             {product.quantity > 0 ? (
                                 <>
                                     <button onClick={() => onAddToCart(product)}><i class="bx bx-cart"></i>Add to Cart</button>
-                                    <button onClick={() => handleBuyNow(product)}
+                                    <button
+                                        onClick={() => handleBuyNow(product, quantity)}
                                         style={{ marginLeft: '10px' }}
-                                    >Buy Now</button>
+                                    >
+                                        Buy Now
+                                    </button>
                                 </>
                             ) : (
                                 <p style={{ color: 'red' }}>Out of stock</p>
@@ -258,9 +277,15 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                             <h4>Available Bundle</h4>
                             <p>Save money, avail discounted items</p>
                             <div>
-                                {bundleProducts.map((bProduct) => (
-                                    <div key={bProduct.product_code}>
 
+                                {bundleProducts.map((bProduct) => (
+
+                                    <div key={bProduct.product_code}>
+                                        <img
+                                            src={bProduct.product_image}
+                                            alt={bProduct.product_name}
+                                            className="modalproduct-image-bundle"
+                                        />
                                         <input
                                             type="checkbox"
                                             checked={selectedBundleProducts[bProduct.product_code] || false}

@@ -73,15 +73,7 @@ const findResetToken = async (email, token) => {
     return results[0];
 };
 
-const updateUserPassword = async (email, newPassword) => {
-    const query = 'UPDATE users SET password = ? WHERE email = ?';
-    await db.execute(query, [newPassword, email]);
-};
 
-const deleteResetToken = async (email) => {
-    const query = 'DELETE FROM PasswordResets WHERE email = ?';
-    await db.execute(query, [email]);
-};
 
 
 router.post('/verify-reset-token', async (req, res) => {
