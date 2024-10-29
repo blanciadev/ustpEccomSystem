@@ -69,8 +69,8 @@
         -2px -2px 5px #cececed5;
     /* background: linear-gradient(90deg, rgba(255,253,194,0.6) 0%, rgba(255, 205, 248, 0.6) 100%); */
     display: grid;
-    grid-template-columns: 48% 50%;
-    grid-template-rows: 10% 85%;
+    grid-template-columns: 40% 60%;
+    grid-template-rows: 10% 55% 30%;
     justify-content: center;
     align-content: center;
     gap: 5px;
@@ -81,26 +81,56 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 0;
+    padding: 10px 5px;
+
 }
 .profile-image-upload{
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
     align-content: center;
-    justify-content: space-around;
-
-}
-.profile-image-preview{
-    display: flex;
     justify-content: center;
+    align-items: center;
 }
-.profile-image-preview img{
-    width: 50%;
-    height: auto;
-    border-radius: 4px;
-    border: 1px solid rgba(82, 82, 82, 0.466);
+.profile-image-preview {
+    position: relative;
 }
+
+.image-container {
+    cursor: pointer; 
+}
+
+.user-profile-image {
+    width: 70%; 
+    height: auto; 
+    display: block; 
+}
+.profile-image-preview img {
+    width: 230px;
+    object-fit: cover;
+    border-radius: 10px;
+    display: block;
+  }
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7); /* Black background with transparency */
+    display: flex;
+    justify-content: center; /* Center text horizontally */
+    align-items: center; /* Center text vertically */
+    opacity: 0; /* Initially hide the overlay */
+    transition: opacity 0.3s ease;
+    color: white;
+    border-radius: 10px;
+}
+
+.image-container:hover .overlay {
+    opacity: 1;
+}
+
 .user-details .userDetails{
     height: 100%;
     display: grid;
@@ -119,13 +149,27 @@
     align-items: center;
     gap: 15px;
 }
-.edit-user input{
+.edit-user input,.user-password input{
     border: none;
     outline: none;
     background-color: white;
     border-bottom: 1px solid black;
     border-radius: 0px;
     padding: 0;
+}
+.user-password{
+    padding: 0 10px;
+    grid-column: span 2;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.user-password form{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-content: center;
+    align-items: flex-start;
 }
 .save-button {
     grid-column: 2/3;

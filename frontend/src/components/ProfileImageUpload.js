@@ -99,16 +99,23 @@ function ProfileImageUpload({ formData }) {
             {!isUploading && (
                 <>
                     <div className='profile-image-preview'>
-                        {formData.profile_img ? (
-                            <img src={formData.profile_img} alt="Profile" className="user-profile-image" />
-                        ) : (
-                            <img src="https://static.vecteezy.com/system/resources/previews/026/434/409/non_2x/default-avatar-profile-icon-social-media-user-photo-vector.jpg" alt="Default Profile" />
-                        )}
+                        <div className='image-container' onClick={() => document.getElementById('file-input').click()}>
+                            {formData.profile_img ? (
+                                <img src={formData.profile_img} alt="Profile" className="user-profile-image" />
+                            ) : (
+                                <img src="https://static.vecteezy.com/system/resources/previews/026/434/409/non_2x/default-avatar-profile-icon-social-media-user-photo-vector.jpg" alt="Default Profile" className="user-profile-image" />
+                            )}
+                            <div className='overlay'>Change Image</div>
+                        </div>
+                        <input 
+                            type="file" 
+                            id="file-input" 
+                            accept="image/jpeg, image/jpg, image/png" 
+                            onChange={handleFileChange} 
+                            style={{ display: 'none' }}  // Hides the file input
+                        />
                     </div>
 
-                    <div className="image-upload">
-                        <input type="file" accept="image/jpeg, image/jpg, image/png" onChange={handleFileChange} />
-                    </div>
 
 
                     <Modal show={showModal} onHide={() => setShowModal(false)} centered>

@@ -1016,19 +1016,93 @@ table td button,.order-table td button,.prod-table td button{
     border-radius: 10px;
     padding: 10px;
     display: grid;
-    grid-template-columns: 30% 70%;
-    grid-template-rows: 60% 40%;
+    grid-template-columns: 43% 57%;
+    grid-template-rows: 50% 50%;
     justify-items: center;
     align-items: center;
 }
-.admin-image img{
- width: 100%;
- object-fit: contain;
- border-radius: 10px;
+.admin-settings input{
+    width: 60%;
+    height: 20px;
+    background-color: white;
+    border: none;
+    outline: none;
+    border-bottom: 1px solid black;
+    border-radius: 0px;
 }
+.admin-image {
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .admin-image img {
+    width: 230px;
+    height: 230px;
+    object-fit: cover;
+    border-radius: 10px;
+    display: block;
+  }
+  
+  .admin-image .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); 
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .admin-image:hover .overlay {
+    opacity: 1;
+  }
+  
 .admin-password{
     grid-column: span 2;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
+.admin-information {
+    width: 90%;
+  }
+  
+  .info-form, .password-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  .form-group label {
+    font-weight: bold;
+  }
+  
+  .update-info-btn, .update-password-btn {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background-color: #d91e7b;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .update-info-btn:hover, .update-password-btn:hover {
+    background-color: #b31764;
+  }
 
 @media (max-width:768px){
     .user-counts{
