@@ -285,6 +285,37 @@ const Checkout = () => {
     return price * (1 - (discount / 100));
   };
 
+const formatPhoneNumber = (input) => {
+    const formattedInput = input.replace(/\D/g, ""); 
+    const phonePrefix = "+639";
+    const mainNumber = formattedInput.slice(3); 
+    
+    return mainNumber.length > 0
+      ? `${phonePrefix} ${mainNumber.slice(0, 3)} ${mainNumber.slice(3, 6)} ${mainNumber.slice(6, 9)}`
+      : phonePrefix;
+  };
+  
+  const handlePhoneNumberChange = (e) => {
+    let input = e.target.value.replace(/\D/g, "");
+    
+    if (!input.startsWith("639")) {
+      input = "639" + input; 
+    }
+  
+    setFormData({ ...formData, phoneNumber: `+${input}` });
+  };
+  
+  const formatPhoneNumberOnBlur = () => {
+    const formattedPhone = formatPhoneNumber(formData.phoneNumber);
+    setFormData({ ...formData, phoneNumber: formattedPhone });
+  };
+  
+  
+  const handlePostalCodeChange = (e) => {
+    const numericPostalCode = e.target.value.replace(/\D/g, "");
+    setFormData({ ...formData, postalCode: numericPostalCode });
+  };
+  
   return (
     <div className='checkout-container'>
       <ToastNotification toastMessage={toastMessage} />
@@ -294,8 +325,102 @@ const Checkout = () => {
         <div className='checkout-content'>
           <div className='checkout-address'>
             <h3>Delivery Address</h3>
+            <form class="address-form" onSubmit={handleSubmit}>
 
-            <form className='address-form' onSubmit={handleSubmit}>
+                <div class="form-group">
+                    <label for="fullName">FULL NAME</label>
+                    <input type="text" 
+                            id="fullName" 
+                            name="fullName" 
+                            value={formData.fullName}
+                            onChange={handleInputChange}
+                            required
+                    />
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="phoneNumber">PHONE NUMBER</label>
+                    <input
+                        type="tel"
+                        id="phoneNumber"
+                        name="phoneNumber"
+                        value={formData.phoneNumber}
+                        onChange={handlePhoneNumberChange}
+                        onBlur={formatPhoneNumberOnBlur}
+                        maxLength="16"
+                        placeholder="+639 XXX XXX XXX"
+                        required
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label for="streetname">STREETNAME</label>
+                    <input type="text" 
+                            id="streetname" 
+                            name="streetname" 
+                            value={formData.streetname}
+                            onChange={handleInputChange}
+                            required
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label for="address">ADDRESS</label>
+                    <input type="text" 
+                            id="address" 
+                            name="address" 
+                            value={formData.address}
+                            onChange={handleInputChange}
+                            required
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label for="region">REGION</label>
+                    <input type="text" 
+                            id="region" 
+                            name="region" 
+                            value={formData.region}
+                            onChange={handleInputChange}
+                            required
+                    />
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="postalCode">POSTAL CODE</label>
+                    <input
+                        type="text"
+                        id="postalCode"
+                        name="postalCode"
+                        value={formData.postalCode}
+                        onChange={handlePostalCodeChange}
+                        maxLength="4" 
+                        placeholder="e.g., 1234"
+                        required
+                    />
+                </div>
+
+                <div class="form-group">
+                    <h3>Payment Method</h3>
+                    <label>
+                        <input  type="radio" 
+                                name="paymentMethod" 
+                                checked={formData.paymentMethod === 'COD'} 
+                                onChange={handlePaymentChange}
+                                value="COD"/>
+                                Cash On Delivery
+                    </label>
+                </div>
+
+                <div className='form-group'>
+                    <button type='submit' className='submit-btn' disabled={loading}>
+                    {loading ? 'Processing...' : 'Place Order'}
+                    </button>
+                </div>
+
+            </form>
+
+            {/* <form className='address-form' onSubmit={handleSubmit}>
               {error && <p className='error-message'>{error}</p>}
               {success && <p className='success-message'>{success}</p>}
               {['fullName', 'phoneNumber', 'streetname', 'address', 'region', 'postalCode'].map(field => (
@@ -329,7 +454,7 @@ const Checkout = () => {
                   {loading ? 'Processing...' : 'Place Order'}
                 </button>
               </div>
-            </form>
+            </form> */}
           </div>
           <div className='checkout-summary' style={{
             width: '100%',
