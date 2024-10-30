@@ -457,59 +457,69 @@ const formatPhoneNumber = (input) => {
             </form> */}
           </div>
           <div className='checkout-summary' style={{
-            width: '100%',
-            maxWidth: '800px',
-            margin: '0 auto',
-            padding: '20px',
-            border: '1px solid #ccc',
-            borderRadius: '8px',
-            backgroundColor: '#f9f9f9'
-          }}>
-            <h3>Order Summary</h3>
-            {savedProducts.map((product, index) => {
-              const effectiveDiscount = discounts[0] || 0;
-              const discountedPrice = getDiscountedPrice(product.price, effectiveDiscount);
-              const total = (discountedPrice * quantities[index]).toFixed(2);
+    width: '100%',
+    maxWidth: '800px',
+    margin: '0 auto',
+    padding: '20px',
+    border: '1px solid #ccc',
+    borderRadius: '8px',
+    backgroundColor: '#f9f9f9'
+  }}>
+    <h3>Order Summary</h3>
+    {savedProducts.map((product, index) => {
+      const effectiveDiscount = product.discount || 0; // Check product-specific discount
+      const discountedPrice = getDiscountedPrice(product.price, effectiveDiscount);
+      const total = (discountedPrice * quantities[index]).toFixed(2);
 
-              return (
-                <div className='product-summary' key={index} style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '10px 0',
-                  borderBottom: '1px solid #ddd'
-                }}>
-                  <div>
-                    <h4>{product.product_name}</h4>
-                    <p>Original Price: ₱{product.price.toFixed(2)} (Discounted Price: ₱{discountedPrice.toFixed(2)} at {effectiveDiscount}% Off)</p>
-                    <input
-                      type='number'
-                      min='1'
-                      value={quantities[index]}
-                      onChange={e => handleQuantityChange(index, e)}
-                      style={{ width: '50px', marginRight: '10px' }}
-                    />
-                    <button onClick={() => handleRemoveProduct(index)}>Remove</button>
-                  </div>
-                  <div style={{ fontWeight: 'bold' }}>₱{total}</div>
-                </div>
-              );
-            })}
-
-            <span>Shipping Fee: ₱150</span>
-            <div className='total-price' style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginTop: '20px',
-              fontSize: '1.2em',
-              fontWeight: 'bold'
+      return (
+        <div className='product-summary' key={index} style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '10px 0',
+          borderBottom: '1px solid #ddd'
+        }}>
+          <div>
+            <h4>{product.product_name}</h4>
+            <p style={{
+              textDecoration: effectiveDiscount > 0 ? 'line-through' : 'none', 
+              color: effectiveDiscount > 0 ? '#888' : 'black' 
             }}>
-
-              <span>Total Price:</span>
-              <span>₱{calculateTotalPrice()}</span>
-            </div>
+              Original Price: ₱{product.price.toFixed(2)}
+            </p>
+            {effectiveDiscount > 0 && (
+              <p style={{ color: 'green', fontWeight: 'bold' }}>
+                Discounted Price: ₱{discountedPrice.toFixed(2)} at {effectiveDiscount}% Off
+              </p>
+            )}
+            <input
+              type='number'
+              min='1'
+              value={quantities[index]}
+              onChange={e => handleQuantityChange(index, e)}
+              style={{ width: '50px', marginRight: '10px' }}
+            />
+            <button onClick={() => handleRemoveProduct(index)}>Remove</button>
           </div>
+          <div style={{ fontWeight: 'bold' }}>₱{total}</div>
+        </div>
+      );
+    })}
+
+    <span>Shipping Fee: ₱150</span>
+    <div className='total-price' style={{
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginTop: '20px',
+      fontSize: '1.2em',
+      fontWeight: 'bold'
+    }}>
+      <span>Total Price:</span>
+      <span>₱{calculateTotalPrice()}</span>
+    </div>
+  </div>
+
         </div>
       </div>
       <Footer />

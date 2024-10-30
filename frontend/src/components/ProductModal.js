@@ -278,27 +278,48 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                             <p>Save money, avail discounted items</p>
                             <div>
 
-                                {bundleProducts.map((bProduct) => (
+                            {bundleProducts.map((bProduct) => (
+                            <div 
+                                key={bProduct.product_code} 
+                                className={`bundle-card ${selectedBundleProducts[bProduct.product_code] ? 'selected' : ''}`} 
+                                onClick={() => handleBundleProductSelect(bProduct.product_code)}
+                                style={{
+                                    border: '1px solid #ddd',
+                                    borderRadius: '8px',
+                                    padding: '16px',
+                                    margin: '10px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    cursor: 'pointer',
+                                    backgroundColor: selectedBundleProducts[bProduct.product_code] ? '#f0f8ff' : 'white'
+                                }}
+                            >
+                                <img
+                                    src={bProduct.product_image}
+                                    alt={bProduct.product_name}
+                                    className="modalproduct-image-bundle"
+                                    style={{ width: '50px', height: '50px', marginRight: '10px', borderRadius: '4px' }}
+                                />
+                                <div style={{ flex: 1 }}>
+                                    <label style={{ display: 'block', fontWeight: 'bold' }}>
+                                        {bProduct.product_name} - P{calculateDiscountedPrice(bProduct.price, bProduct.discount)}
+                                    </label>
+                                    <span style={{ marginLeft: '10px', color: 'red', fontSize: '0.85em' }}>
+                                        (Discount: {bProduct.discount}%)
+                                    </span>
+                                </div>
+                                <input
+                                    type="checkbox"
+                                    checked={selectedBundleProducts[bProduct.product_code] || false}
+                                    onChange={(e) => {
+                                        e.stopPropagation();
+                                        handleBundleProductSelect(bProduct.product_code);
+                                    }}
+                                    style={{ marginLeft: 'auto' }}
+                                />
+                            </div>
+                        ))}
 
-                                    <div key={bProduct.product_code}>
-                                        <img
-                                            src={bProduct.product_image}
-                                            alt={bProduct.product_name}
-                                            className="modalproduct-image-bundle"
-                                        />
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedBundleProducts[bProduct.product_code] || false}
-                                            onChange={() => handleBundleProductSelect(bProduct.product_code)}
-                                        />
-                                        <label>
-                                            {bProduct.product_name} - P{calculateDiscountedPrice(bProduct.price, bProduct.discount)}
-                                            <span style={{ marginLeft: '10px', color: 'red' }}>
-                                                (Discount: {bProduct.discount}%)
-                                            </span>
-                                        </label>
-                                    </div>
-                                ))}
                             </div>
                             <button onClick={handleBuyNowBundle} className="buy-now-btn">
                                 Buy Selected Products Now
