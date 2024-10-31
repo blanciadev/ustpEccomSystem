@@ -491,3 +491,24 @@ body {
     background-color: gray;
     color: white;
 }
+
+/* transitions */
+.fade-enter {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+  .fade-enter-active {
+    opacity: 1;
+    transform: translateX(0);
+    transition: opacity 300ms, transform 300ms;
+  }
+  .fade-exit {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .fade-exit-active {
+    opacity: 0;
+    transform: translateX(100px);
+    transition: opacity 300ms, transform 300ms;
+  }
+  

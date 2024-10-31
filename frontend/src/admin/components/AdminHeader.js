@@ -57,8 +57,7 @@ const AdminHeader = () => {
                     </Dropdown.Toggle>
 
                     <Dropdown.Menu style={{ marginTop: '35px', width: '200px' }}>
-                        <Dropdown.Item href='#/profile'>Profile</Dropdown.Item>
-                        <Dropdown.Item href='#/settings'>Settings</Dropdown.Item>
+                        <Dropdown.Item href='/admin/profile'>Profile</Dropdown.Item>
                         <Dropdown.Item onClick={() => setShowLogoutModal(true)}>Logout</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>

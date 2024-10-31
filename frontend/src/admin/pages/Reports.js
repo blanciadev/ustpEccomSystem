@@ -206,7 +206,7 @@ const Reports = () => {
                                                     <td>{report.product_code}</td>
                                                     <td>{report.product_name}</td>
                                                     <td>{report.total_quantity}</td>
-                                                    <td>PHP {parseFloat(report.total_sales).toFixed(2)}</td>
+                                                    <td>₱ {parseFloat(report.total_sales).toFixed(2)}</td>
                                                 </tr>
                                             ))}
                                         </tbody>

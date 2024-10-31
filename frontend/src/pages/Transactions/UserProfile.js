@@ -119,7 +119,9 @@ const UserProfile = () => {
                 {isEditing ? 'Cancel' : 'Edit'}
               </button>
             </div>
+            
             <ProfileImageUpload formData={formData} />
+
             {loading ? (
               <div className='cskeleton-item' style={{ gridColumn: 'span 2' }}></div>
             ) : userDetails ? (
@@ -217,6 +219,25 @@ const UserProfile = () => {
             ) : (
               <p>No user details found.</p>
             )}
+
+            <div className='user-password'>
+              <h3>Change Password</h3>
+              <form >
+                <div className='form-group'>
+                  <label>Current Password</label>
+                  <input type='text' placeholder='Enter current password' />
+                </div>
+                <div className='form-group'>
+                  <label>New Password</label>
+                  <input type='text' placeholder='Enter new password' />
+                </div>
+                <div className='form-group'>
+                  <label>Confirm New Password</label>
+                  <input type='text' placeholder='Confirm new password' />
+                </div>
+                <button type='submit'>Update Password</button>
+              </form>
+            </div>
           </div>
         </div>
       </div>

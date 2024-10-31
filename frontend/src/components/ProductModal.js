@@ -21,43 +21,49 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
             setLoading(true);
             setError(null);
 
-            Promise.all([
-                fetch('http://localhost:5001/products-recommendations', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ product_code: product.product_code }),
-                }),
-                fetch('http://localhost:5001/product-bundles', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ product_code: product.product_code }),
-                })
-            ])
+            const fetchRecommendations = fetch('http://localhost:5001/products-recommendations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ product_code: product.product_code }),
+            });
+
+            const fetchBundles = fetch('http://localhost:5001/product-bundles', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ product_code: product.product_code }),
+            });
+
+            Promise.allSettled([fetchRecommendations, fetchBundles])
                 .then(async ([recommendationRes, bundleRes]) => {
-                    if (!recommendationRes.ok || !bundleRes.ok) {
-                        throw new Error('Network response was not ok');
+                    if (recommendationRes.status === 'fulfilled' && recommendationRes.value.ok) {
+                        const recommendationData = await recommendationRes.value.json();
+                        setRecommendedProducts(recommendationData);
+                    } else {
+                        console.error('Error fetching recommendations:', recommendationRes.reason);
+                        setError('Failed to load recommendations.');
                     }
 
-                    const recommendationData = await recommendationRes.json();
-                    const bundleData = await bundleRes.json();
+                    if (bundleRes.status === 'fulfilled' && bundleRes.value.ok) {
+                        const bundleData = await bundleRes.value.json();
+                        setBundleProducts(bundleData);
 
-                    setRecommendedProducts(recommendationData);
-                    setBundleProducts(bundleData);
-
-                    const initialSelection = {};
-                    bundleData.forEach(bProduct => {
-                        initialSelection[bProduct.product_code] = true;
-                    });
-                    setSelectedBundleProducts(initialSelection);
+                        const initialSelection = {};
+                        bundleData.forEach(bProduct => {
+                            initialSelection[bProduct.product_code] = true;
+                        });
+                        setSelectedBundleProducts(initialSelection);
+                    } else {
+                        console.error('Error fetching bundles:', bundleRes.reason);
+                    }
 
                     setLoading(false);
                 })
                 .catch(error => {
-                    console.error('Error fetching data:', error);
+                    console.error('Unexpected error:', error);
                     setError('Failed to load data.');
                     setLoading(false);
                 });
@@ -103,22 +109,27 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
             return acc + (product.discount || 0);
         }, 0);
 
-        const originalProduct = {
-            ...product,
-            quantity: 1,
-            discount: Math.min(totalBundleDiscount, product.product_discount || 0), // Use the lesser discount
-            original_price: product.price,
-            discounted_price: calculateDiscountedPrice(product.price, Math.min(totalBundleDiscount, product.product_discount || 0)), // Apply the discount
-        };
+        // const originalProduct = {
+        //     ...product,
+        //     quantity: 1,
+        //     discount: Math.min(totalBundleDiscount, product.product_discount || 0), // Use the lesser discount
+        //     original_price: product.price,
+        //     discounted_price: calculateDiscountedPrice(product.price, Math.min(totalBundleDiscount, product.product_discount || 0)), // Apply the discount
+        // };
 
-        if (selectedProducts.length === 0 && originalProduct.discount <= 0) {
+        // if (selectedProducts.length === 0 && originalProduct.discount <= 0) {
+        //     alert('Please select at least one product from the bundle.');
+        //     return;
+        // }
+
+        if (selectedProducts.length === 0) {
             alert('Please select at least one product from the bundle.');
             return;
         }
 
-        if (!selectedProducts.some(item => item.product_code === originalProduct.product_code)) {
-            selectedProducts.push(originalProduct);
-        }
+        // if (!selectedProducts.some(item => item.product_code === originalProduct.product_code)) {
+        //     selectedProducts.push(originalProduct);
+        // }
 
         const unbundledProducts = JSON.parse(localStorage.getItem('unbundledProducts')) || [];
         unbundledProducts.forEach(product => {
@@ -279,26 +290,47 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                             <div>
 
                                 {bundleProducts.map((bProduct) => (
-
-                                    <div key={bProduct.product_code}>
+                                    <div
+                                        key={bProduct.product_code}
+                                        className={`bundle-card ${selectedBundleProducts[bProduct.product_code] ? 'selected' : ''}`}
+                                        onClick={() => handleBundleProductSelect(bProduct.product_code)}
+                                        style={{
+                                            border: '1px solid #ddd',
+                                            borderRadius: '8px',
+                                            padding: '16px',
+                                            margin: '10px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            cursor: 'pointer',
+                                            backgroundColor: selectedBundleProducts[bProduct.product_code] ? '#f0f8ff' : 'white'
+                                        }}
+                                    >
                                         <img
                                             src={bProduct.product_image}
                                             alt={bProduct.product_name}
                                             className="modalproduct-image-bundle"
+                                            style={{ width: '50px', height: '50px', marginRight: '10px', borderRadius: '4px' }}
                                         />
+                                        <div style={{ flex: 1 }}>
+                                            <label style={{ display: 'block', fontWeight: 'bold' }}>
+                                                {bProduct.product_name} - P{calculateDiscountedPrice(bProduct.price, bProduct.discount)}
+                                            </label>
+                                            <span style={{ marginLeft: '10px', color: 'red', fontSize: '0.85em' }}>
+                                                (Discount: {bProduct.discount}%)
+                                            </span>
+                                        </div>
                                         <input
                                             type="checkbox"
                                             checked={selectedBundleProducts[bProduct.product_code] || false}
-                                            onChange={() => handleBundleProductSelect(bProduct.product_code)}
+                                            onChange={(e) => {
+                                                e.stopPropagation();
+                                                handleBundleProductSelect(bProduct.product_code);
+                                            }}
+                                            style={{ marginLeft: 'auto' }}
                                         />
-                                        <label>
-                                            {bProduct.product_name} - P{calculateDiscountedPrice(bProduct.price, bProduct.discount)}
-                                            <span style={{ marginLeft: '10px', color: 'red' }}>
-                                                (Discount: {bProduct.discount}%)
-                                            </span>
-                                        </label>
                                     </div>
                                 ))}
+
                             </div>
                             <button onClick={handleBuyNowBundle} className="buy-now-btn">
                                 Buy Selected Products Now

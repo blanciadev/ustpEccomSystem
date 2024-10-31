@@ -20,6 +20,8 @@ const Checkout = () => {
   const [quantities, setQuantities] = useState(savedProducts.map(product => product.quantity || 1));
   const [originalQuantities, setOriginalQuantities] = useState([]);
 
+  let effectiveGlobalDiscount = 0;
+
   const [formData, setFormData] = useState({
     fullName: '',
     phoneNumber: '',
@@ -217,59 +219,67 @@ const Checkout = () => {
 
   };
 
-
   const calculateTotalPrice = () => {
-    const allValuesEqual = (array) => {
-      if (array.length === 0) return true;
-      return array.every(value => value === array[0]);
+    // Helper function to check if all values in an array are identical
+    const allValuesEqual = (array) => array.length === 0 || array.every(value => value === array[0]);
+
+    // Function to calculate effective price based on discount
+    const getEffectivePrice = (basePrice, discount) => {
+      const discountMultiplier = 1 - (discount / 100 || 0);
+      return basePrice * discountMultiplier;
     };
 
-    let discounts = globalDiscounts;
-
+    // Check if there are no saved products
     if (savedProducts.length === 0) return 0;
 
     console.log("----- Receipt -----");
 
-    const generalDiscountExists = allValuesEqual(discounts) && discounts[0] > 0;
+    let totalCost = 0;
+    const generalDiscount = allValuesEqual(globalDiscounts) ? globalDiscounts[0] : 0;
+    const hasGeneralDiscount = generalDiscount > 0;
+    console.log("----- GENERAL DISCOUNT  -----");
+    console.log(effectiveGlobalDiscount);
 
-    const productTotal = savedProducts.reduce((acc, product, index) => {
+
+    // Calculate total for each product
+    savedProducts.forEach((product, index) => {
+      const quantity = quantities[index] || 0;
       let effectivePrice = 0;
+      let discountApplied = 0;
 
+      console.log(hasGeneralDiscount);
+
+      // Check if product has its own discount
       if (product.discounted_price) {
-        const effectiveDiscount = allValuesEqual(discounts) ? discounts[0] : discounts || 0;
-        const discountMultiplier = (1 - (effectiveDiscount / 100 || 0));
-        effectivePrice = product.discounted_price * discountMultiplier;
+        discountApplied = allValuesEqual(globalDiscounts) ? globalDiscounts[0] : 0;
+        effectivePrice = getEffectivePrice(product.discounted_price, discountApplied);
 
-        console.log(`  Discounted Price: $${effectivePrice.toFixed(2)}`);
+        console.log(`Product: ${product.product_name} (Discounted)`);
       } else {
-        let effectiveDiscount = generalDiscountExists ? discounts[0] : 0;
-        const discountMultiplier = (1 - (effectiveDiscount / 100 || 0));
-        effectivePrice = product.price * discountMultiplier;
-        console.log(`${product.product_name} (Non-Bundled)`);
+        // Apply general discount if product does not have its own discount
+        discountApplied = hasGeneralDiscount ? generalDiscount : 0;
+        effectivePrice = getEffectivePrice(product.price, discountApplied);
 
-        if (generalDiscountExists) {
-          console.log(`  Discount: ${effectiveDiscount}% (due to bundle)`);
-        } else {
-          console.log("No Discount");
-        }
-        console.log(`  Price: $${effectivePrice.toFixed(2)}`);
-
-        console.log(`(Effective Discount )`, effectiveDiscount);
+        console.log(`Product: ${product.product_name} (Non-Bundled)`);
       }
 
-      const quantity = quantities[index] || 0;
-      const totalForProduct = effectivePrice * quantity;
-
+      console.log(`  Discount: ${discountApplied}%`);
+      console.log(`  Price per unit: $${effectivePrice.toFixed(2)}`);
       console.log(`  Quantity: ${quantity}`);
+
+      const totalForProduct = effectivePrice * quantity;
+      totalCost += totalForProduct;
+
       console.log(`  Total for ${product.product_name}: $${totalForProduct.toFixed(2)}`);
       console.log("------------------------------");
+    });
 
-      return acc + totalForProduct;
-    }, 0);
+    // Add shipping and display transaction total
+    const shippingCost = 150;
+    const transactionTotal = totalCost + shippingCost;
 
-    const shipping = 150;
-    const transactionTotal = productTotal + shipping;
-
+    console.log(`Subtotal: $${totalCost.toFixed(2)}`);
+    console.log(`Shipping: $${shippingCost.toFixed(2)}`);
     console.log(`Transaction Total: $${transactionTotal.toFixed(2)}`);
     console.log("----- End of Receipt -----");
 
@@ -281,8 +291,40 @@ const Checkout = () => {
 
 
 
+
   const getDiscountedPrice = (price, discount) => {
     return price * (1 - (discount / 100));
+  };
+
+  const formatPhoneNumber = (input) => {
+    const formattedInput = input.replace(/\D/g, "");
+    const phonePrefix = "+639";
+    const mainNumber = formattedInput.slice(3);
+
+    return mainNumber.length > 0
+      ? `${phonePrefix} ${mainNumber.slice(0, 3)} ${mainNumber.slice(3, 6)} ${mainNumber.slice(6, 9)}`
+      : phonePrefix;
+  };
+
+  const handlePhoneNumberChange = (e) => {
+    let input = e.target.value.replace(/\D/g, "");
+
+    if (!input.startsWith("639")) {
+      input = "639" + input;
+    }
+
+    setFormData({ ...formData, phoneNumber: `+${input}` });
+  };
+
+  const formatPhoneNumberOnBlur = () => {
+    const formattedPhone = formatPhoneNumber(formData.phoneNumber);
+    setFormData({ ...formData, phoneNumber: formattedPhone });
+  };
+
+
+  const handlePostalCodeChange = (e) => {
+    const numericPostalCode = e.target.value.replace(/\D/g, "");
+    setFormData({ ...formData, postalCode: numericPostalCode });
   };
 
   return (
@@ -294,8 +336,102 @@ const Checkout = () => {
         <div className='checkout-content'>
           <div className='checkout-address'>
             <h3>Delivery Address</h3>
+            <form class="address-form" onSubmit={handleSubmit}>
 
-            <form className='address-form' onSubmit={handleSubmit}>
+              <div class="form-group">
+                <label for="fullName">FULL NAME</label>
+                <input type="text"
+                  id="fullName"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="phoneNumber">PHONE NUMBER</label>
+                <input
+                  type="tel"
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handlePhoneNumberChange}
+                  onBlur={formatPhoneNumberOnBlur}
+                  maxLength="13"
+                  placeholder="+639 XXX XXX XXX"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="streetname">STREETNAME</label>
+                <input type="text"
+                  id="streetname"
+                  name="streetname"
+                  value={formData.streetname}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="address">ADDRESS</label>
+                <input type="text"
+                  id="address"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="region">REGION</label>
+                <input type="text"
+                  id="region"
+                  name="region"
+                  value={formData.region}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="postalCode">POSTAL CODE</label>
+                <input
+                  type="text"
+                  id="postalCode"
+                  name="postalCode"
+                  value={formData.postalCode}
+                  onChange={handlePostalCodeChange}
+                  maxLength="4"
+                  placeholder="e.g., 1234"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <h3>Payment Method</h3>
+                <label>
+                  <input type="radio"
+                    name="paymentMethod"
+                    checked={formData.paymentMethod === 'COD'}
+                    onChange={handlePaymentChange}
+                    value="COD" />
+                  Cash On Delivery
+                </label>
+              </div>
+
+              <div className='form-group'>
+                <button type='submit' className='submit-btn' disabled={loading}>
+                  {loading ? 'Processing...' : 'Place Order'}
+                </button>
+              </div>
+
+            </form>
+
+            {/* <form className='address-form' onSubmit={handleSubmit}>
               {error && <p className='error-message'>{error}</p>}
               {success && <p className='success-message'>{success}</p>}
               {['fullName', 'phoneNumber', 'streetname', 'address', 'region', 'postalCode'].map(field => (
@@ -329,7 +465,7 @@ const Checkout = () => {
                   {loading ? 'Processing...' : 'Place Order'}
                 </button>
               </div>
-            </form>
+            </form> */}
           </div>
           <div className='checkout-summary' style={{
             width: '100%',
@@ -342,9 +478,12 @@ const Checkout = () => {
           }}>
             <h3>Order Summary</h3>
             {savedProducts.map((product, index) => {
-              const effectiveDiscount = discounts[0] || 0;
+              const effectiveDiscount = product.discount || 0; // Check product-specific discount
               const discountedPrice = getDiscountedPrice(product.price, effectiveDiscount);
               const total = (discountedPrice * quantities[index]).toFixed(2);
+              effectiveGlobalDiscount = effectiveDiscount;
+              console.log('GLOBAL EFFECTIVE DISCOUNT : ' + effectiveGlobalDiscount);
+
 
               return (
                 <div className='product-summary' key={index} style={{
@@ -356,7 +495,17 @@ const Checkout = () => {
                 }}>
                   <div>
                     <h4>{product.product_name}</h4>
-                    <p>Original Price: ₱{product.price.toFixed(2)} (Discounted Price: ₱{discountedPrice.toFixed(2)} at {effectiveDiscount}% Off)</p>
+                    <p style={{
+                      textDecoration: effectiveDiscount > 0 ? 'line-through' : 'none',
+                      color: effectiveDiscount > 0 ? '#888' : 'black'
+                    }}>
+                      Original Price: ₱{product.price.toFixed(2)}
+                    </p>
+                    {effectiveDiscount > 0 && (
+                      <p style={{ color: 'green', fontWeight: 'bold' }}>
+                        Discounted Price: ₱{discountedPrice.toFixed(2)} at {effectiveDiscount}% Off
+                      </p>
+                    )}
                     <input
                       type='number'
                       min='1'
@@ -380,11 +529,11 @@ const Checkout = () => {
               fontSize: '1.2em',
               fontWeight: 'bold'
             }}>
-
               <span>Total Price:</span>
-              <span>₱{calculateTotalPrice()}</span>
+              <span>₱{calculateTotalPrice().toFixed(2)}</span>
             </div>
           </div>
+
         </div>
       </div>
       <Footer />
