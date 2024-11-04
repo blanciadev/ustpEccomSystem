@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import './modal.css';
 import ToastNotification from './ToastNotification';
 
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
     const [recommendedProducts, setRecommendedProducts] = useState([]);
@@ -15,6 +16,8 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
     const [quantity, setQuantity] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
     const [productsPerPage] = useState(3);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (product) {
@@ -85,6 +88,8 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
     };
 
     const handleBuyNowBundle = () => {
+        const token = localStorage.getItem('token');
+
         const selectedProducts = Object.entries(selectedBundleProducts)
             .filter(([_, value]) => value)
             .map(([key]) => {
@@ -109,27 +114,12 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
             return acc + (product.discount || 0);
         }, 0);
 
-        // const originalProduct = {
-        //     ...product,
-        //     quantity: 1,
-        //     discount: Math.min(totalBundleDiscount, product.product_discount || 0), // Use the lesser discount
-        //     original_price: product.price,
-        //     discounted_price: calculateDiscountedPrice(product.price, Math.min(totalBundleDiscount, product.product_discount || 0)), // Apply the discount
-        // };
-
-        // if (selectedProducts.length === 0 && originalProduct.discount <= 0) {
-        //     alert('Please select at least one product from the bundle.');
-        //     return;
-        // }
 
         if (selectedProducts.length === 0) {
             alert('Please select at least one product from the bundle.');
             return;
         }
 
-        // if (!selectedProducts.some(item => item.product_code === originalProduct.product_code)) {
-        //     selectedProducts.push(originalProduct);
-        // }
 
         const unbundledProducts = JSON.parse(localStorage.getItem('unbundledProducts')) || [];
         unbundledProducts.forEach(product => {
@@ -155,28 +145,46 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
 
         localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
 
-        showToast('Redirecting to Checkout Page...');
-
-        window.location.href = '/checkout';
+        if (token) {
+            showToast('Redirecting to Checkout Page...');
+            window.location.href = '/checkout';
+        } else {
+            // Set the redirect to checkout after login
+            localStorage.setItem('redirectTo', '/checkout');
+            showToast('Redirecting to Login Page...');
+            // Redirect to login page
+            navigate('/login');
+        }
     };
 
-
     const handleBuyNow = (product) => {
+        const token = localStorage.getItem('token');
         const productData = {
             ...product,
             quantity,
-
         };
 
-        const existingProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
-        existingProducts.push(productData);
+        if (!token) {
+            const existingProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
+            existingProducts.push(productData);
+            localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
 
-        localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
+            // Set the redirect to checkout after login
+            localStorage.setItem('redirectTo', '/checkout');
 
-        showToast('Redirecting to Checkout Page...');
+            // Redirect to login page
+            navigate('/login');
+        } else {
+            // User is logged in, proceed to save the selected product for checkout
+            const existingProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
+            existingProducts.push(productData);
+            localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
 
-        window.location.href = '/checkout';
+            showToast('Redirecting to Checkout Page...');
+            window.location.href = '/checkout';
+        }
     };
+
 
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;

@@ -91,15 +91,25 @@ const CartContent = () => {
   }, [cartItems]);
 
   const handleCheckout = () => {
+    const token = localStorage.getItem('token');
+
     const selectedProducts = cartItems.filter(item => selectedItems[item.product_code]);
 
     if (selectedProducts.length === 0) {
       alert("Please select at least one product to proceed to checkout.");
       return;
     }
-
     localStorage.setItem('selectedProducts', JSON.stringify(selectedProducts));
-    navigate('/checkout', { state: { selectedProducts, totalPrice } });
+
+    if (!token) {
+      // Set the redirect to checkout after login
+      localStorage.setItem('redirectTo', '/checkout');
+
+      navigate('/login');
+    } else {
+      navigate('/checkout', { state: { selectedProducts, totalPrice } });
+    }
+
   };
 
 

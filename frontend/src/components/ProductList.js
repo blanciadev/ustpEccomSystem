@@ -107,6 +107,7 @@ const ProductList = ({ stickyComponents }) => {
     function generateCartItemId() {
         return 'CART-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
     }
+
     const handleAddToCart = async (product) => {
         const token = localStorage.getItem('token');
         const customerId = localStorage.getItem('customer_id');
@@ -187,6 +188,7 @@ const ProductList = ({ stickyComponents }) => {
 
 
     const handleBuyNow = (product) => {
+        const token = localStorage.getItem('token');
         const productData = {
             ...product,
             quantity: 1,
@@ -197,7 +199,17 @@ const ProductList = ({ stickyComponents }) => {
         localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
         setToastMessage('Redirecting to Checkout Page');
 
-        window.location.href = '/checkout';
+        // window.location.href = '/checkout';
+        console.log("Trigger Product List");
+
+        if (token) {
+            window.location.href = '/checkout';
+        } else {
+            localStorage.setItem('redirectTo', '/checkout');
+            // Redirect to login page
+            navigate('/login');
+        }
+
     };
 
     if (loading) {

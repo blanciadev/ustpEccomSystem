@@ -7,7 +7,10 @@ import ProductModal from '../../components/ProductModal';
 import ToastNotification from '../../components/ToastNotification';
 import ClientHomeLoader from '../../Loaders/ClientHomeLoader';
 
+import { useNavigate } from 'react-router-dom';
+
 const Shop = () => {
+    const navigate = useNavigate()
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -74,6 +77,8 @@ const Shop = () => {
     };
 
     const handleBuyNow = (product) => {
+        const token = localStorage.getItem('token');
+
         const productData = {
             ...product,
             quantity: product.quantity = 1,
@@ -92,7 +97,13 @@ const Shop = () => {
             setToastMessage('');
         }, 3000);
 
-        window.location.href = '/checkout';
+        if (token) {
+            window.location.href = '/checkout';
+        } else {
+            localStorage.setItem('redirectTo', '/checkout');
+            // Redirect to login page
+            navigate('/login');
+        }
         console.log(productData);
 
     };
