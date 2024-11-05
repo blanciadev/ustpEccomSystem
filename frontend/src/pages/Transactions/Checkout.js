@@ -134,61 +134,184 @@ const Checkout = () => {
     setOriginalQuantities(updatedQuantities);
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   setError('');
+  //   setSuccess('');
+  //   const userId = localStorage.getItem('customer_id');
+  //   const payload = {};
+  //   const token = localStorage.getItem('token');
+  //   if (!token) {
+  //     localStorage.setItem('redirectTo', '/checkout');
+  //     navigate('/login');
+  //     return;
+  //   }
+
+  //   if (!validateForm()) {
+  //     setLoading(false);
+  //     setError('All fields are required.');
+  //     return;
+  //   }
+
+
+  //   try {
+  //     if (!customerId || savedProducts.length === 0) {
+  //       setLoading(false);
+  //       setError('Missing customer ID or no products selected.');
+  //       return;
+  //     }
+  //     // Define the interaction payload
+  //     payload = {
+  //       product_code: savedProducts.map(product => product.product_code),
+  //       customerId: userId,
+  //       interaction_type: 'order'
+  //     };
+
+  //     console.log("Payload Entry : ", payload);
+
+  //     const totalOrderPrice = calculateTotalPrice().toFixed(2);
+  //     const orderData = {
+  //       customer_id: customerId,
+  //       fullName: formData.fullName,
+  //       order_details: savedProducts.map((product, index) => {
+  //         const discountedPrice = product.price * (1 - (discounts[index] / 100));
+  //         const productTotal = discountedPrice * quantities[index];
+
+  //         return {
+  //           cart_items: product.cart_items_id,
+  //           product_id: product.product_code,
+  //           quantity: quantities[index],
+  //           totalprice: productTotal.toFixed(2),
+  //           payment_method: 'COD',
+  //           payment_status: 'Pending',
+  //         };
+  //       }),
+  //       total_price: totalOrderPrice,
+  //       order_date: new Date().toISOString(),
+  //       shipment_date: new Date().toISOString(),
+  //       address: formData.address,
+  //       streetname: formData.streetname,
+  //       region: formData.region,
+  //       shipment_status: 'Pending',
+  //       paymentMethod: formData.paymentMethod,
+  //       phoneNumber: formData.phoneNumber,
+  //       postalCode: formData.postalCode,
+  //     };
+
+  //     const response = await axios.post('http://localhost:5001/insert-order', orderData, {
+  //       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+  //     });
+
+  //     localStorage.setItem('checkoutOrderData', JSON.stringify(orderData));
+
+  //     if (response.status === 201) {
+
+  //       setSuccess('Order placed successfully!');
+  //       localStorage.removeItem('selectedProducts');
+
+  //       setToastMessage('Order Successful!');
+  //       setTimeout(() => {
+  //         setToastMessage('');
+  //         navigate('/user/purchase');
+  //       }, 3000);
+
+  //       console.log('toast should display T-T')
+
+
+  //     }
+  //   } catch (error) {
+  //     console.error('Error placing order:', error);
+  //     setError('Failed to place order. Please try again.');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  //   // Function to record product interaction
+  //   const recordProductInteraction = async (payload) => {
+  //     try {
+  //       console.log('Recording product interaction:', payload);
+  //       await axios.get('http://localhost:5001/products-interaction', { params: payload });
+  //       console.log('Product interaction recorded successfully.');
+  //     } catch (error) {
+  //       console.error('Error recording product interaction:', error);
+  //     }
+  //   };
+
+  //   await recordProductInteraction(payload);
+
+  // };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     setSuccess('');
 
+    const customerId = localStorage.getItem('customer_id');
     const token = localStorage.getItem('token');
+
+    // Redirect to login if token is missing
     if (!token) {
       localStorage.setItem('redirectTo', '/checkout');
       navigate('/login');
       return;
     }
 
+    // Validate the form before proceeding
     if (!validateForm()) {
       setLoading(false);
       setError('All fields are required.');
       return;
     }
 
+    // Check for customerId and selected products
+    if (!customerId || savedProducts.length === 0) {
+      setLoading(false);
+      setError('Missing customer ID or no products selected.');
+      return;
+    }
+
+
+    const totalOrderPrice = calculateTotalPrice().toFixed(2);
+
+    const orderData = {
+      customer_id: customerId,
+      fullName: formData.fullName,
+      order_details: savedProducts.map((product, index) => {
+        const discountedPrice = product.price * (1 - (discounts[index] / 100));
+        const productTotal = discountedPrice * quantities[index];
+        return {
+          cart_items: product.cart_items_id,
+          product_id: product.product_code,
+          quantity: quantities[index],
+          totalprice: productTotal.toFixed(2),
+          payment_method: 'COD',
+          payment_status: 'Pending',
+        };
+      }),
+      total_price: totalOrderPrice,
+      order_date: new Date().toISOString(),
+      shipment_date: new Date().toISOString(),
+      address: formData.address,
+      streetname: formData.streetname,
+      region: formData.region,
+      shipment_status: 'Pending',
+      paymentMethod: formData.paymentMethod,
+      phoneNumber: formData.phoneNumber,
+      postalCode: formData.postalCode,
+    };
+
+    // Define the interaction payload
+    const payload = {
+      product_code: orderData.order_details.map(detail => detail.product_id),  // retrieve product_id from order_details in orderData
+      customerId: customerId,
+      interaction_type: 'order'
+    };
+
+    console.log("Payload Entry:", payload);
+
     try {
-      if (!customerId || savedProducts.length === 0) {
-        setLoading(false);
-        setError('Missing customer ID or no products selected.');
-        return;
-      }
-
-      const totalOrderPrice = calculateTotalPrice().toFixed(2);
-      const orderData = {
-        customer_id: customerId,
-        fullName: formData.fullName,
-        order_details: savedProducts.map((product, index) => {
-          const discountedPrice = product.price * (1 - (discounts[index] / 100));
-          const productTotal = discountedPrice * quantities[index];
-
-          return {
-            cart_items: product.cart_items_id,
-            product_id: product.product_code,
-            quantity: quantities[index],
-            totalprice: productTotal.toFixed(2),
-            payment_method: 'COD',
-            payment_status: 'Pending',
-          };
-        }),
-        total_price: totalOrderPrice,
-        order_date: new Date().toISOString(),
-        shipment_date: new Date().toISOString(),
-        address: formData.address,
-        streetname: formData.streetname,
-        region: formData.region,
-        shipment_status: 'Pending',
-        paymentMethod: formData.paymentMethod,
-        phoneNumber: formData.phoneNumber,
-        postalCode: formData.postalCode,
-      };
-
+      // Send order data to the server
       const response = await axios.post('http://localhost:5001/insert-order', orderData, {
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
@@ -196,7 +319,6 @@ const Checkout = () => {
       localStorage.setItem('checkoutOrderData', JSON.stringify(orderData));
 
       if (response.status === 201) {
-
         setSuccess('Order placed successfully!');
         localStorage.removeItem('selectedProducts');
 
@@ -206,9 +328,9 @@ const Checkout = () => {
           navigate('/user/purchase');
         }, 3000);
 
-        console.log('toast should display T-T')
+        console.log('Toast should display T-T');
 
-
+        await recordProductInteraction(payload);
       }
     } catch (error) {
       console.error('Error placing order:', error);
@@ -216,20 +338,27 @@ const Checkout = () => {
     } finally {
       setLoading(false);
     }
-
   };
 
+  const recordProductInteraction = async (payload) => {
+    try {
+      console.log('Recording product interaction:', payload);
+      await axios.get('http://localhost:5001/products-interaction', { params: payload });
+      console.log('Product interaction recorded successfully.');
+    } catch (error) {
+      console.error('Error recording product interaction:', error);
+    }
+  };
+
+
   const calculateTotalPrice = () => {
-    // Helper function to check if all values in an array are identical
     const allValuesEqual = (array) => array.length === 0 || array.every(value => value === array[0]);
 
-    // Function to calculate effective price based on discount
     const getEffectivePrice = (basePrice, discount) => {
       const discountMultiplier = 1 - (discount / 100 || 0);
       return basePrice * discountMultiplier;
     };
 
-    // Check if there are no saved products
     if (savedProducts.length === 0) return 0;
 
     console.log("----- Receipt -----");
@@ -241,7 +370,6 @@ const Checkout = () => {
     console.log(effectiveGlobalDiscount);
 
 
-    // Calculate total for each product
     savedProducts.forEach((product, index) => {
       const quantity = quantities[index] || 0;
       let effectivePrice = 0;
@@ -249,14 +377,12 @@ const Checkout = () => {
 
       console.log(hasGeneralDiscount);
 
-      // Check if product has its own discount
       if (product.discounted_price) {
         discountApplied = allValuesEqual(globalDiscounts) ? globalDiscounts[0] : 0;
         effectivePrice = getEffectivePrice(product.discounted_price, discountApplied);
 
         console.log(`Product: ${product.product_name} (Discounted)`);
       } else {
-        // Apply general discount if product does not have its own discount
         discountApplied = hasGeneralDiscount ? generalDiscount : 0;
         effectivePrice = getEffectivePrice(product.price, discountApplied);
 
@@ -274,7 +400,6 @@ const Checkout = () => {
       console.log("------------------------------");
     });
 
-    // Add shipping and display transaction total
     const shippingCost = 150;
     const transactionTotal = totalCost + shippingCost;
 

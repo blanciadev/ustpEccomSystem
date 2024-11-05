@@ -76,9 +76,27 @@ const ProductList = ({ stickyComponents }) => {
         });
     };
 
-    const handleProductClick = (product) => {
+
+    const handleProductClick = async (product) => {
+        // Set the selected product and open the modal
         setSelectedProduct(product);
         setIsModalOpen(true);
+        const customerId = localStorage.getItem('customer_id');
+
+        const payload = {
+            product_code: product.product_code,
+            customerId: customerId,
+            interaction_type: 'view'
+        };
+        console.log("payload", payload);
+
+        try {
+            const response = await axios.get('http://localhost:5001/products-interaction', { params: payload });
+
+            console.log('API response:', response.data);
+        } catch (error) {
+            console.error('Error recording product interaction:', error);
+        }
     };
 
     const closeModal = () => {
@@ -116,6 +134,26 @@ const ProductList = ({ stickyComponents }) => {
         console.log('Token:', token);
         console.log('Customer ID:', customerId);
 
+        const payload = {
+            product_code: product.product_code,
+            customerId: customerId,
+            interaction_type: 'cart'
+        };
+
+        const recordProductInteraction = async () => {
+            try {
+                console.log('Recording product interaction:', payload);
+                const response = await axios.get('http://localhost:5001/products-interaction', { params: payload });
+                console.log('Product interaction response:', response.data);
+            } catch (error) {
+                console.error('Error recording product interaction:', error);
+            }
+        };
+
+        const recordedInteractions = new Set();
+
+        let interactionRecorded = false;
+
         if (!token || !customerId) {
             console.log('User not logged in, using localStorage for cart');
             const cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -129,7 +167,6 @@ const ProductList = ({ stickyComponents }) => {
                 cart[existingProductIndex].sub_total = cart[existingProductIndex].price * cart[existingProductIndex].quantity;
                 console.log('Increased quantity for existing product:', cart[existingProductIndex]);
             } else {
-
                 const newCartItem = {
                     cart_items_id: generateCartItemId(),
                     product_code: product.product_code,
@@ -140,7 +177,6 @@ const ProductList = ({ stickyComponents }) => {
                 };
                 cart.push(newCartItem);
                 console.log('Added new product to cart:', newCartItem);
-
             }
 
             localStorage.setItem('cart', JSON.stringify(cart));
@@ -150,10 +186,16 @@ const ProductList = ({ stickyComponents }) => {
             console.log('Emitted cartUpdated event');
 
             setToastMessage('Added to Cart!');
-
             setTimeout(() => {
                 setToastMessage('');
             }, 3000);
+
+            if (!interactionRecorded && !recordedInteractions.has(product.product_code)) {
+                await recordProductInteraction();
+                recordedInteractions.add(product.product_code);
+                interactionRecorded = true;
+            }
+
             return;
         }
 
@@ -171,11 +213,19 @@ const ProductList = ({ stickyComponents }) => {
 
             cartEventEmitter.emit('cartUpdated');
             console.log('Emitted cartUpdated event after server response');
+
             setToastMessage('Added to Cart!');
             setTimeout(() => {
                 setToastMessage('');
             }, 3000);
-            return;
+
+            // Check if the interaction has already been recorded
+            if (!interactionRecorded && !recordedInteractions.has(product.product_code)) {
+                await recordProductInteraction();
+                recordedInteractions.add(product.product_code);
+                interactionRecorded = true;
+            }
+
         } catch (error) {
             if (error.response && error.response.status === 401) {
                 console.log('Unauthorized, redirecting to login');
@@ -185,6 +235,9 @@ const ProductList = ({ stickyComponents }) => {
             }
         }
     };
+
+
+
 
 
     const handleBuyNow = (product) => {

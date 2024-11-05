@@ -4,7 +4,8 @@ const db = require('../db');
 const crypto = require('crypto');
 
 
-const TOKEN_EXPIRATION_TIME = 3600000;
+const TOKEN_EXPIRATION_TIME = 900000;
+
 
 router.post('/users-login', async (req, res) => {
     const { email, password } = req.body;
@@ -22,30 +23,45 @@ router.post('/users-login', async (req, res) => {
 
         const user = rows[0];
 
-
         if (password !== user.password) {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        // Check if a token already exists for the user
-        const [existingTokenRows] = await db.query('SELECT * FROM tokens WHERE user_id = ? AND token_status = ?', [user.customer_id, 'Active']);
+        // Check for an existing token
+        const [existingTokenRows] = await db.query(
+            'SELECT * FROM tokens WHERE user_id = ? AND token_status = ?',
+            [user.customer_id, 'Active']
+        );
 
         if (existingTokenRows.length > 0) {
-            return res.status(400).json({ message: 'User already logged in' });
+            const existingToken = existingTokenRows[0];
+
+            // Check if the existing token is expired
+            const now = new Date();
+            if (new Date(existingToken.expires_at) > now) {
+                return res.status(400).json({ message: 'User already logged in' });
+            } else {
+                // Token is expired, so delete it
+                await db.query('DELETE FROM tokens WHERE token = ?', [existingToken.token]);
+                console.log('Expired token deleted:', existingToken.token);
+            }
         }
 
-        // Generate a random token
+        // Generate a new token
         const token = crypto.randomBytes(64).toString('hex');
 
-        // Store the token in the database
-        await db.query('INSERT INTO tokens (user_id, token, token_status, expires_at) VALUES (?, ?,?, ?)', [
-            user.customer_id,
-            token,
-            'Active',
-            new Date(Date.now() + TOKEN_EXPIRATION_TIME)
-        ]);
+        // Store the new token in the database
+        await db.query(
+            'INSERT INTO tokens (user_id, token, token_status, expires_at) VALUES (?, ?, ?, ?)',
+            [
+                user.customer_id,
+                token,
+                'Active',
+                new Date(Date.now() + TOKEN_EXPIRATION_TIME)
+            ]
+        );
 
-        // Respond with success message, token, user_id, username, and first_name
+        // Respond with the token and user info
         res.json({
             message: 'Login successful',
             token: token,
@@ -53,11 +69,9 @@ router.post('/users-login', async (req, res) => {
             username: user.username,
             first_name: user.first_name,
             role_type: user.role_type
-
         });
     } catch (err) {
-        // Log only the message
-        console.error('Token Validation Backedn Error during login:', err.message);
+        console.error('Token Validation Backend Error during login:', err.message);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
