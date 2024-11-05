@@ -186,15 +186,15 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
     };
 
 
-    const indexOfLastProduct = currentPage * productsPerPage;
-    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-    const currentRecommendedProducts = recommendedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+    // const indexOfLastProduct = currentPage * productsPerPage;
+    // const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    // const currentRecommendedProducts = recommendedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
 
-    const totalPages = Math.ceil(recommendedProducts.length / productsPerPage);
+    // const totalPages = Math.ceil(recommendedProducts.length / productsPerPage);
 
-    const handlePageChange = (pageNumber) => {
-        setCurrentPage(pageNumber);
-    };
+    // const handlePageChange = (pageNumber) => {
+    //     setCurrentPage(pageNumber);
+    // };
 
     const handleBundleProductSelect = (productCode) => {
         setSelectedBundleProducts(prevState => ({
@@ -288,62 +288,106 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
 
                     <button onClick={onClose} className='promodal-close-btn'>Close</button>
 
-
                     {/* Bundle Section */}
                     {bundleProducts.length > 0 && (
 
-                        <div className="bundle-section">
-                            <h4>Available Bundle</h4>
-                            <p>Save money, avail discounted items</p>
-                            <div>
+                    <div className="bundle-section">
+                        <h4>Available Bundle</h4>
+                        <p>Save money, avail discounted items</p>
+                        <div>
 
-                                {bundleProducts.map((bProduct) => (
-                                    <div
-                                        key={bProduct.product_code}
-                                        className={`bundle-card ${selectedBundleProducts[bProduct.product_code] ? 'selected' : ''}`}
-                                        onClick={() => handleBundleProductSelect(bProduct.product_code)}
-                                        style={{
-                                            border: '1px solid #ddd',
-                                            borderRadius: '8px',
-                                            padding: '16px',
-                                            margin: '10px',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            cursor: 'pointer',
-                                            backgroundColor: selectedBundleProducts[bProduct.product_code] ? '#f0f8ff' : 'white'
-                                        }}
-                                    >
-                                        <img
-                                            src={bProduct.product_image}
-                                            alt={bProduct.product_name}
-                                            className="modalproduct-image-bundle"
-                                            style={{ width: '50px', height: '50px', marginRight: '10px', borderRadius: '4px' }}
-                                        />
-                                        <div style={{ flex: 1 }}>
-                                            <label style={{ display: 'block', fontWeight: 'bold' }}>
-                                                {bProduct.product_name} - P{calculateDiscountedPrice(bProduct.price, bProduct.discount)}
-                                            </label>
-                                            <span style={{ marginLeft: '10px', color: 'red', fontSize: '0.85em' }}>
-                                                (Discount: {bProduct.discount}%)
-                                            </span>
-                                        </div>
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedBundleProducts[bProduct.product_code] || false}
-                                            onChange={(e) => {
-                                                e.stopPropagation();
-                                                handleBundleProductSelect(bProduct.product_code);
-                                            }}
-                                            style={{ marginLeft: 'auto' }}
-                                        />
-                                    </div>
-                                ))}
+                        {bundleProducts.map((bProduct) => (
+                        <div 
+                            key={bProduct.product_code} 
+                            className={`bundle-card ${selectedBundleProducts[bProduct.product_code] ? 'selected' : ''}`} 
+                            onClick={() => handleBundleProductSelect(bProduct.product_code)}
+                            style={{
+                                position: 'relative', // Add position: relative to the card container
+                                border: selectedBundleProducts[bProduct.product_code] ? '3px solid rgb(255, 114, 138)' : '3px solid #ddd',
+                                borderRadius: '2px',
+                                padding: '16px',
+                                margin: '10px',
+                                display: 'grid',
+                                gridTemplateRows: '50% 50%',
+                                alignItems: 'center',
+                                justifyItems:'center',
+                                cursor: 'pointer',
+                                backgroundColor: 'white'
+                            }}
+                        >
+                            {/* Discount Badge */}
+                            <div style={{
+                                position: 'absolute',
+                                top: '10px',
+                                left: '10px',
+                                background: 'linear-gradient(316deg, #ff728a, #f3163c, #ffa7a7, #df1b1b)',
+                                backgroundSize: '800% 800%',
+                                animation: 'gradient 3s ease infinite',
+                                color: 'white',
+                                padding: '5px',
+                                width:'59px',
+                                height:'59px',
+                                borderRadius: '50%',
+                                fontSize: '.8em',
+                                fontWeight: '600',
+                                zIndex:'1',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'center',
+                                alignItems:'center'
 
+
+                            }}>
+                                <p style={{fontSize:'1.2rem' }}>{bProduct.discount}% </p>
+                                <p style={{lineHeight: '0.5'}}>OFF</p>
                             </div>
-                            <button onClick={handleBuyNowBundle} className="buy-now-btn">
-                                Buy Selected Products Now
-                            </button>
+                            <style>
+                                {`
+                                    @keyframes gradient {
+                                        0%{background-position:14% 0%}
+                                        50%{background-position:87% 100%}
+                                        100%{background-position:14% 0%}
+                                    }
+                                `}
+                            </style>
+                            <img
+                                src={bProduct.product_image}
+                                alt={bProduct.product_name}
+                                className="modalproduct-image-bundle"
+                                style={{ width: '50%', objectFit:'contain', borderRadius: '4px' }}
+                            />
+                            <div style={{ flex: 1 , textAlign: 'center' }}>
+                                <label style={{ display: 'block', fontWeight: 'bold', }}>
+                                    {bProduct.product_name}
+                                </label>
+                                <p style={{background: 'linear-gradient(to right, hotpink, red)',
+                                            WebkitBackgroundClip: 'text',
+                                            WebkitTextFillColor: 'transparent',
+                                            fontSize:'1.2rem',
+                                            fontWeight:'600'}}>
+                                                ₱{calculateDiscountedPrice(bProduct.price, bProduct.discount)}</p>
+                                <p style={{color: '#858585', textDecoration: 'line-through'}}> ₱{bProduct.price}</p>
+                            </div>
+                            <input
+                                type="checkbox"
+                                checked={selectedBundleProducts[bProduct.product_code] || false}
+                                onChange={(e) => {
+                                    handleBundleProductSelect(bProduct.product_code);
+                                }}
+                                style={{ display: 'none' }}
+                            />
                         </div>
+
+                        ))}
+
+                        </div>
+
+                        <p style={{fontSize: '1.1rem', fontWeight:'600'}}><span style={{textDecoration:'line-through',fontWeight:'500', color:'#858585', paddingRight:'3px'}}>₱ ORIGINAL TOTAL </span>₱ DISCOUNTED TOTAL</p>{/* PLEASE  */}
+                        
+                        <button onClick={handleBuyNowBundle} className="buy-now-btn">
+                            Buy Selected Products Now
+                        </button>
+                    </div>
                     )}
 
                     {/* Recommendations Section */}
@@ -353,9 +397,9 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                             <p>Loading recommendations...</p>
                         ) : error ? (
                             <p>{error}</p>
-                        ) : currentRecommendedProducts.length > 0 ? (
+                        ) : recommendedProducts.length > 0 ? (
                             <div className="recommended-modalproducts-grid">
-                                {currentRecommendedProducts.map((recProduct) => (
+                                {recommendedProducts.map((recProduct) => (
                                     <div key={recProduct.product_id} className="modalproduct-card">
                                         <img
                                             src={recProduct.product_image}
@@ -400,7 +444,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                         )}
 
                         {/* Pagination Controls */}
-                        {totalPages > 1 && (
+                        {/*{totalPages > 1 && (
                             <div className="pagination-controls">
                                 {Array.from({ length: totalPages }, (_, index) => (
                                     <button
@@ -411,8 +455,8 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                                         {index + 1}
                                     </button>
                                 ))}
-                            </div>
-                        )}
+                             </div> 
+                        )}*/}
                     </div>
                 </div>
             </div>

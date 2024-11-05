@@ -179,6 +179,12 @@
     padding: 10px 0;
     margin: 10px 0;
 }
+.bundle-section > div{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-rows: 350px;
+    justify-items: center;
+}
 
 .recommendations {
     grid-area: 3 / 1 / 4 / 3;
