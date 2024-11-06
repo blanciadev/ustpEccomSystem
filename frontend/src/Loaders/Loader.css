@@ -1,0 +1,44 @@
+.skeleton{
+    width: 100vw;
+    height: 100vh;
+}
+.cskeleton-container{
+    width: 100%;
+    height: 100%;
+    background-color: rgb(253, 253, 253);
+    display: grid;
+    grid-template-rows: 10% 90%;
+    justify-items: center;
+    align-items: center;
+    padding: 10px;
+}
+.crskeleton-container{
+    width: 100%;
+    height: 100%;
+    background-color: rgb(253, 253, 253);
+    display: grid;
+    grid-template-columns: 20% 80%;
+    justify-items: center;
+    align-items: center;
+    padding: 10px;
+}
+.cskeleton-item{
+    width: 98%;
+    height: 95%;
+    border-radius: 4px; 
+    background-color: #cecece; 
+    animation: pulse 1.5s infinite;
+
+}
+
+@keyframes pulse {
+    0% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.6;
+    }
+  }

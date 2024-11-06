@@ -1,84 +1,124 @@
-import React from 'react'
-import '../admin.css'
+import React, { useState, useEffect } from 'react';
+import '../admin.css';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import axios from 'axios';
 
-// Register the components needed for Chart.js
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const data = {
-  labels: ['Completed', 'Pending', 'Waiting'], // Labels for the doughnut chart
-  datasets: [
-    {
-      label: 'Order Status',
-      data: [50, 30, 20], // Data for each segment of the doughnut chart
-      backgroundColor: [
-        'rgba(42,212,125, 0.5)', // Color for Completed
-        'rgba(255, 159, 64, 0.5)', // Color for Pending
-        'rgba(245,78,78, 0.5)', // Color for Waiting
-      ],
-      borderColor: [
-        'rgba(42,212,125, 1)', // Border color for Completed
-        'rgba(255, 159, 64, 1)', // Border color for Pending
-        'rgba(245,78,78, 1)', // Border color for Waiting
-      ],
-      borderWidth: 1, // Border width of the doughnut segments
-    },
-  ],
-};
+const OrderProcessing = () => {
+  const [chartData, setChartData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-const options = {
-  responsive: true,
-  maintainAspectRatio: false, // Allow the chart to adjust to the container's size
-  plugins: {
-    legend: {
-      position: 'right', // Position of the legend
-      labels: {
-        boxWidth: 10,
-        boxHeight: 10,
-        padding: 10,
-        color: '#333', // Color of the legend text
-      },
-    },
-    tooltip: {
-      callbacks: {
-        label: function (tooltipItem) {
-          return tooltipItem.label + ': ' + tooltipItem.raw + '%'; // Tooltip label format
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('http://localhost:5001/admin-order-history-total-component');  // Your API endpoint
+        const { statusCounts } = response.data;
+
+        setChartData({
+          labels: ['Completed', 'Pending', 'To Ship', 'To Receive', 'Cancelled', 'Return/Refund', 'Returned'],
+          datasets: [
+            {
+              label: 'Order Status',
+              data: [
+                statusCounts.Completed,
+                statusCounts['To Process'],
+                statusCounts['To Ship'],
+                statusCounts['To Receive'],
+                statusCounts.Cancelled,
+                statusCounts['Return/Refund'],
+                statusCounts.Returned,
+              ],
+              backgroundColor: [
+                'rgba(42,212,125, 0.5)',
+                'rgba(255, 159, 64, 0.5)',
+                'rgba(245,78,78, 0.5)',
+                'rgba(54, 162, 235, 0.5)',
+                'rgba(153, 102, 255, 0.5)',
+                'rgba(255, 206, 86, 0.5)',
+                'rgba(201, 203, 207, 0.5)',
+              ],
+              borderColor: [
+                'rgba(42,212,125, 1)',
+                'rgba(255, 159, 64, 1)',
+                'rgba(245,78,78, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(201, 203, 207, 1)',
+              ],
+              borderWidth: 1,
+            },
+          ],
+        });
+
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching order history:', err.message);
+        setError('Error fetching order data.');
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'right',
+        labels: {
+          boxWidth: 10,
+          boxHeight: 10,
+          padding: 10,
+          color: '#333',
         },
       },
-      backgroundColor: 'rgba(0,0,0,0.7)', // Tooltip background color
-      titleColor: '#fff', // Tooltip title color
-      bodyColor: '#fff', // Tooltip body color
-      borderColor: '#007bff', // Tooltip border color
-      borderWidth: 1, // Tooltip border width
+      tooltip: {
+        callbacks: {
+          label: function (tooltipItem) {
+            return tooltipItem.label + ': ' + tooltipItem.raw + ' orders';  // Tooltip label format
+          },
+        },
+        backgroundColor: 'rgba(0,0,0,0.7)',
+        titleColor: '#fff',
+        bodyColor: '#fff',
+        borderColor: '#007bff',
+        borderWidth: 1,
+      },
     },
-  },
-  layout: {
-    padding: {
-      right: 0, // Add padding to the right to avoid cutting off the legend
+    layout: {
+      padding: {
+        right: 0,
+      },
     },
-  },
-  elements: {
-    arc: {
-      borderWidth: 1,
+    elements: {
+      arc: {
+        borderWidth: 1,
+      },
     },
-  },
-  cutout: '70%', // Adjust this value to change the width of the doughnut
-};
+    cutout: '70%',
+  };
 
-const OrderProcessing = () => {
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
+
   return (
     <div className='order-processing'>
-        <div className='header'>
-            <div className='title'>
-                <h6>Order Processing</h6>
-            </div> 
+      <div className='header'>
+        <div className='title'>
+          <h6>Order Processing</h6>
         </div>
-        <div className='doughnut-chart'>
-          <Doughnut data={data} options={options} />
-        </div>
+      </div>
+      <div className='doughnut-chart'>
+        <Doughnut data={chartData} options={options} />
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default OrderProcessing
+export default OrderProcessing;

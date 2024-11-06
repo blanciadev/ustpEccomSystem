@@ -15,24 +15,30 @@
     box-shadow: 6px 6px 27px #dea0c7,
                 -6px -6px 27px #dea0c7;
     border-radius: 20px;
-    display: flex;
+    display: grid;
+    grid-template-columns: 55% 45%;
+    grid-template-rows: 95%;
     justify-content: space-evenly;
     align-items: center;
+    justify-items: center;
+    align-content: center;
     
 }
 .login-form{
-    background-color: aquamarine;
-    width: 45%;
-    height: 80%;
+    /* background-color: aquamarine; */
+    width: 95%;
+    height: 98%;
     display: flex;
     justify-content: flex-start;
+
+    align-items: flex-start;
     flex-direction: column;
     gap: 20px;
 }
 .login-form .login-google{
     width: 100%;
     height: 25%;
-    background-color: cadetblue;
+    /* background-color: cadetblue; */
 }
 .login-google > form{
     width: 100%;
@@ -98,8 +104,9 @@
     font-size: 2rem;
 }
 .login-image{
-    width: 45%;
-    height: 95%;
+    width: 95%;
+    height: 98%;
+    padding: 10px;
     /* background-color: cadetblue; */
 }
 .login-image img{
@@ -118,3 +125,36 @@ a:hover{
 .error{
     transition: ease 1.5s;
 }
+
+@media (max-width: 768px) {
+    /* Tablet */
+    .login-box{
+        width: 90%;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    /* Mobile */
+    .login-con{
+        height: auto;
+        padding: 20px 0;
+    }
+    .login-box{
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .login-image{
+        width: 90%;
+    }
+    .login-image > img{
+        border-radius: 0;
+        border-bottom-right-radius: 15px;
+        border-bottom-left-radius: 15px;
+
+    }
+    .login-form{
+        padding: 10px 0;
+    }
+  }

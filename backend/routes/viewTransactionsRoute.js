@@ -37,7 +37,7 @@ router.get('/cart-transactions', authenticateToken, async (req, res) => {
                 p.product_code,
                 p.product_name,
                 p.description,
-                p.brand,
+     
                 p.price,
                 p.size,
                 p.expiration_date,
@@ -63,7 +63,7 @@ router.get('/cart-transactions', authenticateToken, async (req, res) => {
             items: rows.map(item => ({
                 product_id: item.product_id,
                 product_code: item.product_code,
-                product_name: item.product_name, // Product name included
+                product_name: item.product_name,
                 description: item.description,
                 brand: item.brand,
                 category: item.category_name,

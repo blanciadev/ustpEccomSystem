@@ -1,53 +1,137 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Transaction.css';
 import Navigation from '../../components/Navigation';
 import Footer from '../../components/Footer';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import ToastNotification from '../../components/ToastNotification';
 
 const Checkout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
   const customerId = localStorage.getItem('customer_id');
-  console.log('Customer ID:', customerId);
+  const authToken = localStorage.getItem('token');
 
-  const { selectedProducts = [], totalPrice = 0 } = location.state || {};
+  const globalDiscounts = JSON.parse(localStorage.getItem('globalDiscounts')) || [];
 
-  const [authToken, setAuthToken] = useState(localStorage.getItem('token'));
+  const [discounts, setDiscounts] = useState([]);
+  const savedProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
+  const [quantities, setQuantities] = useState(savedProducts.map(product => product.quantity || 1));
+  const [originalQuantities, setOriginalQuantities] = useState([]);
+
+  let effectiveGlobalDiscount = 0;
+
   const [formData, setFormData] = useState({
     fullName: '',
     phoneNumber: '',
+    streetname: '',
     address: '',
     region: '',
     postalCode: '',
     paymentMethod: '',
   });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [hasFetched, setHasFetched] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    if (savedProducts.length > 0 && !hasFetched) {
+      const fetchOriginalQuantities = async () => {
+        try {
+          const productData = await Promise.all(
+            savedProducts.map(product =>
+              axios.get(`http://localhost:5001/products-checkout/${product.product_code}`, {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }).then(response => response.data)
+            )
+          );
+
+          const productQuantities = productData.map(item => item.quantity);
+          setOriginalQuantities(productQuantities);
+          const productDiscounts = savedProducts.map(product => product.discount || 0);
+          setDiscounts(productDiscounts);
+          setHasFetched(true);
+        } catch (error) {
+          console.error('Error fetching quantities and discounts:', error);
+        }
+      };
+
+      fetchOriginalQuantities();
+    }
+
+    const handleBeforeUnload = () => {
+      localStorage.removeItem('selectedProducts');
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [savedProducts, hasFetched]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData(prevData => ({
+      ...prevData,
       [name]: value,
-    });
+    }));
   };
 
   const handlePaymentChange = (e) => {
-    setFormData({
-      ...formData,
+    setFormData(prevData => ({
+      ...prevData,
       paymentMethod: e.target.value,
-    });
+    }));
+  };
+
+  const handleQuantityChange = (index, e) => {
+    const newQuantity = Math.max(1, Number(e.target.value));
+
+    if (newQuantity > originalQuantities[index]) {
+      setError(`Quantity exceeds available stock for ${savedProducts[index].product_name}. Available: ${originalQuantities[index]}`);
+      return;
+    }
+
+    const newQuantities = [...quantities];
+    newQuantities[index] = newQuantity;
+    setQuantities(newQuantities);
+    setError('');
   };
 
   const validateForm = () => {
-    const { fullName, phoneNumber, address, region, postalCode, paymentMethod } = formData;
-    if (!fullName || !phoneNumber || !address || !region || !postalCode || !paymentMethod) {
-      return 'All fields are required.';
+    const { fullName, phoneNumber, streetname, address, region, postalCode, paymentMethod } = formData;
+    return fullName && phoneNumber && streetname && address && region && postalCode && paymentMethod;
+  };
+
+  const handleRemoveProduct = (index) => {
+    const updatedProducts = [...savedProducts];
+    const updatedQuantities = [...quantities];
+
+    updatedProducts.splice(index, 1);
+    updatedQuantities.splice(index, 1);
+
+    setQuantities(updatedQuantities);
+    localStorage.setItem('selectedProducts', JSON.stringify(updatedProducts));
+
+    if (updatedProducts.length === 0) {
+      localStorage.removeItem('selectedProducts');
+      setToastMessage('Redirecting to Cart');
+      setTimeout(() => {
+        setToastMessage('');
+
+        navigate('/cart')
+      }, 3000);
     }
-    return '';
+
+    setOriginalQuantities(updatedQuantities);
   };
 
   const handleSubmit = async (e) => {
@@ -56,179 +140,400 @@ const Checkout = () => {
     setError('');
     setSuccess('');
 
-    const validationError = validateForm();
-    if (validationError) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      localStorage.setItem('redirectTo', '/checkout');
+      navigate('/login');
+      return;
+    }
+
+    if (!validateForm()) {
       setLoading(false);
-      setError(validationError);
+      setError('All fields are required.');
       return;
     }
 
     try {
-      if (!customerId) {
+      if (!customerId || savedProducts.length === 0) {
         setLoading(false);
-        setError('Customer ID is missing.');
+        setError('Missing customer ID or no products selected.');
         return;
       }
 
+      const totalOrderPrice = calculateTotalPrice().toFixed(2);
       const orderData = {
         customer_id: customerId,
+        fullName: formData.fullName,
+        order_details: savedProducts.map((product, index) => {
+          const discountedPrice = product.price * (1 - (discounts[index] / 100));
+          const productTotal = discountedPrice * quantities[index];
+
+          return {
+            cart_items: product.cart_items_id,
+            product_id: product.product_code,
+            quantity: quantities[index],
+            totalprice: productTotal.toFixed(2),
+            payment_method: 'COD',
+            payment_status: 'Pending',
+          };
+        }),
+        total_price: totalOrderPrice,
         order_date: new Date().toISOString(),
-        order_details: selectedProducts.map(product => ({
-          product_id: product.product_code,
-          quantity: product.quantity,
-          totalprice: product.price * product.quantity, // Add total price here
-          payment_date: new Date().toISOString(), // Set payment_date to current date
-          payment_method: formData.paymentMethod, // Use payment method from form
-          payment_status: 'Pending', // Default payment status
-        })),
-        total_price: totalPrice // Include total price for order summary
+        shipment_date: new Date().toISOString(),
+        address: formData.address,
+        streetname: formData.streetname,
+        region: formData.region,
+        shipment_status: 'Pending',
+        paymentMethod: formData.paymentMethod,
+        phoneNumber: formData.phoneNumber,
+        postalCode: formData.postalCode,
       };
 
-      const response = await axios.post(
-        'http://localhost:5000/insert-order',
-        orderData,
-        {
-          headers: {
-            'Authorization': `Bearer ${authToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const response = await axios.post('http://localhost:5001/insert-order', orderData, {
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      });
+
+      localStorage.setItem('checkoutOrderData', JSON.stringify(orderData));
 
       if (response.status === 201) {
+
         setSuccess('Order placed successfully!');
-        navigate('/order-success'); // Navigate to a success page or order summary
+        localStorage.removeItem('selectedProducts');
+
+        setToastMessage('Order Successful!');
+        setTimeout(() => {
+          setToastMessage('');
+          navigate('/user/purchase');
+        }, 3000);
+
+        console.log('toast should display T-T')
+
+
       }
     } catch (error) {
-      console.error('Error placing order:', error.message);
+      console.error('Error placing order:', error);
       setError('Failed to place order. Please try again.');
     } finally {
       setLoading(false);
     }
+
+  };
+
+  const calculateTotalPrice = () => {
+    // Helper function to check if all values in an array are identical
+    const allValuesEqual = (array) => array.length === 0 || array.every(value => value === array[0]);
+
+    // Function to calculate effective price based on discount
+    const getEffectivePrice = (basePrice, discount) => {
+      const discountMultiplier = 1 - (discount / 100 || 0);
+      return basePrice * discountMultiplier;
+    };
+
+    // Check if there are no saved products
+    if (savedProducts.length === 0) return 0;
+
+    console.log("----- Receipt -----");
+
+    let totalCost = 0;
+    const generalDiscount = allValuesEqual(globalDiscounts) ? globalDiscounts[0] : 0;
+    const hasGeneralDiscount = generalDiscount > 0;
+    console.log("----- GENERAL DISCOUNT  -----");
+    console.log(effectiveGlobalDiscount);
+
+
+    // Calculate total for each product
+    savedProducts.forEach((product, index) => {
+      const quantity = quantities[index] || 0;
+      let effectivePrice = 0;
+      let discountApplied = 0;
+
+      console.log(hasGeneralDiscount);
+
+      // Check if product has its own discount
+      if (product.discounted_price) {
+        discountApplied = allValuesEqual(globalDiscounts) ? globalDiscounts[0] : 0;
+        effectivePrice = getEffectivePrice(product.discounted_price, discountApplied);
+
+        console.log(`Product: ${product.product_name} (Discounted)`);
+      } else {
+        // Apply general discount if product does not have its own discount
+        discountApplied = hasGeneralDiscount ? generalDiscount : 0;
+        effectivePrice = getEffectivePrice(product.price, discountApplied);
+
+        console.log(`Product: ${product.product_name} (Non-Bundled)`);
+      }
+
+      console.log(`  Discount: ${discountApplied}%`);
+      console.log(`  Price per unit: $${effectivePrice.toFixed(2)}`);
+      console.log(`  Quantity: ${quantity}`);
+
+      const totalForProduct = effectivePrice * quantity;
+      totalCost += totalForProduct;
+
+      console.log(`  Total for ${product.product_name}: $${totalForProduct.toFixed(2)}`);
+      console.log("------------------------------");
+    });
+
+    // Add shipping and display transaction total
+    const shippingCost = 150;
+    const transactionTotal = totalCost + shippingCost;
+
+    console.log(`Subtotal: $${totalCost.toFixed(2)}`);
+    console.log(`Shipping: $${shippingCost.toFixed(2)}`);
+    console.log(`Transaction Total: $${transactionTotal.toFixed(2)}`);
+    console.log("----- End of Receipt -----");
+
+    return transactionTotal;
+  };
+
+
+
+
+
+
+
+  const getDiscountedPrice = (price, discount) => {
+    return price * (1 - (discount / 100));
+  };
+
+  const formatPhoneNumber = (input) => {
+    const formattedInput = input.replace(/\D/g, "");
+    const phonePrefix = "+639";
+    const mainNumber = formattedInput.slice(3);
+
+    return mainNumber.length > 0
+      ? `${phonePrefix} ${mainNumber.slice(0, 3)} ${mainNumber.slice(3, 6)} ${mainNumber.slice(6, 9)}`
+      : phonePrefix;
+  };
+
+  const handlePhoneNumberChange = (e) => {
+    let input = e.target.value.replace(/\D/g, "");
+
+    if (!input.startsWith("639")) {
+      input = "639" + input;
+    }
+
+    setFormData({ ...formData, phoneNumber: `+${input}` });
+  };
+
+  const formatPhoneNumberOnBlur = () => {
+    const formattedPhone = formatPhoneNumber(formData.phoneNumber);
+    setFormData({ ...formData, phoneNumber: formattedPhone });
+  };
+
+
+  const handlePostalCodeChange = (e) => {
+    const numericPostalCode = e.target.value.replace(/\D/g, "");
+    setFormData({ ...formData, postalCode: numericPostalCode });
   };
 
   return (
     <div className='checkout-container'>
+      <ToastNotification toastMessage={toastMessage} />
       <Navigation />
       <div className='checkout-wrapper'>
-        <h1>Checkout</h1>
+        <h1><i class='bx bxs-shopping-bag'></i>Checkout</h1>
         <div className='checkout-content'>
           <div className='checkout-address'>
             <h3>Delivery Address</h3>
-            <button className='change-address-btn'>Change</button>
-            <form className='address-form' onSubmit={handleSubmit}>
-              {error && <p className='error-message'>{error}</p>}
-              {success && <p className='success-message'>{success}</p>}
-              <div className='form-group'>
-                <label htmlFor='fullName'>Full Name</label>
-                <input
-                  type='text'
-                  id='fullName'
-                  name='fullName'
+            <form class="address-form" onSubmit={handleSubmit}>
+
+              <div class="form-group">
+                <label for="fullName">FULL NAME</label>
+                <input type="text"
+                  id="fullName"
+                  name="fullName"
                   value={formData.fullName}
                   onChange={handleInputChange}
                   required
                 />
               </div>
-              <div className='form-group'>
-                <label htmlFor='phoneNumber'>Phone Number</label>
+
+              <div className="form-group">
+                <label htmlFor="phoneNumber">PHONE NUMBER</label>
                 <input
-                  type='text'
-                  id='phoneNumber'
-                  name='phoneNumber'
+                  type="tel"
+                  id="phoneNumber"
+                  name="phoneNumber"
                   value={formData.phoneNumber}
+                  onChange={handlePhoneNumberChange}
+                  onBlur={formatPhoneNumberOnBlur}
+                  maxLength="13"
+                  placeholder="+639 XXX XXX XXX"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="streetname">STREETNAME</label>
+                <input type="text"
+                  id="streetname"
+                  name="streetname"
+                  value={formData.streetname}
                   onChange={handleInputChange}
                   required
                 />
               </div>
-              <div className='form-group'>
-                <label htmlFor='address'>Street Name, Building, House Number</label>
-                <input
-                  type='text'
-                  id='address'
-                  name='address'
+
+              <div class="form-group">
+                <label for="address">ADDRESS</label>
+                <input type="text"
+                  id="address"
+                  name="address"
                   value={formData.address}
                   onChange={handleInputChange}
                   required
                 />
               </div>
-              <div className='form-group'>
-                <label htmlFor='region'>Region, Province, City, Barangay</label>
-                <input
-                  type='text'
-                  id='region'
-                  name='region'
+
+              <div class="form-group">
+                <label for="region">REGION</label>
+                <input type="text"
+                  id="region"
+                  name="region"
                   value={formData.region}
                   onChange={handleInputChange}
                   required
                 />
               </div>
-              <div className='form-group'>
-                <label htmlFor='postalCode'>Postal Code</label>
+
+              <div className="form-group">
+                <label htmlFor="postalCode">POSTAL CODE</label>
                 <input
-                  type='text'
-                  id='postalCode'
-                  name='postalCode'
+                  type="text"
+                  id="postalCode"
+                  name="postalCode"
                   value={formData.postalCode}
-                  onChange={handleInputChange}
+                  onChange={handlePostalCodeChange}
+                  maxLength="4"
+                  placeholder="e.g., 1234"
                   required
                 />
               </div>
+
+              <div class="form-group">
+                <h3>Payment Method</h3>
+                <label>
+                  <input type="radio"
+                    name="paymentMethod"
+                    checked={formData.paymentMethod === 'COD'}
+                    onChange={handlePaymentChange}
+                    value="COD" />
+                  Cash On Delivery
+                </label>
+              </div>
+
+              <div className='form-group'>
+                <button type='submit' className='submit-btn' disabled={loading}>
+                  {loading ? 'Processing...' : 'Place Order'}
+                </button>
+              </div>
+
+            </form>
+
+            {/* <form className='address-form' onSubmit={handleSubmit}>
+              {error && <p className='error-message'>{error}</p>}
+              {success && <p className='success-message'>{success}</p>}
+              {['fullName', 'phoneNumber', 'streetname', 'address', 'region', 'postalCode'].map(field => (
+                <div className='form-group' key={field}>
+                  <label htmlFor={field}>{field.replace(/([A-Z])/g, ' $1').toUpperCase()}</label>
+                  <input
+                    type='text'
+                    id={field}
+                    name={field}
+                    value={formData[field]}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+              ))}
               <div className='form-group'>
                 <h3>Payment Method</h3>
-                <div className='payment-options'>
-                  <label>
-                    <input
-                      type='radio'
-                      name='paymentMethod'
-                      value='COD'
-                      checked={formData.paymentMethod === 'COD'}
-                      onChange={handlePaymentChange}
-                    />
-                    Cash On Delivery
-                  </label>
-                  <label>
-                    <input
-                      type='radio'
-                      name='paymentMethod'
-                      value='Credit/Debit Card'
-                      checked={formData.paymentMethod === 'Credit/Debit Card'}
-                      onChange={handlePaymentChange}
-                    />
-                    Credit/Debit Card
-                  </label>
-                </div>
+                <label>
+                  <input
+                    type='radio'
+                    name='paymentMethod'
+                    value='COD'
+                    checked={formData.paymentMethod === 'COD'}
+                    onChange={handlePaymentChange}
+                  />
+                  Cash On Delivery
+                </label>
               </div>
               <div className='form-group'>
                 <button type='submit' className='submit-btn' disabled={loading}>
                   {loading ? 'Processing...' : 'Place Order'}
                 </button>
               </div>
-            </form>
+            </form> */}
           </div>
-          <div className='checkout-summary'>
+          <div className='checkout-summary' style={{
+            width: '100%',
+            maxWidth: '800px',
+            margin: '0 auto',
+            padding: '20px',
+            border: '1px solid #ccc',
+            borderRadius: '8px',
+            backgroundColor: '#f9f9f9'
+          }}>
             <h3>Order Summary</h3>
-            <div className='summary-header'>
-              <span>Item</span>
-              <span>Quantity</span>
-              <span>Total Price</span>
+            {savedProducts.map((product, index) => {
+              const effectiveDiscount = product.discount || 0; // Check product-specific discount
+              const discountedPrice = getDiscountedPrice(product.price, effectiveDiscount);
+              const total = (discountedPrice * quantities[index]).toFixed(2);
+              effectiveGlobalDiscount = effectiveDiscount;
+              console.log('GLOBAL EFFECTIVE DISCOUNT : ' + effectiveGlobalDiscount);
+
+
+              return (
+                <div className='product-summary' key={index} style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '10px 0',
+                  borderBottom: '1px solid #ddd'
+                }}>
+                  <div>
+                    <h4>{product.product_name}</h4>
+                    <p style={{
+                      textDecoration: effectiveDiscount > 0 ? 'line-through' : 'none',
+                      color: effectiveDiscount > 0 ? '#888' : 'black'
+                    }}>
+                      Original Price: ₱{product.price.toFixed(2)}
+                    </p>
+                    {effectiveDiscount > 0 && (
+                      <p style={{ color: 'green', fontWeight: 'bold' }}>
+                        Discounted Price: ₱{discountedPrice.toFixed(2)} at {effectiveDiscount}% Off
+                      </p>
+                    )}
+                    <input
+                      type='number'
+                      min='1'
+                      value={quantities[index]}
+                      onChange={e => handleQuantityChange(index, e)}
+                      style={{ width: '50px', marginRight: '10px' }}
+                    />
+                    <button onClick={() => handleRemoveProduct(index)}>Remove</button>
+                  </div>
+                  <div style={{ fontWeight: 'bold' }}>₱{total}</div>
+                </div>
+              );
+            })}
+
+            <span>Shipping Fee: ₱150</span>
+            <div className='total-price' style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginTop: '20px',
+              fontSize: '1.2em',
+              fontWeight: 'bold'
+            }}>
+              <span>Total Price:</span>
+              <span>₱{calculateTotalPrice().toFixed(2)}</span>
             </div>
-            <ul className='product-list'>
-              {selectedProducts.length > 0 ? (
-                selectedProducts.map((product) => (
-                  <li key={product.product_code}>
-                    <span>{product.product_name}</span>
-                    <span className='quantity'>{product.quantity}</span>
-                    <span className='total-price'>₱{product.price * product.quantity}</span>
-                  </li>
-                ))
-              ) : (
-                <p>No products selected.</p>
-              )}
-            </ul>
-            <br />
-            <h4>Total: ₱ {totalPrice}</h4>
           </div>
+
         </div>
       </div>
       <Footer />

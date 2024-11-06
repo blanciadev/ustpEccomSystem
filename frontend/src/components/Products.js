@@ -1,13 +1,13 @@
 import React from 'react'
 import axios from 'axios';
-import Productcard from './Productcard'
+import ProductList from './ProductList';
 
 const Products = () => {
   return (
     <div className='products-con'>
       <h2>SHOP</h2>
       <div className='products'>
-        <Productcard />
+        <ProductList />
 
       </div>
     </div>
