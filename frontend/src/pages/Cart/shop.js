@@ -24,7 +24,9 @@ const Shop = () => {
     const [topPickedProducts, setTopPickedProducts] = useState([]);
     const [recommendedProducts, setRecommendedProducts] = useState([]);
     const [toastMessage, setToastMessage] = useState('');
+
     useEffect(() => {
+
         const fetchProducts = async () => {
             try {
 
@@ -87,12 +89,8 @@ const Shop = () => {
         const existingProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
 
         existingProducts.push(productData);
-
-
         localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
-
         setToastMessage('Redirecting to Checkout Page');
-
         setTimeout(() => {
             setToastMessage('');
         }, 3000);
@@ -112,9 +110,28 @@ const Shop = () => {
         return 'CART-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
     }
 
+
     const handleAddToCart = async (product) => {
         const token = localStorage.getItem('token');
         const userId = localStorage.getItem('customer_id');
+
+        const interactionPayload = {
+            product_code: product.product_code,
+            customerId: userId,
+            interaction_type: 'cart'
+        };
+
+        const recordProductInteraction = async (payload) => {
+            try {
+                console.log('Recording product interaction:', payload);
+                await axios.get('http://localhost:5001/products-interaction', { params: payload });
+                console.log('Product interaction recorded successfully.');
+            } catch (error) {
+                console.error('Error recording product interaction:', error);
+            }
+        };
+
+        let interactionRecorded = false;
 
         if (!token || !userId) {
             console.log('User not logged in or user ID missing, saving to localStorage.');
@@ -127,6 +144,7 @@ const Shop = () => {
                 cart[existingProductIndex].sub_total = cart[existingProductIndex].quantity * cart[existingProductIndex].price;
                 console.log('Increased quantity for existing product:', cart[existingProductIndex]);
             } else {
+                // Add new product to cart
                 const newCartItem = {
                     cart_items_id: generateCartItemId(),
                     product_code: product.product_code,
@@ -137,15 +155,7 @@ const Shop = () => {
                 };
                 cart.push(newCartItem);
                 console.log('Added new product to cart:', newCartItem);
-
-                setToastMessage('Added to cart!');
-
-                setTimeout(() => {
-                    setToastMessage('');
-                }, 3000);
-                return;
             }
-
 
             localStorage.setItem('cart', JSON.stringify(cart));
             console.log('Cart updated and saved to localStorage:', cart);
@@ -154,16 +164,20 @@ const Shop = () => {
             cartEventEmitter.emit('cartUpdated', { product_code: product.product_code, quantity: 1 });
 
             setToastMessage('Added to cart!');
-
-
             setTimeout(() => {
                 setToastMessage('');
             }, 3000);
-            return;
 
+
+            if (!interactionRecorded) {
+                await recordProductInteraction(interactionPayload);
+                interactionRecorded = true;
+            }
+            return;
         }
 
         try {
+
             await axios.post(
                 'http://localhost:5001/add-to-cart',
                 { product_code: product.product_code, quantity: 1 },
@@ -174,11 +188,14 @@ const Shop = () => {
             cartEventEmitter.emit('cartUpdated', { product_code: product.product_code, quantity: 1 });
 
             setToastMessage('Added to cart!');
-
             setTimeout(() => {
                 setToastMessage('');
             }, 3000);
-            return;
+
+            if (!interactionRecorded) {
+                await recordProductInteraction(interactionPayload);
+                interactionRecorded = true;
+            }
 
         } catch (error) {
             console.error('Error adding product to cart:', error.response ? error.response.data : error.message);
@@ -186,9 +203,27 @@ const Shop = () => {
     };
 
 
-    const openModal = (product) => {
+    const openModal = async (product) => {
         setSelectedProduct(product);
         setIsModalOpen(true);
+        const userId = localStorage.getItem('customer_id');
+
+
+        const interactionPayload = {
+            product_code: product.product_code,
+            customerId: userId,
+            interaction_type: 'view'
+        };
+
+        try {
+            console.log('Recording product view interaction:', interactionPayload);
+            await axios.get('http://localhost:5001/products-interaction', { params: interactionPayload });
+            console.log('Product view interaction recorded successfully.');
+        } catch (error) {
+            console.error('Error recording product view interaction:', error);
+        }
+
+
     };
 
     const closeModal = () => {
