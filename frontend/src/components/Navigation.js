@@ -16,6 +16,7 @@ const Navigation = () => {
     const [profileImg, setProfileImg] = useState('');
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
+    
     useEffect(() => {
         const token = localStorage.getItem('token');
         const storedUsername = localStorage.getItem('username');

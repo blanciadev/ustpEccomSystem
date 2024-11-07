@@ -105,6 +105,7 @@ const ProductList = ({ stickyComponents }) => {
     };
 
     useEffect(() => {
+        
         const fetchProducts = async () => {
             setLoading(true);
             try {
@@ -129,7 +130,13 @@ const ProductList = ({ stickyComponents }) => {
     const handleAddToCart = async (product) => {
         const token = localStorage.getItem('token');
         const customerId = localStorage.getItem('customer_id');
+        let quantity = parseInt(localStorage.getItem('quantity'), 10) || 0;
 
+        if (quantity === 0) {
+            quantity = 1; 
+            localStorage.setItem('quantity', quantity);
+        }
+        
         console.log('Product:', product);
         console.log('Token:', token);
         console.log('Customer ID:', customerId);
@@ -170,7 +177,7 @@ const ProductList = ({ stickyComponents }) => {
                 const newCartItem = {
                     cart_items_id: generateCartItemId(),
                     product_code: product.product_code,
-                    quantity: 1,
+                    quantity,
                     product_name: product.product_name,
                     price: product.price,
                     sub_total: product.price
@@ -204,7 +211,7 @@ const ProductList = ({ stickyComponents }) => {
             const response = await axios.post('http://localhost:5001/add-to-cart', {
                 customer_id: customerId,
                 product_code: product.product_code,
-                quantity: 1
+                quantity,
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });

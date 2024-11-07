@@ -87,19 +87,19 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         }, 3000);
     };
 
+    
     const handleBuyNowBundle = () => {
         const token = localStorage.getItem('token');
-
-        const selectedProducts = Object.entries(selectedBundleProducts)
+     const selectedProducts = Object.entries(selectedBundleProducts)
             .filter(([_, value]) => value)
             .map(([key]) => {
                 const bProduct = bundleProducts.find(product => product.product_code === key);
-
+    
                 if (!bProduct) {
                     console.log(`Product with code ${key} is not part of the bundle.`);
                     return null;
                 }
-
+    
                 return {
                     ...bProduct,
                     quantity: 1,
@@ -109,23 +109,37 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                 };
             })
             .filter(Boolean);
-
-        const totalBundleDiscount = selectedProducts.reduce((acc, product) => {
-            return acc + (product.discount || 0);
-        }, 0);
-
-
-        if (selectedProducts.length === 0) {
+    
+        const discounts = [...new Set(selectedProducts.map(product => product.discount).filter(Boolean))];
+    
+        let applicableDiscount = product.product_discount || 0; 
+    
+        if (discounts.length === 1) {
+            applicableDiscount = discounts[0];
+        }
+    
+        const originalProduct = {
+            ...product,
+            quantity: 1,
+            discount: applicableDiscount,
+            original_price: product.price,
+            discounted_price: calculateDiscountedPrice(product.price, applicableDiscount),
+        };
+    
+       if (selectedProducts.length === 0 && originalProduct.discount <= 0) {
             alert('Please select at least one product from the bundle.');
             return;
         }
-
-
+    
+        if (!selectedProducts.some(item => item.product_code === originalProduct.product_code)) {
+            selectedProducts.push(originalProduct);
+        }
+    
         const unbundledProducts = JSON.parse(localStorage.getItem('unbundledProducts')) || [];
         unbundledProducts.forEach(product => {
             const unbundledDiscount = product.product_discount || 0;
             const discountedPrice = calculateDiscountedPrice(product.price, unbundledDiscount);
-
+    
             selectedProducts.push({
                 ...product,
                 quantity: 1,
@@ -133,29 +147,31 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                 discount: unbundledDiscount,
                 discounted_price: discountedPrice,
             });
-
+    
             console.log(`Unbundled Product: ${product.product_name}`);
             console.log(`  Original Price: $${product.price}`);
             console.log(`  Discount: ${unbundledDiscount}%`);
             console.log(`  Discounted Price: $${discountedPrice}`);
         });
-
+    
         const existingProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
         existingProducts.push(...selectedProducts);
-
+    
         localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
-
-        if (token) {
+    
+         if (token) {
             showToast('Redirecting to Checkout Page...');
             window.location.href = '/checkout';
         } else {
-            // Set the redirect to checkout after login
             localStorage.setItem('redirectTo', '/checkout');
             showToast('Redirecting to Login Page...');
-            // Redirect to login page
             navigate('/login');
         }
     };
+    
+    
+
+
 
     const handleBuyNow = (product) => {
         const token = localStorage.getItem('token');
@@ -203,15 +219,23 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         }));
     };
 
-    // Function to increase quantity
-    const incrementQuantity = () => {
-        setQuantity((prevQuantity) => prevQuantity + 1);
-    };
+  
+const incrementQuantity = () => {
+    setQuantity((prevQuantity) => {
+        const newQuantity = prevQuantity + 1;
+        localStorage.setItem('quantity', newQuantity); 
+        return newQuantity;
+    });
+};
 
-    // Function to decrease quantity
-    const decrementQuantity = () => {
-        setQuantity((prevQuantity) => (prevQuantity > 1 ? prevQuantity - 1 : 1));
-    };
+const decrementQuantity = () => {
+    setQuantity((prevQuantity) => {
+        const newQuantity = prevQuantity > 1 ? prevQuantity - 1 : 1;
+        localStorage.setItem('quantity', newQuantity); 
+        return newQuantity;
+    });
+};
+
 
     if (!isOpen || !product) return null;
     return (
@@ -228,11 +252,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                             <p><strong>Price</strong></p>
                             <p className='price-value'>
                                 ₱{calculateDiscountedPrice(product.price, product.product_discount)}
-                                {product.product_discount && (
-                                    <span style={{ marginLeft: '10px', color: 'green' }}>
-                                        (Discount: {product.product_discount}%)
-                                    </span>
-                                )}
+                             
                             </p>
                             <p><strong>Stocks</strong></p>
                             <p>{product.quantity}</p>
@@ -382,7 +402,6 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
 
                         </div>
 
-                        <p style={{fontSize: '1.1rem', fontWeight:'600'}}><span style={{textDecoration:'line-through',fontWeight:'500', color:'#858585', paddingRight:'3px'}}>₱ ORIGINAL TOTAL </span>₱ DISCOUNTED TOTAL</p>{/* PLEASE  */}
                         
                         <button onClick={handleBuyNowBundle} className="buy-now-btn">
                             Buy Selected Products Now
