@@ -201,6 +201,22 @@
     font-size: 14px;
     margin: 4px 0;
 }
+.shop__recommendations .shop__product-item{
+    border: 1px solid #d4d4d4;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    transition: transform 0.2s;
+
+    height: 370px;
+    /* background-color: #538b55; */
+    overflow: hidden;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: 40% 60%;
+}
+
 
 @media (max-width:425px){
     .shop__product-list{

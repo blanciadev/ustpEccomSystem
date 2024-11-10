@@ -18,8 +18,38 @@ body {
     justify-content: center;
 }
 
-/* Home */
-/* Navigation */
+:root{
+    --white: #fff;
+    --black: #000;
+    --primaryColor:#ff728a;
+
+    --lGray: #f5f5f5;
+    --mGray:#ccc;
+    --dGray: #4d4d4d;
+
+    --accentOne:#ffb3b9;
+    --accentTwo:#A3E4DB;
+    --accentThree:#D1B3FF;
+    --accentFour:#FF9AA2;
+
+    --neutralOne: #F8E8D0;
+    --neutralTwo: #333;
+
+    --borderRad: 4px;
+
+    --paddingOne:8px 10px;
+}
+
+/* Buttons */
+.primary-btn{
+    background-color: var(--primaryColor);
+    color: var(--white);
+    border: none;
+    border-radius: 3px;
+    padding: var(--paddingOne);
+    cursor: pointer;
+    font-size: 0.8em;
+}
 
 
 .notification-bell {
@@ -245,6 +275,9 @@ body {
     height: 80vh;
     object-fit: cover;
     border-radius: 10px;
+}
+.slideshow-con button{
+    padding: 0;
 }
 
 /* Products */
@@ -491,6 +524,10 @@ body {
     background-color: gray;
     color: white;
 }
+
+
+
+
 
 /* transitions */
 .fade-enter {

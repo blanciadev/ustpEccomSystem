@@ -537,15 +537,12 @@ const Checkout = () => {
               </div>
 
               <div class="form-group">
-                <h3>Payment Method</h3>
-                <label>
-                  <input type="radio"
+                <h6>Payment Method: Cash On Delivery (COD)</h6>
+                  <input type="hidden"
                     name="paymentMethod"
                     checked={formData.paymentMethod === 'COD'}
                     onChange={handlePaymentChange}
                     value="COD" />
-                  Cash On Delivery
-                </label>
               </div>
 
               <div className='form-group'>

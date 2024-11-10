@@ -186,6 +186,86 @@
     justify-items: center;
 }
 
+.bundle-card {
+    position: relative;
+    border: 3px solid #ddd;
+    border-radius: 2px;
+    padding: 16px;
+    margin: 10px;
+    display: grid;
+    grid-template-rows: 50% 50%;
+    align-items: center;
+    justify-items: center;
+    cursor: pointer;
+    background-color: white;
+}
+
+.bundle-card.selected {
+    border-color: rgb(255, 114, 138);
+}
+
+.discount-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: linear-gradient(316deg, #ff728a, #f3163c, #ffa7a7, #df1b1b);
+    background-size: 800% 800%;
+    animation: gradient 3s ease infinite;
+    color: white;
+    padding: 5px;
+    width: 59px;
+    height: 59px;
+    border-radius: 50%;
+    font-size: 0.8em;
+    font-weight: 600;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 14% 0%;
+    }
+    50% {
+        background-position: 87% 100%;
+    }
+    100% {
+        background-position: 14% 0%;
+    }
+}
+
+.modalproduct-image-bundle {
+    width: 50%;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.product-name {
+    display: block;
+    font-weight: bold;
+    text-align: center;
+}
+
+.product-price {
+    background: linear-gradient(to right, hotpink, red);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.product-original-price {
+    color: #858585;
+    text-decoration: line-through;
+    text-align: center;
+}
+
+
 .recommendations {
     grid-area: 3 / 1 / 4 / 3;
     display: flex;
@@ -204,13 +284,20 @@
 }
 
 .recommended-modalproducts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
+    /* background-color: #0056b3; */
+    width: 90%;
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding: 10px;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory; 
 }
 
 .modalproduct-card {
+    flex: 1; 
+    min-width: 24.6%;
+    scroll-snap-align: start;
     border: 1px solid #ddd;
     border-radius: 10px;
     padding: 10px;
@@ -280,4 +367,18 @@
 
 .pagination-button.active {
     background-color: #0056b3;
+}
+
+@media (max-width:768px) {
+    .modalproduct-card{
+        min-width: 33%;
+    }
+    
+}
+
+@media (max-width:425px) {
+    .modalproduct-card{
+        min-width: 95%;
+    }
+    
 }

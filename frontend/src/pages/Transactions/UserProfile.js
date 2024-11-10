@@ -111,14 +111,14 @@ const UserProfile = () => {
         <div className='user'>
           <UserSideNav />
         </div>
-        <div className='purchase'>
+        <div className='purchase2'>
+          <h2>User Profile</h2>
           <div className='purchase-box2'>
-            <div className='purchase-header'>
-              <h2>User Profile</h2>
+            {/* <div className='purchase-header'>
               <button onClick={handleEditToggle} className='edit-button'>
                 {isEditing ? 'Cancel' : 'Edit'}
               </button>
-            </div>
+            </div> */}
             
             <ProfileImageUpload formData={formData} />
 
@@ -126,9 +126,23 @@ const UserProfile = () => {
               <div className='cskeleton-item' style={{ gridColumn: 'span 2' }}></div>
             ) : userDetails ? (
               <div className='user-details'>
-
+                <div className='purchase-header'>
+                    <h1>Personal Details</h1>
+                    {isEditing ? 
+                    (
+                        <div>
+                            <button type='submit' className='save-button' form="edit-user">
+                            {isMobile ? <i className='bx bxs-save'></i> : 'Save Changes'}
+                            </button>
+                            <button onClick={handleEditToggle} >Cancel</button>
+                        </div>
+                     ):( 
+                        <button onClick={handleEditToggle} className='edit-button'>Edit
+                        </button>
+                    )}
+                </div> 
                 {isEditing ? (
-                  <form onSubmit={handleSubmit} className='edit-user'>
+                  <form onSubmit={handleSubmit} className='edit-user' id='edit-user'>
                     <label>First Name</label>
                     <input
                       type='text'
@@ -201,9 +215,7 @@ const UserProfile = () => {
                       placeholder='Postal Code'
                       required
                     />
-                    <button type='submit' className='save-button'>
-                      {isMobile ? <i className='bx bxs-save'></i> : 'Save Changes'}
-                    </button>
+                    
                   </form>
                 ) : (
                   <div className='userDetails'>
@@ -221,8 +233,15 @@ const UserProfile = () => {
             )}
 
             <div className='user-password'>
-              <h3>Change Password</h3>
-              <form >
+                <div className='purchase-header'>
+                    <h1>Change Password</h1>
+                        <div>
+                            <button type='submit' className='save-button' form="change-password">
+                            {isMobile ? <i className='bx bxs-save'></i> : 'Update Password'}
+                            </button>
+                        </div>
+                </div> 
+              <form id='change-password'>
                 <div className='form-group'>
                   <label>Current Password</label>
                   <input type='text' placeholder='Enter current password' />
@@ -235,7 +254,6 @@ const UserProfile = () => {
                   <label>Confirm New Password</label>
                   <input type='text' placeholder='Confirm new password' />
                 </div>
-                <button type='submit'>Update Password</button>
               </form>
             </div>
           </div>

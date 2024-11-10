@@ -105,7 +105,7 @@ function ProfileImageUpload({ formData }) {
                             ) : (
                                 <img src="https://static.vecteezy.com/system/resources/previews/026/434/409/non_2x/default-avatar-profile-icon-social-media-user-photo-vector.jpg" alt="Default Profile" className="user-profile-image" />
                             )}
-                            <div className='overlay'>Change Image</div>
+                            <div className='overlay'>Change Profile</div>
                         </div>
                         <input 
                             type="file" 
@@ -114,6 +114,12 @@ function ProfileImageUpload({ formData }) {
                             onChange={handleFileChange} 
                             style={{ display: 'none' }}  // Hides the file input
                         />
+                    </div>
+
+                    <div>
+                        <h5>Click image to update profile</h5>
+                        <p>At least 800x800 px recommended.</p>
+                        <p>JPG or PNG is allowed.</p>
                     </div>
 
 
