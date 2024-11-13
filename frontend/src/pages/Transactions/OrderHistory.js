@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import './orderhistory.css';
 import Navigation from '../../components/Navigation';
 import UserSideNav from '../../components/UserSideNav';
 import AdminSkeleton from '../../Loaders/AdminSkeleton';
@@ -146,10 +147,9 @@ const OrderHistory = () => {
                       <h4>Order ID: {order.order_id}</h4>
                       <p>Order Date: {new Date(order.order_date).toLocaleDateString()}</p>
                       <p>Total Price: P{order.order_total ? order.order_total.toFixed(2) : '0.00'}</p>
-                      <p>Order Status: {order.order_status}</p> {/* Display order status */}
+                      <p>Order Status: {order.order_status}</p>
                       <div>
                         <h5>Product Details</h5>
-                        {/* Check if order.products exists and is an array */}
                         {Array.isArray(order.products) && order.products.length > 0 ? (
                           order.products.map((product, index) => (
                             <div key={index} className="product-details">
@@ -160,7 +160,7 @@ const OrderHistory = () => {
                             </div>
                           ))
                         ) : (
-                          <p>No product details available.</p> // Fallback if no products are available
+                          <p>No product details available.</p>
                         )}
                       </div>
                       <button
@@ -174,6 +174,7 @@ const OrderHistory = () => {
                   ))
                 )}
               </div>
+
             </div>
           </div>
         </div>

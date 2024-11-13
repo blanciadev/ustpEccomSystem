@@ -87,19 +87,19 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         }, 3000);
     };
 
-    
+
     const handleBuyNowBundle = () => {
         const token = localStorage.getItem('token');
-     const selectedProducts = Object.entries(selectedBundleProducts)
+        const selectedProducts = Object.entries(selectedBundleProducts)
             .filter(([_, value]) => value)
             .map(([key]) => {
                 const bProduct = bundleProducts.find(product => product.product_code === key);
-    
+
                 if (!bProduct) {
                     console.log(`Product with code ${key} is not part of the bundle.`);
                     return null;
                 }
-    
+
                 return {
                     ...bProduct,
                     quantity: 1,
@@ -109,15 +109,15 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                 };
             })
             .filter(Boolean);
-    
+
         const discounts = [...new Set(selectedProducts.map(product => product.discount).filter(Boolean))];
-    
-        let applicableDiscount = product.product_discount || 0; 
-    
+
+        let applicableDiscount = product.product_discount || 0;
+
         if (discounts.length === 1) {
             applicableDiscount = discounts[0];
         }
-    
+
         const originalProduct = {
             ...product,
             quantity: 1,
@@ -125,21 +125,21 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
             original_price: product.price,
             discounted_price: calculateDiscountedPrice(product.price, applicableDiscount),
         };
-    
-       if (selectedProducts.length === 0 && originalProduct.discount <= 0) {
+
+        if (selectedProducts.length === 0 && originalProduct.discount <= 0) {
             alert('Please select at least one product from the bundle.');
             return;
         }
-    
+
         if (!selectedProducts.some(item => item.product_code === originalProduct.product_code)) {
             selectedProducts.push(originalProduct);
         }
-    
+
         const unbundledProducts = JSON.parse(localStorage.getItem('unbundledProducts')) || [];
         unbundledProducts.forEach(product => {
             const unbundledDiscount = product.product_discount || 0;
             const discountedPrice = calculateDiscountedPrice(product.price, unbundledDiscount);
-    
+
             selectedProducts.push({
                 ...product,
                 quantity: 1,
@@ -147,19 +147,19 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                 discount: unbundledDiscount,
                 discounted_price: discountedPrice,
             });
-    
+
             console.log(`Unbundled Product: ${product.product_name}`);
             console.log(`  Original Price: $${product.price}`);
             console.log(`  Discount: ${unbundledDiscount}%`);
             console.log(`  Discounted Price: $${discountedPrice}`);
         });
-    
+
         const existingProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
         existingProducts.push(...selectedProducts);
-    
+
         localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
-    
-         if (token) {
+
+        if (token) {
             showToast('Redirecting to Checkout Page...');
             window.location.href = '/checkout';
         } else {
@@ -168,8 +168,8 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
             navigate('/login');
         }
     };
-    
-    
+
+
 
 
 
@@ -214,22 +214,22 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         }));
     };
 
-  
-const incrementQuantity = () => {
-    setQuantity((prevQuantity) => {
-        const newQuantity = prevQuantity + 1;
-        localStorage.setItem('quantity', newQuantity); 
-        return newQuantity;
-    });
-};
 
-const decrementQuantity = () => {
-    setQuantity((prevQuantity) => {
-        const newQuantity = prevQuantity > 1 ? prevQuantity - 1 : 1;
-        localStorage.setItem('quantity', newQuantity); 
-        return newQuantity;
-    });
-};
+    const incrementQuantity = () => {
+        setQuantity((prevQuantity) => {
+            const newQuantity = prevQuantity + 1;
+            localStorage.setItem('quantity', newQuantity);
+            return newQuantity;
+        });
+    };
+
+    const decrementQuantity = () => {
+        setQuantity((prevQuantity) => {
+            const newQuantity = prevQuantity > 1 ? prevQuantity - 1 : 1;
+            localStorage.setItem('quantity', newQuantity);
+            return newQuantity;
+        });
+    };
 
 
     if (!isOpen || !product) return null;
@@ -247,7 +247,7 @@ const decrementQuantity = () => {
                             <p><strong>Price</strong></p>
                             <p className='price-value'>
                                 ₱{calculateDiscountedPrice(product.price, product.product_discount)}
-                             
+
                             </p>
                             <p><strong>Stocks</strong></p>
                             <p>{product.quantity}</p>
@@ -259,15 +259,7 @@ const decrementQuantity = () => {
                         <p><strong>Description: </strong>
                             {product.description || 'No description available.'}
                         </p>
-                        {/* <p><strong>Hair Type:</strong>
-                            Suitable for virgin and colored hair.
-                        </p>
-                        <p><strong>Hair Texture:</strong>
-                            Works for straight, wavy, or curly hair.
-                        </p>
-                        <p><strong>Effect/Target Problems:</strong>
-                            Treats dandruff, reduces scalp irritation, and soothes sensitive scalps.
-                        </p> */}
+
                         <br></br>
                         <div className="quantity">
                             <p><strong>Quantity</strong></p>
@@ -306,51 +298,51 @@ const decrementQuantity = () => {
                     {/* Bundle Section */}
                     {bundleProducts.length > 0 && (
 
-                    <div className="bundle-section">
-                        <h4>Available Bundle</h4>
-                        <p>Save money, avail discounted items</p>
-                        <div>
+                        <div className="bundle-section">
+                            <h4>Available Bundle</h4>
+                            <p>Save money, avail discounted items</p>
+                            <div>
 
-                        {bundleProducts.map((bProduct) => (
-                        <div
-                        key={bProduct.product_code}
-                        className={`bundle-card ${selectedBundleProducts[bProduct.product_code] ? 'selected' : ''}`}
-                        onClick={() => handleBundleProductSelect(bProduct.product_code)}
-                    >
-                        {/* Discount Badge */}
-                        <div className="discount-badge">
-                            <p style={{ fontSize: '1.2rem' }}>{bProduct.discount}%</p>
-                            <p style={{ lineHeight: '0.5' }}>OFF</p>
+                                {bundleProducts.map((bProduct) => (
+                                    <div
+                                        key={bProduct.product_code}
+                                        className={`bundle-card ${selectedBundleProducts[bProduct.product_code] ? 'selected' : ''}`}
+                                        onClick={() => handleBundleProductSelect(bProduct.product_code)}
+                                    >
+                                        {/* Discount Badge */}
+                                        <div className="discount-badge">
+                                            <p style={{ fontSize: '1.2rem' }}>{bProduct.discount}%</p>
+                                            <p style={{ lineHeight: '0.5' }}>OFF</p>
+                                        </div>
+
+                                        <img
+                                            src={bProduct.product_image}
+                                            alt={bProduct.product_name}
+                                            className="modalproduct-image-bundle"
+                                        />
+                                        <div style={{ flex: 1, textAlign: 'center' }}>
+                                            <label className="product-name">{bProduct.product_name}</label>
+                                            <p className="product-price">₱{calculateDiscountedPrice(bProduct.price, bProduct.discount)}</p>
+                                            <p className="product-original-price">₱{bProduct.price}</p>
+                                        </div>
+
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedBundleProducts[bProduct.product_code] || false}
+                                            onChange={() => handleBundleProductSelect(bProduct.product_code)}
+                                            style={{ display: 'none' }}
+                                        />
+                                    </div>
+
+                                ))}
+
+                            </div>
+
+
+                            <button onClick={handleBuyNowBundle} className="buy-now-btn">
+                                Buy Selected Products Now
+                            </button>
                         </div>
-            
-                        <img
-                            src={bProduct.product_image}
-                            alt={bProduct.product_name}
-                            className="modalproduct-image-bundle"
-                        />
-                        <div style={{ flex: 1, textAlign: 'center' }}>
-                            <label className="product-name">{bProduct.product_name}</label>
-                            <p className="product-price">₱{calculateDiscountedPrice(bProduct.price, bProduct.discount)}</p>
-                            <p className="product-original-price">₱{bProduct.price}</p>
-                        </div>
-            
-                        <input
-                            type="checkbox"
-                            checked={selectedBundleProducts[bProduct.product_code] || false}
-                            onChange={() => handleBundleProductSelect(bProduct.product_code)}
-                            style={{ display: 'none' }}
-                        />
-                    </div>
-
-                        ))}
-
-                        </div>
-
-                        
-                        <button onClick={handleBuyNowBundle} className="buy-now-btn">
-                            Buy Selected Products Now
-                        </button>
-                    </div>
                     )}
 
                     {/* Recommendations Section */}
@@ -362,65 +354,47 @@ const decrementQuantity = () => {
                             <p>{error}</p>
                         ) : recommendedProducts.length > 0 ? (
                             <div className="recommended-modalproducts-grid">
-                                {recommendedProducts.map((recProduct) => (
-                                    <div key={recProduct.product_id} className="modalproduct-card">
-                                        <img
-                                            src={recProduct.product_image}
-                                            alt={recProduct.product_name}
-                                            className="modalproduct-image"
-                                        />
-                                        <div className="modalproduct-details">
-                                            <span className="modalproduct-name">{recProduct.product_name}</span>
-                                            <span className="modalproduct-price">₱{calculateDiscountedPrice(recProduct.price, recProduct.product_discount)}</span>
+                                {recommendedProducts
+                                    .filter((recProduct) => recProduct.quantity > 0)
+                                    .map((recProduct) => (
+                                        <div key={recProduct.product_id} className="modalproduct-card">
+                                            <img
+                                                src={recProduct.product_image}
+                                                alt={recProduct.product_name}
+                                                className="modalproduct-image"
+                                            />
+                                            <div className="modalproduct-details">
+                                                <span className="modalproduct-name">{recProduct.product_name}</span>
+                                                <span className="modalproduct-price">₱{calculateDiscountedPrice(recProduct.price, recProduct.product_discount)}</span>
 
-                                            {recProduct.product_status === 'Discounted' && (
-                                                <span className="modalproduct-discount">
-                                                    Discounted by: {recProduct.product_discount}%
-                                                </span>
-                                            )}
+                                                {recProduct.product_status === 'Discounted' && (
+                                                    <span className="modalproduct-discount">
+                                                        Discounted by: {recProduct.product_discount}%
+                                                    </span>
+                                                )}
 
-                                            {recProduct.quantity > 0 ? (
-                                                <>
-                                                    <button
-                                                        className="add-to-cart-btn"
-                                                        onClick={() => onAddToCart(recProduct)}
-                                                    >
-                                                        Add to Cart
-                                                    </button>
-                                                    <button
-                                                        className="buy-now-btn"
-                                                        onClick={() => handleBuyNow(recProduct)}
-                                                        style={{ marginLeft: '10px' }}
-                                                    >
-                                                        Buy Now
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                <p style={{ color: 'red' }}>Out of stock</p>
-                                            )}
+                                                <button
+                                                    className="add-to-cart-btn"
+                                                    onClick={() => onAddToCart(recProduct)}
+                                                >
+                                                    Add to Cart
+                                                </button>
+                                                <button
+                                                    className="buy-now-btn"
+                                                    onClick={() => handleBuyNow(recProduct)}
+                                                    style={{ marginLeft: '10px' }}
+                                                >
+                                                    Buy Now
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))}
                             </div>
                         ) : (
                             <p>No recommendations available.</p>
                         )}
-
-                        {/* Pagination Controls */}
-                        {/*{totalPages > 1 && (
-                            <div className="pagination-controls">
-                                {Array.from({ length: totalPages }, (_, index) => (
-                                    <button
-                                        key={index + 1}
-                                        className={currentPage === index + 1 ? 'active' : ''}
-                                        onClick={() => handlePageChange(index + 1)}
-                                    >
-                                        {index + 1}
-                                    </button>
-                                ))}
-                             </div> 
-                        )}*/}
                     </div>
+
                 </div>
             </div>
         </div>

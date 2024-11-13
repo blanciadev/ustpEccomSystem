@@ -107,8 +107,8 @@ const Checkout = () => {
   };
 
   const validateForm = () => {
-    const { fullName, phoneNumber, streetname, address, region, postalCode, paymentMethod } = formData;
-    return fullName && phoneNumber && streetname && address && region && postalCode && paymentMethod;
+    const { fullName, phoneNumber, streetname, address, region, postalCode } = formData;
+    return fullName && phoneNumber && streetname && address && region && postalCode;
   };
 
   const handleRemoveProduct = (index) => {
@@ -538,11 +538,11 @@ const Checkout = () => {
 
               <div class="form-group">
                 <h6>Payment Method: Cash On Delivery (COD)</h6>
-                  <input type="hidden"
-                    name="paymentMethod"
-                    checked={formData.paymentMethod === 'COD'}
-                    onChange={handlePaymentChange}
-                    value="COD" />
+                <input type="hidden"
+                  name="paymentMethod"
+                  checked={formData.paymentMethod === 'COD'}
+                  onChange={handlePaymentChange}
+                  value="COD" />
               </div>
 
               <div className='form-group'>

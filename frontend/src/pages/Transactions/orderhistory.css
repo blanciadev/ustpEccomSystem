@@ -1,0 +1,7 @@
+.cancel-button.disabled {
+    background-color: #ccc;
+    /* Light grey to indicate disabled */
+    cursor: not-allowed;
+    /* Change cursor to indicate it's not clickable */
+    color: #666;
+}

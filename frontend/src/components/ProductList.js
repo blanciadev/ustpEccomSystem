@@ -19,25 +19,24 @@ const ProductCard = React.memo(({ product, onAddToCart, onBuyNow, onProductClick
     const isOutOfStock = product.quantity === 0;
 
     return (
-        <div className="product-card" onClick={() => onProductClick(product)}>
-            <img src={product.product_image} alt={product.product_name} />
-            <h3>{product.product_name}</h3>
-            <p>{product.description || 'No description available.'}</p>
-            <p>Product Quantity: {product.quantity}</p>
-            <h3>P{product.price}</h3>
-            {product.product_status === 'Discounted' && (
-                <h3>Discounted Price: {product.product_discount}%</h3>
-            )}
-            {isOutOfStock ? (
-                <p style={{ color: 'red' }}>Out of Stock</p>
-            ) : (
-                <>
+        <>
+            {product.quantity > 0 && (
+                <div className="product-card" onClick={() => onProductClick(product)}>
+                    <img src={product.product_image} alt={product.product_name} />
+                    <h3>{product.product_name}</h3>
+                    <p>{product.description || 'No description available.'}</p>
+                    <p>Product Quantity: {product.quantity}</p>
+                    <h3>P{product.price}</h3>
+                    {product.product_status === 'Discounted' && (
+                        <h3>Discounted Price: {product.product_discount}%</h3>
+                    )}
                     <button onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}>Add to Cart</button>
                     <button onClick={(e) => { e.stopPropagation(); onBuyNow(product); }}>Buy Now</button>
-                </>
+                </div>
             )}
-        </div>
+        </>
     );
+
 });
 
 // ProductList Component
@@ -105,7 +104,7 @@ const ProductList = ({ stickyComponents }) => {
     };
 
     useEffect(() => {
-        
+
         const fetchProducts = async () => {
             setLoading(true);
             try {
@@ -133,10 +132,10 @@ const ProductList = ({ stickyComponents }) => {
         let quantity = parseInt(localStorage.getItem('quantity'), 10) || 0;
 
         if (quantity === 0) {
-            quantity = 1; 
+            quantity = 1;
             localStorage.setItem('quantity', quantity);
         }
-        
+
         console.log('Product:', product);
         console.log('Token:', token);
         console.log('Customer ID:', customerId);

@@ -86,13 +86,12 @@ router.post('/insert-order', async (req, res) => {
         address,
         region,
         postalCode,
-        paymentMethod
     } = req.body;
-
-    console.log('Received order data:', { customer_id, order_date, order_details, total_price, fullName, phoneNumber, address, region, postalCode, paymentMethod });
+    const paymentMethod = 'COD'
+    console.log('Received order data:', { customer_id, order_date, order_details, total_price, fullName, phoneNumber, address, region, postalCode, });
 
     // Validate incoming request data
-    if (!customer_id || !order_date || !order_details || !Array.isArray(order_details) || !total_price || !fullName || !phoneNumber || !address || !region || !postalCode || !paymentMethod) {
+    if (!customer_id || !order_date || !order_details || !Array.isArray(order_details) || !total_price || !fullName || !phoneNumber || !address || !region || !postalCode) {
         const missingFields = [];
         if (!customer_id) missingFields.push('customer_id');
         if (!order_date) missingFields.push('order_date');
@@ -105,7 +104,7 @@ router.post('/insert-order', async (req, res) => {
         if (!streetname) missingFields.push('streetname');
         if (!region) missingFields.push('region');
         if (!postalCode) missingFields.push('postalCode');
-        if (!paymentMethod) missingFields.push('paymentMethod');
+
 
         const errorMessage = 'Invalid request data: ' + missingFields.join(', ');
         console.log('Error:', errorMessage);
@@ -426,7 +425,7 @@ router.get('/order-history-display', authenticateToken, async (req, res) => {
 router.post('/cancel-order', authenticateToken, async (req, res) => {
     try {
         const { order_id } = req.body;
-
+        console.log('Cancelling Order');
         await db.query(`
             UPDATE \`order_details\`
             SET order_status = 'Cancelled'
