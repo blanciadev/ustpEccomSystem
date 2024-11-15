@@ -103,7 +103,7 @@ const Shop = () => {
             window.location.href = '/checkout';
         } else {
             localStorage.setItem('redirectTo', '/checkout');
-            // Redirect to login page
+           
             navigate('/login');
         }
         console.log(productData);
@@ -148,7 +148,7 @@ const Shop = () => {
                 cart[existingProductIndex].sub_total = cart[existingProductIndex].quantity * cart[existingProductIndex].price;
                 console.log('Increased quantity for existing product:', cart[existingProductIndex]);
             } else {
-                // Add new product to cart
+               
                 const newCartItem = {
                     cart_items_id: generateCartItemId(),
                     product_code: product.product_code,
@@ -254,12 +254,13 @@ const Shop = () => {
         <div className='shop'>
             <Navigation />
             <ToastNotification toastMessage={toastMessage} />
+
             {/* Top Picks Section */}
             <div className='shop__top-picks'>
                 <h2 className='shop__title'>Top Picks</h2>
                 <div className='shop__product-list'>
                     {topPickedProducts
-                        .filter((product) => product.quantity > 0) // Filter out out-of-stock products
+                        .filter((product) => product.quantity > 0) 
                         .map((product) => (
                             <div key={product.product_code} className='shop__product-item' onClick={() => openModal(product)}>
                                 <div className='shop__product-img'>

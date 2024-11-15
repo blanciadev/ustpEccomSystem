@@ -107,7 +107,7 @@ router.get('/admin-order-history', async (req, res) => {
         // Add where clause if status or searchTerm is provided
         const conditions = [];
         if (status) {
-            conditions.push('order_details.order_status = ?');
+            conditions.push('order_details.payment_status = ?');
         }
         if (searchTerm) {
             conditions.push(`(users.first_name LIKE ? OR users.last_name LIKE ? OR \`order\`.order_id LIKE ?)`);
@@ -192,7 +192,7 @@ router.get('/admin-order-history', async (req, res) => {
             ordersArray.forEach(order => {
                 worksheet.addRow({
                     order_id: order.order_id,
-                    customer_name: `${order.customer_first_name} ${order.customer_last_name}`,
+                    customer_id: `${order.customer_id}`,
                     order_date: new Date(order.order_date).toLocaleDateString(),
                     order_status: order.order_status,
                     payment_status: order.payment_status,

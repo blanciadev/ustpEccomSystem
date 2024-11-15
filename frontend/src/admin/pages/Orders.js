@@ -7,7 +7,6 @@ import axios from 'axios';
 import OrderModal from '../components/OrderModal';
 import { saveAs } from 'file-saver';
 
-
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [status, setStatus] = useState('');
@@ -20,10 +19,8 @@ const Orders = () => {
   const [modalShow, setModalShow] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 425);
 
-
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
-
+  const pageSize = 5;
 
   const fetchOrders = async () => {
     try {
@@ -68,7 +65,9 @@ const Orders = () => {
   const highlightText = (text, searchTerm) => {
     if (!searchTerm) return text;
 
-    const parts = text.split(new RegExp(`(${searchTerm})`, 'gi'));
+    const regex = new RegExp(`(${searchTerm})`, 'gi');
+    const parts = text.split(regex);
+
     return parts.map((part, index) =>
       part.toLowerCase() === searchTerm.toLowerCase() ? (
         <span key={index} className='highlighted-term'>{part}</span>
@@ -76,19 +75,19 @@ const Orders = () => {
     );
   };
 
-  const isRowHighlighted = (order) => {
-    const fieldsToCheck = [
-      order.order_id.toString(),
-      `${order.customer_first_name} ${order.customer_last_name}`,
-      new Date(order.order_date).toLocaleDateString(),
-      order.order_status,
-      order.payment_status
-    ];
+  const filteredOrders = orders.filter(order => {
+    const search = searchTerm.toLowerCase();
 
-    return fieldsToCheck.some(field => field.toLowerCase().includes(searchTerm.toLowerCase()));
-  };
-
-  const filteredOrders = orders.filter(order => isRowHighlighted(order));
+    return (
+      order.order_id.toString().toLowerCase().includes(search) ||
+      order.customer_id.toString().toLowerCase().includes(search) ||
+      `${order.customer_first_name} ${order.customer_last_name}`.toLowerCase().includes(search) ||
+      new Date(order.order_date).toLocaleDateString().toLowerCase().includes(search) ||
+      order.order_status.toLowerCase().includes(search) ||
+      order.payment_status.toLowerCase().includes(search) ||
+      order.order_total.toString().toLowerCase().includes(search)
+    );
+  });
 
   const sortOrders = (orders) => {
     return [...orders].sort((a, b) => {
@@ -204,46 +203,46 @@ const Orders = () => {
                   <tr>
                     <th><input type='checkbox' /></th>
                     <th>Order ID</th>
-                    <th>Customer Name</th>
+                    <th>Customer ID</th>
                     <th>Order Date</th>
                     <th>Status</th>
                     <th>Payment Status</th>
-                    <th>Total</th>
-                    <th>Action</th>
+                    <th>Total Amount</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {paginatedOrders.map(order => (
-                    <tr key={order.order_id} className={isRowHighlighted(order) ? 'highlighted-row' : ''}>
+                  {paginatedOrders.map((order) => (
+                    <tr
+                      key={order.order_id}
+                      onClick={() => handleOpenModal(order)}
+                    >
                       <td><input type='checkbox' /></td>
                       <td>{highlightText(order.order_id.toString(), searchTerm)}</td>
-                      <td>{highlightText(`${order.customer_first_name} ${order.customer_last_name}`, searchTerm)}</td>
+                      <td>{highlightText(order.customer_id.toString(), searchTerm)}</td>
                       <td>{highlightText(new Date(order.order_date).toLocaleDateString(), searchTerm)}</td>
                       <td>{highlightText(order.order_status, searchTerm)}</td>
                       <td>{highlightText(order.payment_status, searchTerm)}</td>
-                      <td>₱ {highlightText(order.order_total, searchTerm)}</td>
-                      <td><button onClick={() => handleOpenModal(order)}>View</button></td>
+                      <td>{highlightText(order.order_total.toString(), searchTerm)}</td>
+                      <td>
+                        <button onClick={() => handleOpenModal(order)}>
+                          View
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
-
-
               </table>
-              {/* Pagination Controls */}
               <div className='pagination'>
-                <button
-                  disabled={currentPage === 1}
-                  onClick={() => handlePageChange(currentPage - 1)}
-                >
-                  Previous
-                </button>
-                <span>Page {currentPage} of {totalPages}</span>
-                <button
-                  disabled={currentPage === totalPages}
-                  onClick={() => handlePageChange(currentPage + 1)}
-                >
-                  Next
-                </button>
+                {Array.from({ length: totalPages }, (_, index) => (
+                  <button
+                    key={index + 1}
+                    onClick={() => handlePageChange(index + 1)}
+                    className={index + 1 === currentPage ? 'active' : ''}
+                  >
+                    {index + 1}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
@@ -251,10 +250,10 @@ const Orders = () => {
       </div>
       {selectedOrder && (
         <OrderModal
-          order={selectedOrder}
           show={modalShow}
-          handleClose={handleCloseModal}
-          refreshOrders={refreshOrders}
+          onHide={handleCloseModal}
+          order={selectedOrder}
+          onRefresh={refreshOrders}
         />
       )}
     </div>

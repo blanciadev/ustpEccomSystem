@@ -17,11 +17,9 @@ const Payments = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const itemsPerPage = 15;
+  const itemsPerPage = 10;
 
-  const [statusOptions, setStatusOptions] = useState([
-    'To Ship', 'To Receive', 'Completed', 'Cancelled', 'Return/Refund', 'Pending'
-  ]);
+
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 425);
 
   useEffect(() => {
@@ -47,6 +45,7 @@ const Payments = () => {
         },
       });
 
+      console.log('Fetched Orders:', response.data.orders); // Inspect the orders
       const ordersData = response.data.orders;
       setOrders(ordersData);
       setTotalOrders(ordersData.length);
@@ -59,6 +58,7 @@ const Payments = () => {
       setLoading(false);
     }
   };
+
 
 
   const handlePageChange = (pageNumber) => {
@@ -116,16 +116,15 @@ const Payments = () => {
     }
   };
 
-
-
-
   const totalPages = Math.ceil(totalOrders / itemsPerPage);
 
   const filteredOrders = orders.filter(order => {
     const orderIdMatch = order.order_id.toString().toLowerCase().includes(searchTerm.toLowerCase());
     const customerNameMatch = `${order.first_name} ${order.last_name}`.toLowerCase().includes(searchTerm.toLowerCase());
-    return orderIdMatch || customerNameMatch;
+    const statusMatch = statusFilter ? order.payment_status === statusFilter : true;  // Apply status filter
+    return (orderIdMatch || customerNameMatch) && statusMatch;  // Ensure both filters are applied
   });
+
 
   const ordersToDisplay = filteredOrders.length > 0
     ? filteredOrders
@@ -168,12 +167,11 @@ const Payments = () => {
                   </button>
                 </div>
                 <div className='order-filter'>
-                  <label htmlFor="statusFilter">Filter by Status</label>
+                  <label htmlFor="statusFilter">Filter by Payment Status</label>
                   <select id="statusFilter" value={statusFilter} onChange={handleStatusFilterChange}>
                     <option value="">All</option>
-                    {statusOptions.map((status) => (
-                      <option key={status} value={status}>{status}</option>
-                    ))}
+                    <option value="Pending">Pending</option>
+                    <option value="Order Paid">Order Paid</option>
                   </select>
                 </div>
               </div>
@@ -191,7 +189,6 @@ const Payments = () => {
                       <th>Customer ID</th>
                       <th>Payment Date</th>
                       <th>Payment Method</th>
-                      <th>Shipment Status</th>
                       <th>Payment Status</th>
                       <th>Action</th>
                     </tr>
@@ -206,7 +203,7 @@ const Payments = () => {
                           {order.order_update ? new Date(order.order_update).toLocaleDateString() : 'N/A'}
                         </td>
                         <td>{order.payment_method}</td>
-                        <td>{order.order_status}</td>
+
                         <td>{order.payment_status}</td>
                         <td>
                           <button onClick={() => handleUpdateClick(order)}>Update</button>

@@ -4,7 +4,7 @@ const db = require('../db');
 const crypto = require('crypto');
 
 
-const TOKEN_EXPIRATION_TIME = 900000;
+const TOKEN_EXPIRATION_TIME = 1900000;
 
 
 router.post('/users-login', async (req, res) => {

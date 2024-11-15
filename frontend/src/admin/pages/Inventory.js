@@ -23,6 +23,7 @@ const Inventory = () => {
     const [showModal, setShowModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [stockStatusFilter, setStockStatusFilter] = useState(''); // New state for filter
 
     const handleCloseModal = () => setShowModal(false);
     const handleShowModal = () => setShowModal(true);
@@ -88,12 +89,26 @@ const Inventory = () => {
     };
 
     const filteredProducts = productNames.filter(product => {
+        // Filter based on stock status
+        let stockStatus = 'Low on Stock';
+        let isLowStock = false;
+
+        if (product.quantity > 100) {
+            stockStatus = 'Good Stocks';
+        } else if (product.quantity > 20) {
+            stockStatus = 'Moderately Low';
+        } else {
+            isLowStock = true;
+        }
+
+        // Apply filters
         return (
-            product.product_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            product.product_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            product.category_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            product.price.toString().includes(searchTerm) ||
-            product.quantity.toString().includes(searchTerm)
+            (product.product_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                product.product_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                product.category_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                product.price.toString().includes(searchTerm) ||
+                product.quantity.toString().includes(searchTerm)) &&
+            (stockStatusFilter === '' || stockStatus === stockStatusFilter)
         );
     });
 
@@ -146,11 +161,23 @@ const Inventory = () => {
                                         />
                                     </form>
                                 </div>
+                                {/* Stock Status Filter Dropdown */}
+                                <div className="filter">
+                                    <select
+                                        value={stockStatusFilter}
+                                        onChange={(e) => setStockStatusFilter(e.target.value)}
+                                        className="form-select"
+                                    >
+                                        <option value="">All Status</option>
+                                        <option value="Good Stocks">Good Stocks</option>
+                                        <option value="Low on Stock">Low on Stock</option>
+                                    </select>
+                                </div>
                             </div>
 
                             <div className="inv-table table-responsive">
                                 <table className="table table-hover">
-                                    <thead className='bg-light sticky-top'>
+                                    <thead className="bg-light sticky-top">
                                         <tr>
                                             <th>Product ID</th>
                                             <th>Code</th>
@@ -180,9 +207,7 @@ const Inventory = () => {
                                                     <td>{product.product_code}</td>
                                                     <td>{product.product_name}</td>
                                                     <td>₱ {product.price}</td>
-
                                                     <td className={isLowStock ? 'blinking' : ''}>{product.quantity}</td>
-
                                                     <td>{product.category_name}</td>
                                                     <td>{stockStatus}</td>
                                                 </tr>

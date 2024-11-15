@@ -57,6 +57,7 @@ const PaymentModal = ({ show, handleClose, order, handleUpdate }) => {
               type="text"
               value={paymentMethod}
               onChange={(e) => setPaymentMethod(e.target.value)}
+              readOnly
             />
           </Form.Group>
 
@@ -66,6 +67,7 @@ const PaymentModal = ({ show, handleClose, order, handleUpdate }) => {
               type="text"
               value={orderStatus}
               onChange={(e) => setOrderStatus(e.target.value)}
+              readOnly
             />
           </Form.Group>
 

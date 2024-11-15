@@ -48,7 +48,7 @@ const OrderHistory = () => {
 
   const handleStatusClick = (status) => {
     setStatusFilter(status);
-    setLoading(true); // Show loading state while fetching
+    setLoading(true);
   };
 
   const handleCancelOrder = async (orderId) => {
@@ -70,7 +70,7 @@ const OrderHistory = () => {
   };
 
   const handleResize = () => {
-    setIsMobile(window.innerWidth <= 768);  // Update state based on screen width
+    setIsMobile(window.innerWidth <= 768);
   };
 
   if (loading) return <AdminSkeleton />

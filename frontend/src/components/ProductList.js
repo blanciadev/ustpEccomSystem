@@ -26,7 +26,7 @@ const ProductCard = React.memo(({ product, onAddToCart, onBuyNow, onProductClick
                     <h3>{product.product_name}</h3>
                     <p>{product.description || 'No description available.'}</p>
                     <p>Product Quantity: {product.quantity}</p>
-                    <h3>P{product.price}</h3>
+                    <h3>₱{product.price}</h3>
                     {product.product_status === 'Discounted' && (
                         <h3>Discounted Price: {product.product_discount}%</h3>
                     )}
