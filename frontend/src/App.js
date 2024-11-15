@@ -4,14 +4,21 @@ import React, { useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
-import Home from './pages/Home';
-import Login from './pages/Login/Login';
-import Signup from './pages/Signup/Signup';
-import Cart from './pages/Cart/Cart';
-import Checkout from './pages/Transactions/Checkout';
-import OrderHistory from './pages/Transactions/OrderHistory';
+import Home from './public/pages/Home';
+import Login from './public/pages/Login';
+import Signup from './public/pages/Signup';
+
+import ForgotPassword from './public/pages/ForgotPassword/ForgotPassword';
+import Verification from './public/pages/ForgotPassword/Verification';
+import ChangePassword from './public/pages/ForgotPassword/ChangePassword';
+
+import Cart from './client/pages/Cart/Cart';
+import Checkout from './client/pages/Transactions/Checkout';
+import OrderHistory from './client/pages/Transactions/OrderHistory';
+import Shop from './client/pages/Cart/shop';
+import UserProfile from './client/pages/Transactions/UserProfile';
+
 import Dashboard from './admin/Dashboard';
-import Shop from './pages/Cart/shop';
 import Orders from './admin/pages/Orders';
 import Payments from './admin/pages/Payments';
 import Shipments from './admin/pages/Shipments';
@@ -19,11 +26,6 @@ import Products from './admin/pages/Products';
 import Inventory from './admin/pages/Inventory';
 import Reports from './admin/pages/Reports';
 import Users from './admin/pages/Users';
-import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
-import Verification from './pages/ForgotPassword/Verification';
-import ChangePassword from './pages/ForgotPassword/ChangePassword';
-import UserProfile from './pages/Transactions/UserProfile';
-import ToastNotification from './components/ToastNotification';
 import Settings from './admin/pages/Settings';
 
 function App() {
@@ -61,7 +63,6 @@ function App() {
           <Route path='/forgot-password' element={<ForgotPassword />} />
           <Route path='/verify' element={<Verification />} />
           <Route path='/change-password' element={<ChangePassword />} />
-          <Route path='/sticky' element={<ToastNotification />} />
           <Route path="/user" element={<UserProfile />} />
         </Routes>
       </CSSTransition>

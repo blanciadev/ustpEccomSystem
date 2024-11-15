@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Form, Table, Pagination, Alert, Spinner } from 'react-bootstrap';
 import axios from 'axios';
-import ToastNotification from '../../components/ToastNotification';
+import ToastNotification from '../../public/components/ToastNotification';
 
 const BundleProductModal = () => {
     const [show, setShow] = useState(false);

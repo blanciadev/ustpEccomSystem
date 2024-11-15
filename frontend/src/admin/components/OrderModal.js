@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './modal.css';
 import axios from 'axios';
-import ToastNotification from '../../components/ToastNotification';
+import ToastNotification from '../../public/components/ToastNotification';
 
 const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
     const [status, setStatus] = useState(order ? order.order_status : ''); // Initialize with current status

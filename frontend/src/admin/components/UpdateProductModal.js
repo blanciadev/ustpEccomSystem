@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './modal.css'
 import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
-import ToastNotification from '../../components/ToastNotification';
+import ToastNotification from '../../public/components/ToastNotification';
 
 const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
     const [formData, setFormData] = useState({

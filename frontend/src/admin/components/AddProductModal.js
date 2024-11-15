@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
-import ToastNotification from '../../components/ToastNotification';
+import ToastNotification from '../../public/components/ToastNotification';
 
 
 const AddProductModal = ({ show, handleClose, handleSubmit }) => {
