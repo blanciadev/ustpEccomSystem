@@ -70,8 +70,9 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
         >
             <div className="modal-dialog modal-dialog-centered modal-lg" role="document">
                 <div className="modal-content">
-                    <div className="modal-header">
-                        <h5 className="modal-title">Order Details</h5>
+                    <div className="modal-header order-head">
+                        <h5 className="modal-title"> 
+                        <i className='bx bxs-package'></i> Orders</h5>
                         <button
                             type="button"
                             className="close"

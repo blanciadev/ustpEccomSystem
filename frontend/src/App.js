@@ -27,6 +27,10 @@ import Inventory from './admin/pages/Inventory';
 import Reports from './admin/pages/Reports';
 import Users from './admin/pages/Users';
 import Settings from './admin/pages/Settings';
+import Sales from './admin/pages/Sales';
+import Transactions from './admin/pages/Transaction';
+import AdminHistory from './admin/pages/AdminHistory';
+
 
 function App() {
   const [loginStatus, setLoginStatus] = useState('');
@@ -64,6 +68,10 @@ function App() {
           <Route path='/verify' element={<Verification />} />
           <Route path='/change-password' element={<ChangePassword />} />
           <Route path="/user" element={<UserProfile />} />
+          <Route path='/admin/reports/sales' element={<Sales/>}/>
+          <Route path='/admin/reports/order-history' element={<AdminHistory/>}/>
+          <Route path='/admin/reports/transactions' element={<Transactions/>}/>
+          
         </Routes>
       </CSSTransition>
     </TransitionGroup>

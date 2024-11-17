@@ -79,4 +79,15 @@
     grid-column-start: 1;
     grid-column-end: 3;
 }
-
+.modal-header{
+    justify-content: space-between;
+    padding: 0;
+}
+.order-head button{
+    background-color: var(---white);
+    color: black;
+    font-size: 1.3rem;
+}
+.modal-content{
+    padding: 10px 15px;
+}

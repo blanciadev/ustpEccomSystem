@@ -6,6 +6,9 @@ const AdminNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 769);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(
+    JSON.parse(localStorage.getItem('isDropdownOpen')) || false
+  );
 
   useEffect(() => {
 
@@ -25,6 +28,11 @@ const AdminNav = () => {
     setIsMobile(window.innerWidth <= 769);
   };
 
+  const toggleDropdown = () => {
+    const newDropdownState = !isDropdownOpen;
+    setIsDropdownOpen(newDropdownState);
+    localStorage.setItem('isDropdownOpen', JSON.stringify(newDropdownState)); 
+  }
   return (
     <div className='nav-con'>
       <div className='nav-img'>
@@ -108,18 +116,7 @@ const AdminNav = () => {
           )
           }
         </a>
-        <a
-          href='/admin/reports'
-          className={location.pathname === '/admin/reports' ? 'active' : ''}
-        >
-          {isMobile ? (
-            <i class="bx bxs-report"></i>
-          ) : (
-            <i class="bx bxs-report"></i>,
-            <span>Reports</span>
-          )
-          }
-        </a>
+
         <a
           href='/admin/manage-users'
           className={location.pathname === '/admin/manage-users' ? 'active' : ''}
@@ -132,9 +129,52 @@ const AdminNav = () => {
           )
           }
         </a>
+
+        <a
+          onClick={(e) => {
+            e.preventDefault();
+            toggleDropdown();
+          }}
+          
+          className={`dropdown-toggle ${isDropdownOpen  ? 'active2' : ''}`}
+        >
+          <i className='bx bxs-report'></i>
+          {!isMobile && <span>Reports</span>}
+        </a>
+
+        {isDropdownOpen && (
+          <div className='dropdown-content'>
+            <a
+              href='/admin/reports/sales'
+              className={location.pathname === '/admin/reports/sales' ? 'active' : ''}
+            >
+              <i class='bx bx-line-chart'></i>
+              Sales
+            </a>
+            <a
+              href='/admin/reports/order-history'
+              className={
+                location.pathname === '/admin/reports/order-history' ? 'active' : ''
+              }
+            >
+              <i class='bx bx-history' ></i>
+              Order History
+            </a>
+            <a
+              href='/admin/reports/transactions'
+              className={
+                location.pathname === '/admin/reports/transactions' ? 'active' : ''
+              }
+            >
+              <i class='bx bx-transfer-alt' ></i>
+              Transactions
+            </a>
+          </div>
+        )}
+
+        
       </div>
     </div>
   );
 };
-
 export default AdminNav;
