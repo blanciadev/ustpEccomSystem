@@ -6,7 +6,7 @@ const db = require('../db');
 router.get('/products', async (req, res) => {
     try {
         const [rows] = await db.query(`
-            SELECT p.product_id, p.product_code, p.product_name, p.price ,p.description, p.quantity, c.category_name, p.product_image,  p.product_discount, 
+            SELECT p.product_id, p.product_code, p.product_name, p.price ,p.description, p.quantity, p.size, c.category_name, p.product_image,  p.product_discount, 
                 p.product_status
             FROM product p
             INNER JOIN category c ON p.category_id = c.category_id
@@ -167,7 +167,7 @@ router.get('/sticky-components', async (req, res) => {
             query += ' AND (' + searchTerms.join(' OR ') + ')';
         }
 
-        query += ' LIMIT 4';
+        query += ' LIMIT 5';
 
         console.log('Final query to execute:', query);
         console.log('Query parameters:', queryParams);

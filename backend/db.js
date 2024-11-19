@@ -6,11 +6,14 @@ const pool = mysql.createPool({
     user: 'root',
 
     port: '3306',
-    password: '',
+    //password: '',
 
     //PORT KURT 
     // port: '3307',
     // password: 'root',
+
+    //SAM
+    password: "sam12345",
 
     // password: '',
     database: 'ustpecom',

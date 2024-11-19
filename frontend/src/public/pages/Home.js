@@ -1,4 +1,5 @@
 import React from 'react'
+import './Home.css';
 import Navigation from '../../client/components/Navigation';
 import Slideshow from '../../client/components/Slideshow';
 import Products from '../../client/components/Products';
