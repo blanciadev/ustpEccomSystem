@@ -5,15 +5,15 @@ const pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
 
-    port: '3306',
+    // port: '3306',
     //password: '',
 
     //PORT KURT 
-    // port: '3307',
-    // password: 'root',
+    port: '3307',
+    password: 'root',
 
     //SAM
-    password: "sam12345",
+    // password: "sam12345",
 
     // password: '',
     database: 'ustpecom',

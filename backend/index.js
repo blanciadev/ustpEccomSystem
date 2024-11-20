@@ -131,6 +131,123 @@ app.post('/verify-token', async (req, res) => {
 });
 
 
+app.post('/google-signup', async (req, res) => {
+  const { token } = req.body;
+
+  if (!token) {
+    return res.status(400).json({ message: 'Google token is required' });
+  }
+
+  try {
+    // Verify the Google token
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: GOOGLE_CLIENT_ID, // Ensure this matches your Google OAuth Client ID
+    });
+
+    const payload = ticket.getPayload();
+    const googleEmail = payload.email;
+    const firstName = payload.given_name || '';
+    const lastName = payload.family_name || '';
+
+    // Check if the user already exists
+    const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [googleEmail]);
+
+    if (rows.length > 0) {
+      const user = rows[0];
+
+      // Check for existing active tokens for this user
+      const [activeTokens] = await db.query(
+        'SELECT * FROM tokens WHERE user_id = ? AND token_status = ?',
+        [user.customer_id, 'Active']
+      );
+
+      const now = new Date();
+      if (activeTokens.length > 0) {
+        const activeToken = activeTokens[0];
+
+        // If the token is still valid, return user details
+        if (new Date(activeToken.expires_at) > now) {
+          return res.status(200).json({
+            message: 'User verified',
+            status: 'registered',
+            user_id: user.customer_id,
+            username: user.username,
+            first_name: user.first_name,
+            role_type: user.role_type,
+            profile_img: user.profile_img,
+            token: activeToken.token,
+          });
+        }
+
+        // Remove expired token
+        await db.query('DELETE FROM tokens WHERE id = ?', [activeToken.id]);
+      }
+
+      // Insert a new token for the user
+      const newToken = generateToken(); // Function to generate a new token
+      const expiresAt = new Date(Date.now() + TOKEN_EXPIRATION_TIME);
+
+      await db.query('INSERT INTO tokens (user_id, token, token_status, expires_at) VALUES (?, ?, ?, ?)', [
+        user.customer_id,
+        newToken,
+        'Active',
+        expiresAt,
+      ]);
+
+      return res.status(200).json({
+        message: 'User verified',
+        status: 'registered',
+        user_id: user.customer_id,
+        username: user.username,
+        first_name: user.first_name,
+        role_type: user.role_type,
+        profile_img: user.profile_img,
+        token: newToken,
+      });
+    } else {
+      // If user doesn't exist, register a new user
+      const [result] = await db.query(
+        'INSERT INTO users (first_name, last_name, email, password) VALUES (?, ?, ?, ?)',
+        [firstName, lastName, googleEmail, null] // Password is null for Google signup
+      );
+
+      const newUserId = result.insertId;
+
+      // Create a new token for the newly registered user
+      const newToken = generateToken(); // Function to generate a new token
+      const expiresAt = new Date(Date.now() + TOKEN_EXPIRATION_TIME);
+
+      await db.query('INSERT INTO tokens (user_id, token, token_status, expires_at) VALUES (?, ?, ?, ?)', [
+        newUserId,
+        newToken,
+        'Active',
+        expiresAt,
+      ]);
+
+      return res.status(201).json({
+        message: 'User registered successfully',
+        status: 'registered',
+        user_id: newUserId,
+        first_name: firstName,
+        last_name: lastName,
+        email: googleEmail,
+        token: newToken, // Include the token in the response
+        role_type: 'Customer', // Set default role if applicable
+        profile_img: payload.picture || '', // Include profile picture if available
+      });
+    }
+  } catch (error) {
+    console.error('Token verification error or signup error:', error.message);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Helper function to generate a unique token
+function generateToken() {
+  return require('crypto').randomBytes(48).toString('hex');
+}
+
 
 
 // Routes
