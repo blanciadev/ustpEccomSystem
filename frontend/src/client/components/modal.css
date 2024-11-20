@@ -15,7 +15,7 @@
 }
 
 .promodal-content {
-    width: 90%;
+    width: 70%;
     height: 90%;
     overflow-y: auto;
     padding: 10px;
@@ -57,6 +57,7 @@
 
 .product-image img {
     object-fit: contain;
+    border-bottom: 2px solid #ff728a;
 }
 
 .price-stock {
@@ -67,7 +68,7 @@
 
 .product-info {
     display: grid;
-    grid-template-rows: 15% 20% 1fr 1fr 1fr 1fr 20% 20%;
+    grid-template-rows: 20%  1fr 30%  20%;
     align-items: center;
 }
 
@@ -89,8 +90,12 @@
 .quantity-buttons>button {
     background-color: white;
     border: none;
-    color: black;
     padding: 0 20px;
+}
+
+.quantity-buttons>button:hover {
+    background-color: rgb(255, 114, 138);
+    color: white;
 }
 
 .promodal-close-btn {

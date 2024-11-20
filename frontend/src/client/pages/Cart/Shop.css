@@ -4,8 +4,10 @@
 
 .shop__title {
     font-size: 24px;
+    font-weight: bold;
     margin-bottom: 10px;
     margin-top: 10px;
+    text-align: center;
 }
 
 .shop__top-picks,
@@ -15,6 +17,7 @@
 
 .shop__product-list {
     display: grid;
+    justify-content: center;
     grid-template-columns: repeat(auto-fit, minmax(200px, 250px));
     gap: 15px;
 }
@@ -222,5 +225,6 @@
     .shop__product-list{
         justify-content: center;
         grid-template-columns: 300px;
+       
     }
 }

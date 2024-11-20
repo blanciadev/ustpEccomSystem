@@ -7,19 +7,20 @@
 
 .product-list-container {
     display: grid;
-    grid-template-columns: repeat(3, minmax(200px, 250px));
+    grid-template-columns: repeat(4, minmax(200px, 250px));
     grid-auto-rows: 1fr;
     justify-content: center;
     gap: 15px;
 }
 
 .product-card {
-    background-color: #f9f9f9;
+    background-color: #ffffff;
     border: 1px solid #ddd;
     border-radius: 4px;
-    padding: 10px;
+
     text-align: center;
     transition: transform 0.3s ease;
+    padding-bottom: 10px;
 }
 
 .product-card:hover {
@@ -29,7 +30,6 @@
 .product-card img {
     width: 100%;
     height: auto;
-    border-radius: 5px;
 }
 
 .product-card h3 {
@@ -55,10 +55,12 @@
     color: white;
     border: none;
     border-radius: 3px;
-    padding: 8px 10px;
+    padding: 8px 20px;
     cursor: pointer;
-    font-size: 0.8em;
+    font-size: 16px;
     margin-top: 5px;
+    margin-bottom: 10px;
+    
 }
 
 .product-card button:hover {
@@ -206,27 +208,31 @@ button:hover {
 .pagination {
     display: flex;
     justify-content: center;
-    margin-top: 15px;
+    margin-top: 25px;
 }
 
 .pagination button {
-    background-color: #e9ecef;
-    color: #333;
-    border: 1px solid #ccc;
-    padding: 5px 10px;
+    padding: 10px 20px;
     margin: 0 5px;
+    border: 2px solid rgb(255, 144, 162);
+    background-color: #007bff00;
+    color: rgb(128, 0, 64);
+    border-radius: 5px;
     cursor: pointer;
-    border-radius: 4px;
+    font-size: 16px;
 }
 
 .pagination button.active {
-    background-color: rgb(223, 95, 116);
+ 
     color: white;
 }
 
-.pagination button:hover:not(.active) {
-    background-color: #b9b9b9;
+.pagination button:hover {
+    background-color: 2px solid rgb(255, 144, 162);
+    
 }
+
+
 
 @media (max-width:768px) {
     

@@ -5,6 +5,10 @@ import ToastNotification from '../../public/components/ToastNotification';
 
 import { useLocation, useNavigate } from 'react-router-dom';
 
+
+import { FaPlus } from "react-icons/fa6";
+import { FaMinus } from "react-icons/fa6";
+
 const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
     const [recommendedProducts, setRecommendedProducts] = useState([]);
     const [bundleProducts, setBundleProducts] = useState([]);
@@ -245,16 +249,17 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                             alt="" height="400" width="300" />
                         <div class="price-stock">
                             <p><strong>Price</strong></p>
-                            <p className='price-value'>
-                                ₱{calculateDiscountedPrice(product.price, product.product_discount)}
 
-                            </p>
+                            <h3 className="text-primary" style={{ fontSize: "1.2rem" }}>
+                                ₱ {calculateDiscountedPrice(product.price, product.product_discount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </h3>
+                           
                             <p><strong>Stocks</strong></p>
                             <p>{product.quantity}</p>
                         </div>
                     </div>
-                    <div class="product-info">
-                        {/* <p>HAIRCARE • Shampoo</p> */}<br></br>
+                    <div class="product-info px-4 mb-4">
+                        <p>HAIRCARE • {product.size}</p><br></br>
                         <h3>{product.product_name}</h3>
                         <p><strong>Description: </strong>
                             {product.description || 'No description available.'}
@@ -264,14 +269,15 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                         <div className="quantity">
                             <p><strong>Quantity</strong></p>
                             <div className='quantity-buttons'>
-                                <button onClick={decrementQuantity}>-</button>
+                                <button onClick={decrementQuantity}><FaMinus class="text-dark"/></button>
                                 <input
                                     type="text"
                                     value={quantity}
+                                    class="text-center "
                                     readOnly
                                     style={{ width: '70px', border: '1px solid gray', outline: 'none', borderRadius: '0' }}
                                 />
-                                <button onClick={incrementQuantity}>+</button>
+                                <button onClick={incrementQuantity}><FaPlus class="text-dark"/></button>
                             </div>
                         </div>
                         <div class="buttons">
@@ -365,7 +371,10 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                                             />
                                             <div className="modalproduct-details">
                                                 <span className="modalproduct-name">{recProduct.product_name}</span>
-                                                <span className="modalproduct-price">₱{calculateDiscountedPrice(recProduct.price, recProduct.product_discount)}</span>
+                                                <h3 className="modalproduct-price text-primary" style={{ fontSize: "1.2rem" }}>
+                                                    ₱ {calculateDiscountedPrice(recProduct.price, recProduct.product_discount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                </h3>
+                                               
 
                                                 {recProduct.product_status === 'Discounted' && (
                                                     <span className="modalproduct-discount">

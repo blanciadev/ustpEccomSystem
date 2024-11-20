@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Card } from 'react-bootstrap';
 import './StickyComponent.css';
+// import './productList.css';
+
 
 const StickyComponent = ({ onSubmit }) => {
   const [isClicked, setIsClicked] = useState(false);
@@ -38,13 +40,13 @@ const StickyComponent = ({ onSubmit }) => {
   return (
     <div>
       <div className={`sticky-card ${isClicked ? 'clicked' : ''}`} onClick={handleClick}>
-        <p>Find Your Perfect Haircare Match</p>
+        <p class="fw-bold">Find Your Perfect Haircare Match</p>
         <i className='bx bx-chevron-right' style={{ fontSize: '26pt' }}></i>
       </div>
 
       <div className={`expanded-content ${isClicked ? 'show' : ''}`}>
         <Card>
-          <Card.Body>
+          <Card.Body >
             <h5>Healthy Hair Starts Here!</h5>
             <div className='forms'>
               <form onSubmit={handleSubmit}>

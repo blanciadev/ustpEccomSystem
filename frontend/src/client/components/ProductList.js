@@ -4,14 +4,14 @@ import PropTypes from 'prop-types';
 import ProductModal from './ProductModal';
 import StickyComponent from './StickyComponent';
 import { cartEventEmitter } from './eventEmitter';
-import './modal.css';
+// import './modal.css';
 import './productList.css';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import ToastNotification from '../../public/components/ToastNotification';
 
 
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 8;
 
 const ProductCard = React.memo(({ product, onAddToCart, onBuyNow, onProductClick }) => {
     if (!product) return <div>Product data is not available</div>;
@@ -22,14 +22,26 @@ const ProductCard = React.memo(({ product, onAddToCart, onBuyNow, onProductClick
         <>
             {product.quantity > 0 && (
                 <div className="product-card" onClick={() => onProductClick(product)}>
-                    <img src={product.product_image} alt={product.product_name} />
-                    <h3>{product.product_name}</h3>
-                    <p>{product.description || 'No description available.'}</p>
-                    <p>Product Quantity: {product.quantity}</p>
-                    <h3>₱{product.price}</h3>
+                    <img
+                        src={product.product_image}
+                        alt={product.product_name}
+                        className="img-fluid"
+                        style={{ height: "150px", width: "150px", objectFit: "fit", borderBottom: "2px solid #ff728a"}}
+                    />
+                    <p className="text-muted mb-1 mt-2">Haircare • {product.size}</p>
+                    <h3 className="product-name m-0 p-0 align-items-center mb-4" style={{ fontSize: "14px", height: "60px"}}>
+                        {product.product_name}
+                        <br/><strong className="text-primary" style={{ fontSize: "1rem" }}>₱ {product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+                    </h3>
+                    {/* <p>{product.description || 'No description available.'}</p> */}
+                    {/* <p>Product Quantity: {product.quantity}</p> */}
+                    {/* <h3 className="text-primary" style={{ fontSize: "1.2rem" }}>
+                        ₱ {product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </h3> */}
                     {product.product_status === 'Discounted' && (
                         <h3>Discounted Price: {product.product_discount}%</h3>
                     )}
+                    
                     <button onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}>Add to Cart</button>
                     <button onClick={(e) => { e.stopPropagation(); onBuyNow(product); }}>Buy Now</button>
                 </div>
@@ -282,10 +294,14 @@ const ProductList = ({ stickyComponents }) => {
     const paginatedProducts = products.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
 
     return (
+        <div >
+          <div className='d-flex justify-content-center'>
         <div className='product-list'>
             <ToastNotification toastMessage={toastMessage} />
-            <StickyComponent onSubmit={handleStickySubmit} />
-            <h2>Top Products</h2>
+            <StickyComponent className="" onSubmit={handleStickySubmit} />
+            
+
+            <h2 class="text-center mt-4">HAIRCARE BEAUTY OFFERS</h2>
             <div className='product-list-container'>
                 {paginatedProducts.map((product) => (
                     <ProductCard
@@ -297,11 +313,12 @@ const ProductList = ({ stickyComponents }) => {
                     />
                 ))}
             </div>
+
             <div className='pagination'>
-                <button onClick={() => handlePageChange(-1)} disabled={currentPage === 0}>
+                <button className='btns' onClick={() => handlePageChange(-1)} disabled={currentPage === 0}>
                     Previous
                 </button>
-                <button onClick={() => handlePageChange(1)} disabled={currentPage >= Math.ceil(products.length / PAGE_SIZE) - 1}>
+                <button className='btns' onClick={() => handlePageChange(1)} disabled={currentPage >= Math.ceil(products.length / PAGE_SIZE) - 1}>
                     Next
                 </button>
             </div>
@@ -313,6 +330,11 @@ const ProductList = ({ stickyComponents }) => {
                     onAddToCart={handleAddToCart}
                 />
             )}
+        </div>
+
+
+
+        </div>  
         </div>
     );
 };

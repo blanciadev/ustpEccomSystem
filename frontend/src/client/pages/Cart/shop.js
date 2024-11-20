@@ -257,7 +257,7 @@ const Shop = () => {
 
             {/* Top Picks Section */}
             <div className='shop__top-picks'>
-                <h2 className='shop__title'>Top Picks</h2>
+                <h2 className='shop__title'>TOP PICKS</h2>
                 <div className='shop__product-list'>
                     {topPickedProducts
                         .filter((product) => product.quantity > 0) 
@@ -272,7 +272,9 @@ const Shop = () => {
                                 <div className='shop__product-desc'>
                                     <p className='shop__product-name'>{product.product_name || 'No product name'}</p>
                                     <p className='shop__product-quantity'>Quantity: {product.quantity}</p>
-                                    <p className='shop__product-price'>Price: ₱{product.price}</p>
+                                    <p className="shop__product-price text-primary">
+                                        ₱{product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </p>
                                     {product.product_status === 'Discounted' && (
                                         <p className='shop__product-discount'>Product Discount: P{product.product_discount}%</p>
                                     )}
@@ -356,6 +358,7 @@ const Shop = () => {
 
             {/* Filter Section */}
             <div className='shop__filter'>
+                <h2 className='shop__title'>ALL HAIRCARE PRODUCTS</h2>
                 <label htmlFor='category-filter' className='shop__filter-label'>Filter by Category:</label>
                 <select id='category-filter' className='shop__filter-select' value={selectedCategory} onChange={handleCategoryChange}>
                     <option value=''>All Categories</option>
@@ -380,7 +383,10 @@ const Shop = () => {
                             <div className='shop__product-desc'>
                                 <p className='shop__product-name'>{product.product_name || 'No product name'}</p>
                                 <p className='shop__product-quantity'>Quantity: {product.quantity}</p>
-                                <p className='shop__product-price'>Price: ₱{product.price}</p>
+                                <p className="shop__product-price text-primary" style={{ width: "50px" }}>
+                                        ₱{product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </p>
+                                
                                 {product.product_status === 'Discounted' && (
                                     <p className='shop__product-discount'>Product Discount: P{product.product_discount}%</p>
                                 )}
