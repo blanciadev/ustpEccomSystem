@@ -21,7 +21,7 @@ const Navigation = () => {
     const [profileImg, setProfileImg] = useState('');
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
-    
+
     useEffect(() => {
         const token = localStorage.getItem('token');
         const storedUsername = localStorage.getItem('username');
@@ -153,125 +153,125 @@ const Navigation = () => {
     };
 
     return (
-    <div className="nav-container d-flex justify-content-between align-items-center p-3 ">
-    <ToastNotification toastMessage={toastMessage} />
-    
-    
-    <div className="logo d-flex align-items-center">
-        <a href="/" className="d-flex align-items-center">
-            <img src={logo} alt="Logo" className="me-2" style={{ height: "50px", width: "50px" }} />
-            {isMobile ? (
-                <p></p>
-            ) : (
-                <h1 className="m-0">N&B Beauty Vault</h1>
-            )}
-        </a>
-    </div>
+        <div className="nav-container d-flex justify-content-between align-items-center p-3 ">
+            <ToastNotification toastMessage={toastMessage} />
 
 
-
-
-    <div className="d-flex align-items-center p-0 m-0">
-    <div className="searchbar d-flex justify-content-center mb-3">
-        <form className="d-flex align-items-start p-0 m-0">
-            <div className="input-group custom-border">
-                <span className="input-group-text custom-icon">
-                    <IoIosSearch style={{ height: "20px", width: "20px" }} />
-                </span>
-                <input
-                    type="search"
-                    placeholder="Look for your perfect haircare products..."
-                    className="p-0 m-0"
-                    style={{ width: "350px", height: "40px" }}
-                />
+            <div className="logo d-flex align-items-center">
+                <a href="/" className="d-flex align-items-center">
+                    <img src={logo} alt="Logo" className="me-2" style={{ height: "50px", width: "50px" }} />
+                    {isMobile ? (
+                        <p></p>
+                    ) : (
+                        <h1 className="m-0">N&B Beauty Vault</h1>
+                    )}
+                </a>
             </div>
-        </form>
-    </div>
-</div>
 
 
 
 
-
-
-    <button className="menu-toggle" onClick={toggleMenu}>
-        {isMenuOpen ? (
-            <i className="bx bx-x"></i>
-        ) : (
-            <i className="bx bx-menu"></i>
-        )}
-    </button>
-
-
-    <div className="navlinks">
-        <ul className={`linklist ${isMenuOpen ? "active" : ""}`}>
-            {commonLinks.map((data) => (
-                <li key={data.id}>
-                    <a href={data.link} onClick={data.id === 3 ? handleCartClick : undefined}>
-                        {data.id === 3 ? (
-                            <>
-                                <BsCart style={{ height: "20px", width: "20px" }} /> {data.page}
-                            </>
-                        ) : (
-                            data.page
-                        )}
-                    </a>
-                </li>
-            ))}
-            {!isLoggedIn ? (
-                <>
-                    <li><a href='/signup'>Sign Up</a></li>
-                    <li><a href='/login' class="login">Login</a></li>
-                </>
-            ) : (
-                <>
-                    <li>
-                        <span className="cartIcon" onClick={handleProfileClick}>
-                            {isMobile ? (
-                                <p style={{ fontWeight: '400' }}>Profile</p>
-                            ) : (
-                                <img
-                                    src={profileImg || 'https://static.vecteezy.com/system/resources/previews/026/434/409/non_2x/default-avatar-profile-icon-social-media-user-photo-vector.jpg'}
-                                    alt="Profile Image"
-                                    style={{ width: '40px', height: '40px', borderRadius: '50%' }}
-                                />
-                            )}
-                        </span>
-                    </li>
-                    <li><button onClick={() => setShowLogoutModal(true)}>Logout</button></li>
-                </>
-            )}
-        </ul>
-    </div>
-
-
-    <div
-        className={`modal fade ${showLogoutModal ? 'show' : ''}`}
-        id="logoutModal"
-        tabIndex="-1"
-        role="dialog"
-        aria-labelledby="logoutModalLabel"
-        aria-hidden="true"
-        style={{ display: showLogoutModal ? 'block' : 'none', backgroundColor: 'rgba(0,0,0,0.5)' }}
-    >
-        <div className="modal-dialog" role="document">
-            <div className="modal-content">
-                <div className="modal-header">
-                    <h5 className="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+            {/* <div className="d-flex align-items-center p-0 m-0">
+                <div className="searchbar d-flex justify-content-center mb-3">
+                    <form className="d-flex align-items-start p-0 m-0">
+                        <div className="input-group custom-border">
+                            <span className="input-group-text custom-icon">
+                                <IoIosSearch style={{ height: "20px", width: "20px" }} />
+                            </span>
+                            <input
+                                type="search"
+                                placeholder="Look for your perfect haircare products..."
+                                className="p-0 m-0"
+                                style={{ width: "350px", height: "40px" }}
+                            />
+                        </div>
+                    </form>
                 </div>
-                <div className="modal-body">
-                    <p>Are you sure you want to log out?</p>
-                </div>
-                <div className="modal-footer">
-                    <button type="button" className="btn btn-secondary" onClick={() => setShowLogoutModal(false)}>Cancel</button>
-                    <button type="button" className="btn btn-danger" onClick={handleLogout}>Logout</button>
+            </div> */}
+
+
+
+
+
+
+            <button className="menu-toggle" onClick={toggleMenu}>
+                {isMenuOpen ? (
+                    <i className="bx bx-x"></i>
+                ) : (
+                    <i className="bx bx-menu"></i>
+                )}
+            </button>
+
+
+            <div className="navlinks">
+                <ul className={`linklist ${isMenuOpen ? "active" : ""}`}>
+                    {commonLinks.map((data) => (
+                        <li key={data.id}>
+                            <a href={data.link} onClick={data.id === 3 ? handleCartClick : undefined}>
+                                {data.id === 3 ? (
+                                    <>
+                                        <BsCart style={{ height: "20px", width: "20px" }} /> {data.page}
+                                    </>
+                                ) : (
+                                    data.page
+                                )}
+                            </a>
+                        </li>
+                    ))}
+                    {!isLoggedIn ? (
+                        <>
+                            <li><a href='/signup'>Sign Up</a></li>
+                            <li><a href='/login' class="login">Login</a></li>
+                        </>
+                    ) : (
+                        <>
+                            <li>
+                                <span className="cartIcon" onClick={handleProfileClick}>
+                                    {isMobile ? (
+                                        <p style={{ fontWeight: '400' }}>Profile</p>
+                                    ) : (
+                                        <img
+                                            src={profileImg || 'https://static.vecteezy.com/system/resources/previews/026/434/409/non_2x/default-avatar-profile-icon-social-media-user-photo-vector.jpg'}
+                                            alt="Profile Image"
+                                            style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+                                        />
+                                    )}
+                                </span>
+                            </li>
+                            <li><button onClick={() => setShowLogoutModal(true)}>Logout</button></li>
+                        </>
+                    )}
+                </ul>
+            </div>
+
+
+            <div
+                className={`modal fade ${showLogoutModal ? 'show' : ''}`}
+                id="logoutModal"
+                tabIndex="-1"
+                role="dialog"
+                aria-labelledby="logoutModalLabel"
+                aria-hidden="true"
+                style={{ display: showLogoutModal ? 'block' : 'none', backgroundColor: 'rgba(0,0,0,0.5)' }}
+            >
+                <div className="modal-dialog" role="document">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                        </div>
+                        <div className="modal-body">
+                            <p>Are you sure you want to log out?</p>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-secondary" onClick={() => setShowLogoutModal(false)}>Cancel</button>
+                            <button type="button" className="btn btn-danger" onClick={handleLogout}>Logout</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-    
+
     );
 };
 

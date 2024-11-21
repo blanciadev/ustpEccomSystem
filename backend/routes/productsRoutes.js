@@ -124,64 +124,83 @@ router.post('/products-recommendations', async (req, res) => {
 });
 
 router.get('/sticky-components', async (req, res) => {
-    const { hairType, hairTexture, hairVirgin, hairColor, hairRebonded } = req.query;
+    const { hairType, hairTexture, hairVirgin, hairColor, hairRebonded, query } = req.query;
 
-    console.log('--------- STICKY COMPONENT -------');
+    console.log('--------- STICKY COMPONENT REQUEST START -------');
     console.log('Received parameters:', req.query);
 
     try {
         // Base query to fetch active products
-        let query = 'SELECT * FROM product WHERE product_status IN ("active", "Discounted")';
+        let queryStr = 'SELECT * FROM product WHERE product_status IN ("active", "Discounted")';
 
         // List of possible search terms
         const searchTerms = [];
         const queryParams = [];
 
-        // Check each parameter and add to searchTerms array if provided
+        console.log(query);
+
+        // Add search term for product name if provided
+        if (query) {
+            console.log('Adding product name filter:', query);
+            searchTerms.push('LOWER(product_name) LIKE ?');
+            queryParams.push(`%${query.toLowerCase()}%`);
+        }
+
+        // Add filter terms if provided
         if (hairType) {
+            console.log('Adding hair type filter:', hairType);
             searchTerms.push('LOWER(description) LIKE ?');
             queryParams.push(`%${hairType.toLowerCase()}%`);
         }
 
         if (hairTexture) {
+            console.log('Adding hair texture filter:', hairTexture);
             searchTerms.push('LOWER(description) LIKE ?');
             queryParams.push(`%${hairTexture.toLowerCase()}%`);
         }
 
         if (hairVirgin) {
+            console.log('Adding hair virgin filter:', hairVirgin);
             searchTerms.push('LOWER(description) LIKE ?');
             queryParams.push(`%${hairVirgin.toLowerCase()}%`);
         }
 
         if (hairColor) {
+            console.log('Adding hair color filter:', hairColor);
             searchTerms.push('LOWER(description) LIKE ?');
             queryParams.push(`%${hairColor.toLowerCase()}%`);
         }
 
         if (hairRebonded) {
+            console.log('Adding hair rebonded filter:', hairRebonded);
             searchTerms.push('LOWER(description) LIKE ?');
             queryParams.push(`%${hairRebonded.toLowerCase()}%`);
         }
 
+        // Combine search terms if any are present
         if (searchTerms.length > 0) {
-            query += ' AND (' + searchTerms.join(' OR ') + ')';
+            queryStr += ' AND (' + searchTerms.join(' OR ') + ')';
         }
 
-        query += ' LIMIT 5';
+        queryStr += ' LIMIT 5'; // Optional: Limit number of results for performance
 
-        console.log('Final query to execute:', query);
+        console.log('Final SQL query to execute:', queryStr);
         console.log('Query parameters:', queryParams);
 
-        const [products] = await db.query(query, queryParams);
+        const [products] = await db.query(queryStr, queryParams);
 
         console.log('Fetched products:', products);
+
+        console.log('--------- STICKY COMPONENT REQUEST END -------');
 
         res.json(products);
     } catch (error) {
         console.error('Error fetching products:', error.message);
+        console.error('Stack Trace:', error.stack);
         res.status(500).send('Server error');
     }
 });
+
 
 
 router.get('/products-bundle-recommendation', async (req, res) => {
