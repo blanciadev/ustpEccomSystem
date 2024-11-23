@@ -69,8 +69,8 @@ const CartProduct = ({
         />
         <button className='qtyBtn' onClick={incrementQuantity}>+</button> {/* Increment button */}
       </td>
-      <td>₱{price.toFixed(2)}</td>
-      <td>₱{(price * localQuantity).toFixed(2)}</td>
+      <td>₱{price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td>₱{(price * localQuantity).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
       <td>
         <button className='cart__delBtn' onClick={handleRemoveFromCart}><i class='bx bxs-trash-alt'></i></button> {/* Remove button */}
       </td>

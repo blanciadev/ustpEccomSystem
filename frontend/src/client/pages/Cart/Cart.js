@@ -246,8 +246,8 @@ const CartContent = () => {
               <tfoot>
                 <tr>
                   <td colSpan="4">Total</td>
-                  <td>${totalPrice.toFixed(2)}</td>
-                </tr>
+                  <td>₱{totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                </tr>"///;"
               </tfoot>
             </table>
             <div className='cart__checkout'>

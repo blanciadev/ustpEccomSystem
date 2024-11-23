@@ -124,7 +124,14 @@ const Login = () => {
                         <div class="col-12 col-xxl-11 d-flex justify-content-center">
                             <div class="login-box card border-light-subtle shadow-sm">
 
+                                <div class="col-12 col-md-6">
+                                <a href="/">
+                                    <img class="img-fluid rounded-start w-100 h-100 object-fit-cover" loading="lazy" src={login_signup} alt="login-image"/>
+                                </a>
+                                </div>
+
                                 <div class="row g-0">
+
 
                                     <div class="col-12 col-md-6">
                                         <img class="img-fluid rounded-start w-100 h-100 object-fit-cover" loading="lazy" src={login_signup} alt="login-image" />

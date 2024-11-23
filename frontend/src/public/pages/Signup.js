@@ -111,24 +111,21 @@ const Signup = () => {
 
   return (
     <div class="d-flex justify-content-center">
-      <section class="signup-con">
-        <div class="container">
-          <div class="row">
-            <div class="col-12 col-xxl-11 d-flex justify-content-center">
-              <div class="signup-box card border-light-subtle shadow-sm">
 
-                <div class="row g-0">
+    <section class="signup-con">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 col-xxl-11 d-flex justify-content-center">
+            <div class="signup-box card border-light-subtle shadow-sm">
+              
+              <div class="row g-0">
 
-                  <div class="col-12 col-md-6">
-                    <img class="img-fluid rounded-start w-100 h-100 object-fit-cover" loading="lazy" src={login_signup} alt="login-image" />
-                  </div>
+                <div class="col-12 col-md-6">
+                  <a href="/">
+                    <img class="img-fluid rounded-start w-100 h-100 object-fit-cover" loading="lazy" src={login_signup} alt="login-image"/>
+                  </a>
+                </div>
 
-                  <div class="col-gradient col-12 col-md-6 d-flex justify-content-center">
-                    <div class="col-12 col-lg-11 col-xl-10">
-                      <div class="card-body p-0">
-                        <div class="row">
-                          <div class="col-12 mt-4">
-                            <div class="mb-4">
 
                               <h2 class=" text-center">Registration</h2>
                             </div>

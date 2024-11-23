@@ -2,14 +2,14 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
-
 router.get('/products', async (req, res) => {
     try {
         const [rows] = await db.query(`
-            SELECT p.product_id, p.product_code, p.product_name, p.price ,p.description, p.quantity, p.size, c.category_name, p.product_image,  p.product_discount, 
-                p.product_status
+            SELECT p.product_id, p.product_code, p.product_name, p.price, p.description, p.quantity, p.size, 
+                   c.category_name, p.product_image, p.product_discount, p.product_status
             FROM product p
             INNER JOIN category c ON p.category_id = c.category_id
+            ORDER BY RAND()
         `);
 
         res.json(rows);
@@ -18,6 +18,7 @@ router.get('/products', async (req, res) => {
         res.status(500).send('Error fetching products');
     }
 });
+
 
 
 // Route to get top 4 user-picked products for interaction view
