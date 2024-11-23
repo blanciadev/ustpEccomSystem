@@ -38,7 +38,7 @@ const Payments = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5001/admin-order-history', {
+      const response = await axios.get('http://localhost:5001/admin-order-history-payment', {
         params: {
           status: statusFilter,
           search: searchTerm,
