@@ -5,11 +5,44 @@ const db = require('../db');
 router.get('/products', async (req, res) => {
     try {
         const [rows] = await db.query(`
-            SELECT p.product_id, p.product_code, p.product_name, p.price, p.description, p.quantity, p.size, 
-                   c.category_name, p.product_image, p.product_discount, p.product_status
-            FROM product p
-            INNER JOIN category c ON p.category_id = c.category_id
-            ORDER BY RAND()
+          SELECT 
+    p.product_id, 
+    p.product_code, 
+    p.product_name, 
+    p.price, 
+    p.description, 
+    p.quantity, 
+    p.size, 
+    c.category_name, 
+    p.product_image, 
+    p.product_discount, 
+    p.product_status,
+    COALESCE(SUM(CASE WHEN user_product_interactions.interaction_type = 'view' THEN 1 ELSE 0 END), 0) AS view_count,
+    COALESCE(SUM(CASE WHEN user_product_interactions.interaction_type = 'cart' THEN 1 ELSE 0 END), 0) AS cart_count,
+    COALESCE(SUM(CASE WHEN user_product_interactions.interaction_type = 'order' THEN 1 ELSE 0 END), 0) AS order_count
+FROM 
+    product p
+INNER JOIN 
+    category c ON p.category_id = c.category_id
+LEFT JOIN 
+    user_product_interactions ON p.product_code = user_product_interactions.product_code
+GROUP BY 
+    p.product_id, 
+    p.product_code, 
+    p.product_name, 
+    p.price, 
+    p.description, 
+    p.quantity, 
+    p.size, 
+    c.category_name, 
+    p.product_image, 
+    p.product_discount, 
+    p.product_status
+ORDER BY 
+    view_count DESC, 
+    cart_count DESC, 
+    order_count DESC
+    
         `);
 
         res.json(rows);
