@@ -292,7 +292,14 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                                     </button>
                                 </>
                             ) : (
-                                <p style={{ color: 'red' }}>Out of stock</p>
+                                <p style={{ color: 'red',
+                                            padding: '8px 15px',
+                                            border: '2px solid red',
+                                            borderRadius: '5px',
+                                            fontWeight: 600}}
+                                >
+                                    SOLD OUT
+                                </p>
                             )}
                         </div>
                     </div>

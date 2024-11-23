@@ -328,7 +328,7 @@ const Shop = () => {
                                     </div>
                                     <div className='shop__product-desc'>
                                         <p className='shop__product-name'>{product.product_name || 'No product name'}</p>
-                                        <p className='shop__product-quantity'>Quantity: {product.quantity}</p>
+                                        <p className='shop__product-quantity'>Stocks: {product.quantity}</p>
                                         <p className="shop__product-price text-primary">
                                             ₱{product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                         </p>
@@ -376,7 +376,7 @@ const Shop = () => {
                                     </div>
                                     <div className='shop__product-desc'>
                                         <p className='shop__product-name'>{product.product_name || 'No product name'}</p>
-                                        <p className='shop__product-quantity'>Quantity: {product.quantity}</p>
+                                        <p className='shop__product-quantity'>Stocks: {product.quantity}</p>
                                         <p className="shop__product-price text-primary">
                                             ₱{product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                         </p>
@@ -415,45 +415,46 @@ const Shop = () => {
                     <h2 className='shop__title'>Discounted Bundles</h2>
                     <div className='shop__product-list'>
                         {recommendedProducts.map((product) => (
-                            <div key={product.product_code} className='shop__product-item' onClick={() => openModal(product)}>
-                                <div className='shop__product-img'>
-                                    <img
-                                        src={product.product_image || 'https://via.placeholder.com/150'}
-                                        alt={product.product_name || 'Product Image'}
-                                        loading="lazy"
-                                    />
+                            <div key={product.product_code} className='bundle-card selected' style={{height:'370px', gridTemplateRows: '40% 40% 20%'}} onClick={() => openModal(product)}>
+                                <div className="discount-badge">
+                                    <p style={{ fontSize: '1.2rem' }}>{product.discount}%</p>
+                                    <p style={{ lineHeight: '0.5' }}>OFF</p>
                                 </div>
-                                <div className='shop__product-desc'>
+
+                                <img
+                                    src={product.product_image || 'https://via.placeholder.com/150'}
+                                    alt={product.product_name || 'Product Image'}
+                                    className="modalproduct-image-bundle"
+                                    loading="lazy"
+                                />
+                                <div style={{ flex: 1, textAlign: 'center' }}>
                                     <p className='shop__product-name'>{product.product_name || 'No product name available'}</p>
-                                    <p className='shop__product-price'>
-                                        Price: ₱{product.price ? product.price.toFixed(2) : 'N/A'}
-                                    </p>
-                                    <p className='shop__product-discount'>
-                                        Bundle Discount: {product.discount}%
-                                    </p>
-                                    <p className='shop__product-final-price'>
-                                        Final Price: ₱{product.final_price ? product.final_price.toFixed(2) : 'N/A'}
-                                    </p>
-                                    <div className='shop__button-group'>
-                                        <button
-                                            className='shop__add-to-cart-button'
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleAddToCart(product);
-                                            }}
-                                        >
-                                            <i className='bx bxs-cart-alt cart-icon animated-cart-icon'></i>
-                                        </button>
-                                        <button
-                                            className='shop__buy-now-button'
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleBuyNow(product);
-                                            }}
-                                        >
-                                            Buy Now
-                                        </button>
-                                    </div>
+                                    <p className="product-price">₱{product.final_price ? product.final_price.toFixed(2) : 'N/A'}</p>
+                                    <p className="product-original-price">₱{product.price ? product.price.toFixed(2) : 'N/A'}</p>
+                                </div>
+                                <div className='btn-grp'>
+                                {product.quantity > 0 ? (
+                                    <button
+                                        className='shop__add-to-cart-button'
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleAddToCart(product);
+                                        }}
+                                    >
+                                        <i className='bx bxs-cart-alt cart-icon animated-cart-icon'></i>
+                                    </button>,
+                                    <button
+                                        className='shop__buy-now-button'
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleBuyNow(product);
+                                        }}
+                                    >
+                                        Buy Now
+                                    </button>
+                                ):(
+                                    <p style={{ color: 'red' }}>Sold Out</p>
+                                )}
                                 </div>
                             </div>
                         ))}
@@ -488,7 +489,7 @@ const Shop = () => {
                             </div>
                             <div className='shop__product-desc'>
                                 <p className='shop__product-name'>{product.product_name || 'No product name'}</p>
-                                <p className='shop__product-quantity'>Quantity: {product.quantity}</p>
+                                <p className='shop__product-quantity'>Stocks: {product.quantity}</p>
                                 <p className="shop__product-price text-primary" style={{ width: "50px" }}>
                                     ₱{product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 </p>
