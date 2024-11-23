@@ -5,6 +5,11 @@ import { useNavigate } from 'react-router-dom';
 import './Signup.css';
 import start from '../../assets/start.png'
 
+import axios from 'axios';
+
+import { GoogleLogin } from '@react-oauth/google';
+
+
 
 import login_signup from '../../assets/img/login-signup.png'
 
@@ -64,6 +69,46 @@ const Signup = () => {
     }
   };
 
+  const handleGoogleSignup = async (credentialResponse) => {
+    const token = credentialResponse.credential;
+
+    try {
+      const response = await axios.post('http://localhost:5001/google-signup', { token });
+
+
+      if (response.status === 200) {
+        const userData = response.data.payload;
+        const userStatus = response.data.status;
+
+        console.log('User Info:', userData);
+
+        if (userStatus === 'registered') {
+          // setLoginStatus('Login successful');
+          localStorage.setItem('token', token);
+          localStorage.setItem('customer_id', response.data.user_id);
+          localStorage.setItem('username', response.data.username);
+          localStorage.setItem('first_name', response.data.first_name);
+          localStorage.setItem('role', response.data.role_type);
+          localStorage.setItem('profile_img', response.data.profile_img);
+
+          navigate('/forgot-password');
+          console.log(token);
+        } else {
+          navigate('/signup');
+        }
+      }
+    } catch (err) {
+      console.error('Error during Google login:', err);
+      // setToastMessage('Failed to login with Google. Please try again.');
+
+      // setTimeout(() => {
+      //   setToastMessage('');
+      // }, 3000);
+    }
+  };
+
+
+
   return (
     <div class="d-flex justify-content-center">
       <section class="signup-con">
@@ -75,9 +120,7 @@ const Signup = () => {
                 <div class="row g-0">
 
                   <div class="col-12 col-md-6">
-                    <a href="/">
-                      <img class="img-fluid rounded-start w-100 h-100 object-fit-cover" loading="lazy" src={login_signup} alt="login-image" />
-                    </a>
+                    <img class="img-fluid rounded-start w-100 h-100 object-fit-cover" loading="lazy" src={login_signup} alt="login-image" />
                   </div>
 
                   <div class="col-gradient col-12 col-md-6 d-flex justify-content-center">
@@ -94,14 +137,14 @@ const Signup = () => {
                         <div class="row">
                           <div class="col-12">
                             <div class="d-flex gap-3 flex-column">
-                              <button class="d-flex btn btn-outline-danger justify-content-center align-items-center">
-                                <img style={{ height: '30px', width: '30px' }}
-                                  src="https://imagepng.org/wp-content/uploads/2019/08/google-icon.png"
-                                  alt="Google Icon"
-                                  class="me-2"
-                                />
-                                Register with Google
-                              </button>
+                              <GoogleLogin
+                                className="btn btn-outline-danger"
+                                onSuccess={handleGoogleSignup}
+                                onError={(err) => {
+                                  console.error('Google signup error:', err);
+                                  setError('Failed to register with Google. Please try again.');
+                                }}
+                              />
                             </div>
                             <div class="row d-flex justify-content-center align-items-center">
                               <div class="col"><hr></hr></div>
@@ -223,6 +266,8 @@ const Signup = () => {
         </div>
       </section>
     </div>
+
+
   );
 };
 
