@@ -6,6 +6,7 @@ import './StickyComponent.css';
 
 const StickyComponent = ({ onSubmit }) => {
   const [isClicked, setIsClicked] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const [formData, setFormData] = useState({
     hairType: '',
@@ -28,14 +29,29 @@ const StickyComponent = ({ onSubmit }) => {
     });
   };
 
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    const updatedFormData = {
+      ...formData,
+      query: searchTerm
+    };
+
+    localStorage.setItem('searchTerm', searchTerm);
+
+    setFormData(updatedFormData);
+
     if (onSubmit) {
-      onSubmit(formData);
+      console.log('Search term:', searchTerm);
+      onSubmit(updatedFormData);
     } else {
       console.error('onSubmit function is not provided');
     }
   };
+
 
   return (
     <div>
@@ -49,7 +65,21 @@ const StickyComponent = ({ onSubmit }) => {
           <Card.Body >
             <h5>Healthy Hair Starts Here!</h5>
             <div className='forms'>
+
               <form onSubmit={handleSubmit}>
+                {/* Search Bar */}
+                <div>
+                  <label htmlFor="search">Search:</label>
+                  <input
+                    type="text"
+                    id="search"
+                    name="query"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    placeholder="Search products..."
+                  />
+                </div>
+
                 <div>
                   <p>Hair Type:</p>
                   <div className='input'>

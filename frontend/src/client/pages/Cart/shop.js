@@ -21,15 +21,20 @@ const Shop = () => {
     const [productsPerPage] = useState(10);
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
+
     const [topPickedProducts, setTopPickedProducts] = useState([]);
+
     const [recommendedProducts, setRecommendedProducts] = useState([]);
     const [toastMessage, setToastMessage] = useState('');
+
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchTriggered, setSearchTriggered] = useState(false);
+
 
     useEffect(() => {
 
         const fetchProducts = async () => {
             try {
-
                 const response = await axios.get('http://localhost:5001/products');
                 setProducts(response.data);
                 setFilteredProducts(response.data);
@@ -63,11 +68,6 @@ const Shop = () => {
                 console.error('Error fetching recommended products:', error.response ? error.response.data : error.message);
             }
         };
-
-
-
-
-
 
         fetchProducts();
         fetchTopPickedProducts();
@@ -103,7 +103,7 @@ const Shop = () => {
             window.location.href = '/checkout';
         } else {
             localStorage.setItem('redirectTo', '/checkout');
-           
+
             navigate('/login');
         }
         console.log(productData);
@@ -148,7 +148,7 @@ const Shop = () => {
                 cart[existingProductIndex].sub_total = cart[existingProductIndex].quantity * cart[existingProductIndex].price;
                 console.log('Increased quantity for existing product:', cart[existingProductIndex]);
             } else {
-               
+
                 const newCartItem = {
                     cart_items_id: generateCartItemId(),
                     product_code: product.product_code,
@@ -250,58 +250,164 @@ const Shop = () => {
     }
 
 
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
+    const handleSearchSubmit = async () => {
+        localStorage.setItem('searchTerm', searchTerm);
+
+        const formData = {
+            query: searchTerm
+        };
+
+        await handleSearch(formData);
+
+        setSearchTriggered(true);
+    };
+
+    const handleSearch = async (formData) => {
+        setLoading(true);
+
+        const storedSearchTerm = localStorage.getItem('searchTerm');
+
+        if (storedSearchTerm) {
+            formData = {
+                ...formData,
+                query: storedSearchTerm
+            };
+        }
+
+        try {
+            const response = await axios.get(`http://localhost:5001/sticky-components`, {
+                params: formData
+            });
+            console.log('Form data being sent:', formData);
+            setProducts(response.data);
+            setError(null);
+        } catch (err) {
+            setError('Failed to fetch products');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className='shop'>
             <Navigation />
             <ToastNotification toastMessage={toastMessage} />
-
-            {/* Top Picks Section */}
-            <div className='shop__top-picks'>
-                <h2 className='shop__title'>TOP PICKS</h2>
-                <div className='shop__product-list'>
-                    {topPickedProducts
-                        .filter((product) => product.quantity > 0) 
-                        .map((product) => (
-                            <div key={product.product_code} className='shop__product-item' onClick={() => openModal(product)}>
-                                <div className='shop__product-img'>
-                                    <img
-                                        src={product.product_image || 'https://via.placeholder.com/150'}
-                                        alt={product.product_name || 'Product Image'}
-                                    />
-                                </div>
-                                <div className='shop__product-desc'>
-                                    <p className='shop__product-name'>{product.product_name || 'No product name'}</p>
-                                    <p className='shop__product-quantity'>Quantity: {product.quantity}</p>
-                                    <p className="shop__product-price text-primary">
-                                        ₱{product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                    </p>
-                                    {product.product_status === 'Discounted' && (
-                                        <p className='shop__product-discount'>Product Discount: P{product.product_discount}%</p>
-                                    )}
-                                    <button
-                                        className='shop__add-to-cart-button'
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleAddToCart(product);
-                                        }}
-                                    >
-                                        <i className='bx bxs-cart-alt cart-icon animated-cart-icon'></i>
-                                    </button>
-                                    <button
-                                        className='shop__buy-now-button'
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleBuyNow(product, product.quantity);
-                                        }}
-                                    >
-                                        Buy Now
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                </div>
+            <div>
+                <label htmlFor="search">Search:</label>
+                <input
+                    type="text"
+                    id="search"
+                    name="query"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    placeholder="Search products..."
+                />
+                <button type="button" onClick={handleSearchSubmit}>Search</button>
             </div>
 
+            {searchTriggered && products.length > 0 ? (
+                <div>
+                    <h3>Search Results:</h3>
+                    {loading ? (
+                        <p>Loading...</p>
+                    ) : error ? (
+                        <p>{error}</p>
+                    ) : (
+                        <div className='shop__product-list'>
+                            {products.map((product) => (
+                                <div key={product.product_code} className='shop__product-item' onClick={() => openModal(product)}>
+                                    <div className='shop__product-img'>
+                                        <img
+                                            src={product.product_image || 'https://via.placeholder.com/150'}
+                                            alt={product.product_name || 'Product Image'}
+                                        />
+                                    </div>
+                                    <div className='shop__product-desc'>
+                                        <p className='shop__product-name'>{product.product_name || 'No product name'}</p>
+                                        <p className='shop__product-quantity'>Quantity: {product.quantity}</p>
+                                        <p className="shop__product-price text-primary">
+                                            ₱{product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </p>
+                                        {product.product_status === 'Discounted' && (
+                                            <p className='shop__product-discount'>Product Discount: P{product.product_discount}%</p>
+                                        )}
+                                        <button
+                                            className='shop__add-to-cart-button'
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleAddToCart(product);
+                                            }}
+                                        >
+                                            <i className='bx bxs-cart-alt cart-icon animated-cart-icon'></i>
+                                        </button>
+                                        <button
+                                            className='shop__buy-now-button'
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleBuyNow(product, product.quantity);
+                                            }}
+                                        >
+                                            Buy Now
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            ) : (
+                // Display Top Picks if no search is triggered or no results are found
+                <div className='shop__top-picks'>
+                    <h2 className='shop__title'>TOP PICKS</h2>
+                    <div className='shop__product-list'>
+                        {topPickedProducts
+                            .filter((product) => product.quantity > 0)
+                            .map((product) => (
+                                <div key={product.product_code} className='shop__product-item' onClick={() => openModal(product)}>
+                                    <div className='shop__product-img'>
+                                        <img
+                                            src={product.product_image || 'https://via.placeholder.com/150'}
+                                            alt={product.product_name || 'Product Image'}
+                                        />
+                                    </div>
+                                    <div className='shop__product-desc'>
+                                        <p className='shop__product-name'>{product.product_name || 'No product name'}</p>
+                                        <p className='shop__product-quantity'>Quantity: {product.quantity}</p>
+                                        <p className="shop__product-price text-primary">
+                                            ₱{product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </p>
+                                        {product.product_status === 'Discounted' && (
+                                            <p className='shop__product-discount'>Product Discount: P{product.product_discount}%</p>
+                                        )}
+                                        <button
+                                            className='shop__add-to-cart-button'
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleAddToCart(product);
+                                            }}
+                                        >
+                                            <i className='bx bxs-cart-alt cart-icon animated-cart-icon'></i>
+                                        </button>
+                                        <button
+                                            className='shop__buy-now-button'
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleBuyNow(product, product.quantity);
+                                            }}
+                                        >
+                                            Buy Now
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                    </div>
+                </div>
+            )
+            };
 
             {/* Bundle Section */}
             {recommendedProducts.length > 0 && (
@@ -384,9 +490,9 @@ const Shop = () => {
                                 <p className='shop__product-name'>{product.product_name || 'No product name'}</p>
                                 <p className='shop__product-quantity'>Quantity: {product.quantity}</p>
                                 <p className="shop__product-price text-primary" style={{ width: "50px" }}>
-                                        ₱{product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                    </p>
-                                
+                                    ₱{product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </p>
+
                                 {product.product_status === 'Discounted' && (
                                     <p className='shop__product-discount'>Product Discount: P{product.product_discount}%</p>
                                 )}

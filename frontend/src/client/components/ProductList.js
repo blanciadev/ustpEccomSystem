@@ -26,12 +26,12 @@ const ProductCard = React.memo(({ product, onAddToCart, onBuyNow, onProductClick
                         src={product.product_image}
                         alt={product.product_name}
                         className="img-fluid"
-                        style={{ height: "150px", width: "150px", objectFit: "fit", borderBottom: "2px solid #ff728a"}}
+                        style={{ height: "150px", width: "150px", objectFit: "fit", borderBottom: "2px solid #ff728a" }}
                     />
                     <p className="text-muted mb-1 mt-2">Haircare • {product.size}</p>
-                    <h3 className="product-name m-0 p-0 align-items-center mb-4" style={{ fontSize: "14px", height: "60px"}}>
+                    <h3 className="product-name m-0 p-0 align-items-center mb-4" style={{ fontSize: "14px", height: "60px" }}>
                         {product.product_name}
-                        <br/><strong className="text-primary" style={{ fontSize: "1rem" }}>₱ {product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+                        <br /><strong className="text-primary" style={{ fontSize: "1rem" }}>₱ {product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
                     </h3>
                     {/* <p>{product.description || 'No description available.'}</p> */}
                     {/* <p>Product Quantity: {product.quantity}</p> */}
@@ -41,7 +41,7 @@ const ProductCard = React.memo(({ product, onAddToCart, onBuyNow, onProductClick
                     {product.product_status === 'Discounted' && (
                         <h3>Discounted Price: {product.product_discount}%</h3>
                     )}
-                    
+
                     <button onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}>Add to Cart</button>
                     <button onClick={(e) => { e.stopPropagation(); onBuyNow(product); }}>Buy Now</button>
                 </div>
@@ -65,10 +65,21 @@ const ProductList = ({ stickyComponents }) => {
 
     const handleStickySubmit = async (formData) => {
         setLoading(true);
+
+        const storedSearchTerm = localStorage.getItem('searchTerm');
+
+        if (storedSearchTerm) {
+            formData = {
+                ...formData,
+                query: storedSearchTerm
+            };
+        }
+
         try {
             const response = await axios.get(`http://localhost:5001/sticky-components`, {
                 params: formData
             });
+            console.log('Form data being sent:', formData);
             setProducts(response.data);
             setError(null);
             setCurrentPage(0);
@@ -78,6 +89,8 @@ const ProductList = ({ stickyComponents }) => {
             setLoading(false);
         }
     };
+
+
 
     const handlePageChange = (direction) => {
         setCurrentPage((prevPage) => {
@@ -295,46 +308,46 @@ const ProductList = ({ stickyComponents }) => {
 
     return (
         <div >
-          <div className='d-flex justify-content-center'>
-        <div className='product-list'>
-            <ToastNotification toastMessage={toastMessage} />
-            <StickyComponent className="" onSubmit={handleStickySubmit} />
-            
+            <div className='d-flex justify-content-center'>
+                <div className='product-list'>
+                    <ToastNotification toastMessage={toastMessage} />
+                    <StickyComponent className="" onSubmit={handleStickySubmit} />
 
-            <h2 class="text-center mt-4">HAIRCARE BEAUTY OFFERS</h2>
-            <div className='product-list-container'>
-                {paginatedProducts.map((product) => (
-                    <ProductCard
-                        key={product.product_code}
-                        product={product}
-                        onAddToCart={handleAddToCart}
-                        onProductClick={handleProductClick}
-                        onBuyNow={handleBuyNow}
-                    />
-                ))}
+
+                    <h2 class="text-center mt-4">HAIRCARE BEAUTY OFFERS</h2>
+                    <div className='product-list-container'>
+                        {paginatedProducts.map((product) => (
+                            <ProductCard
+                                key={product.product_code}
+                                product={product}
+                                onAddToCart={handleAddToCart}
+                                onProductClick={handleProductClick}
+                                onBuyNow={handleBuyNow}
+                            />
+                        ))}
+                    </div>
+
+                    <div className='pagination'>
+                        <button className='btns' onClick={() => handlePageChange(-1)} disabled={currentPage === 0}>
+                            Previous
+                        </button>
+                        <button className='btns' onClick={() => handlePageChange(1)} disabled={currentPage >= Math.ceil(products.length / PAGE_SIZE) - 1}>
+                            Next
+                        </button>
+                    </div>
+                    {isModalOpen && (
+                        <ProductModal
+                            isOpen={isModalOpen}
+                            product={selectedProduct}
+                            onClose={closeModal}
+                            onAddToCart={handleAddToCart}
+                        />
+                    )}
+                </div>
+
+
+
             </div>
-
-            <div className='pagination'>
-                <button className='btns' onClick={() => handlePageChange(-1)} disabled={currentPage === 0}>
-                    Previous
-                </button>
-                <button className='btns' onClick={() => handlePageChange(1)} disabled={currentPage >= Math.ceil(products.length / PAGE_SIZE) - 1}>
-                    Next
-                </button>
-            </div>
-            {isModalOpen && (
-                <ProductModal
-                    isOpen={isModalOpen}
-                    product={selectedProduct}
-                    onClose={closeModal}
-                    onAddToCart={handleAddToCart}
-                />
-            )}
-        </div>
-
-
-
-        </div>  
         </div>
     );
 };
