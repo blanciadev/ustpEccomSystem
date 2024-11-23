@@ -142,6 +142,18 @@
     font-size: 24px;
     animation: none;
 }
+.btn-grp{
+    width: 100%;
+    height: 100%;
+    display: grid;
+    justify-items: center;
+    align-items: center;
+    align-content: center;
+    gap: 1px;
+}
+.buttons{
+    display: flex;
+}
 
 .shop__add-to-cart-button:active .animated-cart-icon {
     animation: moveToCart 5s ease;
