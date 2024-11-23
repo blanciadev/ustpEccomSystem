@@ -127,7 +127,9 @@ const Login = () => {
                             <div class="row g-0">
 
                                 <div class="col-12 col-md-6">
-                                <img class="img-fluid rounded-start w-100 h-100 object-fit-cover" loading="lazy" src={login_signup} alt="login-image"/>
+                                <a href="/">
+                                    <img class="img-fluid rounded-start w-100 h-100 object-fit-cover" loading="lazy" src={login_signup} alt="login-image"/>
+                                </a>
                                 </div>
 
                                 <div class="col-gradient col-12 col-md-6 d-flex justify-content-center">
