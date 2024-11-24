@@ -210,7 +210,7 @@ const Products = () => {
                       <th>Price</th>
                       <th>Category</th>
                       <th>Quantity</th>
-                      <th>Description</th>
+                      {/* <th>Description</th> */}
                       <th>Action</th>
                     </tr>
                   </thead>
@@ -221,10 +221,10 @@ const Products = () => {
                         <td><input type='checkbox' /></td>
                         <td>{product.product_code}</td>
                         <td>{product.product_name}</td>
-                        <td>₱ {product.price}</td>
+                        <td>₱{product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                         <td>{product.category_name}</td>
                         <td>{product.quantity}</td>
-                        <td>{product.description}</td>
+                        {/* <td>{product.description}</td> */}
                         <td>
                           <Button variant="secondary" onClick={() => handleShowProductModal(product)}>
                             View

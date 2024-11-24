@@ -223,7 +223,7 @@ const Orders = () => {
                       <td>{highlightText(new Date(order.order_date).toLocaleDateString(), searchTerm)}</td>
                       <td>{highlightText(order.order_status, searchTerm)}</td>
                       <td>{highlightText(order.payment_status, searchTerm)}</td>
-                      <td>{highlightText(order.order_total.toString(), searchTerm)}</td>
+                      <td>₱{highlightText(order.order_total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), searchTerm)}</td>
                       <td>
                         <button onClick={() => handleOpenModal(order)}>
                           View

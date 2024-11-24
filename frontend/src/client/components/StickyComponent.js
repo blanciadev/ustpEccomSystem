@@ -122,7 +122,7 @@ const StickyComponent = ({ onSubmit }) => {
                     <input
                       type='radio'
                       id='rebondedYes'
-                      value='Rebonded'
+                      value='Rebonded' //yes
                       name='hairRebonded'
                       onChange={handleInputChange}
                     />
@@ -198,7 +198,7 @@ const StickyComponent = ({ onSubmit }) => {
                     <input
                       type='radio'
                       id='virginYes'
-                      value='yes'
+                      value='virgin'
                       name='hairVirgin'
                       onChange={handleInputChange}
                     />

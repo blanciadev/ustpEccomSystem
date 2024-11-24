@@ -226,8 +226,8 @@ const Transactions = () => {
                         <td>{highlightText(product.product_name, searchTerm)}</td>
                         <td>{highlightText(product.category_name, searchTerm)}</td>
                         <td>{highlightText(product.order_quantity.toString(), searchTerm)}</td>
-                        <td>{highlightText(product.price.toString(), searchTerm)}</td>
-                        <td>{highlightText(product.item_total.toString(), searchTerm)}</td>
+                        <td>₱{highlightText(product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), searchTerm)}</td>
+                        <td>₱{highlightText(product.item_total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), searchTerm)}</td>
                         <td>{highlightText(new Date(order.order_date).toLocaleDateString(), searchTerm)}</td>
                         <td>{highlightText(product.product_quantity.toString(), searchTerm)}</td>
                         <td>

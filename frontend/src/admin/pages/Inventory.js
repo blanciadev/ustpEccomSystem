@@ -206,7 +206,7 @@ const Inventory = () => {
                                                     <td>{product.product_id}</td>
                                                     <td>{product.product_code}</td>
                                                     <td>{product.product_name}</td>
-                                                    <td>₱ {product.price}</td>
+                                                    <td>₱{product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                                                     <td className={isLowStock ? 'blinking' : ''}>{product.quantity}</td>
                                                     <td>{product.category_name}</td>
                                                     <td>{stockStatus}</td>

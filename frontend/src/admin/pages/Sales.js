@@ -206,7 +206,8 @@ const Sales = () => {
                                                     <td>{report.product_code}</td>
                                                     <td>{report.product_name}</td>
                                                     <td>{report.total_quantity}</td>
-                                                    <td>₱ {parseFloat(report.total_sales).toFixed(2)}</td>
+                                                    <td>₱ {parseFloat(report.total_sales).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                                  
                                                 </tr>
                                             ))}
                                         </tbody>
