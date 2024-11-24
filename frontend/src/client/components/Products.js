@@ -4,8 +4,8 @@ import ProductList from './ProductList';
 
 const Products = () => {
   return (
-    <div className=''>
-      <div className='products'>
+    <div>
+      <div className=' mx-2'>
         <ProductList/>
 
       </div>

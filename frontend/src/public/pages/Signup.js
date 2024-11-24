@@ -39,7 +39,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5001/customer-signup', {
+      const response = await fetch('http://localhost:5001/users-signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -83,6 +83,7 @@ const Signup = () => {
         console.log('User Info:', userData);
 
         if (userStatus === 'registered') {
+          console.log('Google signup success');
           // setLoginStatus('Login successful');
           localStorage.setItem('token', token);
           localStorage.setItem('customer_id', response.data.user_id);
@@ -94,10 +95,13 @@ const Signup = () => {
           navigate('/forgot-password');
           console.log(token);
         } else {
+          
+          console.log('Google signup ');
           navigate('/signup');
         }
       }
     } catch (err) {
+      
       console.error('Error during Google login:', err);
       // setToastMessage('Failed to login with Google. Please try again.');
 

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import ProductModal from './ProductModal';
 import StickyComponent from './StickyComponent';
 import { cartEventEmitter } from './eventEmitter';
-// import './modal.css';
+
 import './productList.css';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
@@ -42,9 +42,11 @@ const ProductCard = React.memo(({ product, onAddToCart, onBuyNow, onProductClick
                         <h3>Discounted Price: {product.product_discount}%</h3>
                     )}
 
-                    <button onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}>Add to Cart</button>
-                    <button onClick={(e) => { e.stopPropagation(); onBuyNow(product); }}>Buy Now</button>
-                </div>
+                    <button class="add-to-cart-button px-10" onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}>Add to cart</button>
+                    <button class="buy-now-button px-10" onClick={(e) => { e.stopPropagation(); onBuyNow(product); }}>Buy Now</button>
+                
+
+                    </div>
             )}
         </>
     );
@@ -307,47 +309,145 @@ const ProductList = ({ stickyComponents }) => {
     const paginatedProducts = products.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
 
     return (
-        <div >
-            <div className='d-flex justify-content-center'>
-                <div className='product-list'>
-                    <ToastNotification toastMessage={toastMessage} />
-                    <StickyComponent className="" onSubmit={handleStickySubmit} />
-
-
-                    <h2 class="text-center mt-4">HAIRCARE BEAUTY OFFERS</h2>
-                    <div className='product-list-container'>
-                        {paginatedProducts.map((product) => (
-                            <ProductCard
-                                key={product.product_code}
-                                product={product}
-                                onAddToCart={handleAddToCart}
-                                onProductClick={handleProductClick}
-                                onBuyNow={handleBuyNow}
-                            />
-                        ))}
+        <div class="mx-2">
+                <div>
+                    <h2 class="text-center mt-4 ">HAIRCARE BEAUTY OFFERS</h2>
+                    {/* Buttons */}
+                    <div class="container mb-2">
+                        <div class="row justify-content-center">
+                        <div class="col">
+                            <button class="gradient-button btn-rebonded w-100">Rebonded</button>
+                        </div>
+                       
+                        <div class="col">
+                            <button class="gradient-button btn-damaged w-100">Damaged Hair</button>
+                        </div>
+                        <div class="col">
+                            <button class="gradient-button btn-frizzy w-100">Frizzy Hair</button>
+                        </div>
+                        <div class="col">
+                            <button class="gradient-button btn-oily w-100">Oily Hair</button>
+                        </div>
+                        <div class="col">
+                            <button class="gradient-button btn-dry w-100">Dry Hair</button>
+                        </div>
+                        <div class="col">
+                            <button class="gradient-button btn-curly w-100">Curly Hair</button>
+                        </div>
+                        </div>
                     </div>
 
-                    <div className='pagination'>
-                        <button className='btns' onClick={() => handlePageChange(-1)} disabled={currentPage === 0}>
-                            Previous
-                        </button>
-                        <button className='btns' onClick={() => handlePageChange(1)} disabled={currentPage >= Math.ceil(products.length / PAGE_SIZE) - 1}>
-                            Next
-                        </button>
+                    <div class="mx-2 ">
+                        <div class="row">
+                            
+                        <div class="left-product-list col-12 col-lg-9 text-white p-3">
+                                 
+                        <div className='product-list'>
+                                        <ToastNotification toastMessage={toastMessage} />
+                                        <StickyComponent className="" onSubmit={handleStickySubmit} />
+
+                                        <div className='product-list-container'>
+                                            {paginatedProducts.map((product) => (
+                                                <ProductCard
+                                                    key={product.product_code}
+                                                    product={product}
+                                                    onAddToCart={handleAddToCart}
+                                                    onProductClick={handleProductClick}
+                                                    onBuyNow={handleBuyNow}
+                                                />
+                                            ))}
+                                        </div>
+
+
+                                        <div className='pagination'>
+                                            <button className='btns' onClick={() => handlePageChange(-1)} disabled={currentPage === 0}>
+                                                Previous
+                                            </button>
+                                            <button className='btns' onClick={() => handlePageChange(1)} disabled={currentPage >= Math.ceil(products.length / PAGE_SIZE) - 1}>
+                                                Next
+                                            </button>
+                                        </div>
+                                        {isModalOpen && (
+                                            <ProductModal
+                                                isOpen={isModalOpen}
+                                                product={selectedProduct}
+                                                onClose={closeModal}
+                                                onAddToCart={handleAddToCart}
+                                            />
+                                        )}
+                                    </div>
+
+                        </div>
+                        
+                        
+                        <div class="right-product-list col-12 col-lg-3 text-white">
+
+
+                            <h3 class="mt-2 text-center fw-bold">TOP PICKS FOR YOU</h3>
+
+
+                              <div class="container">
+                                <div class="row">
+                                        
+                                    <div class="col-12">
+                                        <div class="product-card1">
+                                        <img src="https://via.placeholder.com/120" alt="Product 1" class="product-image1"/>
+                                        <div class="product-text1">
+                                            <h6>L'Oréal Professionnel Hair Spa Deep Nourishing Creambath 500ML</h6>
+                                            <p class="price">₱957.00</p>
+                                        </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-12">
+                                        <div class="product-card1">
+                                        <img src="https://via.placeholder.com/120" alt="Product 2" class="product-image1"/>
+                                        <div class="product-text1">
+                                            <h6>L'Oréal Professionnel Hair Spa Deep Nourishing Creambath 500ML</h6>
+                                            <p class="price">₱957.00</p>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="product-card1">
+                                        <img src="https://via.placeholder.com/120" alt="Product 2" class="product-image1"/>
+                                        <div class="product-text1">
+                                            <h6>L'Oréal Professionnel Hair Spa Deep Nourishing Creambath 500ML</h6>
+                                            <p class="price">₱957.00</p>
+                                        </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-12">
+                                        <div class="product-card1">
+                                        <img src="https://via.placeholder.com/120" alt="Product 3" class="product-image1"/>
+                                        <div class="product-text1">
+                                            <h6>L'Oréal Professionnel Hair Spa Deep Nourishing Creambath 500ML</h6>
+                                            <p class="price">₱957.00</p>
+                                        </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="product-card1">
+                                        <img src="https://via.placeholder.com/120" alt="Product 3" class="product-image1"/>
+                                        <div class="product-text1">
+                                            <h6>L'Oréal Professionnel Hair Spa Deep Nourishing Creambath 500ML</h6>
+                                            <p class="price">₱957.00</p>
+                                        </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                        </div>
                     </div>
-                    {isModalOpen && (
-                        <ProductModal
-                            isOpen={isModalOpen}
-                            product={selectedProduct}
-                            onClose={closeModal}
-                            onAddToCart={handleAddToCart}
-                        />
-                    )}
                 </div>
-
-
-
-            </div>
+                
         </div>
     );
 };

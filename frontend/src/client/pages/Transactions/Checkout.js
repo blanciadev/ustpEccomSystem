@@ -434,11 +434,11 @@ const Checkout = () => {
   const handlePhoneNumberChange = (e) => {
     let input = e.target.value.replace(/\D/g, "");
 
-    if (!input.startsWith("639")) {
-      input = "639" + input;
+    if (!input.startsWith("09")) {
+      input = "09" + input;
     }
 
-    setFormData({ ...formData, phoneNumber: `+${input}` });
+    setFormData({ ...formData, phoneNumber: `${input}` });
   };
 
   const formatPhoneNumberOnBlur = () => {
@@ -447,9 +447,16 @@ const Checkout = () => {
   };
 
 
+  // const handlePostalCodeChange = (e) => {
+  //   const numericPostalCode = e.target.value.replace(/\D/g, "");
+  //   setFormData({ ...formData, postalCode: numericPostalCode });
+  // };
+
   const handlePostalCodeChange = (e) => {
-    const numericPostalCode = e.target.value.replace(/\D/g, "");
-    setFormData({ ...formData, postalCode: numericPostalCode });
+    const value = e.target.value;
+    if (value.length <= 4) {
+      setFormData({ ...formData, postalCode: value });
+    }
   };
 
   return (
@@ -458,196 +465,246 @@ const Checkout = () => {
       <Navigation />
       <div className='checkout-wrapper'>
         <h1><i class='bx bxs-shopping-bag'></i>Checkout</h1>
-        <div className='checkout-content'>
-          <div className='checkout-address'>
-            <h3>Delivery Address</h3>
-            <form class="address-form" onSubmit={handleSubmit}>
-
-              <div class="form-group">
-                <label for="fullName">FULL NAME</label>
-                <input type="text"
-                  id="fullName"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="phoneNumber">PHONE NUMBER</label>
-                <input
-                  type="tel"
-                  id="phoneNumber"
-                  name="phoneNumber"
-                  value={formData.phoneNumber}
-                  onChange={handlePhoneNumberChange}
-                  onBlur={formatPhoneNumberOnBlur}
-                  maxLength="13"
-                  placeholder="+639 XXX XXX XXX"
-                  required
-                />
-              </div>
-
-              <div class="form-group">
-                <label for="streetname">STREETNAME</label>
-                <input type="text"
-                  id="streetname"
-                  name="streetname"
-                  value={formData.streetname}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-
-              <div class="form-group">
-                <label for="address">ADDRESS</label>
-                <input type="text"
-                  id="address"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-
-              <div class="form-group">
-                <label for="region">REGION</label>
-                <input type="text"
-                  id="region"
-                  name="region"
-                  value={formData.region}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="postalCode">POSTAL CODE</label>
-                <input
-                  type="text"
-                  id="postalCode"
-                  name="postalCode"
-                  value={formData.postalCode}
-                  onChange={handlePostalCodeChange}
-                  maxLength="4"
-                  placeholder="e.g., 1234"
-                  required
-                />
-              </div>
-
-              <div class="form-group">
-                <h6>Payment Method</h6>
-                <label htmlFor='paymentMethod'>
-                <input type="radio"
-                  name="paymentMethod"
-                //   checked={formData.paymentMethod === 'COD'}
-                  onChange={handlePaymentChange}
-                  checked
-                  value="COD" />
-                    Cash on Delivery
-                </label>
-              </div>
-
-              <div className='form-group'>
-                <button type='submit' className='submit-btn' disabled={loading}>
-                  {loading ? 'Processing...' : 'Place Order'}
-                </button>
-              </div>
-
-            </form>
-
-            {/* <form className='address-form' onSubmit={handleSubmit}>
-              {error && <p className='error-message'>{error}</p>}
-              {success && <p className='success-message'>{success}</p>}
-              {['fullName', 'phoneNumber', 'streetname', 'address', 'region', 'postalCode'].map(field => (
-                <div className='form-group' key={field}>
-                  <label htmlFor={field}>{field.replace(/([A-Z])/g, ' $1').toUpperCase()}</label>
-                  <input
-                    type='text'
-                    id={field}
-                    name={field}
-                    value={formData[field]}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-              ))}
-              <div className='form-group'>
-                <h3>Payment Method</h3>
-                <label>
-                  <input
-                    type='radio'
-                    name='paymentMethod'
-                    value='COD'
-                    checked={formData.paymentMethod === 'COD'}
-                    onChange={handlePaymentChange}
-                  />
-                  Cash On Delivery
-                </label>
-              </div>
-              <div className='form-group'>
-                <button type='submit' className='submit-btn' disabled={loading}>
-                  {loading ? 'Processing...' : 'Place Order'}
-                </button>
-              </div>
-            </form> */}
-          </div>
-          <div className='checkout-summary' style={{
-            width: '100%',
-            maxWidth: '800px',
-            margin: '0 auto',
-            padding: '20px',
-            border: '1px solid #ccc',
-            borderRadius: '8px',
-            backgroundColor: '#f9f9f9'
-          }}>
-            <h3>Order Summary</h3>
-            {savedProducts.map((product, index) => {
-              const effectiveDiscount = product.discount || 0; // Check product-specific discount
-              const discountedPrice = getDiscountedPrice(product.price, effectiveDiscount);
-              const total = (discountedPrice * quantities[index]).toFixed(2);
-              effectiveGlobalDiscount = effectiveDiscount;
-              console.log('GLOBAL EFFECTIVE DISCOUNT : ' + effectiveGlobalDiscount);
 
 
-              return (
-                <div className='product-summary' key={index} style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '10px 0',
-                  borderBottom: '1px solid #ddd'
-                }}>
-                  <div>
-                    <h4>{product.product_name}</h4>
-                    <p style={{
-                      textDecoration: effectiveDiscount > 0 ? 'line-through' : 'none',
-                      color: effectiveDiscount > 0 ? '#888' : 'black'
-                    }}>
-                      Original Price: ₱{product.price.toFixed(2)}
-                    </p>
-                    {effectiveDiscount > 0 && (
-                      <p style={{ color: 'green', fontWeight: 'bold' }}>
-                        Discounted Price: ₱{discountedPrice.toFixed(2)} at {effectiveDiscount}% Off
-                      </p>
-                    )}
-                    <input
-                      type='number'
-                      min='1'
-                      value={quantities[index]}
-                      onChange={e => handleQuantityChange(index, e)}
-                      style={{ width: '50px', marginRight: '10px' }}
-                    />
-                    <button onClick={() => handleRemoveProduct(index)}>Remove</button>
+        <div class="container">
+          <div class="row">
+            
+            <div class="col-12 col-md-6 ">
+              <div class="p-3 text-black text-start"
+              style={{border: '5px solid #f0cac8'}}>
+                <div class="container">
+                  <h2 class="mb-4">Delivery Information Form</h2>
+                  <form onSubmit={handleSubmit}>
+                    <div class="mb-2">
+                      <label for="fullName" class="form-label">Full Name</label>
+                      <input 
+                        type="text" 
+                        class="form-control" 
+                        id="fullName"
+                        name="fullName" 
+                        placeholder="Enter your full name"
+                        value={formData.fullName}
+                        onChange={handleInputChange}
+                        required
+                        
+                      />
+                    </div>
+                    
+                    <div className="mb-2">
+                      <label htmlFor="phoneNumber" className="form-label">Phone Number</label>
+                      <input 
+                        type="text" 
+                        className="form-control" 
+                        id="phoneNumber" 
+                        name="phoneNumber"
+                        placeholder="Enter your phone number"
+                        value={formData.phoneNumber}
+                        onChange={handlePhoneNumberChange}
+                        onBlur={formatPhoneNumberOnBlur}
+                        maxLength="11"
+                        required
+                      />
+                    </div>
+
+                    
+                    <div class="mb-2">
+                      <label for="streetname" class="form-label">Street Name</label>
+                      <input 
+                        type="text" 
+                        class="form-control" 
+                        id="streetname" 
+                        name="streetname"
+                        placeholder="Enter your street name"
+                        value={formData.streetname}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+
+                    <div class="mb-2">
+                      <label for="address" class="form-label">Address</label>
+                      <input 
+                        type="text" 
+                        class="form-control" 
+                        id="address" 
+                        placeholder="Enter your address"
+                        name="address"
+                        value={formData.address}
+                        onChange={handleInputChange}
+                        required
+
+                        />
+                    </div>
+                    
+                    <div class="mb-2">
+                      <label for="region" class="form-label">Region</label>
+                      <input 
+                        type="text" 
+                        class="form-control" 
+                        id="region" 
+                        placeholder="Enter your region"
+                        name="region"
+                        value={formData.region}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    
+                    <div className="mb-2">
+                      <label htmlFor="postalCode" className="form-label">Postal Code</label>
+                      <input 
+                        type="number" 
+                        className="form-control" 
+                        id="postalCode" 
+                        placeholder="Enter your postal code"
+                        name="postalCode"
+                        value={formData.postalCode}
+                        onChange={handlePostalCodeChange}
+                        maxLength="4"
+                        
+                        required
+                      />
+                    </div>
+
+                    <div class="mb-2">
+                      <h5>Payment Method</h5>
+                    <label class="form-label" htmlFor='paymentMethod'>
+                    <input type="radio"
+                      name="paymentMethod"
+                    //   checked={formData.paymentMethod === 'COD'}
+                      onChange={handlePaymentChange}
+                      checked
+                      value="COD" />
+                          Cash on Delivery
+                    </label>
                   </div>
-                  <div style={{ fontWeight: 'bold' }}>₱{total}</div>
+                    
+                    <div class="d-grid">
+                      <button type="submit" class="place-order-btn" disabled={loading}>
+                        {loading ? 'Processing...' : 'Place Order'}
+                      </button>
+                    </div>
+
+
+                    
+                  </form>
                 </div>
-              );
+              </div>
+            </div>
+            
+            <div class="col-12 col-md-6">
+              <div 
+                class="p-3 text-white text-center"
+                style={{backgroundColor: '#f0cac8'}}
+              >
+              
+                <h3 class="fw-bold text-dark" >Order Summary</h3>
+            
+            
+                  {savedProducts.map((product, index) => {
+                    const effectiveDiscount = product.discount || 0; // Check product-specific discount
+                    const discountedPrice = getDiscountedPrice(product.price, effectiveDiscount);
+                    const total = (discountedPrice * quantities[index]).toFixed(2);
+                    effectiveGlobalDiscount = effectiveDiscount;
+                    console.log('GLOBAL EFFECTIVE DISCOUNT : ' + effectiveGlobalDiscount);
+
+
+                    return (
+
+
+                      <div class="container my-1"  key={index}>
+                          <div class="card p-3" style={{backgroundColor: 'white'}}>
+                            <div class="row align-items-start">
+                        
+                        
+                              <div class="col-md-3 text-start align-items-center">
+                                <img src="https://via.placeholder.com/100" alt="Product" class="img-fluid rounded"/>
+                              </div>
+
+
+                              <div class="col-md-9">
+                                <p class="text-start mb-1">{product.product_name}</p>
+                                
+                                <div class="d-flex justify-content-between align-content-center">
+                                  <p
+                                    className={`mb-1 ${effectiveDiscount > 0 ? 'text-decoration-line-through text-muted' : ''}`}
+                                  >
+                                    Original Price: ₱{product.price.toFixed(2)}
+                                  </p>
+
+                                  {/* Discounted Price */}
+                                  {effectiveDiscount > 0 && (
+                                    <p className="mb-2 text-success fw-bold">
+                                      Discounted Price: ₱{discountedPrice.toFixed(2)} at {effectiveDiscount}% Off
+                                    </p>
+                                  )}
+
+
+
+
+                                  <p class="fw-bold text-danger">₱{total}</p>
+
+
+                                </div>
+                                <div class="d-flex align-items-center">
+                                  <input 
+                                    type="number" 
+                                    class="text-center" 
+                                    min="1" 
+                                    value={quantities[index]}
+                                    onChange={(e) => handleQuantityChange(index, e)}
+                                    style={{ maxWidth: "100px", maxHeight: "30px" }}
+                        
+                                  
+                                  />
+                                  <button 
+                                    className="btn btn-danger btn-sm"
+                                    onClick={() => handleRemoveProduct(index)}
+                                    >
+                                    
+                                      Remove
+                                  </button>
+
+
+
+                                </div>
+                                
+                              </div>
+                              
+
+                            </div>
+                          </div>
+                        </div>
+
+                    );
+                    
             })}
 
-            <span>Shipping Fee: ₱150</span>
-            <div className='total-price' style={{
+
+
+
+
+
+
+
+
+              <div className='total-price mx-4' style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: '20px',
+                marginBottom: '0',
+                fontSize: '1.2em',
+                fontWeight: 'bold'
+              }}>
+                <span class="text-dark">Shipping Fee:</span>
+                <span class="text-danger">₱150</span>
+              </div>
+
+              <hr class="text-danger"></hr>
+           
+            <div className='total-price mx-4' style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
@@ -655,12 +712,19 @@ const Checkout = () => {
               fontSize: '1.2em',
               fontWeight: 'bold'
             }}>
-              <span>Total Price:</span>
-              <span>₱{calculateTotalPrice().toFixed(2)}</span>
+              <span class="text-dark">Total Price:</span>
+              <span class="text-danger">₱{calculateTotalPrice().toFixed(2)}</span>
+            </div>
+
+
+
+
+            
+              </div>
             </div>
           </div>
-
         </div>
+
       </div>
       <Footer />
     </div>
