@@ -6,6 +6,7 @@ import CartProduct from '../../components/CartProduct';
 import cartEventEmitter from '../../components/cartEventEmitter';
 import { useNavigate } from 'react-router-dom';
 import ToastNotification from '../../../public/components/ToastNotification';
+import axios from 'axios';
 
 const CartContent = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -90,7 +91,8 @@ const CartContent = () => {
     };
   }, [cartItems]);
 
-  const handleCheckout = () => {
+
+  const handleCheckout = async () => {
     const token = localStorage.getItem('token');
 
     const selectedProducts = cartItems.filter(item => selectedItems[item.product_code]);
@@ -99,17 +101,42 @@ const CartContent = () => {
       alert("Please select at least one product to proceed to checkout.");
       return;
     }
-    localStorage.setItem('selectedProducts', JSON.stringify(selectedProducts));
 
-    if (!token) {
-      // Set the redirect to checkout after login
-      localStorage.setItem('redirectTo', '/checkout');
+    try {
+      const updatedProducts = await Promise.all(
+        selectedProducts.map(async (product) => {
+          try {
+            const response = await axios.get(`http://localhost:5001/products-checkout/${product.product_code}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            const productDetails = response.data;
 
-      navigate('/login');
-    } else {
-      navigate('/checkout', { state: { selectedProducts, totalPrice } });
+            return {
+              ...product,
+              product_image: productDetails.product_image || '',
+            };
+          } catch (error) {
+            console.error(`Error fetching product image for product code ${product.product_code}:`, error);
+            return product;
+          }
+        })
+      );
+
+      localStorage.setItem('selectedProducts', JSON.stringify(updatedProducts));
+
+      if (!token) {
+        localStorage.setItem('redirectTo', '/checkout');
+
+        navigate('/login');
+      } else {
+        navigate('/checkout', { state: { selectedProducts: updatedProducts, totalPrice } });
+      }
+    } catch (error) {
+      console.error('Error fetching product details:', error);
+      alert('There was an error retrieving product details. Please try again.');
     }
-
   };
 
 

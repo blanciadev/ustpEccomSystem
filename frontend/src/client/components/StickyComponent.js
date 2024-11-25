@@ -33,6 +33,7 @@ const StickyComponent = ({ onSubmit }) => {
     setSearchTerm(e.target.value);
   };
 
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const updatedFormData = {
@@ -40,8 +41,10 @@ const StickyComponent = ({ onSubmit }) => {
       query: searchTerm
     };
 
+    // Save search term in local storage
     localStorage.setItem('searchTerm', searchTerm);
 
+    // Submit the form
     setFormData(updatedFormData);
 
     if (onSubmit) {
@@ -50,6 +53,17 @@ const StickyComponent = ({ onSubmit }) => {
     } else {
       console.error('onSubmit function is not provided');
     }
+
+    // Reset form data and search term after submission
+    setSearchTerm('');
+    setFormData({
+      hairType: '',
+      hairRebonded: '',
+      hairTexture: '',
+      hairVirgin: '',
+      hairColor: '',
+      query: ''
+    });
   };
 
 

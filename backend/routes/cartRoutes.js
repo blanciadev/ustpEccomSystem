@@ -240,7 +240,7 @@ router.post('/cart-update-quantity', authenticateToken, async (req, res) => {
 // CheckOut Page Backend
 router.get('/products-checkout/:productCode', async (req, res) => {
     const { productCode } = req.params;
-    console.log(productCode);
+
     try {
         // Query to fetch the product based on the product code
         const [rows] = await db.query(`
@@ -262,7 +262,7 @@ router.get('/products-checkout/:productCode', async (req, res) => {
                     p.category_id = c.category_id
                         WHERE p.product_code = ?
         `, [productCode]);
-
+        console.log(rows);
         // Check if product exists
         if (rows.length === 0) {
             return res.status(404).send('Product not found');

@@ -79,7 +79,7 @@ FROM
 	ON 
 		p.product_code = user_product_interactions.product_code
 WHERE
-	user_product_interactions.interaction_type = 'view'
+	user_product_interactions.interaction_type = 'Order'
 GROUP BY
 	p.product_id, 
 	p.product_code, 
@@ -89,8 +89,7 @@ GROUP BY
 	p.quantity, 
 	c.category_name
 ORDER BY
-	interaction_count DESC
-LIMIT 4;`);
+	interaction_count DESC;`);
 
         res.json(rows);
     } catch (error) {
@@ -171,9 +170,7 @@ router.get('/sticky-components', async (req, res) => {
         const searchTerms = [];
         const queryParams = [];
 
-        console.log(query);
-
-        // Add search term for product name if provided
+        // If query is provided, add the product name filter
         if (query) {
             console.log('Adding product name filter:', query);
             searchTerms.push('LOWER(product_name) LIKE ?');
@@ -216,17 +213,19 @@ router.get('/sticky-components', async (req, res) => {
             queryStr += ' AND (' + searchTerms.join(' OR ') + ')';
         }
 
-        queryStr += ' LIMIT 5'; // Optional: Limit number of results for performance
+        queryStr += ' LIMIT 5';
 
         console.log('Final SQL query to execute:', queryStr);
         console.log('Query parameters:', queryParams);
 
+        // Execute the query with the provided filters
         const [products] = await db.query(queryStr, queryParams);
 
         console.log('Fetched products:', products);
 
         console.log('--------- STICKY COMPONENT REQUEST END -------');
 
+        // Return the filtered products
         res.json(products);
     } catch (error) {
         console.error('Error fetching products:', error.message);

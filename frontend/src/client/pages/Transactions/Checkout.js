@@ -38,32 +38,37 @@ const Checkout = () => {
   const [hasFetched, setHasFetched] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
+
   useEffect(() => {
     const token = localStorage.getItem('token');
 
+    const fetchOriginalQuantities = async () => {
+      try {
+        const productData = await Promise.all(
+          savedProducts.map(product =>
+            axios.get(`http://localhost:5001/products-checkout/${product.product_code}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }).then(response => response.data)
+          )
+        );
+
+        console.log("CHECKOUT API TRIGGERED");
+
+        const productQuantities = productData.map(item => item.quantity);
+        setOriginalQuantities(productQuantities);
+
+        const productDiscounts = savedProducts.map(product => product.discount || 0);
+        setDiscounts(productDiscounts);
+
+        setHasFetched(true);
+      } catch (error) {
+        console.error('Error fetching quantities and discounts:', error);
+      }
+    };
+
     if (savedProducts.length > 0 && !hasFetched) {
-      const fetchOriginalQuantities = async () => {
-        try {
-          const productData = await Promise.all(
-            savedProducts.map(product =>
-              axios.get(`http://localhost:5001/products-checkout/${product.product_code}`, {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }).then(response => response.data)
-            )
-          );
-
-          const productQuantities = productData.map(item => item.quantity);
-          setOriginalQuantities(productQuantities);
-          const productDiscounts = savedProducts.map(product => product.discount || 0);
-          setDiscounts(productDiscounts);
-          setHasFetched(true);
-        } catch (error) {
-          console.error('Error fetching quantities and discounts:', error);
-        }
-      };
-
       fetchOriginalQuantities();
     }
 
@@ -72,10 +77,12 @@ const Checkout = () => {
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
+
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [savedProducts, hasFetched]);
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -134,112 +141,7 @@ const Checkout = () => {
     setOriginalQuantities(updatedQuantities);
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   setLoading(true);
-  //   setError('');
-  //   setSuccess('');
-  //   const userId = localStorage.getItem('customer_id');
-  //   const payload = {};
-  //   const token = localStorage.getItem('token');
-  //   if (!token) {
-  //     localStorage.setItem('redirectTo', '/checkout');
-  //     navigate('/login');
-  //     return;
-  //   }
 
-  //   if (!validateForm()) {
-  //     setLoading(false);
-  //     setError('All fields are required.');
-  //     return;
-  //   }
-
-
-  //   try {
-  //     if (!customerId || savedProducts.length === 0) {
-  //       setLoading(false);
-  //       setError('Missing customer ID or no products selected.');
-  //       return;
-  //     }
-  //     // Define the interaction payload
-  //     payload = {
-  //       product_code: savedProducts.map(product => product.product_code),
-  //       customerId: userId,
-  //       interaction_type: 'order'
-  //     };
-
-  //     console.log("Payload Entry : ", payload);
-
-  //     const totalOrderPrice = calculateTotalPrice().toFixed(2);
-  //     const orderData = {
-  //       customer_id: customerId,
-  //       fullName: formData.fullName,
-  //       order_details: savedProducts.map((product, index) => {
-  //         const discountedPrice = product.price * (1 - (discounts[index] / 100));
-  //         const productTotal = discountedPrice * quantities[index];
-
-  //         return {
-  //           cart_items: product.cart_items_id,
-  //           product_id: product.product_code,
-  //           quantity: quantities[index],
-  //           totalprice: productTotal.toFixed(2),
-  //           payment_method: 'COD',
-  //           payment_status: 'Pending',
-  //         };
-  //       }),
-  //       total_price: totalOrderPrice,
-  //       order_date: new Date().toISOString(),
-  //       shipment_date: new Date().toISOString(),
-  //       address: formData.address,
-  //       streetname: formData.streetname,
-  //       region: formData.region,
-  //       shipment_status: 'Pending',
-  //       paymentMethod: formData.paymentMethod,
-  //       phoneNumber: formData.phoneNumber,
-  //       postalCode: formData.postalCode,
-  //     };
-
-  //     const response = await axios.post('http://localhost:5001/insert-order', orderData, {
-  //       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-  //     });
-
-  //     localStorage.setItem('checkoutOrderData', JSON.stringify(orderData));
-
-  //     if (response.status === 201) {
-
-  //       setSuccess('Order placed successfully!');
-  //       localStorage.removeItem('selectedProducts');
-
-  //       setToastMessage('Order Successful!');
-  //       setTimeout(() => {
-  //         setToastMessage('');
-  //         navigate('/user/purchase');
-  //       }, 3000);
-
-  //       console.log('toast should display T-T')
-
-
-  //     }
-  //   } catch (error) {
-  //     console.error('Error placing order:', error);
-  //     setError('Failed to place order. Please try again.');
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  //   // Function to record product interaction
-  //   const recordProductInteraction = async (payload) => {
-  //     try {
-  //       console.log('Recording product interaction:', payload);
-  //       await axios.get('http://localhost:5001/products-interaction', { params: payload });
-  //       console.log('Product interaction recorded successfully.');
-  //     } catch (error) {
-  //       console.error('Error recording product interaction:', error);
-  //     }
-  //   };
-
-  //   await recordProductInteraction(payload);
-
-  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -303,7 +205,7 @@ const Checkout = () => {
 
     // Define the interaction payload
     const payload = {
-      product_code: orderData.order_details.map(detail => detail.product_id),  // retrieve product_id from order_details in orderData
+      product_code: orderData.order_details.map(detail => detail.product_id),
       customerId: customerId,
       interaction_type: 'order'
     };
@@ -361,13 +263,13 @@ const Checkout = () => {
 
     if (savedProducts.length === 0) return 0;
 
-    console.log("----- Receipt -----");
+    // console.log("----- Receipt -----");
 
     let totalCost = 0;
     const generalDiscount = allValuesEqual(globalDiscounts) ? globalDiscounts[0] : 0;
     const hasGeneralDiscount = generalDiscount > 0;
-    console.log("----- GENERAL DISCOUNT  -----");
-    console.log(effectiveGlobalDiscount);
+    // console.log("----- GENERAL DISCOUNT  -----");
+    // console.log(effectiveGlobalDiscount);
 
 
     savedProducts.forEach((product, index) => {
@@ -375,29 +277,30 @@ const Checkout = () => {
       let effectivePrice = 0;
       let discountApplied = 0;
 
-      console.log(hasGeneralDiscount);
+      // console.log(hasGeneralDiscount);
 
       if (product.discounted_price) {
         discountApplied = allValuesEqual(globalDiscounts) ? globalDiscounts[0] : 0;
         effectivePrice = getEffectivePrice(product.discounted_price, discountApplied);
 
-        console.log(`Product: ${product.product_name} (Discounted)`);
+        // console.log(`Product: ${product.product_name} (Discounted)`);
       } else {
         discountApplied = hasGeneralDiscount ? generalDiscount : 0;
         effectivePrice = getEffectivePrice(product.price, discountApplied);
 
-        console.log(`Product: ${product.product_name} (Non-Bundled)`);
+        // console.log(`Product: ${product.product_name} (Non-Bundled)`);
       }
 
-      console.log(`  Discount: ${discountApplied}%`);
-      console.log(`  Price per unit: $${effectivePrice.toFixed(2)}`);
-      console.log(`  Quantity: ${quantity}`);
+      // console.log(`  Discount: ${discountApplied}%`);
+      // console.log(`  Price per unit: $${effectivePrice.toFixed(2)}`);
+      // console.log(`  Quantity: ${quantity}`);
 
       const totalForProduct = effectivePrice * quantity;
       totalCost += totalForProduct;
 
-      console.log(`  Total for ${product.product_name}: $${totalForProduct.toFixed(2)}`);
-      console.log("------------------------------");
+      // console.log(`  Total for ${product.product_name}: $${totalForProduct.toFixed(2)}`);
+
+      // console.log("------------------------------");
     });
 
     const shippingCost = 150;
@@ -447,11 +350,6 @@ const Checkout = () => {
   };
 
 
-  // const handlePostalCodeChange = (e) => {
-  //   const numericPostalCode = e.target.value.replace(/\D/g, "");
-  //   setFormData({ ...formData, postalCode: numericPostalCode });
-  // };
-
   const handlePostalCodeChange = (e) => {
     const value = e.target.value;
     if (value.length <= 4) {
@@ -469,34 +367,34 @@ const Checkout = () => {
 
         <div class="container">
           <div class="row">
-            
+
             <div class="col-12 col-md-6 ">
               <div class="p-3 text-black text-start"
-              style={{border: '5px solid #f0cac8'}}>
+                style={{ border: '5px solid #f0cac8' }}>
                 <div class="container">
                   <h2 class="mb-4">Delivery Information Form</h2>
                   <form onSubmit={handleSubmit}>
                     <div class="mb-2">
                       <label for="fullName" class="form-label">Full Name</label>
-                      <input 
-                        type="text" 
-                        class="form-control" 
+                      <input
+                        type="text"
+                        class="form-control"
                         id="fullName"
-                        name="fullName" 
+                        name="fullName"
                         placeholder="Enter your full name"
                         value={formData.fullName}
                         onChange={handleInputChange}
                         required
-                        
+
                       />
                     </div>
-                    
+
                     <div className="mb-2">
                       <label htmlFor="phoneNumber" className="form-label">Phone Number</label>
-                      <input 
-                        type="text" 
-                        className="form-control" 
-                        id="phoneNumber" 
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="phoneNumber"
                         name="phoneNumber"
                         placeholder="Enter your phone number"
                         value={formData.phoneNumber}
@@ -507,13 +405,13 @@ const Checkout = () => {
                       />
                     </div>
 
-                    
+
                     <div class="mb-2">
                       <label for="streetname" class="form-label">Street Name</label>
-                      <input 
-                        type="text" 
-                        class="form-control" 
-                        id="streetname" 
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="streetname"
                         name="streetname"
                         placeholder="Enter your street name"
                         value={formData.streetname}
@@ -524,25 +422,25 @@ const Checkout = () => {
 
                     <div class="mb-2">
                       <label for="address" class="form-label">Address</label>
-                      <input 
-                        type="text" 
-                        class="form-control" 
-                        id="address" 
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="address"
                         placeholder="Enter your address"
                         name="address"
                         value={formData.address}
                         onChange={handleInputChange}
                         required
 
-                        />
+                      />
                     </div>
-                    
+
                     <div class="mb-2">
                       <label for="region" class="form-label">Region</label>
-                      <input 
-                        type="text" 
-                        class="form-control" 
-                        id="region" 
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="region"
                         placeholder="Enter your region"
                         name="region"
                         value={formData.region}
@@ -550,36 +448,36 @@ const Checkout = () => {
                         required
                       />
                     </div>
-                    
+
                     <div className="mb-2">
                       <label htmlFor="postalCode" className="form-label">Postal Code</label>
-                      <input 
-                        type="number" 
-                        className="form-control" 
-                        id="postalCode" 
+                      <input
+                        type="number"
+                        className="form-control"
+                        id="postalCode"
                         placeholder="Enter your postal code"
                         name="postalCode"
                         value={formData.postalCode}
                         onChange={handlePostalCodeChange}
                         maxLength="4"
-                        
+
                         required
                       />
                     </div>
 
                     <div class="mb-2">
                       <h5>Payment Method</h5>
-                    <label class="form-label" htmlFor='paymentMethod'>
-                    <input type="radio"
-                      name="paymentMethod"
-                    //   checked={formData.paymentMethod === 'COD'}
-                      onChange={handlePaymentChange}
-                      checked
-                      value="COD" />
-                          Cash on Delivery
-                    </label>
-                  </div>
-                    
+                      <label class="form-label" htmlFor='paymentMethod'>
+                        <input type="radio"
+                          name="paymentMethod"
+                          //   checked={formData.paymentMethod === 'COD'}
+                          onChange={handlePaymentChange}
+                          checked
+                          value="COD" />
+                        Cash on Delivery
+                      </label>
+                    </div>
+
                     <div class="d-grid">
                       <button type="submit" class="place-order-btn" disabled={loading}>
                         {loading ? 'Processing...' : 'Place Order'}
@@ -587,139 +485,141 @@ const Checkout = () => {
                     </div>
 
 
-                    
+
                   </form>
                 </div>
               </div>
             </div>
-            
+
             <div class="col-12 col-md-6">
-              <div 
+              <div
                 class="p-3 text-white text-center"
-                style={{backgroundColor: '#f0cac8'}}
+                style={{ backgroundColor: '#f0cac8' }}
               >
-              
+
                 <h3 class="fw-bold text-dark" >Order Summary</h3>
-            
-            
-                  {savedProducts.map((product, index) => {
-                    const effectiveDiscount = product.discount || 0; // Check product-specific discount
-                    const discountedPrice = getDiscountedPrice(product.price, effectiveDiscount);
-                    const total = (discountedPrice * quantities[index]).toFixed(2);
-                    effectiveGlobalDiscount = effectiveDiscount;
-                    console.log('GLOBAL EFFECTIVE DISCOUNT : ' + effectiveGlobalDiscount);
 
 
-                    return (
+                {savedProducts.map((product, index) => {
+                  const effectiveDiscount = product.discount || 0;
+                  const discountedPrice = getDiscountedPrice(product.price, effectiveDiscount);
+                  const total = (discountedPrice * quantities[index]).toFixed(2);
+                  effectiveGlobalDiscount = effectiveDiscount;
+                  console.log('GLOBAL EFFECTIVE DISCOUNT : ' + effectiveGlobalDiscount);
+                  console.log('Saved Products data', savedProducts);
+
+                  return (
 
 
-                      <div class="container my-1"  key={index}>
-                          <div class="card p-3" style={{backgroundColor: 'white'}}>
-                            <div class="row align-items-start">
-                        
-                        
-                              <div class="col-md-3 text-start align-items-center">
-                                <img src="https://via.placeholder.com/100" alt="Product" class="img-fluid rounded"/>
-                              </div>
+                    <div class="container my-1" key={index}>
+                      <div class="card p-3" style={{ backgroundColor: 'white' }}>
+                        <div class="row align-items-start">
 
 
-                              <div class="col-md-9">
-                                <p class="text-start mb-1">{product.product_name}</p>
-                                
-                                <div class="d-flex justify-content-between align-content-center">
-                                  <p
-                                    className={`mb-1 ${effectiveDiscount > 0 ? 'text-decoration-line-through text-muted' : ''}`}
-                                  >
-                                    Original Price: ₱{product.price.toFixed(2)}
-                                  </p>
+                          <div className="col-md-3 text-start align-items-center">
+                            <img
+                              src={product.product_image || 'https://via.placeholder.com/150'}
+                              alt={product.product_name || 'Product Image'}
+                              style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                              onError={(e) => {
+                                e.target.onerror = null; // Prevents infinite loop
+                                e.target.src = 'https://via.placeholder.com/150';
+                              }}
+                            />
 
-                                  {/* Discounted Price */}
-                                  {effectiveDiscount > 0 && (
-                                    <p className="mb-2 text-success fw-bold">
-                                      Discounted Price: ₱{discountedPrice.toFixed(2)} at {effectiveDiscount}% Off
-                                    </p>
-                                  )}
+                          </div>
 
 
+                          <div class="col-md-9">
+                            <p class="text-start mb-1">{product.product_name}</p>
+
+                            <div class="d-flex justify-content-between align-content-center">
+                              <p
+                                className={`mb - 1 ${effectiveDiscount > 0 ? 'text-decoration-line-through text-muted' : ''}`}
+                              >
+                                Original Price: ₱{product.price.toFixed(2)}
+                              </p>
+
+                              {/* Discounted Price */}
+                              {effectiveDiscount > 0 && (
+                                <p className="mb-2 text-success fw-bold">
+                                  Discounted Price: ₱{discountedPrice.toFixed(2)} at {effectiveDiscount}% Off
+                                </p>
+                              )}
+                              <p class="fw-bold text-danger">₱{total}</p>
+                            </div>
+                            <div class="d-flex align-items-center">
+                              <input
+                                type="number"
+                                class="text-center"
+                                min="1"
+                                value={quantities[index]}
+                                onChange={(e) => handleQuantityChange(index, e)}
+                                style={{ maxWidth: "100px", maxHeight: "30px" }}
+
+                              />
+                              <button
+                                className="btn btn-danger btn-sm"
+                                onClick={() => handleRemoveProduct(index)}
+                              >
+
+                                Remove
+                              </button>
 
 
-                                  <p class="fw-bold text-danger">₱{total}</p>
-
-
-                                </div>
-                                <div class="d-flex align-items-center">
-                                  <input 
-                                    type="number" 
-                                    class="text-center" 
-                                    min="1" 
-                                    value={quantities[index]}
-                                    onChange={(e) => handleQuantityChange(index, e)}
-                                    style={{ maxWidth: "100px", maxHeight: "30px" }}
-                        
-                                  
-                                  />
-                                  <button 
-                                    className="btn btn-danger btn-sm"
-                                    onClick={() => handleRemoveProduct(index)}
-                                    >
-                                    
-                                      Remove
-                                  </button>
-
-
-
-                                </div>
-                                
-                              </div>
-                              
 
                             </div>
+
                           </div>
+
+
                         </div>
+                      </div>
+                    </div>
 
-                    );
-                    
-            })}
+                  );
 
-
-
-
+                })}
 
 
 
 
 
-              <div className='total-price mx-4' style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginTop: '20px',
-                marginBottom: '0',
-                fontSize: '1.2em',
-                fontWeight: 'bold'
-              }}>
-                <span class="text-dark">Shipping Fee:</span>
-                <span class="text-danger">₱150</span>
-              </div>
-
-              <hr class="text-danger"></hr>
-           
-            <div className='total-price mx-4' style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginTop: '20px',
-              fontSize: '1.2em',
-              fontWeight: 'bold'
-            }}>
-              <span class="text-dark">Total Price:</span>
-              <span class="text-danger">₱{calculateTotalPrice().toFixed(2)}</span>
-            </div>
 
 
 
 
-            
+                <div className='total-price mx-4' style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '20px',
+                  marginBottom: '0',
+                  fontSize: '1.2em',
+                  fontWeight: 'bold'
+                }}>
+                  <span class="text-dark">Shipping Fee:</span>
+                  <span class="text-danger">₱150</span>
+                </div>
+
+                <hr class="text-danger"></hr>
+
+                <div className='total-price mx-4' style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '20px',
+                  fontSize: '1.2em',
+                  fontWeight: 'bold'
+                }}>
+                  <span class="text-dark">Total Price:</span>
+                  <span class="text-danger">₱{calculateTotalPrice().toFixed(2)}</span>
+                </div>
+
+
+
+
+
               </div>
             </div>
           </div>

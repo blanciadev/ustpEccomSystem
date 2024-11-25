@@ -44,9 +44,9 @@ const ProductCard = React.memo(({ product, onAddToCart, onBuyNow, onProductClick
 
                     <button class="add-to-cart-button px-10" onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}>Add to cart</button>
                     <button class="buy-now-button px-10" onClick={(e) => { e.stopPropagation(); onBuyNow(product); }}>Buy Now</button>
-                
 
-                    </div>
+
+                </div>
             )}
         </>
     );
@@ -64,9 +64,14 @@ const ProductList = ({ stickyComponents }) => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
+    const [topPicks, setTopPicks] = useState([]);
+
+
 
     const handleStickySubmit = async (formData) => {
         setLoading(true);
+
+        console.log("Tis is on stickysubmit", formData);
 
         const storedSearchTerm = localStorage.getItem('searchTerm');
 
@@ -85,6 +90,11 @@ const ProductList = ({ stickyComponents }) => {
             setProducts(response.data);
             setError(null);
             setCurrentPage(0);
+
+            // Remove the search term from localStorage
+            localStorage.removeItem('searchTerm');
+
+
         } catch (err) {
             setError('Failed to fetch products');
         } finally {
@@ -92,7 +102,14 @@ const ProductList = ({ stickyComponents }) => {
         }
     };
 
+    const handleButtonClick = (parameter, value) => {
+        const formData = {
+            [parameter]: value
+        };
 
+        handleStickySubmit(formData); // Pass the formData with the correct parameter and value
+        console.log('Button clicked with value:', value);
+    };
 
     const handlePageChange = (direction) => {
         setCurrentPage((prevPage) => {
@@ -144,6 +161,20 @@ const ProductList = ({ stickyComponents }) => {
                 setLoading(false);
             }
         };
+
+        const fetchTopPicks = async () => {
+            try {
+                const response = await axios.get('http://localhost:5001/products-top-picks');
+                // Limit to top 4 picks if there are more
+                const limitedPicks = response.data.slice(0, 4);
+                setTopPicks(limitedPicks);
+            } catch (error) {
+                console.error('Error fetching top picks:', error);
+            }
+        };
+
+        fetchTopPicks();
+
 
         fetchProducts();
     }, []);
@@ -310,145 +341,162 @@ const ProductList = ({ stickyComponents }) => {
 
     return (
         <div class="mx-2">
-                <div>
-                    <h2 class="text-center mt-4 ">HAIRCARE BEAUTY OFFERS</h2>
-                    {/* Buttons */}
-                    <div class="container mb-2">
-                        <div class="row justify-content-center">
-                        <div class="col">
-                            <button class="gradient-button btn-rebonded w-100">Rebonded</button>
+            <div>
+                <h2 class="text-center mt-4 ">HAIRCARE BEAUTY OFFERS</h2>
+                {/* Buttons */}
+                <div className="container mb-2">
+                    <div className="row justify-content-center">
+                        <div className="col">
+                            <button
+                                className="gradient-button btn-rebonded w-100"
+                                onClick={() => handleButtonClick('hairRebonded', 'Rebonded')}
+                            >
+                                Rebonded
+                            </button>
                         </div>
-                       
-                        <div class="col">
-                            <button class="gradient-button btn-damaged w-100">Damaged Hair</button>
+
+                        <div className="col">
+                            <button
+                                className="gradient-button btn-damaged w-100"
+                                onClick={() => handleButtonClick('hairVirgin', 'Damaged')}
+                            >
+                                Damaged Hair
+                            </button>
                         </div>
-                        <div class="col">
-                            <button class="gradient-button btn-frizzy w-100">Frizzy Hair</button>
+
+                        <div className="col">
+                            <button
+                                className="gradient-button btn-frizzy w-100"
+                                onClick={() => handleButtonClick('hairTexture', 'Frizzy')}
+                            >
+                                Frizzy Hair
+                            </button>
                         </div>
-                        <div class="col">
-                            <button class="gradient-button btn-oily w-100">Oily Hair</button>
+
+                        <div className="col">
+                            <button
+                                className="gradient-button btn-oily w-100"
+                                onClick={() => handleButtonClick('hairTexture', 'Oily')}
+                            >
+                                Oily Hair
+                            </button>
                         </div>
-                        <div class="col">
-                            <button class="gradient-button btn-dry w-100">Dry Hair</button>
+
+                        <div className="col">
+                            <button
+                                className="gradient-button btn-dry w-100"
+                                onClick={() => handleButtonClick('hairTexture', 'Dry')}
+                            >
+                                Dry Hair
+                            </button>
                         </div>
-                        <div class="col">
-                            <button class="gradient-button btn-curly w-100">Curly Hair</button>
-                        </div>
+
+                        <div className="col">
+                            <button
+                                className="gradient-button btn-curly w-100"
+                                onClick={() => handleButtonClick('hairType', 'Curly')}
+                            >
+                                Curly Hair
+                            </button>
                         </div>
                     </div>
+                </div>
 
-                    <div class="mx-2 ">
-                        <div class="row">
-                            
+
+                <div class="mx-2 ">
+                    <div class="row">
+
                         <div class="left-product-list col-12 col-lg-9 text-white p-3">
-                                 
-                        <div className='product-list'>
-                                        <ToastNotification toastMessage={toastMessage} />
-                                        <StickyComponent className="" onSubmit={handleStickySubmit} />
 
-                                        <div className='product-list-container'>
-                                            {paginatedProducts.map((product) => (
-                                                <ProductCard
-                                                    key={product.product_code}
-                                                    product={product}
-                                                    onAddToCart={handleAddToCart}
-                                                    onProductClick={handleProductClick}
-                                                    onBuyNow={handleBuyNow}
-                                                />
-                                            ))}
-                                        </div>
+                            <div className='product-list'>
+                                <ToastNotification toastMessage={toastMessage} />
+                                <StickyComponent className="" onSubmit={handleStickySubmit} />
+
+                                <div className='product-list-container'>
+                                    {paginatedProducts.map((product) => (
+                                        <ProductCard
+                                            key={product.product_code}
+                                            product={product}
+                                            onAddToCart={handleAddToCart}
+                                            onProductClick={handleProductClick}
+                                            onBuyNow={handleBuyNow}
+                                        />
+                                    ))}
+                                </div>
 
 
-                                        <div className='pagination'>
-                                            <button className='btns' onClick={() => handlePageChange(-1)} disabled={currentPage === 0}>
-                                                Previous
-                                            </button>
-                                            <button className='btns' onClick={() => handlePageChange(1)} disabled={currentPage >= Math.ceil(products.length / PAGE_SIZE) - 1}>
-                                                Next
-                                            </button>
-                                        </div>
-                                        {isModalOpen && (
-                                            <ProductModal
-                                                isOpen={isModalOpen}
-                                                product={selectedProduct}
-                                                onClose={closeModal}
-                                                onAddToCart={handleAddToCart}
-                                            />
-                                        )}
-                                    </div>
+                                <div className='pagination'>
+                                    <button className='btns' onClick={() => handlePageChange(-1)} disabled={currentPage === 0}>
+                                        Previous
+                                    </button>
+                                    <button className='btns' onClick={() => handlePageChange(1)} disabled={currentPage >= Math.ceil(products.length / PAGE_SIZE) - 1}>
+                                        Next
+                                    </button>
+                                </div>
+                                {isModalOpen && (
+                                    <ProductModal
+                                        isOpen={isModalOpen}
+                                        product={selectedProduct}
+                                        onClose={closeModal}
+                                        onAddToCart={handleAddToCart}
+                                    />
+                                )}
+                            </div>
 
                         </div>
-                        
-                        
+
+
                         <div class="right-product-list col-12 col-lg-3 text-white">
 
 
                             <h3 class="mt-2 text-center fw-bold">TOP PICKS FOR YOU</h3>
 
-
-                              <div class="container">
+                            <div class="container">
                                 <div class="row">
-                                        
-                                    <div class="col-12">
-                                        <div class="product-card1">
-                                        <img src="https://via.placeholder.com/120" alt="Product 1" class="product-image1"/>
-                                        <div class="product-text1">
-                                            <h6>L'Oréal Professionnel Hair Spa Deep Nourishing Creambath 500ML</h6>
-                                            <p class="price">₱957.00</p>
-                                        </div>
+
+
+                                    <div className="right-product-list col-12 col-lg-3 text-white">
+
+                                        <div className="container">
+                                            <div className="row">
+                                                {topPicks.map((product, index) => (
+                                                    <div key={index} className="col-12">
+                                                        <div className="product-card1">
+                                                            <img
+                                                                src={product.product_image || 'https://via.placeholder.com/120'}
+                                                                alt={product.product_name}
+                                                                className="product-image1"
+                                                                onProductClick={handleProductClick}
+                                                            />
+                                                            <div className="product-text1">
+                                                                <h6>{product.product_name}</h6>
+                                                                <p className="price">₱{product.price.toFixed(2)}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            {isModalOpen && selectedProduct && (
+                                                <ProductModal
+                                                    isOpen={isModalOpen}
+                                                    product={selectedProduct}
+                                                    onClose={closeModal}
+                                                    onAddToCart={handleAddToCart}
+                                                />
+                                            )}
                                         </div>
                                     </div>
-
-
-                                    <div class="col-12">
-                                        <div class="product-card1">
-                                        <img src="https://via.placeholder.com/120" alt="Product 2" class="product-image1"/>
-                                        <div class="product-text1">
-                                            <h6>L'Oréal Professionnel Hair Spa Deep Nourishing Creambath 500ML</h6>
-                                            <p class="price">₱957.00</p>
-                                        </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="product-card1">
-                                        <img src="https://via.placeholder.com/120" alt="Product 2" class="product-image1"/>
-                                        <div class="product-text1">
-                                            <h6>L'Oréal Professionnel Hair Spa Deep Nourishing Creambath 500ML</h6>
-                                            <p class="price">₱957.00</p>
-                                        </div>
-                                        </div>
-                                    </div>
-
-
-                                    <div class="col-12">
-                                        <div class="product-card1">
-                                        <img src="https://via.placeholder.com/120" alt="Product 3" class="product-image1"/>
-                                        <div class="product-text1">
-                                            <h6>L'Oréal Professionnel Hair Spa Deep Nourishing Creambath 500ML</h6>
-                                            <p class="price">₱957.00</p>
-                                        </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <div class="product-card1">
-                                        <img src="https://via.placeholder.com/120" alt="Product 3" class="product-image1"/>
-                                        <div class="product-text1">
-                                            <h6>L'Oréal Professionnel Hair Spa Deep Nourishing Creambath 500ML</h6>
-                                            <p class="price">₱957.00</p>
-                                        </div>
-                                        </div>
-                                    </div>
-
-
                                 </div>
                             </div>
-                        </div>
+
+
                         </div>
                     </div>
                 </div>
-                
+            </div>
         </div>
+
     );
 };
 
