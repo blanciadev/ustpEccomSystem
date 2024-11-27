@@ -239,7 +239,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
     if (!isOpen || !product) return null;
     return (
 
-        <div className="promodal-overlay" onClick={onClose}>
+        <div className="promodal-overlay " onClick={onClose}>
             <div className="promodal-content" onClick={(e) => e.stopPropagation()}>
                 <div className="promodal-body">
                     <ToastNotification toastMessage={toastMessage} />

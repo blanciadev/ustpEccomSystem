@@ -65,6 +65,7 @@ router.get('/products-top-picks', async (req, res) => {
 	p.price, 
 	p.description, 
 	p.quantity, 
+    p.size, 
 	c.category_name, 
 	COUNT(DISTINCT user_product_interactions.product_code) AS interaction_count, 
 	p.product_image
@@ -87,6 +88,7 @@ GROUP BY
 	p.price, 
 	p.description, 
 	p.quantity, 
+    p.size, 
 	c.category_name
 ORDER BY
 	interaction_count DESC;`);

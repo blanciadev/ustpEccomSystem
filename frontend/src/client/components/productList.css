@@ -323,16 +323,20 @@ button:hover {
 
   .product-card1 {
     background: #fff;
-    border: 1px solid #f1f1f1;
     border-radius: 5px;
     margin-bottom: 12px;
     display: flex;
-    align-items: center;
+    align-items: start;
     padding: 8px;
   }
+
+  .product-card1:hover {
+    transform: scale(1.05);
+}
   .product-image1 {
-    max-width: 120px;
+    max-width: 90px;
     margin-right: 12px;
+    border-right: 1px solid #d81c4b;
   }
   .product-text1 h6 {
     font-size: 1rem;

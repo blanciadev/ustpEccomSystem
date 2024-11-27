@@ -125,6 +125,11 @@ body {
     border-bottom: 1px solid rgb(255, 74, 192);
     width: 100vw;
     height: 58px;
+
+        position: sticky;
+        top: 0;
+        z-index: 1020; /* Ensure it stays above other elements */
+    background-color: white;
 }
 
 .nav-container>.logo>a {

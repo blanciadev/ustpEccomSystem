@@ -166,7 +166,7 @@ const ProductList = ({ stickyComponents }) => {
             try {
                 const response = await axios.get('http://localhost:5001/products-top-picks');
                 // Limit to top 4 picks if there are more
-                const limitedPicks = response.data.slice(0, 4);
+                const limitedPicks = response.data.slice(0, 5);
                 setTopPicks(limitedPicks);
             } catch (error) {
                 console.error('Error fetching top picks:', error);
@@ -406,7 +406,7 @@ const ProductList = ({ stickyComponents }) => {
                 <div class="mx-2 ">
                     <div class="row">
 
-                        <div class="left-product-list col-12 col-lg-9 text-white p-3">
+                        <div class="left-product-list  d-flex align-items-center col-12 col-lg-9 text-white p-3">
 
                             <div className='product-list'>
                                 <ToastNotification toastMessage={toastMessage} />
@@ -433,14 +433,7 @@ const ProductList = ({ stickyComponents }) => {
                                         Next
                                     </button>
                                 </div>
-                                {isModalOpen && (
-                                    <ProductModal
-                                        isOpen={isModalOpen}
-                                        product={selectedProduct}
-                                        onClose={closeModal}
-                                        onAddToCart={handleAddToCart}
-                                    />
-                                )}
+
                             </div>
 
                         </div>
@@ -449,42 +442,42 @@ const ProductList = ({ stickyComponents }) => {
                         <div class="right-product-list col-12 col-lg-3 text-white">
 
 
-                            <h3 class="mt-2 text-center fw-bold">TOP PICKS FOR YOU</h3>
+                            <h3 class="mt-4 text-center fw-bold">TOP PICKS FOR YOU</h3>
 
-                            <div class="container">
+                            <div class="container ">
                                 <div class="row">
 
 
-                                    <div className="right-product-list col-12 col-lg-3 text-white">
+                                    <div className="right-product-list col-12  text-white">
 
                                         <div className="container">
                                             <div className="row">
                                                 {topPicks.map((product, index) => (
-                                                    <div key={index} className="col-12">
-                                                        <div className="product-card1">
+                                                    <div className="col-12 mt-2">   
+                                                        <div 
+                                                            key={product.product_code} 
+                                                            product={product} 
+                                                            className="product-card1" 
+                                                            onProductClick={handleProductClick}
+                                                            >
+                                                        
+                                                        
                                                             <img
                                                                 src={product.product_image || 'https://via.placeholder.com/120'}
                                                                 alt={product.product_name}
                                                                 className="product-image1"
-                                                                onProductClick={handleProductClick}
+                                                                onClick={() => handleProductClick(product)} // Trigger the handler correctly
                                                             />
                                                             <div className="product-text1">
                                                                 <h6>{product.product_name}</h6>
-                                                                <p className="price">₱{product.price.toFixed(2)}</p>
+                                                                <p className="price">₱{product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 ))}
                                             </div>
 
-                                            {isModalOpen && selectedProduct && (
-                                                <ProductModal
-                                                    isOpen={isModalOpen}
-                                                    product={selectedProduct}
-                                                    onClose={closeModal}
-                                                    onAddToCart={handleAddToCart}
-                                                />
-                                            )}
+                                    
                                         </div>
                                     </div>
                                 </div>
@@ -492,6 +485,14 @@ const ProductList = ({ stickyComponents }) => {
 
 
                         </div>
+                        {isModalOpen && (
+                                    <ProductModal
+                                        isOpen={isModalOpen}
+                                        product={selectedProduct}
+                                        onClose={closeModal}
+                                        onAddToCart={handleAddToCart}
+                                    />
+                                )}
                     </div>
                 </div>
             </div>

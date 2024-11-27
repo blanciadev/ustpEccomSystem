@@ -2,7 +2,7 @@
     width: 100vw;
     height: 100vh;
     position: fixed;
-    top: 0;
+    top: 40px;
     left: 0;
     right: 0;
     bottom: 0;
@@ -334,9 +334,9 @@
     justify-content: center;
 }
 
-.modalproduct-name {
+/* .modalproduct-name {
     font-weight: bold;
-}
+} */
 
 .modalproduct-price {
     color: #007bff;

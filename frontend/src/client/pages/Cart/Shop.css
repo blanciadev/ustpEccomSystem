@@ -213,6 +213,7 @@
 .shop__product-quantity,
 .shop__product-price,
 .shop__product-discount {
+    color: black;
     font-size: 14px;
     margin: 4px 0;
 }

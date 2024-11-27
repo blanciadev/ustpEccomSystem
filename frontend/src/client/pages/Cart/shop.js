@@ -296,22 +296,22 @@ const Shop = () => {
         <div className='shop'>
             <Navigation />
             <ToastNotification toastMessage={toastMessage} />
-            <div>
-                <label htmlFor="search">Search:</label>
+            <div className='d-flex justify-content-center w-50 ms-4 mt-2'>
+                {/* <label htmlFor="search">Search:</label> */}
                 <input
                     type="text"
                     id="search"
                     name="query"
                     value={searchTerm}
                     onChange={handleSearchChange}
-                    placeholder="Search products..."
+                    placeholder="Search for your perfect haircare products..."
                 />
-                <button type="button" onClick={handleSearchSubmit}>Search</button>
+                <button className='w-30' type="button" onClick={handleSearchSubmit}>Search</button>
             </div>
 
             {searchTriggered && products.length > 0 ? (
                 <div>
-                    <h3>Search Results:</h3>
+                    <h3 className='mt-4 ms-4'>Search Results:</h3>
                     {loading ? (
                         <p>Loading...</p>
                     ) : error ? (

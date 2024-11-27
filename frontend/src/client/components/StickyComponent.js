@@ -70,7 +70,7 @@ const StickyComponent = ({ onSubmit }) => {
   return (
     <div>
       <div className={`sticky-card ${isClicked ? 'clicked' : ''}`} onClick={handleClick}>
-        <p class="fw-bold">Find Your Perfect Haircare Match</p>
+        <p class="fw-bold text-white">Find Your Perfect Haircare Match</p>
         <i className='bx bx-chevron-right' style={{ fontSize: '26pt' }}></i>
       </div>
 
@@ -81,156 +81,212 @@ const StickyComponent = ({ onSubmit }) => {
             <div className='forms'>
 
               <form onSubmit={handleSubmit}>
-                {/* Search Bar */}
-                <div>
-                  <label htmlFor="search">Search:</label>
-                  <input
-                    type="text"
-                    id="search"
-                    name="query"
-                    value={searchTerm}
-                    onChange={handleSearchChange}
-                    placeholder="Search products..."
-                  />
-                </div>
 
-                <div>
-                  <p>Hair Type:</p>
-                  <div className='input'>
+
+              <div class="container-fluid full-height d-flex flex-column">
+                <div class="row-1 flex-shrink-0">
+
+                  {/* Search Bar */}
+                  <div class="">
+                    <label htmlFor="search">Search:</label>
                     <input
-                      type='radio'
-                      id='straight'
-                      value='straight'
-                      name='hairType'
-                      onChange={handleInputChange}
+                      type="text"
+                      id="search"
+                      name="query"
+                      value={searchTerm}
+                      onChange={handleSearchChange}
+                      placeholder="Search products..."
+                      style={{
+                        border: `1px solid ${searchTerm ? "rgb(0,128,0)" : "rgb(255,15,147)"}`,
+                        padding: "10px",
+                        borderRadius: "4px",
+                    }}
                     />
-                    <label htmlFor='straight'>Straight</label>
-                  </div>
-                  <div className='input'>
-                    <input
-                      type='radio'
-                      id='wavy'
-                      value='wavy'
-                      name='hairType'
-                      onChange={handleInputChange}
-                    />
-                    <label htmlFor='wavy'>Wavy</label>
-                  </div>
-                  <div className='input'>
-                    <input
-                      type='radio'
-                      id='curly'
-                      value='curly'
-                      name='hairType'
-                      onChange={handleInputChange}
-                    />
-                    <label htmlFor='curly'>Curly</label>
                   </div>
 
                 </div>
 
-                <div>
-                  {/* Rebonded Section */}
-                  <p>Rebonded:</p>
-                  <div className='input'>
-                    <input
-                      type='radio'
-                      id='rebondedYes'
-                      value='Rebonded' //yes
-                      name='hairRebonded'
-                      onChange={handleInputChange}
-                    />
-                    <label htmlFor='rebondedYes'>Yes</label>
+                <div class="row-2 ">
+
+
+                  <div class="row">
+                  <div class="col-md-6">
+
+
+
+                  <div class="">
+                      <p>Hair Type:</p>
+                      <div className='input'>
+                        <input
+                          type='radio'
+                          id='straight'
+                          value='straight'
+                          name='hairType'
+                          onChange={handleInputChange}
+                        />
+                        <label htmlFor='straight'>Straight</label>
+                      </div>
+                      <div className='input'>
+                        <input
+                          type='radio'
+                          id='wavy'
+                          value='wavy'
+                          name='hairType'
+                          onChange={handleInputChange}
+                        />
+                        <label htmlFor='wavy'>Wavy</label>
+                      </div>
+                      <div className='input'>
+                        <input
+                          type='radio'
+                          id='curly'
+                          value='curly'
+                          name='hairType'
+                          onChange={handleInputChange}
+                        />
+                        <label htmlFor='curly'>Curly</label>
+                      </div>
+
+                    </div>
+
+                    <div class="">
+                      {/* Rebonded Section */}
+                      <p>Rebonded:</p>
+                      <div className='input'>
+                        <input
+                          type='radio'
+                          id='rebondedYes'
+                          value='Rebonded' //yes
+                          name='hairRebonded'
+                          onChange={handleInputChange}
+                        />
+                        <label htmlFor='rebondedYes'>Yes</label>
+                      </div>
+                      <div className='input'>
+                        <input
+                          type='radio'
+                          id='rebondedNo'
+                          value='no'
+                          name='hairRebonded'
+                          onChange={handleInputChange}
+                        />
+                        <label htmlFor='rebondedNo'>No</label>
+                      </div>
+                    </div>
                   </div>
-                  <div className='input'>
-                    <input
-                      type='radio'
-                      id='rebondedNo'
-                      value='no'
-                      name='hairRebonded'
-                      onChange={handleInputChange}
-                    />
-                    <label htmlFor='rebondedNo'>No</label>
-                  </div>
-                </div>
-                <div>
-                  <p>Texture:</p>
-                  <div className='input'>
-                    <input
-                      type='radio'
-                      id='frizzy'
-                      value='frizzy'
-                      name='hairTexture'
-                      onChange={handleInputChange}
-                    />
-                    <label htmlFor='frizzy'>Frizzy</label>
-                  </div>
-                  <div className='input'>
-                    <input
-                      type='radio'
-                      id='damaged'
-                      value='damaged'
-                      name='hairTexture'
-                      onChange={handleInputChange}
-                    />
-                    <label htmlFor='damaged'>Damaged</label>
-                  </div>
-                  <div className='input'>
-                    <input
-                      type='radio'
-                      id='oily'
-                      value='oily'
-                      name='hairTexture'
-                      onChange={handleInputChange}
-                    />
-                    <label htmlFor='oily'>Oily</label>
-                  </div>
-                  <div className='input'>
-                    <input
-                      type='radio'
-                      id='dry'
-                      value='dry'
-                      name='hairTexture'
-                      onChange={handleInputChange}
-                    />
-                    <label htmlFor='dry'>Dry</label>
-                  </div>
-                  <div className='input'>
-                    <input
-                      type='radio'
-                      id='normal'
-                      value='normal'
-                      name='hairTexture'
-                      onChange={handleInputChange}
-                    />
-                    <label htmlFor='normal'>Normal</label>
-                  </div>
-                </div>
-                <div>
-                  <p>Virgin:</p>
-                  <div className='input'>
-                    <input
-                      type='radio'
-                      id='virginYes'
-                      value='virgin'
-                      name='hairVirgin'
-                      onChange={handleInputChange}
-                    />
-                    <label htmlFor='virginYes'>Yes</label>
-                  </div>
-                  <div className='input'>
-                    <input
-                      type='radio'
-                      id='virginNo'
-                      value='no'
-                      name='hairVirgin'
-                      onChange={handleInputChange}
-                    />
-                    <label htmlFor='virginNo'>No</label>
+                  <div class="col-md-6 ">
+
+
+                    <div>
+                        <p>Texture:</p>
+                        <div className='input'>
+                          <input
+                            type='radio'
+                            id='frizzy'
+                            value='frizzy'
+                            name='hairTexture'
+                            onChange={handleInputChange}
+                          />
+                          <label htmlFor='frizzy'>Frizzy</label>
+                        </div>
+                        <div className='input'>
+                          <input
+                            type='radio'
+                            id='damaged'
+                            value='damaged'
+                            name='hairTexture'
+                            onChange={handleInputChange}
+                          />
+                          <label htmlFor='damaged'>Damaged</label>
+                        </div>
+                        <div className='input'>
+                          <input
+                            type='radio'
+                            id='oily'
+                            value='oily'
+                            name='hairTexture'
+                            onChange={handleInputChange}
+                          />
+                          <label htmlFor='oily'>Oily</label>
+                        </div>
+                        <div className='input'>
+                          <input
+                            type='radio'
+                            id='dry'
+                            value='dry'
+                            name='hairTexture'
+                            onChange={handleInputChange}
+                          />
+                          <label htmlFor='dry'>Dry</label>
+                        </div>
+                        <div className='input'>
+                          <input
+                            type='radio'
+                            id='normal'
+                            value='normal'
+                            name='hairTexture'
+                            onChange={handleInputChange}
+                          />
+                          <label htmlFor='normal'>Normal</label>
+                        </div>
+                      </div>
+                      <div>
+                        <p>Virgin:</p>
+                        <div className='input'>
+                          <input
+                            type='radio'
+                            id='virginYes'
+                            value='virgin'
+                            name='hairVirgin'
+                            onChange={handleInputChange}
+                          />
+                          <label htmlFor='virginYes'>Yes</label>
+                        </div>
+                        <div className='input'>
+                          <input
+                            type='radio'
+                            id='virginNo'
+                            value='no'
+                            name='hairVirgin'
+                            onChange={handleInputChange}
+                          />
+                          <label htmlFor='virginNo'>No</label>
+                        </div>
+                      </div>
+
                   </div>
                 </div>
 
-                <button type='submit'>Find Products</button>
+
+
+                </div>
+
+
+                <div class="row-3 d-flex justify-content-center">
+                  <button type='submit'>Find Products</button>
+                </div>
+              </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
               </form>
             </div>
           </Card.Body>
