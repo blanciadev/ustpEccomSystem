@@ -6,6 +6,7 @@ import '../admin.css';
 import logo from '../../assets/img/logo.png'
 
 const AdminNav = () => {
+  const roleType = localStorage.getItem('role');
   const location = useLocation();
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 769);
@@ -16,6 +17,7 @@ const AdminNav = () => {
   useEffect(() => {
 
     window.addEventListener('resize', handleResize);
+
     const roleType = localStorage.getItem('role');
 
 
@@ -34,7 +36,7 @@ const AdminNav = () => {
   const toggleDropdown = () => {
     const newDropdownState = !isDropdownOpen;
     setIsDropdownOpen(newDropdownState);
-    localStorage.setItem('isDropdownOpen', JSON.stringify(newDropdownState)); 
+    localStorage.setItem('isDropdownOpen', JSON.stringify(newDropdownState));
   }
   return (
     <div className='nav-con mt-4 mb-4 '>
@@ -43,7 +45,7 @@ const AdminNav = () => {
         <img
           src={logo}
           alt='Logo'
-          style={{width: '100px', height: '100px'}}
+          style={{ width: '100px', height: '100px' }}
           className='mb-4'
         />
       </div>
@@ -123,26 +125,29 @@ const AdminNav = () => {
           }
         </a>
 
-        <a
-          href='/admin/manage-users'
-          className={location.pathname === '/admin/manage-users' ? 'active' : ''}
-        >
-          {isMobile ? (
-            <i class="bx bxs-user-account" style={{ textAlign: 'center' }}></i>
-          ) : (
-            <i class="bx bxs-user-account"></i>,
-            <span>Users</span>
-          )
-          }
-        </a>
+        {roleType === 'Admin' && (
+          <a
+            href='/admin/manage-users'
+            className={location.pathname === '/admin/manage-users' ? 'active' : ''}
+          >
+            {isMobile ? (
+              <i className="bx bxs-user-account" style={{ textAlign: 'center' }}></i>
+            ) : (
+              <>
+                <i className="bx bxs-user-account"></i>
+                <span>Users</span>
+              </>
+            )}
+          </a>
+        )}
 
         <a
           onClick={(e) => {
             e.preventDefault();
             toggleDropdown();
           }}
-          
-          className={`dropdown-toggle ${isDropdownOpen  ? 'active2' : ''}`}
+
+          className={`dropdown-toggle ${isDropdownOpen ? 'active2' : ''}`}
         >
           <i className='bx bxs-report'></i>
           {!isMobile && <span>Reports</span>}
@@ -178,7 +183,7 @@ const AdminNav = () => {
           </div>
         )}
 
-        
+
       </div>
     </div>
   );

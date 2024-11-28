@@ -6,19 +6,26 @@ import AdminHeader from '../components/AdminHeader';
 import UserCountComponent from '../components/UserCountComponent';
 import axios from 'axios';
 import AddUserModal from '../components/AddUserModal';
+import UsersModal from '../components/UsersModal';
 
 const Users = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [showModal, setShowModal] = useState(false);
+    const [showAddUserModal, setShowAddUserModal] = useState(false);
+    const [showUserModal, setShowUserModal] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 425);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const recordsPerPage = 10;
+    const [selectedUser, setSelectedUser] = useState(null);
 
-    const toggleModal = () => {
-        setShowModal(!showModal);
+    const toggleAddUserModal = () => {
+        setShowAddUserModal(!showAddUserModal);
+    };
+
+    const toggleUserModal = () => {
+        setShowUserModal(!showUserModal);
     };
 
     useEffect(() => {
@@ -46,7 +53,6 @@ const Users = () => {
         setIsMobile(window.innerWidth <= 425);
     };
 
-    // Filter users based on the search term
     const filteredUsers = users.filter(user => {
         const searchValue = searchTerm.toLowerCase();
         return (
@@ -56,15 +62,12 @@ const Users = () => {
         );
     });
 
-    // Calculate the paginated users
     const indexOfLastRecord = currentPage * recordsPerPage;
     const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
     const currentUsers = filteredUsers.slice(indexOfFirstRecord, indexOfLastRecord);
 
-    // Calculate total pages
     const totalPages = Math.ceil(filteredUsers.length / recordsPerPage);
 
-    // Function to change the current page
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     return (
@@ -95,7 +98,7 @@ const Users = () => {
                                 </div>
                                 <div className='options'>
                                     <div className='print'>
-                                        <button onClick={toggleModal}>
+                                        <button onClick={toggleAddUserModal}>
                                             {isMobile ? (<i className='bx bxs-user-plus'></i>) : ('Create Account')}
                                         </button>
                                     </div>
@@ -138,7 +141,14 @@ const Users = () => {
                                                     <td>{user.first_name}</td>
                                                     <td>{user.last_name}</td>
                                                     <td>{user.role_type}</td>
-                                                    <td><button>View</button></td>
+                                                    <td>
+                                                        <button onClick={() => {
+                                                            setSelectedUser(user);
+                                                            toggleUserModal();
+                                                        }}>
+                                                            View
+                                                        </button>
+                                                    </td>
                                                 </tr>
                                             ))
                                         )}
@@ -162,7 +172,12 @@ const Users = () => {
                 </div>
             </div>
 
-            <AddUserModal show={showModal} onClose={toggleModal} />
+            <AddUserModal show={showAddUserModal} onClose={toggleAddUserModal} />
+            <UsersModal
+                show={showUserModal}
+                onClose={toggleUserModal}
+                user={selectedUser}
+            />
         </div>
     );
 };

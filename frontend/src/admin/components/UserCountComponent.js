@@ -18,8 +18,8 @@ const UserCountComponent = () => {
 
                 const newUsersCount = users.filter(user => user.role_type === 'user').length;
                 const totalEmployeesCount = users.filter(user => user.role_type === 'employee').length;
-                const activeCustomersCount = users.filter(user => user.status === 'active').length; // Assuming you have a status field
-                const inactiveCustomersCount = users.filter(user => user.status === 'inactive').length; // Assuming you have a status field
+                const activeCustomersCount = users.filter(user => user.status === 'active').length;
+                const inactiveCustomersCount = users.filter(user => user.status === 'inactive').length;
 
                 setUserCounts({
                     newUsers: newUsersCount,
