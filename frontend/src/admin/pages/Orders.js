@@ -13,12 +13,11 @@ const Orders = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('date');
   const [statusOptions, setStatusOptions] = useState([
-    'To Ship', 'To Receive', 'Completed', 'Cancelled', 'Return/Refund', 'Pending'
+    'To Ship', 'To Receive', 'Cancelled', 'Return/Refund', 'Pending'
   ]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalShow, setModalShow] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 425);
-
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
 
@@ -77,15 +76,16 @@ const Orders = () => {
 
   const filteredOrders = orders.filter(order => {
     const search = searchTerm.toLowerCase();
+    const statusMatch = status ? order.order_status.toLowerCase() === status.toLowerCase() : true;
 
     return (
-      order.order_id.toString().toLowerCase().includes(search) ||
-      order.customer_id.toString().toLowerCase().includes(search) ||
-      `${order.customer_first_name} ${order.customer_last_name}`.toLowerCase().includes(search) ||
-      new Date(order.order_date).toLocaleDateString().toLowerCase().includes(search) ||
-      order.order_status.toLowerCase().includes(search) ||
-      order.payment_status.toLowerCase().includes(search) ||
-      order.order_total.toString().toLowerCase().includes(search)
+      statusMatch &&
+      (order.order_id.toString().toLowerCase().includes(search) ||
+        order.customer_id.toString().toLowerCase().includes(search) ||
+        `${order.customer_first_name} ${order.customer_last_name}`.toLowerCase().includes(search) ||
+        new Date(order.order_date).toLocaleDateString().toLowerCase().includes(search) ||
+        order.payment_status.toLowerCase().includes(search) ||
+        order.order_total.toString().toLowerCase().includes(search))
     );
   });
 
@@ -97,8 +97,6 @@ const Orders = () => {
         return a.order_status.localeCompare(b.order_status);
       } else if (sortBy === 'id') {
         return a.order_id - b.order_id;
-      } else if (sortBy === 'customer-id') {
-        return `${a.customer_first_name} ${a.customer_last_name}`.localeCompare(`${b.customer_first_name} ${b.customer_last_name}`);
       }
       return 0;
     });
@@ -176,7 +174,7 @@ const Orders = () => {
                   >
                     <option value='date'>Date</option>
                     <option value='status'>Status</option>
-                    <option value='customer-id'>Customer ID</option>
+
                   </select>
                 </div>
                 <div className='order-filter'>

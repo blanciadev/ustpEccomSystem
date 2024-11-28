@@ -11,9 +11,6 @@ const Transactions = () => {
   const [status, setStatus] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('date');
-  const [statusOptions, setStatusOptions] = useState([
-    'To Ship', 'To Receive', 'Completed', 'Cancelled', 'Return/Refund', 'Pending'
-  ]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalShow, setModalShow] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 425);
@@ -94,10 +91,8 @@ const Transactions = () => {
         return new Date(b.order_date) - new Date(a.order_date);
       } else if (sortBy === 'status') {
         return a.order_status.localeCompare(b.order_status);
-      } else if (sortBy === 'id') {
-        return a.order_id - b.order_id;
       } else if (sortBy === 'customer-id') {
-        return `${a.customer_first_name} ${a.customer_last_name}`.localeCompare(`${b.customer_first_name} ${b.customer_last_name}`);
+        return a.customer_id - b.customer_id;
       }
       return 0;
     });
@@ -113,7 +108,7 @@ const Transactions = () => {
 
   const handlePrintOrders = async () => {
     try {
-      const response = await axios.get('http://localhost:5001/admin-order-history', {
+      const response = await axios.get('http://localhost:5001/admin-order-history-general', {
         params: { exportToExcel: 'true' },
         responseType: 'blob',
       });
@@ -178,22 +173,7 @@ const Transactions = () => {
                     <option value='customer-id'>Customer ID</option>
                   </select>
                 </div>
-                <div className='order-filter'>
-                  <label htmlFor='status'>Filter By Status:</label>
-                  <select
-                    name='status'
-                    id='status'
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value)}
-                  >
-                    <option value=''>All</option>
-                    {statusOptions.map(option => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+
               </div>
             </div>
             <div className='order-table'>
@@ -214,11 +194,10 @@ const Transactions = () => {
                     <th>Customer ID</th>
                     <th>Shipment ID</th>
                     <th>Payment Status</th>
-
                   </tr>
                 </thead>
                 <tbody>
-                  {orders.map((order) => (
+                  {paginatedOrders.map((order) => (
                     order.products.map((product, index) => (
                       <tr key={`${order.order_id}-${product.product_id}-${index}`}>
                         <td><input type="checkbox" /></td>
@@ -240,7 +219,6 @@ const Transactions = () => {
                         <td>{highlightText(order.customer_id.toString(), searchTerm)}</td>
                         <td>{highlightText(order.shipment_id ? order.shipment_id.toString() : 'Not Available', searchTerm)}</td>
                         <td>{highlightText(order.payment_status, searchTerm)}</td>
-
                       </tr>
                     ))
                   ))}
@@ -262,7 +240,6 @@ const Transactions = () => {
           </div>
         </div>
       </div>
-
     </div>
   );
 };
