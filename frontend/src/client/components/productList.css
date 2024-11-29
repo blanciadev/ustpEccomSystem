@@ -53,32 +53,6 @@
     margin: 5px 0;
 }
 
-.product-card h3:nth-of-type(2),
-/* For price */
-.product-card h3:nth-of-type(3) {
-    /* For discounted price */
-    color: #007bff;
-}
-
-/* 
-
-.product-card .add-to-cart-button{
-    font-size: 18px;
-    margin-right: 10px;
-}
-
-
-.product-card .buy-now-button{
-    margin-right: 10px;
-    border: 2px solid rgb(255,114,138);
-}
-
-
-
-.product-card button:hover {
-    background-color: rgb(223, 95, 116);
-}
- */
 
 
 .pagination {
@@ -176,7 +150,6 @@ button {
     padding: 10px 15px;
     margin: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
 }
 
 button:hover {
@@ -220,22 +193,9 @@ button:hover {
 .pagination button {
     padding: 10px 20px;
     margin: 0 5px;
-    border: 2px solid rgb(255, 144, 162);
-    background-color: #007bff00;
-    color: rgb(128, 0, 64);
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-}
-
-.pagination button.active {
- 
-    color: white;
-}
-
-.pagination button:hover {
-    background-color: 2px solid rgb(255, 144, 162);
-    
 }
 
 

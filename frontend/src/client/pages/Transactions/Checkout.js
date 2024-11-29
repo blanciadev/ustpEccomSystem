@@ -530,6 +530,7 @@ const Checkout = () => {
                           </div>
 
 
+
                           <div class="col-md-9">
                             <p class="text-start mb-1">{product.product_name}</p>
 

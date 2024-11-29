@@ -9,6 +9,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { FaPlus } from "react-icons/fa6";
 import { FaMinus } from "react-icons/fa6";
 
+
 const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
     const [recommendedProducts, setRecommendedProducts] = useState([]);
     const [bundleProducts, setBundleProducts] = useState([]);
@@ -235,8 +236,13 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         });
     };
 
+    
+    const [isAddToCartHovered, setIsAddToCartHovered] = useState(false);
+    const [isBuyNowHovered, setIsBuyNowHovered] = useState(false);
 
     if (!isOpen || !product) return null;
+
+
     return (
 
         <div className="promodal-overlay " onClick={onClose}>
@@ -250,7 +256,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                         <div class="price-stock">
                             <p><strong>Price</strong></p>
 
-                            <h3 className="text-primary" style={{ fontSize: "1.2rem" }}>
+                            <h3 className="" style={{ fontSize: "1.2rem" }}>
                                 ₱ {calculateDiscountedPrice(product.price, product.product_discount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </h3>
                            
@@ -283,13 +289,34 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                         <div class="buttons">
                             {product.quantity > 0 ? (
                                 <>
-                                    <button onClick={() => onAddToCart(product)}><i class="bx bx-cart"></i>Add to Cart</button>
-                                    <button
-                                        onClick={() => handleBuyNow(product, quantity)}
-                                        style={{ marginLeft: '10px' }}
-                                    >
-                                        Buy Now
-                                    </button>
+
+<button
+    className="add-to-cart-button px-10"
+    style={{
+        backgroundColor: isAddToCartHovered ? 'rgb(223, 95, 116)' : '#d81c4b',
+        color: 'white',
+    }}
+    onMouseEnter={() => setIsAddToCartHovered(true)}
+    onMouseLeave={() => setIsAddToCartHovered(false)}
+    onClick={() => onAddToCart(product)}
+>
+    Add to cart
+</button>
+
+<button
+    className="buy-now-button px-10"
+    style={{
+        backgroundColor: isBuyNowHovered ? 'rgb(223, 95, 116)' : '#d81c4b',
+        color: 'white',
+    }}
+    onMouseEnter={() => setIsBuyNowHovered(true)}
+    onMouseLeave={() => setIsBuyNowHovered(false)}
+    onClick={() => handleBuyNow(product)}
+>
+    Buy Now
+</button>
+
+
                                 </>
                             ) : (
                                 <p style={{ color: 'red',
@@ -367,6 +394,11 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                             <p>{error}</p>
                         ) : recommendedProducts.length > 0 ? (
                             <div className="recommended-modalproducts-grid">
+                                
+
+
+
+
                                 {recommendedProducts
                                     .filter((recProduct) => recProduct.quantity > 0)
                                     .map((recProduct) => (
@@ -378,7 +410,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                                             />
                                             <div className="modalproduct-details">
                                                 <span className="modalproduct-name">{recProduct.product_name}</span>
-                                                <h3 className="modalproduct-price text-primary" style={{ fontSize: "1.2rem" }}>
+                                                <h3 className="modalproduct-price " style={{ fontSize: "1.2rem" }}>
                                                     ₱ {calculateDiscountedPrice(recProduct.price, recProduct.product_discount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                 </h3>
                                                
@@ -389,19 +421,84 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                                                     </span>
                                                 )}
 
-                                                <button
-                                                    className="add-to-cart-btn"
-                                                    onClick={() => onAddToCart(recProduct)}
-                                                >
-                                                    Add to Cart
-                                                </button>
-                                                <button
-                                                    className="buy-now-btn"
-                                                    onClick={() => handleBuyNow(recProduct)}
-                                                    style={{ marginLeft: '10px' }}
-                                                >
-                                                    Buy Now
-                                                </button>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<button
+            className="add-to-cart-button px-10"
+            style={{
+                backgroundColor: recProduct.isAddToCartHovered
+                    ? 'rgb(223, 95, 116)'
+                    : '#d81c4b',
+                color: 'white',
+            }}
+            onMouseEnter={() =>
+                setRecommendedProducts((prev) =>
+                    prev.map((item) =>
+                        item.product_id === recProduct.product_id
+                            ? { ...item, isAddToCartHovered: true }
+                            : item
+                    )
+                )
+            }
+            onMouseLeave={() =>
+                setRecommendedProducts((prev) =>
+                    prev.map((item) =>
+                        item.product_id === recProduct.product_id
+                            ? { ...item, isAddToCartHovered: false }
+                            : item
+                    )
+                )
+            }
+            onClick={() => onAddToCart(recProduct)}
+        >
+            Add to cart
+        </button>
+
+        <button
+            className="buy-now-button px-10"
+            style={{
+                backgroundColor: recProduct.isBuyNowHovered
+                    ? 'rgb(223, 95, 116)'
+                    : '#d81c4b',
+                color: 'white',
+            }}
+            onMouseEnter={() =>
+                setRecommendedProducts((prev) =>
+                    prev.map((item) =>
+                        item.product_id === recProduct.product_id
+                            ? { ...item, isBuyNowHovered: true }
+                            : item
+                    )
+                )
+            }
+            onMouseLeave={() =>
+                setRecommendedProducts((prev) =>
+                    prev.map((item) =>
+                        item.product_id === recProduct.product_id
+                            ? { ...item, isBuyNowHovered: false }
+                            : item
+                    )
+                )
+            }
+            onClick={() => handleBuyNow(recProduct)}
+        >
+            Buy Now
+        </button>
+
+
+
+
                                             </div>
                                         </div>
                                     ))}
