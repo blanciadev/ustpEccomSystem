@@ -224,6 +224,7 @@ router.get('/admin-order-history', async (req, res) => {
     }
 });
 
+
 router.get('/admin-order-history-payment', async (req, res) => {
     try {
         const { status, searchTerm, exportToExcel } = req.query;
@@ -238,7 +239,7 @@ router.get('/admin-order-history-payment', async (req, res) => {
             order_details.order_update, 
             order_details.payment_method, 
             order_details.total_price AS order_details_total_price, 
-	        shipment.shipment_id, 
+	        
             order_details.quantity, 
             order_details.payment_status, 
             product.price, 

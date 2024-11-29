@@ -247,13 +247,14 @@ const Orders = () => {
         </div>
       </div>
       {selectedOrder && (
-        <OrderModal
-          show={modalShow}
-          onHide={handleCloseModal}
-          order={selectedOrder}
-          onRefresh={refreshOrders}
-        />
-      )}
+  <OrderModal
+    show={modalShow}          // Ensure the 'show' prop controls the modal visibility
+    handleClose={handleCloseModal}  // Pass handleCloseModal as the correct prop
+    order={selectedOrder}
+    refreshOrders={refreshOrders} // Pass correct function name
+  />
+)}
+
     </div>
   );
 };

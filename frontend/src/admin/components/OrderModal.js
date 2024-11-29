@@ -74,13 +74,14 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                         <h5 className="modal-title"> 
                         <i className='bx bxs-package'></i> Orders</h5>
                         <button
-                            type="button"
-                            className="close"
-                            onClick={handleClose}
-                            aria-label="Close"
-                        >
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+  type="button"
+  className="close"
+  onClick={handleClose}  // Ensure this calls the passed function
+  aria-label="Close"
+>
+  <span aria-hidden="true">&times;</span>
+</button>
+
                     </div>
                     <div className="modal-body">
                         <ToastNotification toastMessage={toastMessage} />
