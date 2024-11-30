@@ -72,12 +72,14 @@ const UserSideNav = () => {
   }, []);
 
   return (
-    <div className='side-con'>
-      <div className='side-user'>
+
+    <>
+    <div className='side-con '>
+      <div className='side-user '>
         <img
           src={profileImg || 'https://static.vecteezy.com/system/resources/previews/026/434/409/non_2x/default-avatar-profile-icon-social-media-user-photo-vector.jpg'}
           alt='User Profile'
-          className="user-profile-image"
+          className="user-profile-image "
         />
         {isMobile ? (
           <p style={{ fontSize: '1em', textAlign: 'center' }}>{firstName}</p>
@@ -112,7 +114,11 @@ const UserSideNav = () => {
           )}
         </a>
       </div>
+    
     </div>
+
+</>
+  
   );
 };
 
