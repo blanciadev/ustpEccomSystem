@@ -86,6 +86,7 @@ router.get('/admin-order-history', async (req, res) => {
             order_details.total_price AS order_details_total_price, 
             order_details.quantity, 
             order_details.payment_status, 
+            order_details.payment_method, 
             product.price, 
             users.customer_id, 
             users.first_name, 

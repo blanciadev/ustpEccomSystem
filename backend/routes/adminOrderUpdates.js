@@ -11,7 +11,7 @@ router.put('/update-order-status/:orderId', async (req, res) => {
 
     if (!status) {
         return res.status(400).json({ message: 'Status is required' });
-    }
+    }   
 
     try {
         await db.query('START TRANSACTION');

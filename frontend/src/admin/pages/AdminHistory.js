@@ -137,7 +137,7 @@ const AdminHistory = () => {
         <div className='dash-header'>
           <div className='header-title'>
             <i className='bx bxs-package'></i>
-            <h1>Orders</h1>
+            <h1>Order History</h1>
           </div>
           <AdminHeader />
         </div>

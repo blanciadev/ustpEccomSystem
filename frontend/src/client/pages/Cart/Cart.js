@@ -322,15 +322,18 @@ const CartContent = () => {
             </table>
 
             <div className="cart__checkout d-flex justify-content-end me-4 mt-4">
-  <button
-    className="cart__checkout-button  fw-bold px-5 py-3 shadow"
-    style={{ backgroundColor: "#ff69b4", color: "#fff", borderRadius: "0" }}
-    onClick={handleCheckout}
-  >
-    Checkout
-  </button>
-</div>
-
+              <button
+                className="cart__checkout-button  fw-bold px-5 py-3 shadow"
+                style={{
+                  backgroundColor: "#ff69b4",
+                  color: "#fff",
+                  borderRadius: "0",
+                }}
+                onClick={handleCheckout}
+              >
+                Checkout
+              </button>
+            </div>
           </div>
         )}
       </div>

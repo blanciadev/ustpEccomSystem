@@ -132,7 +132,7 @@ const Transactions = () => {
         <div className='dash-header'>
           <div className='header-title'>
             <i className='bx bxs-package'></i>
-            <h1>Orders</h1>
+            <h1>Transactions</h1>
           </div>
           <AdminHeader />
         </div>

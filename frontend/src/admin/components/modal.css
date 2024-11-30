@@ -1,6 +1,7 @@
+
 .modal-dialog{
-    display: flex;
     justify-content: center;
+    width: 1500px;
 }
 .modal.fade{
     backdrop-filter: contrast(0.5);
@@ -91,3 +92,44 @@
 .modal-content{
     padding: 10px 15px;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.customer-details  {
+    width: 500px;
+    border-left: 4px solid #d81c4b;
+
+}
+
+.product-details-order  {
+ 
+    border-left: 4px solid #d81c4b;
+
+}
+
+#status {
+    margin-left: 158px;
+
+}
+
+/* #status .option1 {
+    width: 200px;
+
+} */
