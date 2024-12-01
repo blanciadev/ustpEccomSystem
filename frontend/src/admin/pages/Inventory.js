@@ -61,7 +61,7 @@ const Inventory = () => {
 
   const fetchProductNames = async () => {
     try {
-      const response = await axios.get("http://localhost:5001/admin-products");
+      const response = await axios.get("http://localhost:5001/admin-products-inventory");
       setProductNames(response.data);
       console.log("Product Names:", response.data);
     } catch (error) {
@@ -69,25 +69,45 @@ const Inventory = () => {
     }
   };
 
-  const fetchInventoryItems = async () => {
-    try {
-      const response = await axios.get("http://localhost:5001/admin-inventory");
-      setInventoryItems(response.data);
-      console.log("Inventory Items:", response.data);
-    } catch (error) {
-      console.error("Error fetching inventory items:", error);
-    }
-  };
+  // const fetchInventoryItems = async () => {
+  //   try {
+  //     const response = await axios.get("http://localhost:5001/admin-inventory");
+  //     setInventoryItems(response.data);
+  //     console.log("Inventory Items:", response.data);
+  //   } catch (error) {
+  //     console.error("Error fetching inventory items:", error);
+  //   }
+  // };
 
   useEffect(() => {
     fetchProductStatistics();
     fetchProductNames();
-    fetchInventoryItems();
+    // fetchInventoryItems();
   }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
     setCurrentPage(1);
+  };
+
+
+  const ExportButton = () => {
+    const handleExport = () => {
+      const url = 'http://localhost:5001/admin-products-inventory?export=excel';
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'products.xlsx';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    return (
+      <button onClick={handleExport} className="btn btn-success">
+        Export to Excel
+      </button>
+    );
   };
 
   const filteredProducts = productNames.filter((product) => {
@@ -174,6 +194,10 @@ const Inventory = () => {
                         </div>
                       </div>
 
+                      <div>
+                        <ExportButton />
+                      </div>
+
                       <div class="col-3 ">
                         <div class="d-flex justify-content-center ">
                           {/* empty div */}
@@ -182,7 +206,7 @@ const Inventory = () => {
 
                       <div class="col-2">
                         <div class=" d-flex ">
-                         {/* empty div */}
+                          {/* empty div */}
                         </div>
                       </div>
 
@@ -209,10 +233,6 @@ const Inventory = () => {
                       </div>
                     </div>
                   </div>
-
-
-
-
 
                   <div className="">
                     <div
@@ -311,7 +331,7 @@ const Inventory = () => {
 
 
 
-                
+
               </div>
             </div>
           </div>

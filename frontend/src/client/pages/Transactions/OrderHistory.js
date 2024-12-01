@@ -153,6 +153,12 @@ const OrderHistory = () => {
                         {Array.isArray(order.products) && order.products.length > 0 ? (
                           order.products.map((product, index) => (
                             <div key={index} className="product-details">
+                              <div className='shop__product-img'>
+                                <img
+                                  src={product.product_image || 'https://via.placeholder.com/150'}
+                                  alt={product.product_name || 'Product Image'}
+                                />
+                              </div>
                               <p>Product Name: {product.product_name}</p>
                               <p>Price: P{product.price ? product.price.toFixed(2) : '0.00'}</p>
                               <p>Quantity: {product.quantity}</p>

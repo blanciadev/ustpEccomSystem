@@ -12,7 +12,9 @@ const Settings = () => {
     firstName: '',
     email: '',
     phone: '',
+    profile_image: null,
   });
+  const [error, setError] = useState(null);
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -22,31 +24,55 @@ const Settings = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const customerId = localStorage.getItem('customer_id');
+      const customerId = localStorage.getItem("customer_id");
       if (!customerId) {
-        console.error('No customer ID found in localStorage');
+        setError("No customer ID found in localStorage");
         return;
       }
 
       try {
         const response = await axios.get(
-          `http://localhost:5001/admin-users-details?customer_id=${customerId}`
+          `http://localhost:5001/admin-users-details`,
+          { params: { customer_id: customerId } }
         );
+
         if (response.data.data && response.data.data.length > 0) {
           const user = response.data.data[0];
+
+          // Convert LONG BLOB to Base64
+          let base64Image = null;
+          if (user.profile_img) {
+            if (typeof user.profile_img === 'string') {
+              base64Image = `data:image/jpeg;base64,${user.profile_img}`;
+            } else if (user.profile_img.data) {
+              const binary = new Uint8Array(user.profile_img.data).reduce(
+                (data, byte) => data + String.fromCharCode(byte),
+                ""
+              );
+              base64Image = `data:image/jpeg;base64,${window.btoa(binary)}`;
+            } else {
+              console.error('Unexpected profile image format:', user.profile_img);
+            }
+          }
+
           setUserData({
             firstName: user.first_name,
             email: user.email,
             phone: user.phone_number,
+            profile_image: base64Image,
           });
+        } else {
+          setError("No user found with the provided customer ID.");
         }
       } catch (error) {
-        console.error('Error fetching user data:', error.message);
+        console.error("Error fetching user data:", error.message);
+        setError("Failed to retrieve user data. Please try again later.");
       }
     };
 
     fetchUserData();
   }, []);
+
 
   const handleInfoSubmit = async (e) => {
     e.preventDefault();
@@ -62,6 +88,7 @@ const Settings = () => {
           first_name: userData.firstName,
           email: userData.email,
           phone_number: userData.phone,
+
         }
       );
 
@@ -156,16 +183,24 @@ const Settings = () => {
         <div className="body">
           <div className="admin-settings">
             <div className="admin-image">
-              <label htmlFor="file-input">
-                <img src={profileImage} alt="Admin Profile" />
-                <div className="overlay">Change Image</div>
-              </label>
+              {/* <label htmlFor="file-input"> */}
+              {userData.profile_image ? (
+                <img
+                  src={userData.profile_image}
+                  alt="Admin Profile"
+                  style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+                />
+              ) : (
+                <div className="placeholder">No Image Available</div>
+              )}
+              {/* <div className="overlay">Change Image</div> */}
+              {/* </label> */}
               <input
                 id="file-input"
                 type="file"
                 accept="image/*"
-                onChange={handleImageChange}
-                style={{ display: 'none' }}
+                // onChange={handleImageChange}
+                style={{ display: "none" }}
               />
             </div>
 

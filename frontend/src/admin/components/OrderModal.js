@@ -5,12 +5,12 @@ import axios from "axios";
 import ToastNotification from "../../public/components/ToastNotification";
 
 const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
-  const [status, setStatus] = useState(order ? order.order_status : ""); // Initialize with current status
+  const [status, setStatus] = useState(order ? order.order_status : "");
   const [loading, setLoading] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
   useEffect(() => {
-    // Reset status when a new order is selected
+
     if (order) {
       setStatus(order.order_status);
     }
@@ -44,7 +44,7 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
       setToastMessage("Updated successfully");
       setTimeout(() => {
         setToastMessage("");
-        handleClose(); // Close the modal after a successful update
+        handleClose();
       }, 2000);
 
       refreshOrders();
@@ -61,8 +61,8 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
     return acc + productTotal;
   }, 0);
 
-  const shippingCost = 150; // Fixed shipping cost for the entire order
-  const grandTotal = totalProductCost + shippingCost; // Total including shipping
+  const shippingCost = 150;
+  const grandTotal = totalProductCost + shippingCost;
 
   return (
     <div
@@ -83,7 +83,7 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
             <button
               type="button"
               className="close"
-              onClick={handleClose} // Ensure this calls the passed function
+              onClick={handleClose}
               aria-label="Close"
             >
               <span aria-hidden="true">&times;</span>
@@ -203,7 +203,7 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                 <br />
 
                 <div class="product-details-order">
-                    <h5 className="modal-title text-start ps-4">Product Details</h5>
+                  <h5 className="modal-title text-start ps-4">Product Details</h5>
 
                   <table class="table">
                     <thead>
@@ -225,7 +225,7 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                             <td className="text-left">
                               <img
                                 src={
-                                    product.product_image ||
+                                  product.product_image ||
                                   "https://th.bing.com/th/id/OIP.vg49Rg4lf-bVtcQjHxlJkgHaHa?rs=1&pid=ImgDetMain"
                                 }
                                 alt={product.product_name}
@@ -243,12 +243,12 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                               {product.product_name}
                             </td>
                             <td>
-                                ₱ {product.price ? product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "N/A"}
-                
+                              ₱ {product.price ? product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "N/A"}
+
                             </td>
                             <td>{product.quantity}</td>
                             <td>
-                                ₱ {productTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              ₱ {productTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </td>
                           </tr>
                         );
@@ -266,7 +266,7 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                         <p className="text-danger fw-bold">
                           {" "}
                           ₱ {totalProductCost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          
+
                         </p>
                       </div>
                     </div>
@@ -279,9 +279,9 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                       </div>
                       <div class="col-3 text-end">
                         <p className="text-danger fw-bold">
-                        ₱ {shippingCost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          
-                         
+                          ₱ {shippingCost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+
+
                         </p>
                       </div>
                     </div>
@@ -330,4 +330,3 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
 };
 
 export default OrderModal;
- 

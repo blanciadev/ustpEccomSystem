@@ -294,7 +294,8 @@ router.get('/order-history', authenticateToken, async (req, res) => {
                 o.order_date, 
                 o.total_price AS order_total, 
                 od.product_id, 
-                p.product_name, 
+                p.product_name,
+                p.product_image,
                 p.price,
                 od.quantity, 
                 od.order_status,
@@ -334,6 +335,7 @@ router.get('/order-history', authenticateToken, async (req, res) => {
             }
             acc[order.order_id].products.push({
                 product_name: order.product_name,
+                product_image: order.product_image,
                 price: order.price,
                 quantity: order.quantity,
                 item_total: order.item_total

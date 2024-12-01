@@ -3,11 +3,9 @@ import { Modal, Button } from 'react-bootstrap';
 import axios from 'axios';
 
 const UsersModal = ({ show, onClose, user }) => {
-    // Ensure hooks are always called
     const [editableUser, setEditableUser] = useState(user || {});
     const [isEditing, setIsEditing] = useState(false);
 
-    // Update editableUser whenever user prop changes
     useEffect(() => {
         if (user) {
             setEditableUser({ ...user });
@@ -24,12 +22,13 @@ const UsersModal = ({ show, onClose, user }) => {
 
     const handleUpdate = async () => {
         try {
-            // Make an API call to update the user's role
             await axios.put(`http://localhost:5001/admin-users-role-update`, {
                 customer_id: editableUser.customer_id,
                 role_type: editableUser.role_type,
+                date_hired: editableUser.date_hired,
+                address: editableUser.address,
             });
-            alert('User position updated successfully!');
+            alert('Data updated successfully!');
             setIsEditing(false);
             onClose();
         } catch (error) {
@@ -92,18 +91,20 @@ const UsersModal = ({ show, onClose, user }) => {
                                 type="text"
                                 id="address"
                                 className="form-control"
-                                value={editableUser.address || 'N/A'}
-                                readOnly
+                                value={editableUser.address || ''}
+                                onChange={handleChange}
+                                disabled={!isEditing}
                             />
                         </div>
                         <div className="form-group">
                             <label htmlFor="date_hired"><strong>Date Hired:</strong></label>
                             <input
-                                type="text"
+                                type="date"
                                 id="date_hired"
                                 className="form-control"
-                                value={editableUser.date_hired || 'N/A'}
-                                readOnly
+                                value={editableUser.date_hired || ''}
+                                onChange={handleChange}
+                                disabled={!isEditing}
                             />
                         </div>
                         <div className="form-group">
@@ -116,8 +117,8 @@ const UsersModal = ({ show, onClose, user }) => {
                                 disabled={!isEditing}
                             >
                                 <option value="">{editableUser.role_type || ''}</option>
-                                <option value="admin">Admin</option>
-                                <option value="manager">WareHouse Manager</option>
+                                <option value="Admin">Admin</option>
+                                <option value="Warehouse Manager">Warehouse Manager</option>
                                 <option value="user">Customer</option>
                             </select>
                         </div>

@@ -11,6 +11,47 @@ const AdminHeader = () => {
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const navigate = useNavigate();
 
+    const [profileImage, setProfileImage] = useState(null);
+
+    (async function fetchUserData() {
+        const customerId = localStorage.getItem("customer_id");
+        if (!customerId) {
+            console.error("No customer ID found in localStorage");
+            return;
+        }
+
+        try {
+            const response = await axios.get(
+                `http://localhost:5001/admin-users-details`,
+                { params: { customer_id: customerId } }
+            );
+
+            if (response.data.data && response.data.data.length > 0) {
+                const user = response.data.data[0];
+
+                let base64Image = null;
+                if (user.profile_img) {
+                    if (typeof user.profile_img === 'string') {
+                        base64Image = `data:image/jpeg;base64,${user.profile_img}`;
+                    } else if (user.profile_img.data) {
+                        const binary = new Uint8Array(user.profile_img.data).reduce(
+                            (data, byte) => data + String.fromCharCode(byte),
+                            ""
+                        );
+                        base64Image = `data:image/jpeg;base64,${window.btoa(binary)}`;
+                    } else {
+                        console.error('Unexpected profile image format:', user.profile_img);
+                    }
+                }
+
+                setProfileImage(base64Image || null);
+            } else {
+                console.error("No user found with the provided customer ID.");
+            }
+        } catch (error) {
+            console.error("Error fetching user data:", error.message);
+        }
+    })();
 
     const handleLogout = async () => {
         const token = localStorage.getItem('token');
@@ -47,8 +88,9 @@ const AdminHeader = () => {
 
             <div className='admin-profile'>
                 <img
-                    src='https://t3.ftcdn.net/jpg/06/17/13/26/360_F_617132669_YptvM7fIuczaUbYYpMe3VTLimwZwzlWf.jpg'
+                    src={profileImage || 'https://t3.ftcdn.net/jpg/06/17/13/26/360_F_617132669_YptvM7fIuczaUbYYpMe3VTLimwZwzlWf.jpg'}
                     alt='Profile'
+                    style={{ width: '50px', height: '50px', borderRadius: '50%' }}
                 />
 
                 <Dropdown>

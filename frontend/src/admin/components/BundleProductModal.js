@@ -92,21 +92,28 @@ const BundleProductModal = () => {
     };
 
     const handleProductSelection = (product) => {
-        if (!selectedCategory) {
-            setSelectedCategory(product.category_name);
-        }
-
-        if (product.category_name !== selectedCategory) return;
-
-        const updatedProduct = { ...product, originalPrice: product.price };
         setSelectedProducts((prevSelected) => {
+            if (!selectedCategory) {
+                setSelectedCategory(product.category_name);
+            }
+
+            if (selectedCategory && product.category_name !== selectedCategory) {
+                return prevSelected;
+            }
+
             if (prevSelected.some((p) => p.product_id === product.product_id)) {
                 return prevSelected.filter((p) => p.product_id !== product.product_id);
             } else {
+                const updatedProduct = { ...product, originalPrice: product.price };
                 return [...prevSelected, updatedProduct];
             }
         });
+
+        if (!selectedCategory) {
+            setSelectedCategory(product.category_name);
+        }
     };
+
 
     const filteredProducts = selectedCategory
         ? products.filter(product => product.category_name === selectedCategory)

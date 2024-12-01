@@ -21,16 +21,13 @@ router.get('/admin-users-details', async (req, res) => {
     try {
         const { customer_id } = req.query;
 
-        // Validate the customer_id
         if (!customer_id) {
             return res.status(400).json({ error: 'Customer ID is required.' });
         }
 
-        // Use a parameterized query to prevent SQL injection
         const query = `SELECT * FROM users WHERE customer_id = ?`;
         const [results] = await db.execute(query, [customer_id]);
 
-        // Check if results exist
         if (results.length === 0) {
             return res.status(404).json({ error: 'No user found with the provided customer ID.' });
         }
@@ -72,30 +69,31 @@ router.put('/admin-users-details-update', async (req, res) => {
     }
 });
 
-
 router.put('/admin-users-role-update', async (req, res) => {
-    const { customer_id, role_type } = req.body;
+    const { customer_id, role_type, date_hired, address } = req.body;
 
     if (!customer_id || !role_type) {
         return res.status(400).json({ message: 'Customer ID and role type are required.' });
     }
 
     try {
-        console.log(`Updating role for user with ID: ${customer_id}`);
-        console.log(`New Role Type: ${role_type}`);
 
         const query = `
             UPDATE users
-            SET role_type = ?
+            SET role_type = ?, date_hired = ?, address = ?
             WHERE customer_id = ?
         `;
-        const result = await db.query(query, [role_type, customer_id]);
-        console.log(result);
 
-        return res.status(200).json({ message: 'User role updated successfully.' });
+        const result = await db.query(query, [role_type, date_hired || null, address || null, customer_id]);
 
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'User not found or no changes made.' });
+        }
+
+        console.log('Update Result:', result);
+        return res.status(200).json({ message: 'User details updated successfully.' });
     } catch (error) {
-        console.error('Error updating user role:', error);
+        console.error('Error updating user details:', error);
         return res.status(500).json({ message: 'Internal server error.' });
     }
 });

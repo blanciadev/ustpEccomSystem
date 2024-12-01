@@ -20,6 +20,9 @@ const Users = () => {
   const recordsPerPage = 10;
   const [selectedUser, setSelectedUser] = useState(null);
 
+  const [sortType, setSortType] = useState("id");
+  const [sortDirection, setSortDirection] = useState("asc");
+
   const toggleAddUserModal = () => {
     setShowAddUserModal(!showAddUserModal);
   };
@@ -64,9 +67,25 @@ const Users = () => {
     );
   });
 
+  const sortedUsers = [...filteredUsers].sort((a, b) => {
+    if (sortType === "type") {
+      if (a.role_type.toLowerCase() < b.role_type.toLowerCase()) {
+        return sortDirection === "asc" ? -1 : 1;
+      }
+      if (a.role_type.toLowerCase() > b.role_type.toLowerCase()) {
+        return sortDirection === "asc" ? 1 : -1;
+      }
+      return 0;
+    } else if (sortType === "id") {
+      return sortDirection === "asc"
+        ? a.customer_id - b.customer_id
+        : b.customer_id - a.customer_id;
+    }
+  });
+
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentUsers = filteredUsers.slice(
+  const currentUsers = sortedUsers.slice(
     indexOfFirstRecord,
     indexOfLastRecord
   );
@@ -74,6 +93,19 @@ const Users = () => {
   const totalPages = Math.ceil(filteredUsers.length / recordsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const handleSortChange = (e) => {
+    const value = e.target.value;
+    if (value === "type") {
+      setSortType("type");
+    } else if (value === "id") {
+      setSortType("id");
+    }
+  };
+
+  const toggleSortDirection = () => {
+    setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+  };
 
   return (
     <div className="dash-con">
@@ -90,15 +122,14 @@ const Users = () => {
           <div className="user-con">
             <UserCountComponent />
             <div className="user-list">
-              <div class="container align-items-center mb-2">
-                <div class="row align-items-center m-0 p-0">
-                  <div class="col-4">
-                    <div class="search d-flex  ">
-                      {" "}
+              <div className="container align-items-center mb-2">
+                <div className="row align-items-center m-0 p-0">
+                  <div className="col-4">
+                    <div className="search d-flex">
                       <form onSubmit={(e) => e.preventDefault()}>
                         <input
                           type="search"
-                          placeholder="Search by Order ID or Customer..."
+                          placeholder="Search by name or role..."
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
                           className="form-control"
@@ -107,14 +138,10 @@ const Users = () => {
                     </div>
                   </div>
 
-                  <div class="col-2">
-                    <div class="d-flex justify-content-center ">
-                      {/* empty div */}
-                    </div>
-                  </div>
+                  <div className="col-2"></div>
 
-                  <div class="col-4">
-                    <div class=" d-flex justify-content-end">
+                  <div className="col-4">
+                    <div className="d-flex justify-content-end">
                       <button
                         onClick={toggleAddUserModal}
                         className="btn btn-primary"
@@ -128,23 +155,37 @@ const Users = () => {
                     </div>
                   </div>
 
-                  <div class="col-2 ">
-                    <div class="d-flex justify-content-end align-items-center py-2">
-                      <label class="me-2" htmlFor="sort ">
+                  <div className="col-2">
+                    <div className="d-flex justify-content-end align-items-center py-2">
+                      <label className="me-2" htmlFor="sort">
                         Sort By
                       </label>
-                      <select name="sort" id="sort">
-                        <option value="name">Name</option>
-                        <option value="type">Type</option>
+                      <select
+                        name="sort"
+                        id="sort"
+                        value={sortType}
+                        onChange={handleSortChange}
+                        className="form-select"
+                      >
+                        <option value="id">ID</option>
+                        <option value="type">User Type</option>
                       </select>
+                      <button
+                        className="btn btn-secondary ms-2"
+                        onClick={toggleSortDirection}
+                        title={`Sort: ${sortDirection === "asc" ? "Ascending" : "Descending"
+                          }`}
+                      >
+                        {sortDirection === "asc" ? "↑" : "↓"}
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="ship-table ">
+              <div className="ship-table">
                 <div className="mx-4" style={{ height: "400px" }}>
-                  <div className="">
+                  <div>
                     {loading ? (
                       <p>Loading...</p>
                     ) : (
@@ -211,9 +252,8 @@ const Users = () => {
                     {Array.from({ length: totalPages }, (_, index) => (
                       <li
                         key={index + 1}
-                        className={`page-item ${
-                          index + 1 === currentPage ? "active" : ""
-                        }`}
+                        className={`page-item ${index + 1 === currentPage ? "active" : ""
+                          }`}
                       >
                         <button
                           onClick={() => paginate(index + 1)}

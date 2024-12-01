@@ -4,13 +4,57 @@ const db = require('../db');
 const ExcelJS = require('exceljs');
 
 
+router.get('/admin-products-inventory', async (req, res) => {
+    try {
+        const [rows] = await db.query(`
+            SELECT p.product_id, p.product_code, p.product_name, p.price, p.description, p.quantity, c.category_name, p.product_image
+            FROM product p
+            INNER JOIN category c ON p.category_id = c.category_id
+        `);
+
+        if (req.query.export === 'excel') {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Products');
+
+            worksheet.columns = [
+                { header: 'Product ID', key: 'product_id', width: 15 },
+                { header: 'Product Code', key: 'product_code', width: 20 },
+                { header: 'Product Name', key: 'product_name', width: 30 },
+                { header: 'Price', key: 'price', width: 15 },
+                { header: 'Description', key: 'description', width: 40 },
+                { header: 'Quantity', key: 'quantity', width: 10 },
+                { header: 'Category', key: 'category_name', width: 20 },
+                { header: 'Product Image', key: 'product_image', width: 30 },
+            ];
+
+            rows.forEach(row => {
+                worksheet.addRow(row);
+            });
+
+            worksheet.getRow(1).font = { bold: true };
+
+            res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            res.setHeader('Content-Disposition', 'attachment; filename=products.xlsx');
+
+            await workbook.xlsx.write(res);
+
+            res.end();
+        } else {
+            res.json(rows);
+        }
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        res.status(500).send('Error fetching products');
+    }
+});
+
+
 router.get('/admin-products-with-interaction', async (req, res) => {
     try {
 
         const LOW_STOCK_THRESHOLD = 10;
         const LOW_INTERACTION_THRESHOLD = 1;
 
-        // Query to get the count of Top Products with interactions of type 'cart'
         const [[{ total }]] = await db.query(`
             SELECT COUNT(DISTINCT p.product_code) AS total
             FROM product AS p
@@ -20,7 +64,6 @@ router.get('/admin-products-with-interaction', async (req, res) => {
             AND upi.interaction_timestamp >= NOW() - INTERVAL 30 DAY
         `);
 
-        // Query to get product names with interaction_type 'cart'
         const [products] = await db.query(`
             SELECT DISTINCT p.product_name
             FROM product AS p
@@ -30,27 +73,23 @@ router.get('/admin-products-with-interaction', async (req, res) => {
             AND upi.interaction_timestamp >= NOW() - INTERVAL 30 DAY
         `);
 
-        // Query to get the total quantity of products
         const [[{ totalQuantity }]] = await db.query(`
             SELECT SUM(quantity) AS totalQuantity
             FROM product
         `);
 
-        // Query to get the count of low stock items
         const [[{ lowStockCount }]] = await db.query(`
             SELECT COUNT(*) AS lowStockCount
             FROM product
             WHERE quantity <= ?
         `, [LOW_STOCK_THRESHOLD]);
 
-        // Query to get the total quantity of low stock items
         const [[{ lowStockQuantity }]] = await db.query(`
             SELECT SUM(quantity) AS lowStockQuantity
             FROM product
             WHERE quantity <= ?
         `, [LOW_STOCK_THRESHOLD]);
 
-        // Query to get the count of unpopular items (interaction_type = 'view' or no interactions)
         const [unpopularProducts] = await db.query(`
             SELECT p.product_name
             FROM product AS p
@@ -60,7 +99,6 @@ router.get('/admin-products-with-interaction', async (req, res) => {
             OR upi.interaction_type = 'view'
         `);
 
-        // Query to get the count and total quantity of out-of-stock items
         const [[{ outOfStockCount }]] = await db.query(`
             SELECT COUNT(*) AS outOfStockCount
             FROM product
@@ -73,7 +111,6 @@ router.get('/admin-products-with-interaction', async (req, res) => {
             WHERE quantity = 0
         `);
 
-        // Query to get the count and total quantity of discontinued products
         const [[{ discontinuedCount }]] = await db.query(`
             SELECT COUNT(*) AS discontinuedCount
             FROM product
@@ -86,7 +123,6 @@ router.get('/admin-products-with-interaction', async (req, res) => {
             WHERE product_status = 'discontinued'
         `);
 
-        // Send response with all the gathered data
         res.json({
             total,
             totalQuantity,
