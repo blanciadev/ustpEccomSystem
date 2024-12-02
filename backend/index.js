@@ -7,7 +7,6 @@ const { OAuth2Client } = require('google-auth-library');
 const dotenv = require('dotenv');
 dotenv.config();
 
-
 // Set your Google Client ID
 const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
@@ -67,9 +66,6 @@ app.post('/verify-token', async (req, res) => {
     if (rows.length > 0) {
       // User exists, retrieve their data
       const user = rows[0];
-
-      // Generate a new random token
-      //  const token = crypto.randomBytes(64).toString('hex');
 
       // Check if a token already exists for the user
       const [existingTokenRows] = await db.query('SELECT * FROM tokens WHERE user_id = ? AND token_status = ?', [user.customer_id, 'Active']);
