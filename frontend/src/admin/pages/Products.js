@@ -253,7 +253,7 @@ const Products = () => {
                       <div class="col-2 ">
                         <div class="d-flex justify-content-end">
                           <Button
-                            variant="primary"
+                            variant="danger"
                             onClick={handleShowDiscountProductModal}
                           >
                             {isMobile ? (

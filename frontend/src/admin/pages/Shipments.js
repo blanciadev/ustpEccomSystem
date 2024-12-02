@@ -157,20 +157,16 @@ const Shipments = () => {
                   </div>
                 </div>
 
-                <div class="col-4">
+                <div class="col-3">
                   <div class=" d-flex justify-content-end">
                   <button onClick={exportToExcel} className="btn btn-primary">
-                      {isMobile ? (
-                        <i className="bx bx-download"></i>
-                      ) : (
-                        "Export Shipment Record"
-                      )}
+                    <i class="bx bx-export"></i> Export Shipment Record
                     </button>
                   </div>
                 </div>
 
-                <div class="col-2">
-                  <div class="d-flex justify-content-end">
+                <div class="col-3">
+                  <div class="d-flex justify-content-end align-items-center">
                     <label htmlFor="sort" className="me-2">
                       Sort By:
                     </label>
@@ -179,7 +175,8 @@ const Shipments = () => {
                       id="sort"
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
-                      className=""
+                      className="form-select"
+                      style={{width: "120px"}}
                     >
                       <option value="date">Date</option>
                       <option value="status">Status</option>

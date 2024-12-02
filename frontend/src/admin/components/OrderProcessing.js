@@ -14,11 +14,21 @@ const OrderProcessing = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:5001/admin-order-history-total-component');  // Your API endpoint
+        const response = await axios.get(
+          'http://localhost:5001/admin-order-history-total-component' // Your API endpoint
+        );
         const { statusCounts } = response.data;
 
         setChartData({
-          labels: ['Completed', 'Pending', 'To Ship', 'To Receive', 'Cancelled', 'Return/Refund', 'Returned'],
+          labels: [
+            'Completed',
+            'Pending',
+            'To Ship',
+            'To Receive',
+            'Cancelled',
+            'Return/Refund',
+            'Returned',
+          ],
           datasets: [
             {
               label: 'Order Status',
@@ -70,7 +80,7 @@ const OrderProcessing = () => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'right',
+        position: 'left',
         labels: {
           boxWidth: 10,
           boxHeight: 10,
@@ -81,7 +91,7 @@ const OrderProcessing = () => {
       tooltip: {
         callbacks: {
           label: function (tooltipItem) {
-            return tooltipItem.label + ': ' + tooltipItem.raw + ' orders';  // Tooltip label format
+            return tooltipItem.label + ': ' + tooltipItem.raw + ' orders'; // Tooltip label format
           },
         },
         backgroundColor: 'rgba(0,0,0,0.7)',
@@ -101,20 +111,20 @@ const OrderProcessing = () => {
         borderWidth: 1,
       },
     },
-    cutout: '70%',
+    cutout: '50%',
   };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
 
   return (
-    <div className='order-processing'>
-      <div className='header'>
-        <div className='title'>
+    <div className="order-processing">
+      <div className="header">
+        <div className="title">
           <h6>Order Processing</h6>
         </div>
       </div>
-      <div className='doughnut-chart'>
+      <div className="doughnut-chart">
         <Doughnut data={chartData} options={options} />
       </div>
     </div>

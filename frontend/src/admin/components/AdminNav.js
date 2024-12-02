@@ -5,6 +5,21 @@ import '../admin.css';
 
 import logo from '../../assets/img/logo.png'
 
+
+import { RxDashboard } from "react-icons/rx";
+import { IoBagHandleOutline } from "react-icons/io5";
+import { MdOutlinePayments } from "react-icons/md";
+import { LiaShippingFastSolid } from "react-icons/lia";
+import { AiOutlineProduct } from "react-icons/ai";
+import { MdOutlineInventory } from "react-icons/md";
+import { FiUsers } from "react-icons/fi";
+import { HiOutlineDocumentReport } from "react-icons/hi";
+import { GoGraph } from "react-icons/go";
+import { LuHistory } from "react-icons/lu";
+import { GrTransaction } from "react-icons/gr";
+
+
+
 const AdminNav = () => {
   const roleType = localStorage.getItem('role');
   const location = useLocation();
@@ -57,8 +72,8 @@ const AdminNav = () => {
           {isMobile ? (
             <i class="bx bxs-dashboard"></i>
           ) : (
-            <i class="bx bxs-dashboard"></i>,
-            <span>Dashboard</span>
+            
+            <span><RxDashboard className='mb-1 me-2'/>Dashboard</span>
           )
           }
 
@@ -70,8 +85,8 @@ const AdminNav = () => {
           {isMobile ? (
             <i class="bx bxs-package"></i>
           ) : (
-            <i class="bx bxs-package"></i>,
-            <span>Orders</span>
+            
+            <span><IoBagHandleOutline className='mb-1 me-2'/>Orders</span>
           )
           }
 
@@ -83,8 +98,8 @@ const AdminNav = () => {
           {isMobile ? (
             <i class="bx bxs-wallet"></i>
           ) : (
-            <i class="bx bxs-wallet"></i>,
-            <span>Payments</span>
+            
+            <span><MdOutlinePayments className='mb-1 me-2'/>Payments</span>
           )
           }
         </a>
@@ -95,8 +110,8 @@ const AdminNav = () => {
           {isMobile ? (
             <i class="bx bxs-truck"></i>
           ) : (
-            <i class="bx bxs-truck"></i>,
-            <span>Shipments</span>
+            
+            <span><LiaShippingFastSolid className='mb-1 me-2'/>Shipments</span>
           )
           }
         </a>
@@ -107,8 +122,8 @@ const AdminNav = () => {
           {isMobile ? (
             <i class="bx bxs-spa"></i>
           ) : (
-            <i class="bx bxs-spa"></i>,
-            <span>Products</span>
+          
+            <span><AiOutlineProduct className='mb-1 me-2'/>Products</span>
           )
           }
         </a>
@@ -119,8 +134,8 @@ const AdminNav = () => {
           {isMobile ? (
             <i class="bx bx-clipboard"></i>
           ) : (
-            <i class="bx bx-clipboard"></i>,
-            <span>Inventory</span>
+            
+            <span><MdOutlineInventory className='mb-1 me-2'/>Inventory</span>
           )
           }
         </a>
@@ -134,8 +149,8 @@ const AdminNav = () => {
               <i className="bx bxs-user-account" style={{ textAlign: 'center' }}></i>
             ) : (
               <>
-                <i className="bx bxs-user-account"></i>
-                <span>Users</span>
+                
+                <span><FiUsers className='mb-1 me-2'/>Users</span>
               </>
             )}
           </a>
@@ -149,8 +164,8 @@ const AdminNav = () => {
 
           className={`dropdown-toggle ${isDropdownOpen ? 'active2' : ''}`}
         >
-          <i className='bx bxs-report'></i>
-          {!isMobile && <span>Reports</span>}
+          
+          {!isMobile && <span><HiOutlineDocumentReport   className='mb-1 me-2'/>Reports</span>}
         </a>
 
         {isDropdownOpen && (
@@ -159,7 +174,7 @@ const AdminNav = () => {
               href='/admin/reports/sales'
               className={location.pathname === '/admin/reports/sales' ? 'active' : ''}
             >
-              <i class='bx bx-line-chart'></i>
+              <GoGraph className='mb-1 me-2'/>
               Sales
             </a>
             <a
@@ -168,7 +183,7 @@ const AdminNav = () => {
                 location.pathname === '/admin/reports/order-history' ? 'active' : ''
               }
             >
-              <i class='bx bx-history' ></i>
+              <LuHistory className='mb-1 me-2'/>
               Order History
             </a>
             <a
@@ -177,7 +192,7 @@ const AdminNav = () => {
                 location.pathname === '/admin/reports/transactions' ? 'active' : ''
               }
             >
-              <i class='bx bx-transfer-alt' ></i>
+              <GrTransaction className='mb-1 me-2'/>
               Transactions
             </a>
           </div>
