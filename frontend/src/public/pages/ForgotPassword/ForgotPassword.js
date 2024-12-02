@@ -16,21 +16,21 @@ const RequestResetPassword = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5001/request-reset-password', { email });
+      const response = await axios.post('http://localhost:5001/api/request-reset-password', { email });
       localStorage.setItem('resetEmail', email);
       setToastMessage(response.data.message);
 
-            setTimeout(() => {
-              setToastMessage('');
-                navigate('/verify');
-            }, 3000);
+      setTimeout(() => {
+        setToastMessage('');
+        navigate('/verify');
+      }, 3000);
     } catch (error) {
       console.error('Error sending reset token:', error);
       setToastMessage('Invalid Email');
 
-            setTimeout(() => {
-              setToastMessage('');
-            }, 3000);
+      setTimeout(() => {
+        setToastMessage('');
+      }, 3000);
     } finally {
       setLoading(false);
     }
@@ -39,7 +39,7 @@ const RequestResetPassword = () => {
   return (
     <div className='fp-con'>
       <Navigation />
-      <ToastNotification toastMessage={toastmessage}/>
+      <ToastNotification toastMessage={toastmessage} />
       <div className='fp-form'>
         <h1>Reset Password</h1>
         <form onSubmit={handleSubmit}>

@@ -42,42 +42,42 @@ const ProductCard = React.memo(({ product, onAddToCart, onBuyNow, onProductClick
                         {product.product_name}
                         <br /><strong className="" style={{ fontSize: "1rem", color: "#d81c4b" }}>₱ {product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
                     </h3>
-              
+
                     {product.product_status === 'Discounted' && (
                         <h3>Discounted Price: {product.product_discount}%</h3>
                     )}
 
 
-            <button
-                className="add-to-cart-button px-10"
-                style={{
-                    backgroundColor: isAddToCartHovered ? 'rgb(223, 95, 116)' : '#d81c4b',
-                    color: 'white', // Ensures text is readable on both background colors
-                }}
-                onMouseEnter={() => setIsAddToCartHovered(true)}
-                onMouseLeave={() => setIsAddToCartHovered(false)}
-                onClick={(e) => {
-                    e.stopPropagation();
-                    onAddToCart(product);
-                }}
-            >
-                Add to cart
-            </button>
-            <button
-                className="buy-now-button px-10"
-                style={{
-                    backgroundColor: isBuyNowHovered ? 'rgb(223, 95, 116)' : '#d81c4b',
-                    color: 'white', // Ensures text is readable on both background colors
-                }}
-                onMouseEnter={() => setIsBuyNowHovered(true)}
-                onMouseLeave={() => setIsBuyNowHovered(false)}
-                onClick={(e) => {
-                    e.stopPropagation();
-                    onBuyNow(product);
-                }}
-            >
-                Buy Now
-            </button>
+                    <button
+                        className="add-to-cart-button px-10"
+                        style={{
+                            backgroundColor: isAddToCartHovered ? 'rgb(223, 95, 116)' : '#d81c4b',
+                            color: 'white', // Ensures text is readable on both background colors
+                        }}
+                        onMouseEnter={() => setIsAddToCartHovered(true)}
+                        onMouseLeave={() => setIsAddToCartHovered(false)}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onAddToCart(product);
+                        }}
+                    >
+                        Add to cart
+                    </button>
+                    <button
+                        className="buy-now-button px-10"
+                        style={{
+                            backgroundColor: isBuyNowHovered ? 'rgb(223, 95, 116)' : '#d81c4b',
+                            color: 'white', // Ensures text is readable on both background colors
+                        }}
+                        onMouseEnter={() => setIsBuyNowHovered(true)}
+                        onMouseLeave={() => setIsBuyNowHovered(false)}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onBuyNow(product);
+                        }}
+                    >
+                        Buy Now
+                    </button>
                 </div>
             )}
         </>
@@ -101,7 +101,7 @@ const ProductList = ({ stickyComponents }) => {
     const [showHaircareHeading, setShowHaircareHeading] = useState(false); //haircare beauty offers heading
     const [isPreviousHovered, setIsPreviousHovered] = useState(false);
     const [isNextHovered, setIsNextHovered] = useState(false);
-   
+
     const handleStickySubmit = async (formData) => {
         setLoading(true);
 
@@ -117,7 +117,7 @@ const ProductList = ({ stickyComponents }) => {
         }
 
         try {
-            const response = await axios.get(`http://localhost:5001/sticky-components`, {
+            const response = await axios.get(`http://localhost:5001/api//sticky-components`, {
                 params: formData
             });
             console.log('Form data being sent:', formData);
@@ -125,7 +125,7 @@ const ProductList = ({ stickyComponents }) => {
             setError(null);
             setShowHaircareHeading(false); // Show the heading
             setShowRecommendedHeading(true); // Show the heading
-            
+
             setCurrentPage(0);
 
             // Remove the search term from localStorage
@@ -171,7 +171,7 @@ const ProductList = ({ stickyComponents }) => {
         console.log("payload", payload);
 
         try {
-            const response = await axios.get('http://localhost:5001/products-interaction', { params: payload });
+            const response = await axios.get('http://localhost:5001/api//products-interaction', { params: payload });
 
             console.log('API response:', response.data);
         } catch (error) {
@@ -189,7 +189,7 @@ const ProductList = ({ stickyComponents }) => {
         const fetchProducts = async () => {
             setLoading(true);
             try {
-                const response = await axios.get(`http://localhost:5001/products`);
+                const response = await axios.get(`http://localhost:5001/api//products`);
                 setProducts(response.data);
                 setError(null);
                 setShowHaircareHeading(true); // Show the heading
@@ -202,7 +202,7 @@ const ProductList = ({ stickyComponents }) => {
 
         const fetchTopPicks = async () => {
             try {
-                const response = await axios.get('http://localhost:5001/products-top-picks');
+                const response = await axios.get('http://localhost:5001/api//products-top-picks');
                 // Limit to top 4 picks if there are more
                 const limitedPicks = response.data.slice(0, 5);
                 setTopPicks(limitedPicks);
@@ -245,7 +245,7 @@ const ProductList = ({ stickyComponents }) => {
         const recordProductInteraction = async () => {
             try {
                 console.log('Recording product interaction:', payload);
-                const response = await axios.get('http://localhost:5001/products-interaction', { params: payload });
+                const response = await axios.get('http://localhost:5001/api//products-interaction', { params: payload });
                 console.log('Product interaction response:', response.data);
             } catch (error) {
                 console.error('Error recording product interaction:', error);
@@ -303,7 +303,7 @@ const ProductList = ({ stickyComponents }) => {
 
         try {
             console.log('User is logged in, adding item to server-side cart');
-            const response = await axios.post('http://localhost:5001/add-to-cart', {
+            const response = await axios.post('http://localhost:5001/api//add-to-cart', {
                 customer_id: customerId,
                 product_code: product.product_code,
                 quantity,
@@ -443,15 +443,15 @@ const ProductList = ({ stickyComponents }) => {
 
 
                 <div class="mx-2 ">
-                    
+
                     <div class="row">
-                        
+
                         <div class="left-product-list col-12 col-lg-9 text-white p-3">
                             <div>
                                 {showRecommendedHeading && <h2 className="text-center text-danger mt-2 mb-2 fw-bold">RECOMMENDED PRODUCTS</h2>}
                                 {showHaircareHeading && <h2 className="text-center text-danger mt-2 mb-2 fw-bold">HAIRCARE BEAUTY OFFERS</h2>}
                             </div>
-                            
+
                             <div className='product-list'>
                                 <ToastNotification toastMessage={toastMessage} />
                                 <StickyComponent className="" onSubmit={handleStickySubmit} />
@@ -461,11 +461,11 @@ const ProductList = ({ stickyComponents }) => {
                                         <ProductCard
                                             key={product.product_code}
                                             product={product}
-                                            
+
                                             onAddToCart={handleAddToCart}
                                             onProductClick={handleProductClick}
                                             onBuyNow={handleBuyNow}
-                                            
+
                                         />
                                     ))}
                                 </div>
@@ -480,34 +480,34 @@ const ProductList = ({ stickyComponents }) => {
                                     </button>
                                 </div> */}
 
-                        <div className="pagination">
-                            <button
-                                className="btns"
-                                style={{
-                                    backgroundColor: isPreviousHovered ? '#d81c4b' : 'pink',
-                                    color: isPreviousHovered ? 'white' : 'black', // Ensures text is readable on both colors
-                                }}
-                                onMouseEnter={() => setIsPreviousHovered(true)}
-                                onMouseLeave={() => setIsPreviousHovered(false)}
-                                onClick={() => handlePageChange(-1)}
-                                disabled={currentPage === 0}
-                            >
-                                Previous
-                            </button>
-                            <button
-                                className="btns"
-                                style={{
-                                    backgroundColor: isNextHovered ? '#d81c4b' : 'pink',
-                                    color: isNextHovered ? 'white' : 'black', // Ensures text is readable on both colors
-                                }}
-                                onMouseEnter={() => setIsNextHovered(true)}
-                                onMouseLeave={() => setIsNextHovered(false)}
-                                onClick={() => handlePageChange(1)}
-                                disabled={currentPage >= Math.ceil(products.length / PAGE_SIZE) - 1}
-                            >
-                                Next
-                            </button>
-                        </div>
+                                <div className="pagination">
+                                    <button
+                                        className="btns"
+                                        style={{
+                                            backgroundColor: isPreviousHovered ? '#d81c4b' : 'pink',
+                                            color: isPreviousHovered ? 'white' : 'black', // Ensures text is readable on both colors
+                                        }}
+                                        onMouseEnter={() => setIsPreviousHovered(true)}
+                                        onMouseLeave={() => setIsPreviousHovered(false)}
+                                        onClick={() => handlePageChange(-1)}
+                                        disabled={currentPage === 0}
+                                    >
+                                        Previous
+                                    </button>
+                                    <button
+                                        className="btns"
+                                        style={{
+                                            backgroundColor: isNextHovered ? '#d81c4b' : 'pink',
+                                            color: isNextHovered ? 'white' : 'black', // Ensures text is readable on both colors
+                                        }}
+                                        onMouseEnter={() => setIsNextHovered(true)}
+                                        onMouseLeave={() => setIsNextHovered(false)}
+                                        onClick={() => handlePageChange(1)}
+                                        disabled={currentPage >= Math.ceil(products.length / PAGE_SIZE) - 1}
+                                    >
+                                        Next
+                                    </button>
+                                </div>
 
                             </div>
 
@@ -528,15 +528,15 @@ const ProductList = ({ stickyComponents }) => {
                                         <div className="container">
                                             <div className="row">
                                                 {topPicks.map((product, index) => (
-                                                    <div className="col-12 mt-2">   
-                                                        <div 
-                                                            key={product.product_code} 
-                                                            product={product} 
-                                                            className="product-card1" 
+                                                    <div className="col-12 mt-2">
+                                                        <div
+                                                            key={product.product_code}
+                                                            product={product}
+                                                            className="product-card1"
                                                             onProductClick={handleProductClick}
-                                                            >
-                                                        
-                                                        
+                                                        >
+
+
                                                             <img
                                                                 src={product.product_image || 'https://via.placeholder.com/120'}
                                                                 alt={product.product_name}
@@ -552,7 +552,7 @@ const ProductList = ({ stickyComponents }) => {
                                                 ))}
                                             </div>
 
-                                    
+
                                         </div>
                                     </div>
                                 </div>
@@ -561,13 +561,13 @@ const ProductList = ({ stickyComponents }) => {
 
                         </div>
                         {isModalOpen && (
-                                    <ProductModal
-                                        isOpen={isModalOpen}
-                                        product={selectedProduct}
-                                        onClose={closeModal}
-                                        onAddToCart={handleAddToCart}
-                                    />
-                                )}
+                            <ProductModal
+                                isOpen={isModalOpen}
+                                product={selectedProduct}
+                                onClose={closeModal}
+                                onAddToCart={handleAddToCart}
+                            />
+                        )}
                     </div>
                 </div>
             </div>

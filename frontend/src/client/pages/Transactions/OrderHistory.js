@@ -19,7 +19,7 @@ const OrderHistory = () => {
     const fetchOrders = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5001/order-history",
+          "http://localhost:5001/api//order-history",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -56,7 +56,7 @@ const OrderHistory = () => {
   const handleCancelOrder = async (orderId) => {
     try {
       await axios.post(
-        "http://localhost:5001/cancel-order",
+        "http://localhost:5001/api//cancel-order",
         {
           order_id: orderId,
         },
@@ -204,11 +204,10 @@ const OrderHistory = () => {
                                 onClick={() =>
                                   handleCancelOrder(order.order_id)
                                 }
-                                className={`btn btn-danger mt-2 ${
-                                  order.order_status === "Pending"
-                                    ? ""
-                                    : "disabled"
-                                }`}
+                                className={`btn btn-danger mt-2 ${order.order_status === "Pending"
+                                  ? ""
+                                  : "disabled"
+                                  }`}
                                 disabled={order.order_status !== "Pending"}
                               >
                                 Cancel this Order
@@ -219,7 +218,7 @@ const OrderHistory = () => {
 
                         <div class="">
                           {Array.isArray(order.products) &&
-                          order.products.length > 0 ? (
+                            order.products.length > 0 ? (
                             <table className="table table-striped table-bordered">
                               <thead className="thead-dark">
                                 <tr>

@@ -30,7 +30,7 @@ const BundleProductModal = () => {
     const fetchProducts = async () => {
         setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5001/products-no-bundle');
+            const response = await axios.get('http://localhost:5001/api/products-no-bundle');
             setProducts(response.data);
         } catch (error) {
             console.error('Error fetching products:', error);
@@ -73,7 +73,7 @@ const BundleProductModal = () => {
         setLoading(true);
 
         try {
-            await axios.post('http://localhost:5001/bundles', bundleData);
+            await axios.post('http://localhost:5001/api/bundles', bundleData);
             setToastMessage('Bundle Created!');
             setTimeout(() => {
                 setToastMessage('');

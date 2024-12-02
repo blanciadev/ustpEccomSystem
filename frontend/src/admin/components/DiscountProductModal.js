@@ -9,7 +9,7 @@ const RemoveDiscountProduct = ({ show, handleClose, order, handleUpdate }) => {
   useEffect(() => {
     if (show) {
       axios
-        .get('http://localhost:5001/products-disable-bundle')
+        .get('http://localhost:5001/api/products-disable-bundle')
         .then((response) => {
           setProducts(response.data);
         })
@@ -21,7 +21,7 @@ const RemoveDiscountProduct = ({ show, handleClose, order, handleUpdate }) => {
 
   const handleRemoveDiscount = (productCode) => {
     axios
-      .post(`http://localhost:5001/remove-discount/${productCode}`)
+      .post(`http://localhost:5001/api/remove-discount/${productCode}`)
       .then((response) => {
         setProducts(products.filter((product) => product.product_code !== productCode));
         handleUpdate();

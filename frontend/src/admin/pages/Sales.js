@@ -27,7 +27,7 @@ const Sales = () => {
             setLoading(true);
             setError(false); // Reset error state on each fetch attempt
             try {
-                const response = await axios.get('http://localhost:5001/product-reports-per-month');
+                const response = await axios.get('http://localhost:5001/api/product-reports-per-month');
 
                 // Check if the response contains data
                 if (response.data && response.data.data) {
@@ -94,7 +94,7 @@ const Sales = () => {
             }
 
             // Send the data to the backend to generate the report
-            const response = await axios.post('http://localhost:5001/product-reports-export', {
+            const response = await axios.post('http://localhost:5001/api/product-reports-export', {
                 month,
                 year,
                 data: storedReports
@@ -207,7 +207,7 @@ const Sales = () => {
                                                     <td>{report.product_name}</td>
                                                     <td>{report.total_quantity}</td>
                                                     <td>₱ {parseFloat(report.total_sales).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                                                  
+
                                                 </tr>
                                             ))}
                                         </tbody>

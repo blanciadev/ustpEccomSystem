@@ -51,7 +51,7 @@ function ProfileImageUpload({ formData }) {
             const customerId = localStorage.getItem('customer_id');
             const token = localStorage.getItem('token');
 
-            await axios.post(`http://localhost:5001/upload-profile-image?customer_id=${customerId}`, formData, {
+            await axios.post(`http://localhost:5001/api//upload-profile-image?customer_id=${customerId}`, formData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data',

@@ -51,7 +51,7 @@ const Checkout = () => {
           savedProducts.map((product) =>
             axios
               .get(
-                `http://localhost:5001/products-checkout/${product.product_code}`,
+                `http://localhost:5001/api//products-checkout/${product.product_code}`,
                 {
                   headers: {
                     Authorization: `Bearer ${token}`,
@@ -226,7 +226,7 @@ const Checkout = () => {
     try {
       // Send order data to the server
       const response = await axios.post(
-        "http://localhost:5001/insert-order",
+        "http://localhost:5001/api//insert-order",
         orderData,
         {
           headers: {
@@ -263,7 +263,7 @@ const Checkout = () => {
   const recordProductInteraction = async (payload) => {
     try {
       console.log("Recording product interaction:", payload);
-      await axios.get("http://localhost:5001/products-interaction", {
+      await axios.get("http://localhost:5001/api//products-interaction", {
         params: payload,
       });
       console.log("Product interaction recorded successfully.");

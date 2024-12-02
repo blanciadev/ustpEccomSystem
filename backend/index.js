@@ -3,12 +3,13 @@ const app = express();
 const db = require('./db');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const { OAuth2Client } = require('google-auth-library'); // Import the Google OAuth client
+const { OAuth2Client } = require('google-auth-library');
+const dotenv = require('dotenv');
+dotenv.config();
+
 
 // Set your Google Client ID
-const GOOGLE_CLIENT_ID = '604163930378-hefd54geho5pkurgd149svlovu50j81t.apps.googleusercontent.com'; // Replace with your actual Google Client ID
-
-// Create a new OAuth2 client
+const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 // Port configuration
@@ -32,6 +33,8 @@ const token = require('./routes/tokenValidation.js');
 const customerData = require('./routes/customerData.js');
 const handleLogout = require('./routes/handlelogout.js');
 const nodemailer = require('./routes/NodeMailer.js');
+
+
 
 app.use(cors());
 
@@ -248,27 +251,17 @@ function generateToken() {
   return require('crypto').randomBytes(48).toString('hex');
 }
 
-
-
 // Routes
-app.use('/', cartRoutes);
-app.use('/', customerSignUpRoutes);
-app.use('/', customerLoginRoutes);
-app.use('/', productRoutes);
-app.use('/', OrderRoutes);
-app.use('/', viewTransactionsRoute);
-app.use('/', userInteraction);
-app.use('/', adminOrderHistory);
-app.use('/', adminOrderUpdates);
-app.use('/', adminProduct);
-app.use('/', adminProductUpdate);
-app.use('/', AdminBundleOrder);
-app.use('/', customerData);
-app.use('/', AdminUsersRoutes);
-app.use('/', handleLogout);
-app.use('/', token);
-app.use('/', nodemailer);
+const routes = [
+  cartRoutes, customerSignUpRoutes, customerLoginRoutes, productRoutes,
+  OrderRoutes, viewTransactionsRoute, userInteraction, adminOrderHistory,
+  adminOrderUpdates, adminProduct, adminProductUpdate, AdminBundleOrder,
+  AdminUsersRoutes, token, customerData, handleLogout, nodemailer
+];
 
+routes.forEach(route => {
+  app.use('/api', route);
+});
 
 // Start the server
 app.listen(PORT, () => {
