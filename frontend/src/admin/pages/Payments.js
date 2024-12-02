@@ -94,13 +94,13 @@ const Payments = () => {
     setLoading(true);
     try {
       const ordersData = JSON.parse(localStorage.getItem("ordersData"));
-  
+
       const response = await axios.post(
         "http://localhost:5001/admin-order-payment-export",
         { orders: ordersData },
         { responseType: "blob" } // Ensures response is treated as a file
       );
-  
+
       // Generate the current date and time
       const now = new Date();
       const formattedDate = `${now.getFullYear()}-${String(
@@ -110,7 +110,7 @@ const Payments = () => {
         now.getMinutes()
       ).padStart(2, "0")}-${String(now.getSeconds()).padStart(2, "0")}`;
       const filename = `Payment Records ${formattedDate}_${formattedTime}.xlsx`;
-  
+
       // Create a link to download the file
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
@@ -125,7 +125,7 @@ const Payments = () => {
       setLoading(false);
     }
   };
-  
+
 
   const totalPages = Math.ceil(totalOrders / itemsPerPage);
 
@@ -139,8 +139,8 @@ const Payments = () => {
       .includes(searchTerm.toLowerCase());
     const statusMatch = statusFilter
       ? order.payment_status === statusFilter
-      : true; // Apply status filter
-    return (orderIdMatch || customerNameMatch) && statusMatch; // Ensure both filters are applied
+      : true;
+    return (orderIdMatch || customerNameMatch) && statusMatch;
   });
 
   const ordersToDisplay = filteredOrders.length > 0 ? filteredOrders : orders;
@@ -188,7 +188,7 @@ const Payments = () => {
 
                 <div class="col-3">
                   <div class=" d-flex justify-content-end">
-                  <button onClick={exportToExcel} className="btn btn-primary">
+                    <button onClick={exportToExcel} className="btn btn-primary">
                       {isMobile ? (
                         <i className="bx bx-printer"></i>
                       ) : (
@@ -234,6 +234,7 @@ const Payments = () => {
                           <th>Order ID</th>
                           <th>Customer ID</th>
                           <th>Payment Date</th>
+                          <th>Order Total</th>
                           <th>Payment Method</th>
                           <th>Payment Status</th>
                           <th>Action</th>
@@ -250,10 +251,11 @@ const Payments = () => {
                             <td>
                               {order.order_update
                                 ? new Date(
-                                    order.order_update
-                                  ).toLocaleDateString()
+                                  order.order_update
+                                ).toLocaleDateString()
                                 : "N/A"}
                             </td>
+                            <td>{order.order_total}</td>
                             <td>{order.payment_method}</td>
 
                             <td>{order.payment_status}</td>

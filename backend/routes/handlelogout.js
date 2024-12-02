@@ -35,6 +35,7 @@ const authenticateToken = async (req, res, next) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 };
+
 // Logout endpoint
 router.post('/logout', authenticateToken, async (req, res) => {
     const token = req.headers['authorization']?.split(' ')[1];

@@ -351,9 +351,9 @@ const Checkout = () => {
 
     return mainNumber.length > 0
       ? `${phonePrefix} ${mainNumber.slice(0, 3)} ${mainNumber.slice(
-          3,
-          6
-        )} ${mainNumber.slice(6, 9)}`
+        3,
+        6
+      )} ${mainNumber.slice(6, 9)}`
       : phonePrefix;
   };
 
@@ -411,7 +411,11 @@ const Checkout = () => {
                         value={formData.fullName}
                         onChange={handleInputChange}
                         required
+                        pattern="[A-Za-z\s]+"
+                        title="Only letters and spaces are allowed (no special characters or numbers)"
+                        aria-describedby="fullNameHelp"
                       />
+
                     </div>
 
                     <div className="mb-2">
@@ -419,7 +423,7 @@ const Checkout = () => {
                         Phone Number
                       </label>
                       <input
-                        type="text"
+                        type="tel"
                         className="form-control"
                         id="phoneNumber"
                         name="phoneNumber"
@@ -427,7 +431,7 @@ const Checkout = () => {
                         value={formData.phoneNumber}
                         onChange={handlePhoneNumberChange}
                         onBlur={formatPhoneNumberOnBlur}
-                        maxLength="11"
+                        maxLength="12"
                         required
                       />
                     </div>
@@ -492,9 +496,12 @@ const Checkout = () => {
                         name="postalCode"
                         value={formData.postalCode}
                         onChange={handlePostalCodeChange}
-                        maxLength="4"
+                        pattern="\d{4}"  // Restrict to exactly 4 digits
+                        maxLength="4"    // Enforce 4 characters max
                         required
+                        title="Postal code must be exactly 4 digits"
                       />
+
                     </div>
 
                     <div class="mb-2">
@@ -582,11 +589,10 @@ const Checkout = () => {
                               <div className="row">
                                 <div className="col border">
                                   <p
-                                    className={`mb-1 ${
-                                      effectiveDiscount > 0
-                                        ? "text-decoration-line-through text-muted"
-                                        : ""
-                                    }`}
+                                    className={`mb-1 ${effectiveDiscount > 0
+                                      ? "text-decoration-line-through text-muted"
+                                      : ""
+                                      }`}
                                   >
                                     Original Price: ₱
                                     {product.price.toLocaleString("en-US", {

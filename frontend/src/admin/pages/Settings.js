@@ -199,7 +199,6 @@ const Settings = () => {
                 id="file-input"
                 type="file"
                 accept="image/*"
-                // onChange={handleImageChange}
                 style={{ display: "none" }}
               />
             </div>
@@ -213,8 +212,16 @@ const Settings = () => {
                     type="text"
                     placeholder="Enter your full name"
                     value={userData.firstName}
-                    onChange={(e) => setUserData({ ...userData, firstName: e.target.value })}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const regex = /^[A-Za-z\s]*$/;
+
+                      if (regex.test(value)) {
+                        setUserData({ ...userData, firstName: value });
+                      }
+                    }}
                   />
+
                 </div>
                 <div className="form-group">
                   <label>Email</label>
@@ -222,8 +229,16 @@ const Settings = () => {
                     type="email"
                     placeholder="Enter your email"
                     value={userData.email}
-                    onChange={(e) => setUserData({ ...userData, email: e.target.value })}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+                      if (regex.test(value) || value === "") {
+                        setUserData({ ...userData, email: value });
+                      }
+                    }}
                   />
+
                 </div>
                 <div className="form-group">
                   <label>Phone Number</label>
