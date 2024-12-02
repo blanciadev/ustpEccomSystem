@@ -1,16 +1,52 @@
-import React from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import '../admin.css';
 
-const AdminNav = () => {
-  const location = useLocation();
 
+import logo from '../../assets/img/logo.png'
+
+const AdminNav = () => {
+  const roleType = localStorage.getItem('role');
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 769);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(
+    JSON.parse(localStorage.getItem('isDropdownOpen')) || false
+  );
+
+  useEffect(() => {
+
+    window.addEventListener('resize', handleResize);
+
+    const roleType = localStorage.getItem('role');
+
+
+    if (roleType !== 'Admin') {
+      navigate('/');
+    }
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [navigate]);
+
+  const handleResize = () => {
+    setIsMobile(window.innerWidth <= 769);
+  };
+
+  const toggleDropdown = () => {
+    const newDropdownState = !isDropdownOpen;
+    setIsDropdownOpen(newDropdownState);
+    localStorage.setItem('isDropdownOpen', JSON.stringify(newDropdownState));
+  }
   return (
-    <div className='nav-con'>
-      <div className='nav-img'>
+    <div className='nav-con mt-4 mb-4 '>
+
+      <div className='nav-img mt-4 mb-4'>
         <img
-          src='https://i.pinimg.com/736x/91/a3/05/91a30517c00978fd864dedea942f6048.jpg'
+          src={logo}
           alt='Logo'
+          style={{ width: '100px', height: '100px' }}
+          className='mb-4'
         />
       </div>
       <div className='nav-links'>
@@ -18,47 +54,138 @@ const AdminNav = () => {
           href='/admin/dashboard'
           className={location.pathname === '/admin/dashboard' ? 'active' : ''}
         >
-          Dashboard
+          {isMobile ? (
+            <i class="bx bxs-dashboard"></i>
+          ) : (
+            <i class="bx bxs-dashboard"></i>,
+            <span>Dashboard</span>
+          )
+          }
+
         </a>
         <a
           href='/admin/orders'
           className={location.pathname === '/admin/orders' ? 'active' : ''}
         >
-          Orders
+          {isMobile ? (
+            <i class="bx bxs-package"></i>
+          ) : (
+            <i class="bx bxs-package"></i>,
+            <span>Orders</span>
+          )
+          }
+
         </a>
         <a
           href='/admin/payments'
           className={location.pathname === '/admin/payments' ? 'active' : ''}
         >
-          Payments
+          {isMobile ? (
+            <i class="bx bxs-wallet"></i>
+          ) : (
+            <i class="bx bxs-wallet"></i>,
+            <span>Payments</span>
+          )
+          }
         </a>
         <a
           href='/admin/shipments'
           className={location.pathname === '/admin/shipments' ? 'active' : ''}
         >
-          Shipments
+          {isMobile ? (
+            <i class="bx bxs-truck"></i>
+          ) : (
+            <i class="bx bxs-truck"></i>,
+            <span>Shipments</span>
+          )
+          }
         </a>
         <a
           href='/admin/products'
           className={location.pathname === '/admin/products' ? 'active' : ''}
         >
-          Products
+          {isMobile ? (
+            <i class="bx bxs-spa"></i>
+          ) : (
+            <i class="bx bxs-spa"></i>,
+            <span>Products</span>
+          )
+          }
         </a>
         <a
           href='/admin/inventory'
           className={location.pathname === '/admin/inventory' ? 'active' : ''}
         >
-          Inventory
+          {isMobile ? (
+            <i class="bx bx-clipboard"></i>
+          ) : (
+            <i class="bx bx-clipboard"></i>,
+            <span>Inventory</span>
+          )
+          }
         </a>
+
+        {roleType === 'Admin' && (
+          <a
+            href='/admin/manage-users'
+            className={location.pathname === '/admin/manage-users' ? 'active' : ''}
+          >
+            {isMobile ? (
+              <i className="bx bxs-user-account" style={{ textAlign: 'center' }}></i>
+            ) : (
+              <>
+                <i className="bx bxs-user-account"></i>
+                <span>Users</span>
+              </>
+            )}
+          </a>
+        )}
+
         <a
-          href='/admin/reports'
-          className={location.pathname === '/admin/reports' ? 'active' : ''}
+          onClick={(e) => {
+            e.preventDefault();
+            toggleDropdown();
+          }}
+
+          className={`dropdown-toggle ${isDropdownOpen ? 'active2' : ''}`}
         >
-          Reports
+          <i className='bx bxs-report'></i>
+          {!isMobile && <span>Reports</span>}
         </a>
+
+        {isDropdownOpen && (
+          <div className='dropdown-content'>
+            <a
+              href='/admin/reports/sales'
+              className={location.pathname === '/admin/reports/sales' ? 'active' : ''}
+            >
+              <i class='bx bx-line-chart'></i>
+              Sales
+            </a>
+            <a
+              href='/admin/reports/order-history'
+              className={
+                location.pathname === '/admin/reports/order-history' ? 'active' : ''
+              }
+            >
+              <i class='bx bx-history' ></i>
+              Order History
+            </a>
+            <a
+              href='/admin/reports/transactions'
+              className={
+                location.pathname === '/admin/reports/transactions' ? 'active' : ''
+              }
+            >
+              <i class='bx bx-transfer-alt' ></i>
+              Transactions
+            </a>
+          </div>
+        )}
+
+
       </div>
     </div>
   );
 };
-
 export default AdminNav;

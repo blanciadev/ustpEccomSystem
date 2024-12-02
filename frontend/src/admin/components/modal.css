@@ -1,0 +1,135 @@
+
+.modal-dialog{
+    justify-content: center;
+    width: 1500px;
+}
+.modal.fade{
+    backdrop-filter: contrast(0.5);
+}
+.modal-body > div{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+.mbody.one > form {
+    /* background-color: aquamarine; */
+    display: grid;
+    grid-template-columns:  45% 1fr;
+    grid-template-rows:  35px 35px 35px 35px 35px 35px 70px 35px 35px 35px;
+    gap: 10px;
+
+}
+.mbody.two > form {
+    /* background-color: aquamarine; */
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 10px;
+
+}
+.mbody > form > div{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: flex-start;
+    align-content: baseline;
+    justify-content: flex-start;
+
+}
+.mbody > form > img{
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 1;
+    grid-row-end: 10;
+    border: 1px solid hotpink;
+    align-self: center;
+    justify-self: center;
+    width: 90%;
+    object-fit: contain;
+}
+.mbody.one > form > div:nth-child(n){
+    grid-column-start: 2;
+    grid-column-end: 3;
+    display: flex;
+
+}
+.mbody.two > form > div:nth-child(n){
+    height: 35px;
+}
+
+.mbody > form > div:nth-child(n) > label{
+    text-align: left;
+    /* background-color: aqua; */
+    width: 35%;
+    height: 100%;
+}
+.mbody > form > div:nth-child(n) > input,
+.mbody > form > div:nth-child(n) > select,
+.mbody > form > div:nth-child(n) > textarea{
+    width: 65%;
+}
+.mbody.two > form > div:nth-child(2){
+    height: 70px;
+    /* background-color: rgb(173, 229, 229); */
+}
+.mbody.two > form > div:nth-child(2) > textarea{
+    height: 100%;
+}
+.mbody > form > button{
+    grid-column-start: 1;
+    grid-column-end: 3;
+}
+.modal-header{
+    justify-content: space-between;
+    padding: 0;
+}
+.order-head button{
+    background-color: var(---white);
+    color: black;
+    font-size: 1.3rem;
+}
+.modal-content{
+    padding: 10px 15px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.customer-details  {
+    width: 500px;
+    border-left: 4px solid #d81c4b;
+
+}
+
+.product-details-order  {
+ 
+    border-left: 4px solid #d81c4b;
+
+}
+
+#status {
+    margin-left: 158px;
+
+}
+
+/* #status .option1 {
+    width: 200px;
+
+} */
