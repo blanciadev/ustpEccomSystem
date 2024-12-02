@@ -202,7 +202,7 @@
   }
   .purchase-box{
     width: 95%;
-    height: 94%;
+    height: 90%;
     margin: 15px;
     border-radius: 10px;
     border-left: 5px solid rgb(240,95,119);
@@ -210,24 +210,18 @@
     box-shadow: 2px 2px 5px #f1f1f1,
         -2px -2px 5px #cececed5;
     /* background: linear-gradient(90deg, rgba(255,253,194,0.6) 0%, rgba(255, 205, 248, 0.6) 100%); */
-    display: grid;
-    grid-template-rows: 50px 1fr;
-    grid-template-columns: 95%;
+   
+    grid-template-rows: 5px 1fr;
+    grid-template-columns: 100%;
     justify-content: center;
     align-content: space-between;
-    flex-wrap: wrap;
     justify-items: center;
+
     
   }
-  .purchase-body{
-    width: 90%;
-    height: 90%;
-    /* background-color: #2980b9; */
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    
-  }
+  
+
+  
   .purchase-btncon{
     display: flex;
     justify-content: space-around;

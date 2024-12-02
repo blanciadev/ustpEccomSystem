@@ -194,13 +194,10 @@ const Inventory = () => {
                         </div>
                       </div>
 
-                      <div>
-                        <ExportButton />
-                      </div>
 
                       <div class="col-3 ">
                         <div class="d-flex justify-content-center ">
-                          {/* empty div */}
+                          <ExportButton />
                         </div>
                       </div>
 

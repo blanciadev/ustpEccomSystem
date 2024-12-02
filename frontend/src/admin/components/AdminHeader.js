@@ -4,10 +4,16 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+
+import { FaRegUser } from "react-icons/fa";
+import { MdLogout } from "react-icons/md";
+
+
 const AdminHeader = () => {
 
     const username = localStorage.getItem('username') || 'User';
     const firstName = localStorage.getItem('first_name') || '';
+    const lastName = localStorage.getItem('last_name') || '';
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const navigate = useNavigate();
 
@@ -73,6 +79,7 @@ const AdminHeader = () => {
                 localStorage.removeItem('customer_id');
                 localStorage.removeItem('username');
                 localStorage.removeItem('first_name');
+                localStorage.removeItem('last_name');
                 localStorage.removeItem('role');
 
 
@@ -87,22 +94,74 @@ const AdminHeader = () => {
         <div className='header-user'>
 
             <div className='admin-profile'>
-                <img
-                    src={profileImage || 'https://t3.ftcdn.net/jpg/06/17/13/26/360_F_617132669_YptvM7fIuczaUbYYpMe3VTLimwZwzlWf.jpg'}
-                    alt='Profile'
-                    style={{ width: '50px', height: '50px', borderRadius: '50%' }}
-                />
+            <span
+                    className="cartIcon d-flex justify-content-end align-items-center"
+                    id="profileDropdown"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
 
-                <Dropdown>
-                    <Dropdown.Toggle as="p" variant='link' className='admin-text'>
-                        {firstName ? firstName : username}
-                    </Dropdown.Toggle>
 
-                    <Dropdown.Menu style={{ marginTop: '35px', width: '200px' }}>
-                        <Dropdown.Item href='/admin/profile'>Profile</Dropdown.Item>
-                        <Dropdown.Item onClick={() => setShowLogoutModal(true)}>Logout</Dropdown.Item>
-                    </Dropdown.Menu>
-                </Dropdown>
+                      <img
+                        src={
+                            profileImage ||
+                          "https://static.vecteezy.com/system/resources/previews/026/434/409/non_2x/default-avatar-profile-icon-social-media-user-photo-vector.jpg"
+                        }
+                        alt="Profile Image"
+                        style={{
+                          width: "40px",
+                          height: "40px",
+                          borderRadius: "50%",
+                        }}
+                      /> 
+
+
+                      <p class="ms-2">{firstName ? firstName + ' ' + lastName : username}</p>
+                    
+                  </span>
+
+                  <ul
+                    className="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3"
+                    aria-labelledby="profileDropdown"
+                    style={{
+                      minWidth: "200px",
+                      fontFamily: "Arial, sans-serif",
+                      fontSize: "14px",
+                    }}
+                  >
+                    
+                    <li>
+                      <a
+                        className="dropdown-item d-flex align-items-center"
+                        // onClick={handleProfileClick}
+                        href='/admin/profile'
+                      >
+                        <FaRegUser
+                          className="me-2"
+                          size={24}
+                          style={{ color: "green" }}
+                        />
+                        <span style={{ fontSize: "16px" }}>Profile</span>
+                      </a>
+                    </li>
+                  
+
+                    <li>
+                      <hr className="dropdown-divider" />
+                    </li>
+
+                    <li>
+                      <a
+                        className="dropdown-item d-flex align-items-center text-danger"
+                        onClick={() => setShowLogoutModal(true)}
+                      >
+                        <MdLogout className="me-2" size={24} />
+                        <span style={{ fontSize: "16px" }}>Logout</span>
+                      </a>
+                    </li>
+                    
+                  </ul>
+
             </div>
             <div
                 className={`modal fade ${showLogoutModal ? 'show' : ''}`}
@@ -113,6 +172,7 @@ const AdminHeader = () => {
                 aria-hidden="true"
                 style={{ display: showLogoutModal ? 'block' : 'none', backgroundColor: 'rgba(0,0,0,0.5)' }}  // Ensure background dimming
             >
+
                 <div className="modal-dialog" role="document">
                     <div className="modal-content">
                         <div className="modal-header">

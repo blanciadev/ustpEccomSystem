@@ -39,7 +39,38 @@ const CartContent = () => {
           }
         } else {
           const localCart = JSON.parse(localStorage.getItem("cart")) || [];
-          setCartItems(localCart);
+          const productCodes = localCart.map((item) => item.product_code);
+
+          // Query the backend with product codes
+          const productDetailsResponse = await fetch(
+            "http://localhost:5001/products-img",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ product_codes: productCodes }),
+            }
+          );
+
+          const productDetails = await productDetailsResponse.json();
+
+          if (productDetailsResponse.ok) {
+            // Merge product images with the localCart items
+            const updatedCart = localCart.map((item) => {
+              const productDetail = productDetails.find(
+                (prod) => prod.product_code === item.product_code
+              );
+              return {
+                ...item,
+                product_image: productDetail ? productDetail.product_image : null,
+              };
+            });
+
+            setCartItems(updatedCart);
+          } else {
+            setError("Failed to fetch product details");
+          }
         }
       } catch (err) {
         setError("Error fetching cart items. Please try again later.");

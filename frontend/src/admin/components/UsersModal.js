@@ -119,7 +119,7 @@ const UsersModal = ({ show, onClose, user }) => {
                                 <option value="">{editableUser.role_type || ''}</option>
                                 <option value="Admin">Admin</option>
                                 <option value="Warehouse Manager">Warehouse Manager</option>
-                                <option value="user">Customer</option>
+                                <option value="Customer">Customer</option>
                             </select>
                         </div>
                         <div className="form-group">

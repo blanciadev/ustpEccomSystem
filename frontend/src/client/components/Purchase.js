@@ -10,12 +10,13 @@ const Purchase = ({ order }) => {
     <div className="order-item">
       <h4>Order ID: {order.order_id}</h4>
       <p>Order Date: {new Date(order.order_date).toLocaleDateString()}</p>
-      <p>Total Price: ${orderTotal}</p>
+      <p>Total Price: ₱{orderTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
       <div>
         <h5>Product Details</h5>
         <p>Product Name: {order.product_name}</p>
         <p>Quantity: {order.quantity}</p>
-        <p>Item Total: ${itemTotal}</p>
+        <p>Item Total: ₱{itemTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        </p>
       </div>
     </div>
   );

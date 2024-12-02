@@ -101,6 +101,30 @@ ORDER BY
 });
 
 
+router.post('/products-img', async (req, res) => {
+    const { product_codes } = req.body;
+
+    if (!product_codes || product_codes.length === 0) {
+        return res.status(400).send('No product codes provided');
+    }
+
+    try {
+        const placeholders = product_codes.map(() => '?').join(',');
+        const query = `
+        SELECT product_code, product_image
+        FROM product
+        WHERE product_code IN (${placeholders})
+      `;
+
+        const [rows] = await db.query(query, product_codes);
+
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        res.status(500).send('Error fetching products');
+    }
+});
+
 router.post('/products-recommendations', async (req, res) => {
     const { product_code } = req.body;
 
