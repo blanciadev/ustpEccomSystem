@@ -4,7 +4,7 @@ const db = require('../db');
 const crypto = require('crypto');
 
 
-const bcrypt = require('bcrypt');
+const bcryptjs = require('bcryptjsjs');
 const saltRounds = 10;
 
 
@@ -28,7 +28,7 @@ router.post('/users-login', async (req, res) => {
 
         const user = rows[0];
 
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+        const isPasswordValid = await bcryptjs.compare(password, user.password);
         if (!isPasswordValid) {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
@@ -190,14 +190,14 @@ router.route('/update-password')
 
             if (isHashed) {
                 console.log('Verifying hashed current password.');
-                passwordMatch = await bcrypt.compare(current_password, currentStoredPassword);
+                passwordMatch = await bcryptjs.compare(current_password, currentStoredPassword);
             } else {
                 console.log('Verifying plaintext current password.');
                 passwordMatch = current_password === currentStoredPassword;
 
                 if (passwordMatch) {
                     console.log('Upgrading plaintext password to hashed.');
-                    const hashedPassword = await bcrypt.hash(current_password, saltRounds);
+                    const hashedPassword = await bcryptjs.hash(current_password, saltRounds);
                     await db.query('UPDATE users SET password = ? WHERE customer_id = ?', [hashedPassword, customer_id]);
                 }
             }
@@ -213,7 +213,7 @@ router.route('/update-password')
             }
 
             console.log('Hashing new password.');
-            const hashedNewPassword = await bcrypt.hash(new_password, saltRounds);
+            const hashedNewPassword = await bcryptjs.hash(new_password, saltRounds);
 
             console.log('Updating password in the database.');
             const result = await db.query(

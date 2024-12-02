@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
-const bcrypt = require('bcrypt');
+const bcryptjs = require('bcryptjs');
 const saltRounds = 10;
 
 router.post('/users-signup', async (req, res) => {
@@ -17,7 +17,7 @@ router.post('/users-signup', async (req, res) => {
             return res.status(400).json({ message: 'Email already exists' });
         }
 
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        const hashedPassword = await bcryptjs.hash(password, saltRounds);
 
         const result = await db.query(
             'INSERT INTO users (first_name, last_name, email, address, phone_number, password) VALUES (?, ?, ?, ?, ?, ?)',
@@ -60,7 +60,7 @@ router.post('/admin-signup', async (req, res) => {
             return res.status(400).json({ message: 'Email already exists' });
         }
 
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        const hashedPassword = await bcryptjs.hash(password, saltRounds);
 
         console.log('Inserting new admin user into the database:', {
             firstName,
