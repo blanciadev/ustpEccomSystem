@@ -5,8 +5,10 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const { OAuth2Client } = require('google-auth-library');
 const dotenv = require('dotenv');
-dotenv.config();
 
+
+app.use(cors());
+dotenv.config();
 
 // Set your Google Client ID
 const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
@@ -28,7 +30,7 @@ const adminOrderUpdates = require('./routes/adminOrderUpdates.js');
 const adminProduct = require('./routes/adminProduct.js');
 const adminProductUpdate = require('./routes/adminProductUpdates.js');
 const AdminBundleOrder = require('./routes/AdminBundleOrder.js');
-const AdminUsersRoutes = require('./routes/AdminUsersRoutes.js');
+// const AdminUsersRoutes = require('./routes/AdminUsersRoutes.js');
 const token = require('./routes/tokenValidation.js');
 const customerData = require('./routes/customerData.js');
 const handleLogout = require('./routes/handlelogout.js');
@@ -36,22 +38,18 @@ const nodemailer = require('./routes/NodeMailer.js');
 
 
 
-app.use(cors());
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
-
-
 const crypto = require('crypto');
-const TOKEN_EXPIRATION_TIME = 3600000; // 1 hour
+const TOKEN_EXPIRATION_TIME = 3600000;
+
 
 app.post('/verify-token', async (req, res) => {
   const { token } = req.body;
 
   try {
-    // Verify the Google token
     const ticket = await client.verifyIdToken({
       idToken: token,
       audience: GOOGLE_CLIENT_ID,
@@ -59,25 +57,18 @@ app.post('/verify-token', async (req, res) => {
     console.error('Token Validation', token);
 
     const payload = ticket.getPayload();
-    const email = payload.email; // Get the email from the payload
+    const email = payload.email;
 
-    // Query the database to check if the user exists
     const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
 
     if (rows.length > 0) {
-      // User exists, retrieve their data
       const user = rows[0];
 
-      // Generate a new random token
-      //  const token = crypto.randomBytes(64).toString('hex');
-
-      // Check if a token already exists for the user
       const [existingTokenRows] = await db.query('SELECT * FROM tokens WHERE user_id = ? AND token_status = ?', [user.customer_id, 'Active']);
 
       if (existingTokenRows.length > 0) {
         const existingToken = existingTokenRows[0];
 
-        // Check if the token has expired
         const now = new Date();
         if (new Date(existingToken.expires_at) > now) {
           return res.status(200).json({
@@ -93,12 +84,10 @@ app.post('/verify-token', async (req, res) => {
           });
         }
 
-        // If token expired, delete the old token
         await db.query('DELETE FROM tokens WHERE id = ?', [existingToken.id]);
       }
 
 
-      // Insert the new token into the tokens table with an expiration time
       await db.query('INSERT INTO tokens (user_id, token, token_status, expires_at) VALUES (?, ?, ?, ?)', [
         user.customer_id,
         token,
@@ -107,7 +96,6 @@ app.post('/verify-token', async (req, res) => {
       ]);
 
 
-      // Respond with user data and the newly generated token
       return res.status(200).json({
         message: 'User verified',
         payload: payload,
@@ -120,7 +108,6 @@ app.post('/verify-token', async (req, res) => {
         profile_img: user.profile_img,
       });
     } else {
-      // User does not exist
       return res.status(200).json({
         message: 'User not registered',
         payload,
@@ -142,10 +129,9 @@ app.post('/google-signup', async (req, res) => {
   }
 
   try {
-    // Verify the Google token
     const ticket = await client.verifyIdToken({
       idToken: token,
-      audience: GOOGLE_CLIENT_ID, // Ensure this matches your Google OAuth Client ID
+      audience: GOOGLE_CLIENT_ID,
     });
 
     const payload = ticket.getPayload();
@@ -153,13 +139,11 @@ app.post('/google-signup', async (req, res) => {
     const firstName = payload.given_name || '';
     const lastName = payload.family_name || '';
 
-    // Check if the user already exists
     const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [googleEmail]);
 
     if (rows.length > 0) {
       const user = rows[0];
 
-      // Check for existing active tokens for this user
       const [activeTokens] = await db.query(
         'SELECT * FROM tokens WHERE user_id = ? AND token_status = ?',
         [user.customer_id, 'Active']
@@ -169,7 +153,6 @@ app.post('/google-signup', async (req, res) => {
       if (activeTokens.length > 0) {
         const activeToken = activeTokens[0];
 
-        // If the token is still valid, return user details
         if (new Date(activeToken.expires_at) > now) {
           return res.status(200).json({
             message: 'User verified',
@@ -183,12 +166,11 @@ app.post('/google-signup', async (req, res) => {
           });
         }
 
-        // Remove expired token
         await db.query('DELETE FROM tokens WHERE id = ?', [activeToken.id]);
       }
 
-      // Insert a new token for the user
-      const newToken = generateToken(); // Function to generate a new token
+
+      const newToken = generateToken();
       const expiresAt = new Date(Date.now() + TOKEN_EXPIRATION_TIME);
 
       await db.query('INSERT INTO tokens (user_id, token, token_status, expires_at) VALUES (?, ?, ?, ?)', [
@@ -209,16 +191,13 @@ app.post('/google-signup', async (req, res) => {
         token: newToken,
       });
     } else {
-      // If user doesn't exist, register a new user
       const [result] = await db.query(
         'INSERT INTO users (first_name, last_name, email, password) VALUES (?, ?, ?, ?)',
-        [firstName, lastName, googleEmail, null] // Password is null for Google signup
-      );
+        [firstName, lastName, googleEmail, null]);
 
       const newUserId = result.insertId;
 
-      // Create a new token for the newly registered user
-      const newToken = generateToken(); // Function to generate a new token
+      const newToken = generateToken();
       const expiresAt = new Date(Date.now() + TOKEN_EXPIRATION_TIME);
 
       await db.query('INSERT INTO tokens (user_id, token, token_status, expires_at) VALUES (?, ?, ?, ?)', [
@@ -235,9 +214,9 @@ app.post('/google-signup', async (req, res) => {
         first_name: firstName,
         last_name: lastName,
         email: googleEmail,
-        token: newToken, // Include the token in the response
-        role_type: 'Customer', // Set default role if applicable
-        profile_img: payload.picture || '', // Include profile picture if available
+        token: newToken,
+        role_type: 'Customer',
+        profile_img: payload.picture || '',
       });
     }
   } catch (error) {
@@ -246,7 +225,6 @@ app.post('/google-signup', async (req, res) => {
   }
 });
 
-// Helper function to generate a unique token
 function generateToken() {
   return require('crypto').randomBytes(48).toString('hex');
 }
@@ -256,11 +234,16 @@ const routes = [
   cartRoutes, customerSignUpRoutes, customerLoginRoutes, productRoutes,
   OrderRoutes, viewTransactionsRoute, userInteraction, adminOrderHistory,
   adminOrderUpdates, adminProduct, adminProductUpdate, AdminBundleOrder,
-  AdminUsersRoutes, token, customerData, handleLogout, nodemailer
+  token, customerData, handleLogout, nodemailer
+  //  AdminUsersRoutes,
 ];
 
 routes.forEach(route => {
   app.use('/api', route);
+});
+
+app.use("/", (req, res) => {
+  res.send("Server is Running. ");
 });
 
 // Start the server
