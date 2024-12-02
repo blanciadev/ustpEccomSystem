@@ -4,7 +4,7 @@ const db = require('../db');
 const crypto = require('crypto');
 
 
-const bcryptjs = require('bcryptjsjs');
+const bcryptjs = require('bcryptjs');
 const saltRounds = 10;
 
 
