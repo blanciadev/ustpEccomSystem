@@ -25,7 +25,7 @@ const UserSideNav = () => {
 
     if (token && customerId) {
       try {
-        const response = await fetch('http://localhost:5001/users-details', {
+        const response = await fetch('http://localhost:5001/api//users-details', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -74,51 +74,51 @@ const UserSideNav = () => {
   return (
 
     <>
-    <div className='side-con '>
-      <div className='side-user '>
-        <img
-          src={profileImg || 'https://static.vecteezy.com/system/resources/previews/026/434/409/non_2x/default-avatar-profile-icon-social-media-user-photo-vector.jpg'}
-          alt='User Profile'
-          className="user-profile-image "
-        />
-        {isMobile ? (
-          <p style={{ fontSize: '1em', textAlign: 'center' }}>{firstName}</p>
-        ) : (
-          <>
-            <br />
-            <h5>{firstName}</h5>
-          </>
-        )}
+      <div className='side-con '>
+        <div className='side-user '>
+          <img
+            src={profileImg || 'https://static.vecteezy.com/system/resources/previews/026/434/409/non_2x/default-avatar-profile-icon-social-media-user-photo-vector.jpg'}
+            alt='User Profile'
+            className="user-profile-image "
+          />
+          {isMobile ? (
+            <p style={{ fontSize: '1em', textAlign: 'center' }}>{firstName}</p>
+          ) : (
+            <>
+              <br />
+              <h5>{firstName}</h5>
+            </>
+          )}
+        </div>
+
+        <div className='side-navlinks'>
+          <a
+            href='/user'
+            className={location.pathname === '/user' ? 'active-link' : ''}
+          >
+            {isMobile ? (
+              <i style={{ fontSize: '18pt', cursor: 'pointer' }} className="bx bxs-user-circle"></i>
+            ) : (
+              <p style={{ fontWeight: '500' }}>Profile</p>
+            )}
+          </a>
+
+          <a
+            href='/user/purchase'
+            className={location.pathname === '/user/purchase' ? 'active-link' : ''}
+          >
+            {isMobile ? (
+              <i style={{ fontSize: '18pt', cursor: 'pointer' }} className="bx bxs-package"></i>
+            ) : (
+              <p style={{ fontWeight: '500' }}>My Orders</p>
+            )}
+          </a>
+        </div>
+
       </div>
 
-      <div className='side-navlinks'>
-        <a
-          href='/user'
-          className={location.pathname === '/user' ? 'active-link' : ''}
-        >
-          {isMobile ? (
-            <i style={{ fontSize: '18pt', cursor: 'pointer' }} className="bx bxs-user-circle"></i>
-          ) : (
-            <p style={{ fontWeight: '500' }}>Profile</p>
-          )}
-        </a>
+    </>
 
-        <a
-          href='/user/purchase'
-          className={location.pathname === '/user/purchase' ? 'active-link' : ''}
-        >
-          {isMobile ? (
-            <i style={{ fontSize: '18pt', cursor: 'pointer' }} className="bx bxs-package"></i>
-          ) : (
-            <p style={{ fontWeight: '500' }}>My Orders</p>
-          )}
-        </a>
-      </div>
-    
-    </div>
-
-</>
-  
   );
 };
 

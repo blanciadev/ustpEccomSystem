@@ -22,7 +22,7 @@ const UsersModal = ({ show, onClose, user }) => {
 
     const handleUpdate = async () => {
         try {
-            await axios.put(`http://localhost:5001/admin-users-role-update`, {
+            await axios.put(`http://localhost:5001/api/admin-users-role-update`, {
                 customer_id: editableUser.customer_id,
                 role_type: editableUser.role_type,
                 date_hired: editableUser.date_hired,

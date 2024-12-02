@@ -39,7 +39,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5001/users-signup', {
+      const response = await fetch('http://localhost:5001/api/users-signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -73,7 +73,7 @@ const Signup = () => {
     const token = credentialResponse.credential;
 
     try {
-      const response = await axios.post('http://localhost:5001/google-signup', { token });
+      const response = await axios.post('http://localhost:5001/api/google-signup', { token });
 
 
       if (response.status === 200) {
@@ -95,13 +95,13 @@ const Signup = () => {
           navigate('/forgot-password');
           console.log(token);
         } else {
-          
+
           console.log('Google signup ');
           navigate('/signup');
         }
       }
     } catch (err) {
-      
+
       console.error('Error during Google login:', err);
       // setToastMessage('Failed to login with Google. Please try again.');
 

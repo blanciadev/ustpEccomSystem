@@ -21,7 +21,7 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await fetch('http://localhost:5001/product-category');
+                const response = await fetch('http://localhost:5001/api/product-category');
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
@@ -68,7 +68,7 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
         };
 
         try {
-            const response = await fetch('http://localhost:5001/add-product', {
+            const response = await fetch('http://localhost:5001/api/add-product', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -28,7 +28,7 @@ const Shipments = () => {
   useEffect(() => {
     const fetchShipments = async () => {
       try {
-        const response = await fetch("http://localhost:5001/shipments");
+        const response = await fetch("http://localhost:5001/api/shipments");
         if (!response.ok) {
           throw new Error("Failed to fetch shipments");
         }
@@ -89,7 +89,7 @@ const Shipments = () => {
   const exportToExcel = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5001/shipments?export=true",
+        "http://localhost:5001/api/shipments?export=true",
         {
           method: "GET",
           headers: {
@@ -98,13 +98,13 @@ const Shipments = () => {
           },
         }
       );
-  
+
       if (!response.ok) {
         throw new Error("Failed to export shipments");
       }
-  
+
       const blob = await response.blob();
-  
+
       // Get the current date and time
       const now = new Date();
       const formattedDateTime = now
@@ -112,14 +112,14 @@ const Shipments = () => {
         .replace(/[-:]/g, "") // Remove hyphens and colons
         .replace("T", "_") // Replace 'T' with an underscore
         .split(".")[0]; // Remove milliseconds
-  
+
       const fileName = `Shipment Records ${formattedDateTime}.xlsx`;
       saveAs(blob, fileName);
     } catch (error) {
       console.error("Error exporting to Excel:", error.message);
     }
   };
-  
+
 
   return (
     <div className="dash-con">
@@ -159,7 +159,7 @@ const Shipments = () => {
 
                 <div class="col-4">
                   <div class=" d-flex justify-content-end">
-                  <button onClick={exportToExcel} className="btn btn-primary">
+                    <button onClick={exportToExcel} className="btn btn-primary">
                       {isMobile ? (
                         <i className="bx bx-download"></i>
                       ) : (

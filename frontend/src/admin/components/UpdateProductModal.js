@@ -41,7 +41,7 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
 
         const fetchCategories = async () => {
             try {
-                const response = await axios.get('http://localhost:5001/categories');
+                const response = await axios.get('http://localhost:5001/api/categories');
                 setCategories(response.data.categories);
             } catch (error) {
                 console.error('Error fetching categories:', error);
@@ -68,7 +68,7 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
                     ...formData,
                     size: formData.size === 'Other' ? formData.custom_size : formData.size
                 };
-                await axios.put(`http://localhost:5001/admin-update-products/${formData.product_code}`, dataToSend);
+                await axios.put(`http://localhost:5001/api/admin-update-products/${formData.product_code}`, dataToSend);
 
                 setToastMessage('Updated Successfully!');
                 setTimeout(() => {

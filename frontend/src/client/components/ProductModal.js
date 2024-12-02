@@ -29,7 +29,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
             setLoading(true);
             setError(null);
 
-            const fetchRecommendations = fetch('http://localhost:5001/products-recommendations', {
+            const fetchRecommendations = fetch('http://localhost:5001/api//products-recommendations', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -37,7 +37,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                 body: JSON.stringify({ product_code: product.product_code }),
             });
 
-            const fetchBundles = fetch('http://localhost:5001/product-bundles', {
+            const fetchBundles = fetch('http://localhost:5001/api//product-bundles', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -236,7 +236,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
         });
     };
 
-    
+
     const [isAddToCartHovered, setIsAddToCartHovered] = useState(false);
     const [isBuyNowHovered, setIsBuyNowHovered] = useState(false);
 
@@ -259,7 +259,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                             <h3 className="" style={{ fontSize: "1.2rem" }}>
                                 ₱ {calculateDiscountedPrice(product.price, product.product_discount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </h3>
-                           
+
                             <p><strong>Stocks</strong></p>
                             <p>{product.quantity}</p>
                         </div>
@@ -275,7 +275,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                         <div className="quantity">
                             <p><strong>Quantity</strong></p>
                             <div className='quantity-buttons'>
-                                <button onClick={decrementQuantity}><FaMinus class="text-dark"/></button>
+                                <button onClick={decrementQuantity}><FaMinus class="text-dark" /></button>
                                 <input
                                     type="text"
                                     value={quantity}
@@ -283,47 +283,49 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                                     readOnly
                                     style={{ width: '70px', border: '1px solid gray', outline: 'none', borderRadius: '0' }}
                                 />
-                                <button onClick={incrementQuantity}><FaPlus class="text-dark"/></button>
+                                <button onClick={incrementQuantity}><FaPlus class="text-dark" /></button>
                             </div>
                         </div>
                         <div class="buttons">
                             {product.quantity > 0 ? (
                                 <>
 
-<button
-    className="add-to-cart-button px-10"
-    style={{
-        backgroundColor: isAddToCartHovered ? 'rgb(223, 95, 116)' : '#d81c4b',
-        color: 'white',
-    }}
-    onMouseEnter={() => setIsAddToCartHovered(true)}
-    onMouseLeave={() => setIsAddToCartHovered(false)}
-    onClick={() => onAddToCart(product)}
->
-    Add to cart
-</button>
+                                    <button
+                                        className="add-to-cart-button px-10"
+                                        style={{
+                                            backgroundColor: isAddToCartHovered ? 'rgb(223, 95, 116)' : '#d81c4b',
+                                            color: 'white',
+                                        }}
+                                        onMouseEnter={() => setIsAddToCartHovered(true)}
+                                        onMouseLeave={() => setIsAddToCartHovered(false)}
+                                        onClick={() => onAddToCart(product)}
+                                    >
+                                        Add to cart
+                                    </button>
 
-<button
-    className="buy-now-button px-10"
-    style={{
-        backgroundColor: isBuyNowHovered ? 'rgb(223, 95, 116)' : '#d81c4b',
-        color: 'white',
-    }}
-    onMouseEnter={() => setIsBuyNowHovered(true)}
-    onMouseLeave={() => setIsBuyNowHovered(false)}
-    onClick={() => handleBuyNow(product)}
->
-    Buy Now
-</button>
+                                    <button
+                                        className="buy-now-button px-10"
+                                        style={{
+                                            backgroundColor: isBuyNowHovered ? 'rgb(223, 95, 116)' : '#d81c4b',
+                                            color: 'white',
+                                        }}
+                                        onMouseEnter={() => setIsBuyNowHovered(true)}
+                                        onMouseLeave={() => setIsBuyNowHovered(false)}
+                                        onClick={() => handleBuyNow(product)}
+                                    >
+                                        Buy Now
+                                    </button>
 
 
                                 </>
                             ) : (
-                                <p style={{ color: 'red',
-                                            padding: '8px 15px',
-                                            border: '2px solid red',
-                                            borderRadius: '5px',
-                                            fontWeight: 600}}
+                                <p style={{
+                                    color: 'red',
+                                    padding: '8px 15px',
+                                    border: '2px solid red',
+                                    borderRadius: '5px',
+                                    fontWeight: 600
+                                }}
                                 >
                                     SOLD OUT
                                 </p>
@@ -394,7 +396,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                             <p>{error}</p>
                         ) : recommendedProducts.length > 0 ? (
                             <div className="recommended-modalproducts-grid">
-                                
+
 
 
 
@@ -413,7 +415,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                                                 <h3 className="modalproduct-price " style={{ fontSize: "1.2rem" }}>
                                                     ₱ {calculateDiscountedPrice(recProduct.price, recProduct.product_discount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                 </h3>
-                                               
+
 
                                                 {recProduct.product_status === 'Discounted' && (
                                                     <span className="modalproduct-discount">
@@ -434,67 +436,67 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
 
 
 
-<button
-            className="add-to-cart-button px-10"
-            style={{
-                backgroundColor: recProduct.isAddToCartHovered
-                    ? 'rgb(223, 95, 116)'
-                    : '#d81c4b',
-                color: 'white',
-            }}
-            onMouseEnter={() =>
-                setRecommendedProducts((prev) =>
-                    prev.map((item) =>
-                        item.product_id === recProduct.product_id
-                            ? { ...item, isAddToCartHovered: true }
-                            : item
-                    )
-                )
-            }
-            onMouseLeave={() =>
-                setRecommendedProducts((prev) =>
-                    prev.map((item) =>
-                        item.product_id === recProduct.product_id
-                            ? { ...item, isAddToCartHovered: false }
-                            : item
-                    )
-                )
-            }
-            onClick={() => onAddToCart(recProduct)}
-        >
-            Add to cart
-        </button>
+                                                <button
+                                                    className="add-to-cart-button px-10"
+                                                    style={{
+                                                        backgroundColor: recProduct.isAddToCartHovered
+                                                            ? 'rgb(223, 95, 116)'
+                                                            : '#d81c4b',
+                                                        color: 'white',
+                                                    }}
+                                                    onMouseEnter={() =>
+                                                        setRecommendedProducts((prev) =>
+                                                            prev.map((item) =>
+                                                                item.product_id === recProduct.product_id
+                                                                    ? { ...item, isAddToCartHovered: true }
+                                                                    : item
+                                                            )
+                                                        )
+                                                    }
+                                                    onMouseLeave={() =>
+                                                        setRecommendedProducts((prev) =>
+                                                            prev.map((item) =>
+                                                                item.product_id === recProduct.product_id
+                                                                    ? { ...item, isAddToCartHovered: false }
+                                                                    : item
+                                                            )
+                                                        )
+                                                    }
+                                                    onClick={() => onAddToCart(recProduct)}
+                                                >
+                                                    Add to cart
+                                                </button>
 
-        <button
-            className="buy-now-button px-10"
-            style={{
-                backgroundColor: recProduct.isBuyNowHovered
-                    ? 'rgb(223, 95, 116)'
-                    : '#d81c4b',
-                color: 'white',
-            }}
-            onMouseEnter={() =>
-                setRecommendedProducts((prev) =>
-                    prev.map((item) =>
-                        item.product_id === recProduct.product_id
-                            ? { ...item, isBuyNowHovered: true }
-                            : item
-                    )
-                )
-            }
-            onMouseLeave={() =>
-                setRecommendedProducts((prev) =>
-                    prev.map((item) =>
-                        item.product_id === recProduct.product_id
-                            ? { ...item, isBuyNowHovered: false }
-                            : item
-                    )
-                )
-            }
-            onClick={() => handleBuyNow(recProduct)}
-        >
-            Buy Now
-        </button>
+                                                <button
+                                                    className="buy-now-button px-10"
+                                                    style={{
+                                                        backgroundColor: recProduct.isBuyNowHovered
+                                                            ? 'rgb(223, 95, 116)'
+                                                            : '#d81c4b',
+                                                        color: 'white',
+                                                    }}
+                                                    onMouseEnter={() =>
+                                                        setRecommendedProducts((prev) =>
+                                                            prev.map((item) =>
+                                                                item.product_id === recProduct.product_id
+                                                                    ? { ...item, isBuyNowHovered: true }
+                                                                    : item
+                                                            )
+                                                        )
+                                                    }
+                                                    onMouseLeave={() =>
+                                                        setRecommendedProducts((prev) =>
+                                                            prev.map((item) =>
+                                                                item.product_id === recProduct.product_id
+                                                                    ? { ...item, isBuyNowHovered: false }
+                                                                    : item
+                                                            )
+                                                        )
+                                                    }
+                                                    onClick={() => handleBuyNow(recProduct)}
+                                                >
+                                                    Buy Now
+                                                </button>
 
 
 

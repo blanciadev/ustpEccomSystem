@@ -26,7 +26,7 @@ const AdminHeader = () => {
 
         try {
             const response = await axios.get(
-                `http://localhost:5001/admin-users-details`,
+                `http://localhost:5001/api/admin-users-details`,
                 { params: { customer_id: customerId } }
             );
 
@@ -63,7 +63,7 @@ const AdminHeader = () => {
         if (token) {
             try {
                 await axios.post(
-                    "http://localhost:5001/logout",
+                    "http://localhost:5001/api/logout",
                     {},
                     {
                         headers: { Authorization: `Bearer ${token}` },
