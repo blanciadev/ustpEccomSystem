@@ -3,8 +3,6 @@ import '../admin.css';
 import Dropdown from 'react-bootstrap/Dropdown';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
-
 import { FaRegUser } from "react-icons/fa";
 import { MdLogout } from "react-icons/md";
 
@@ -59,108 +57,103 @@ const AdminHeader = () => {
         }
     })();
 
+
     const handleLogout = async () => {
-        const token = localStorage.getItem('token');
-
-        if (!token) {
-            console.error('No token found for logout.');
-            return;
-        }
-
-        try {
-            const response = await axios.post('http://localhost:5001/logout', {}, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            if (response.status === 200) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('customer_id');
-                localStorage.removeItem('username');
-                localStorage.removeItem('first_name');
-                localStorage.removeItem('last_name');
-                localStorage.removeItem('role');
-
-
-                navigate('/login');
+        const token = localStorage.getItem("token");
+        if (token) {
+            try {
+                await axios.post(
+                    "http://localhost:5001/logout",
+                    {},
+                    {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }
+                );
+                localStorage.removeItem("token");
+                localStorage.clear();
+                navigate("/");
+            } catch (error) {
+                console.error(
+                    "Error logging out:",
+                    error.response ? error.response.data : error.message
+                );
             }
-        } catch (error) {
-            console.error('Error during logout:', error);
         }
-    };
+    }
+
+
 
     return (
         <div className='header-user'>
 
             <div className='admin-profile'>
-            <span
+                <span
                     className="cartIcon d-flex justify-content-end align-items-center"
                     id="profileDropdown"
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
-                  >
+                >
 
 
-                      <img
+                    <img
                         src={
                             profileImage ||
-                          "https://static.vecteezy.com/system/resources/previews/026/434/409/non_2x/default-avatar-profile-icon-social-media-user-photo-vector.jpg"
+                            "https://static.vecteezy.com/system/resources/previews/026/434/409/non_2x/default-avatar-profile-icon-social-media-user-photo-vector.jpg"
                         }
                         alt="Profile Image"
                         style={{
-                          width: "40px",
-                          height: "40px",
-                          borderRadius: "50%",
+                            width: "40px",
+                            height: "40px",
+                            borderRadius: "50%",
                         }}
-                      /> 
+                    />
 
 
-                      <p class="ms-2">{firstName ? firstName + ' ' + lastName : username}</p>
-                    
-                  </span>
+                    <p class="ms-2">{firstName ? firstName + ' ' + lastName : username}</p>
 
-                  <ul
+                </span>
+
+                <ul
                     className="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3"
                     aria-labelledby="profileDropdown"
                     style={{
-                      minWidth: "200px",
-                      fontFamily: "Arial, sans-serif",
-                      fontSize: "14px",
+                        minWidth: "200px",
+                        fontFamily: "Arial, sans-serif",
+                        fontSize: "14px",
                     }}
-                  >
-                    
-                    <li>
-                      <a
-                        className="dropdown-item d-flex align-items-center"
-                        // onClick={handleProfileClick}
-                        href='/admin/profile'
-                      >
-                        <FaRegUser
-                          className="me-2"
-                          size={24}
-                          style={{ color: "green" }}
-                        />
-                        <span style={{ fontSize: "16px" }}>Profile</span>
-                      </a>
-                    </li>
-                  
+                >
 
                     <li>
-                      <hr className="dropdown-divider" />
+                        <a
+                            className="dropdown-item d-flex align-items-center"
+                            // onClick={handleProfileClick}
+                            href='/admin/profile'
+                        >
+                            <FaRegUser
+                                className="me-2"
+                                size={24}
+                                style={{ color: "green" }}
+                            />
+                            <span style={{ fontSize: "16px" }}>Profile</span>
+                        </a>
+                    </li>
+
+
+                    <li>
+                        <hr className="dropdown-divider" />
                     </li>
 
                     <li>
-                      <a
-                        className="dropdown-item d-flex align-items-center text-danger"
-                        onClick={() => setShowLogoutModal(true)}
-                      >
-                        <MdLogout className="me-2" size={24} />
-                        <span style={{ fontSize: "16px" }}>Logout</span>
-                      </a>
+                        <a
+                            className="dropdown-item d-flex align-items-center text-danger"
+                            onClick={() => setShowLogoutModal(true)}
+                        >
+                            <MdLogout className="me-2" size={24} />
+                            <span style={{ fontSize: "16px" }}>Logout</span>
+                        </a>
                     </li>
-                    
-                  </ul>
+
+                </ul>
 
             </div>
             <div

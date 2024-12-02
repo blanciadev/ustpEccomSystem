@@ -107,12 +107,12 @@ function ProfileImageUpload({ formData }) {
                             )}
                             <div className='overlay'>Change Profile</div>
                         </div>
-                        <input 
-                            type="file" 
-                            id="file-input" 
-                            accept="image/jpeg, image/jpg, image/png" 
-                            onChange={handleFileChange} 
-                            style={{ display: 'none' }}  // Hides the file input
+                        <input
+                            type="file"
+                            id="file-input"
+                            accept="image/jpeg, image/jpg, image/png"
+                            onChange={handleFileChange}
+                            style={{ display: 'none' }}
                         />
                     </div>
 

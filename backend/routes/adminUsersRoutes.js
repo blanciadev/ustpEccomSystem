@@ -155,27 +155,22 @@ router.put('/admin-users-password-update', async (req, res) => {
 
 
 
-
-
-
 // Route to get users counts
 router.get('/admin-users-count', async (req, res) => {
     try {
         const query = `SELECT * FROM users`;
         const [results] = await db.execute(query);
 
-        // Calculate user counts
-        const newUsersCount = results.filter(user => user.role_type === 'user').length;
-        const totalEmployeesCount = results.filter(user => user.role_type === 'Admin').length;
-        const activeCustomersCount = results.filter(user => user.status === 'active').length;
-        const inactiveCustomersCount = results.filter(user => user.status === 'inactive').length;
+        // Count based on role_type
+        const customersCount = results.filter(user => user.role_type === 'Customer').length;
+        const adminsCount = results.filter(user => user.role_type === 'Admin').length;
+        const warehouseManagersCount = results.filter(user => user.role_type === 'Warehouse Manager').length;
 
         res.json({
             data: {
-                newUsers: newUsersCount,
-                totalEmployees: totalEmployeesCount,
-                activeCustomers: activeCustomersCount,
-                inactiveCustomers: inactiveCustomersCount,
+                customers: customersCount, // Count of customers
+                admins: adminsCount,       // Count of admins
+                warehouseManagers: warehouseManagersCount, // Count of warehouse managers
             }
         });
     } catch (error) {
@@ -183,7 +178,6 @@ router.get('/admin-users-count', async (req, res) => {
         res.status(500).json({ error: 'Failed to retrieve users. Please try again.' });
     }
 });
-
 
 
 

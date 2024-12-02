@@ -28,7 +28,7 @@ const PaymentInsight = () => {
     }, []);
 
     const data = {
-        labels: monthlyCounts.map(mc => `Month ${mc.month}`),
+        labels: monthlyCounts.map(mc => mc.month),
         datasets: [
             {
                 label: 'Completed Orders',
@@ -39,6 +39,7 @@ const PaymentInsight = () => {
             },
         ],
     };
+
 
     const options = {
         responsive: true,
@@ -56,7 +57,7 @@ const PaymentInsight = () => {
             tooltip: {
                 callbacks: {
                     label: function (tooltipItem) {
-                        return `${tooltipItem.dataset.label}: ${tooltipItem.raw}`; // Use template literals for readability
+                        return `${tooltipItem.dataset.label}: ${tooltipItem.raw}`;
                     },
                 },
                 backgroundColor: 'rgba(0,0,0,0.7)',

@@ -620,18 +620,19 @@ router.get('/admin-order-history-component', async (req, res) => {
 
         // Base query for fetching order details for today's date using order_date
         let query = `
-            SELECT 
-                order_details.order_status,
-                COUNT(*) AS order_count
-            FROM 
-                \`order\`
-            INNER JOIN 
-                order_details ON \`order\`.order_id = order_details.order_id
-            WHERE 
-                DATE(\`order\`.order_date) = CURDATE()  
-            GROUP BY 
-                order_details.order_status
-        `;
+        SELECT 
+            order_details.order_status,
+            COUNT(*) AS order_count
+        FROM 
+            \`order\`
+        INNER JOIN 
+            order_details ON \`order\`.order_id = order_details.order_id
+        WHERE 
+            DATE(order_details.order_date) = CURDATE()
+        GROUP BY 
+            order_details.order_status;
+    `;
+
 
         if (status) {
             query += ` AND order_details.order_status = ?`;
@@ -657,7 +658,7 @@ router.get('/admin-order-history-component', async (req, res) => {
                 'To Receive': statusCounts['To Receive'] || 0,
                 Cancelled: statusCounts['Cancelled'] || 0,
                 'Return/Refund': statusCounts['Return/Refund'] || 0,
-                Returned: statusCounts['Returned'] || 0,
+                Returned: statusCounts['Return/Refund'] || 0,
             }
         });
 
@@ -745,12 +746,12 @@ router.get('/sales', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
-
 router.get('/payment-insight', async (req, res) => {
     try {
         const query = `
             SELECT 
                 MONTH(order_date) AS order_month,
+                MONTHNAME(order_date) AS month_name,
                 COUNT(*) AS completed_orders_count
             FROM 
                 order_details
@@ -758,23 +759,19 @@ router.get('/payment-insight', async (req, res) => {
                 order_status = 'Completed' 
                 AND payment_status = 'Order Paid'
             GROUP BY 
-                MONTH(order_date)
+                MONTH(order_date), MONTHNAME(order_date)
             ORDER BY 
                 order_month;
         `;
 
         const result = await db.query(query);
-        console.log(result);
-
 
         const monthlyCounts = Array.isArray(result) && result.length > 0
             ? result[0].map(row => ({
-                month: row.order_month,
+                month: row.month_name, // Use the month_name field
                 count: row.completed_orders_count,
             }))
             : [];
-
-        console.log(monthlyCounts);
 
         res.json({ monthlyCounts });
     } catch (error) {
