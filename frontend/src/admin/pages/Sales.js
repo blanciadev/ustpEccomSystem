@@ -244,9 +244,9 @@ const Sales = () => {
                       <table className="table table-hover">
                         <thead className="bg-light sticky-top">
                           <tr>
-                            <th style={{ width: "5%" }}>
+                            {/* <th style={{ width: "5%" }}>
                               <input type="checkbox" />
-                            </th>
+                            </th> */}
                             <th style={{ width: "10%" }}>Period</th>
                             <th style={{ width: "15%" }}>Product Code</th>
                             <th style={{ width: "40%" }}>Product Name</th>
@@ -257,9 +257,9 @@ const Sales = () => {
                         <tbody>
                           {filteredReports.map((report, index) => (
                             <tr key={index}>
-                              <td>
+                              {/* <td>
                                 <input type="checkbox" />
-                              </td>
+                              </td> */}
                               <td>{report.period}</td>
                               <td>{report.product_code}</td>
                               <td>{report.product_name}</td>

@@ -253,9 +253,9 @@ const AdminHistory = () => {
                 <table className="table table-hover">
                   <thead className=" thead-design bg-light sticky-top">
                     <tr>
-                      <th>
+                      {/* <th>
                         <input type="checkbox" />
-                      </th>
+                      </th> */}
                       <th>Customer ID</th>
                       <th>Order ID</th>
                       <th>Shipment ID</th>
@@ -276,9 +276,9 @@ const AdminHistory = () => {
                         <tr
                           key={`${order.order_id}-${product.product_id}-${index}`}
                         >
-                          <td>
+                          {/* <td>
                             <input type="checkbox" />
-                          </td>
+                          </td> */}
                           <td>
                             {highlightText(
                               order.customer_id.toString(),
@@ -338,11 +338,9 @@ const AdminHistory = () => {
                             )}
                           </td>
                           <td>
-                            {highlightText(
-                              new Date(order.order_date).toLocaleDateString(),
-                              searchTerm
-                            )}
+                            {highlightText(order.order_date, searchTerm)}
                           </td>
+
                           <td>
                             {highlightText(
                               product.product_quantity.toString(),

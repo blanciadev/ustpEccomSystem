@@ -205,7 +205,7 @@ const Payments = () => {
                       value={statusFilter}
                       onChange={handleStatusFilterChange}
                       className="form-select"
-                      style={{width: "150px"}}
+                      style={{ width: "150px" }}
                     >
                       <option value="">All</option>
                       <option value="Pending">Pending</option>
@@ -225,9 +225,9 @@ const Payments = () => {
                     <table className="table table-hover">
                       <thead className="bg-light sticky-top">
                         <tr>
-                          <th>
+                          {/* <th>
                             <input type="checkbox" />
-                          </th>
+                          </th> */}
                           <th>Order ID</th>
                           <th>Customer ID</th>
                           <th>Payment Date</th>
@@ -240,9 +240,9 @@ const Payments = () => {
                       <tbody>
                         {paginatedOrders.map((order, index) => (
                           <tr key={index}>
-                            <td>
+                            {/* <td>
                               <input type="checkbox" />
-                            </td>
+                            </td> */}
                             <td>{order.order_id}</td>
                             <td>{order.customer_id}</td>
                             <td>

@@ -76,16 +76,17 @@ const BundleProductModal = () => {
   const handleBundleSubmit = async (e) => {
     e.preventDefault();
 
-    const discountedProducts = selectedProducts.map((product) => ({
-      ...product,
-      discountedPrice: (
+    const discountedProducts = selectedProducts.map((product) => {
+      const discountedPrice = (
         product.originalPrice -
         (product.originalPrice * discount) / 100
-      ).toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }),
-    }));
+      );
+
+      return {
+        ...product,
+        discountedPrice: discountedPrice,
+      };
+    });
 
     const bundleData = {
       selectedProducts: discountedProducts,
@@ -113,16 +114,9 @@ const BundleProductModal = () => {
     }
   };
 
+
   const handleProductSelection = (product) => {
     setSelectedProducts((prevSelected) => {
-      if (!selectedCategory) {
-        setSelectedCategory(product.category_name);
-      }
-
-      if (selectedCategory && product.category_name !== selectedCategory) {
-        return prevSelected;
-      }
-
       if (prevSelected.some((p) => p.product_id === product.product_id)) {
         return prevSelected.filter((p) => p.product_id !== product.product_id);
       } else {
@@ -130,11 +124,8 @@ const BundleProductModal = () => {
         return [...prevSelected, updatedProduct];
       }
     });
-
-    if (!selectedCategory) {
-      setSelectedCategory(product.category_name);
-    }
   };
+
 
   const filteredProducts = selectedCategory
     ? products.filter((product) => product.category_name === selectedCategory)
@@ -175,13 +166,13 @@ const BundleProductModal = () => {
 
   return (
     <>
-<Button
-  variant="secondary"
-  onClick={handleShow}
-  style={{ backgroundColor: '#fb3d69', borderColor: 'white', color: '#fff' }}
->
-  {isMobile ? <i className="bx bxs-discount"></i> : 'Bundle A Product'}
-</Button>
+      <Button
+        variant="secondary"
+        onClick={handleShow}
+        style={{ backgroundColor: '#fb3d69', borderColor: 'white', color: '#fff' }}
+      >
+        {isMobile ? <i className="bx bxs-discount"></i> : 'Bundle A Product'}
+      </Button>
 
 
       <div
@@ -221,7 +212,7 @@ const BundleProductModal = () => {
                       <Spinner animation="border" variant="primary" />
                     )}
                     <div className="container">
-                      <div className="container " style={{height: "400px"}}>
+                      <div className="container " style={{ height: "400px" }}>
                         <table className="table table-striped table-bordered">
                           <thead className="thead-dark">
                             <tr>

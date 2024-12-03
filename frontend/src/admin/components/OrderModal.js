@@ -137,9 +137,10 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                         <strong>Delivery Address</strong>
                       </p>
                     </div>
-                    <div class="col">
-                      <p>{`${order.address}`}</p>
+                    <div className="col">
+                      <p>{`${order.shipment.streetname}, ${order.shipment.address}, ${order.shipment.city}`}</p>
                     </div>
+
                   </div>
 
                   <div class="row align-items-center">

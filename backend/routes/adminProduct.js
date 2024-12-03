@@ -320,14 +320,29 @@ router.get('/product-reports-per-month', async (req, res) => {
         res.status(500).json({ error: 'Failed to retrieve product reports. Please try again.' });
     }
 });
-
 // Route to receive product reports data and generate Excel file
 router.post('/product-reports-export', async (req, res) => {
     try {
         const { month, year, data } = req.body;
 
-        if (!month || !year || !data || !Array.isArray(data) || data.length === 0) {
-            return res.status(400).json({ error: 'Month, year, and valid data are required.' });
+        // Check if data is provided and it's a valid array
+        if (!data || !Array.isArray(data) || data.length === 0) {
+            return res.status(400).json({ error: 'Valid data is required.' });
+        }
+
+        // Filter data based on the provided month and year, if available
+        let filteredData = data;
+
+        if (month && year) {
+            // Filter data for the specific month and year
+            filteredData = data.filter(
+                (item) => item.month === month && item.year === year
+            );
+
+            // If no data found for the given month and year, return an error
+            if (filteredData.length === 0) {
+                return res.status(404).json({ error: 'No data found for the specified month and year.' });
+            }
         }
 
         const workbook = new ExcelJS.Workbook();
@@ -341,7 +356,8 @@ router.post('/product-reports-export', async (req, res) => {
             { header: 'Total Sales (PHP)', key: 'total_sales', width: 20 },
         ];
 
-        data.forEach(result => {
+        // Add the rows for the filtered data
+        filteredData.forEach(result => {
             worksheet.addRow({
                 period: result.period,
                 product_code: result.product_code,
@@ -351,14 +367,14 @@ router.post('/product-reports-export', async (req, res) => {
             });
         });
 
-
+        // Set the response headers for the Excel file download
         res.setHeader(
             'Content-Type',
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         );
         res.setHeader(
             'Content-Disposition',
-            `attachment; filename=product-report-${month}-${year}.xlsx`
+            `attachment; filename=product-report-${month || 'all'}-${year || 'all'}.xlsx`
         );
 
         // Write the workbook to the response

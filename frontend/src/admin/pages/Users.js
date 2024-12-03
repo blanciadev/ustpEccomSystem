@@ -192,9 +192,9 @@ const Users = () => {
                       <table className="table table-hover">
                         <thead className="bg-light sticky-top">
                           <tr>
-                            <th>
+                            {/* <th>
                               <input type="checkbox" />
-                            </th>
+                            </th> */}
                             <th>User ID</th>
                             <th>First Name</th>
                             <th>Last Name</th>
@@ -221,9 +221,9 @@ const Users = () => {
                           ) : (
                             currentUsers.map((user) => (
                               <tr key={user.customer_id}>
-                                <td>
+                                {/* <td>
                                   <input type="checkbox" />
-                                </td>
+                                </td> */}
                                 <td>{user.customer_id}</td>
                                 <td>{user.first_name}</td>
                                 <td>{user.last_name}</td>

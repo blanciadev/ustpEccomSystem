@@ -12,89 +12,52 @@ const Transactions = () => {
   const [status, setStatus] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("date");
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [modalShow, setModalShow] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 425);
-
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
-  const fetchOrders = async () => {
-    try {
-      const response = await axios.get(
-        "http://localhost:5001/admin-order-history-general",
-        {
-          params: { status, searchTerm, sortBy },
-        }
-      );
-      setOrders(response.data.orders);
-    } catch (error) {
-      console.error("Error fetching orders:", error.message);
-    }
-  };
-
   useEffect(() => {
-    fetchOrders();
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
+    const fetchOrders = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5001/admin-order-history-general",
+          {
+            params: { status },
+          }
+        );
+        setOrders(response.data.orders);
+      } catch (error) {
+        console.error("Error fetching orders:", error.message);
+      }
     };
-  }, [status, searchTerm, sortBy]);
 
-  const handleResize = () => {
-    setIsMobile(window.innerWidth <= 425);
-  };
-
-  const handleOpenModal = (order) => {
-    setSelectedOrder(order);
-    setModalShow(true);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedOrder(null);
-    setModalShow(false);
     fetchOrders();
-  };
-
-  const refreshOrders = () => {
-    fetchOrders();
-  };
-
-  const highlightText = (text, searchTerm) => {
-    if (!searchTerm) return text;
-
-    const regex = new RegExp(`(${searchTerm})`, "gi");
-    const parts = text.split(regex);
-
-    return parts.map((part, index) =>
-      part.toLowerCase() === searchTerm.toLowerCase() ? (
-        <span key={index} className="highlighted-term">
-          {part}
-        </span>
-      ) : (
-        part
-      )
-    );
-  };
+  }, [status]);
 
   const filteredOrders = orders.filter((order) => {
     const search = searchTerm.toLowerCase();
-
     return (
-      order.order_id.toString().toLowerCase().includes(search) ||
-      order.customer_id.toString().toLowerCase().includes(search) ||
-      `${order.customer_first_name} ${order.customer_last_name}`
-        .toLowerCase()
-        .includes(search) ||
-      new Date(order.order_date)
-        .toLocaleDateString()
-        .toLowerCase()
-        .includes(search) ||
-      order.order_status.toLowerCase().includes(search) ||
-      order.payment_status.toLowerCase().includes(search) ||
-      order.order_total.toString().toLowerCase().includes(search)
+      order.products.some((product) =>
+        [
+          product.product_code.toString(),
+          product.product_name,
+          product.category_name,
+          product.order_quantity.toString(),
+          product.price.toString(),
+          product.item_total.toString(),
+          product.product_quantity.toString(),
+          (
+            product.product_quantity - product.order_quantity
+          ).toString(),
+        ].some((field) => field.toLowerCase().includes(search))
+      ) ||
+      [
+        order.order_id.toString(),
+        order.customer_id.toString(),
+        `${order.customer_first_name} ${order.customer_last_name}`,
+        new Date(order.order_date).toLocaleDateString(),
+        order.order_status,
+        order.payment_status,
+      ].some((field) => field.toLowerCase().includes(search))
     );
   });
 
@@ -156,11 +119,10 @@ const Transactions = () => {
         </div>
         <div className="body">
           <div className="admin-order">
-            <div class="container align-items-center mb-2">
-              <div class="row align-items-center m-0 p-0 ">
-                <div class="col-4">
-                  <div class="search d-flex  ">
-                    {" "}
+            <div className="container align-items-center mb-2">
+              <div className="row align-items-center m-0 p-0">
+                <div className="col-4">
+                  <div className="search d-flex">
                     <form>
                       <input
                         type="search"
@@ -173,31 +135,27 @@ const Transactions = () => {
                   </div>
                 </div>
 
-                <div class="col-3">
-                  <div class="d-flex align-items-center justify-content-end">
-                    {/* empty div */}
-                  </div>
+                <div className="col-3">
+                  <div className="d-flex align-items-center justify-content-end"></div>
                 </div>
 
-                <div class="col-3 ">
-                  <div class="d-flex justify-content-center ">
+                <div className="col-3">
+                  <div className="d-flex justify-content-center">
                     <button
                       onClick={handlePrintOrders}
                       className="btn btn-primary"
                     >
-                      <i class="bx bx-export"></i> Export Transactions
+                      <i className="bx bx-export"></i> Export Transactions
                     </button>
                   </div>
                 </div>
 
-                <div class="col-2 ">
-                  <div class="d-flex align-items-center justify-content-end">
+                <div className="col-2">
+                  <div className="d-flex align-items-center justify-content-end">
                     <label htmlFor="sort" className="me-2">
                       Sort By:
                     </label>
                     <select
-                      name=""
-                      id=""
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
                       className="form-select"
@@ -222,119 +180,54 @@ const Transactions = () => {
                 className="custom-scrollbar"
               >
                 <table className="table table-hover">
-                  <thead className=" thead-design bg-light sticky-top">
-                 
-                      <tr>
-                        <th>
-                          <input type="checkbox" />
-                        </th>
-                        <th>Product Code</th>
-                        <th>Product Name</th>
-                        <th>Category</th>
-                        <th>Order Quantity</th>
-                        <th>Price</th>
-                        <th>Total Price</th>
-                        <th>Date</th>
-                        <th>Current Quantity</th>
-                        <th>Running Balance</th>
-                        <th>Order ID</th>
-                        <th>Customer ID</th>
-                        <th>Shipment ID</th>
-                        <th>Payment Status</th>
-                      </tr>
-                 
+                  <thead className="thead-design bg-light sticky-top">
+                    <tr>
+                      {/* <th>
+                        <input type="checkbox" />
+                      </th> */}
+                      <th>Product Code</th>
+                      <th>Product Name</th>
+                      <th>Category</th>
+                      <th>Order Quantity</th>
+                      <th>Price</th>
+                      <th>Total Price</th>
+                      <th>Date</th>
+                      <th>Current Quantity</th>
+                      <th>Running Balance</th>
+                      <th>Order ID</th>
+                      <th>Customer ID</th>
+                      <th>Shipment ID</th>
+                      <th>Payment Status</th>
+                    </tr>
                   </thead>
                   <tbody>
-                    {orders.map((order) =>
+                    {paginatedOrders.map((order) =>
                       order.products.map((product, index) => (
                         <tr
                           key={`${order.order_id}-${product.product_id}-${index}`}
                         >
-                          <td>
+                          {/* <td>
                             <input type="checkbox" />
-                          </td>
+                          </td> */}
+                          <td>{product.product_code}</td>
+                          <td>{product.product_name}</td>
+                          <td>{product.category_name}</td>
+                          <td>{product.order_quantity}</td>
+                          <td>₱{product.price.toFixed(2)}</td>
+                          <td>₱{product.item_total.toFixed(2)}</td>
                           <td>
-                            {highlightText(
-                              product.product_code.toString(),
-                              searchTerm
-                            )}
+                            {(order.order_date)}
                           </td>
+                          <td>{product.product_quantity}</td>
                           <td>
-                            {highlightText(product.product_name, searchTerm)}
+                            {product.product_quantity - product.order_quantity}
                           </td>
+                          <td>{order.order_id}</td>
+                          <td>{order.customer_id}</td>
                           <td>
-                            {highlightText(product.category_name, searchTerm)}
+                            {order.shipment_id || "Not Available"}
                           </td>
-                          <td>
-                            {highlightText(
-                              product.order_quantity.toString(),
-                              searchTerm
-                            )}
-                          </td>
-                          <td>
-                            ₱
-                            {highlightText(
-                              product.price.toLocaleString("en-US", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              }),
-                              searchTerm
-                            )}
-                          </td>
-                          <td>
-                            ₱
-                            {highlightText(
-                              product.item_total.toLocaleString("en-US", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              }),
-                              searchTerm
-                            )}
-                          </td>
-                          <td>
-                            {highlightText(
-                              new Date(order.order_date).toLocaleDateString(),
-                              searchTerm
-                            )}
-                          </td>
-                          <td>
-                            {highlightText(
-                              product.product_quantity.toString(),
-                              searchTerm
-                            )}
-                          </td>
-                          <td>
-                            {highlightText(
-                              (
-                                product.product_quantity -
-                                product.order_quantity
-                              ).toString(),
-                              searchTerm
-                            )}
-                          </td>
-                          <td>
-                            {highlightText(
-                              order.order_id.toString(),
-                              searchTerm
-                            )}
-                          </td>
-                          <td>
-                            {highlightText(
-                              order.customer_id.toString(),
-                              searchTerm
-                            )}
-                          </td>
-                          <td>
-                            {highlightText(
-                              order.shipment_id
-                                ? order.shipment_id.toString()
-                                : "Not Available",
-                              searchTerm
-                            )}
-                          </td>
-                          <td>
-                            {highlightText(order.payment_status, searchTerm)}
-                          </td>
+                          <td>{order.payment_status}</td>
                         </tr>
                       ))
                     )}
@@ -343,7 +236,7 @@ const Transactions = () => {
               </div>
             </div>
 
-            {/* <div className="pagination">
+            <div className="pagination">
               {Array.from({ length: totalPages }, (_, index) => (
                 <button
                   key={index + 1}
@@ -353,8 +246,7 @@ const Transactions = () => {
                   {index + 1}
                 </button>
               ))}
-            </div> */}
-            
+            </div>
           </div>
         </div>
       </div>

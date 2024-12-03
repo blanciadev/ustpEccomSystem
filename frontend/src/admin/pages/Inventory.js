@@ -243,9 +243,9 @@ const Inventory = () => {
                             style={{ position: "sticky", top: 0, zIndex: 1 }}
                           >
                             <tr className="">
-                              <th style={{ width: "5%" }}>
+                              {/* <th style={{ width: "5%" }}>
                                 <input type="checkbox" />
-                              </th>
+                              </th> */}
                               <th style={{ width: "10%" }}>Product ID</th>
                               <th style={{ width: "10%" }}>Code</th>
                               <th style={{ width: "25%" }}>Name</th>
@@ -270,9 +270,9 @@ const Inventory = () => {
 
                               return (
                                 <tr key={product.product_id}>
-                                  <td>
+                                  {/* <td>
                                     <input type="checkbox" />
-                                  </td>
+                                  </td> */}
                                   <td>{product.product_id}</td>
                                   <td>{product.product_code}</td>
                                   <td class="text-left">

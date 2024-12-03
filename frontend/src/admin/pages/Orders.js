@@ -138,12 +138,12 @@ const Orders = () => {
           responseType: "blob",
         }
       );
-  
+
       // Generate a timestamp for the filename
       const now = new Date();
       const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}_${String(now.getHours()).padStart(2, "0")}-${String(now.getMinutes()).padStart(2, "0")}-${String(now.getSeconds()).padStart(2, "0")}`;
       const filename = `Order Records ${timestamp}.xlsx`;
-  
+
       // Save the file with the timestamped filename
       const blob = new Blob([response.data], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -153,7 +153,7 @@ const Orders = () => {
       console.error("Error exporting orders to Excel:", error.message);
     }
   };
-  
+
 
   const paginatedOrders = sortedFilteredOrders.slice(
     (currentPage - 1) * pageSize,
@@ -201,9 +201,9 @@ const Orders = () => {
                       onClick={handlePrintOrders}
                       className="btn btn-primary"
                     >
-                     
-                     <i class="bx bx-export"></i> Export Order Record
-                  
+
+                      <i class="bx bx-export"></i> Export Order Record
+
                     </button>
                   </div>
                 </div>
@@ -219,7 +219,7 @@ const Orders = () => {
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
                       className="form-select"
-                      style={{width: "90px"}}
+                      style={{ width: "90px" }}
                     >
                       <option value="date">Date</option>
                       <option value="status">Status</option>
@@ -232,20 +232,20 @@ const Orders = () => {
                     <label htmlFor="status" className="me-2">
                       Filter By Status:
                     </label>
-                    
+
                     <select
                       value={status}
                       onChange={(e) => setStatus(e.target.value)}
                       className="form-select"
-                      style={{width: "130px"}}
+                      style={{ width: "130px" }}
                     >
-                       <option value="">All</option>
+                      <option value="">All</option>
                       {statusOptions.map((option) => (
                         <option key={option} value={option}>
                           {option}
                         </option>
                       ))}
-                   
+
                     </select>
                   </div>
                 </div>
@@ -253,106 +253,106 @@ const Orders = () => {
             </div>
 
 
- 
+
 
             <div className="order-table " >
-              <div className="mx-4" style={{height: "400px"}}>  
-              <div className="">  
-                <table className="table table-hover">
-                  <thead className="bg-light sticky-top">
-                    <tr>
-                      <th>
-                        <input type="checkbox" />
-                      </th>
-                      <th>Order ID</th>
-                      <th>Customer ID</th>
-                      <th>Order Date</th>
-                      <th>Status</th>
-                      <th>Payment Status</th>
-                      <th>Payment Method</th>
-                      <th>Total Amount</th>
-                      <th>Actions</th>
+              <div className="mx-4" style={{ height: "400px" }}>
+                <div className="">
+                  <table className="table table-hover">
+                    <thead className="bg-light sticky-top">
+                      <tr>
+                        {/* <th>
+                          <input type="checkbox" />
+                        </th> */}
+                        <th>Order ID</th>
+                        <th>Customer ID</th>
+                        <th>Order Date</th>
+                        <th>Status</th>
+                        <th>Payment Status</th>
+                        <th>Payment Method</th>
+                        <th>Total Amount</th>
+                        <th>Actions</th>
 
-          
-                    </tr>
-                  </thead>
-                  <tbody>
-                  {paginatedOrders.map((order) => (
-                    <tr
-                      key={order.order_id}
-                      onClick={() => handleOpenModal(order)}
-                      className=""
-                    >
-                      <td>
-                        <input type="checkbox" />
-                      </td>
-                      <td>
-                        {highlightText(order.order_id.toString(), searchTerm)}
-                      </td>
-                      <td>
-                        {highlightText(
-                          order.customer_id.toString(),
-                          searchTerm
-                        )}
-                      </td>
-                      <td>
-                        {highlightText(
-                          new Date(order.order_date).toLocaleDateString(),
-                          searchTerm
-                        )}
-                      </td>
-                      <td>{highlightText(order.order_status, searchTerm)}</td>
-                      <td>{highlightText(order.payment_status, searchTerm)}</td>
-                      <td>{highlightText(order.payment_method, searchTerm)}</td>
-                      <td>
-                        ₱
-                        {highlightText(
-                          order.order_total.toLocaleString("en-US", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          }),
-                          searchTerm
-                        )}
-                      </td>
-                      <td>
-                        <button 
+
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paginatedOrders.map((order) => (
+                        <tr
+                          key={order.order_id}
                           onClick={() => handleOpenModal(order)}
+                          className=""
                         >
-                          View
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-                </table>
-                
-            
-              </div>
+                          {/* <td>
+                            <input type="checkbox" />
+                          </td> */}
+                          <td>
+                            {highlightText(order.order_id.toString(), searchTerm)}
+                          </td>
+                          <td>
+                            {highlightText(
+                              order.customer_id.toString(),
+                              searchTerm
+                            )}
+                          </td>
+                          <td>
+                            {highlightText(
+                              new Date(order.order_date).toLocaleDateString(),
+                              searchTerm
+                            )}
+                          </td>
+                          <td>{highlightText(order.order_status, searchTerm)}</td>
+                          <td>{highlightText(order.payment_status, searchTerm)}</td>
+                          <td>{highlightText(order.payment_method, searchTerm)}</td>
+                          <td>
+                            ₱
+                            {highlightText(
+                              order.order_total.toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              }),
+                              searchTerm
+                            )}
+                          </td>
+                          <td>
+                            <button
+                              onClick={() => handleOpenModal(order)}
+                            >
+                              View
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+
+
+                </div>
               </div>
 
 
               <div className="d-flex justify-content-center align-items-center">
 
-              <div className="d-flex justify-content-center align-items-center">
-              <button
-              className="me-2"
-                disabled={currentPage === 1}
-                onClick={() => handlePageChange(currentPage - 1)}
-              >
-                Previous
-              </button>
-              <span className="px-2">
-                Page {currentPage} of {totalPages}
-              </span>
-              <button
-              className="me-2"
-                disabled={currentPage === totalPages}
-                onClick={() => handlePageChange(currentPage + 1)}
-              >
-                Next
-              </button>
-            </div>
-            </div>
+                <div className="d-flex justify-content-center align-items-center">
+                  <button
+                    className="me-2"
+                    disabled={currentPage === 1}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                  >
+                    Previous
+                  </button>
+                  <span className="px-2">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button
+                    className="me-2"
+                    disabled={currentPage === totalPages}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
 
             </div>
 

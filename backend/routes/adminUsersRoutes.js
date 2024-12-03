@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const bcrypt = require('bcrypt');
+
+
 
 // Route to get users reports 
 router.get('/admin-users-report', async (req, res) => {
@@ -99,8 +102,6 @@ router.put('/admin-users-role-update', async (req, res) => {
 });
 
 
-
-
 router.put('/admin-users-password-update', async (req, res) => {
     const { customer_id, current_password, new_password } = req.body;
 
@@ -126,23 +127,29 @@ router.put('/admin-users-password-update', async (req, res) => {
         const user = userResult[0][0];
         console.log(`User found: ${user.customer_id}`);
 
-        if (user.password !== current_password) {
+        // Compare current password with the hashed password stored in the database
+        const passwordMatch = await bcrypt.compare(current_password, user.password);
+
+        if (!passwordMatch) {
             console.log(`Incorrect current password for customer_id: ${customer_id}`);
             return res.status(403).json({ message: 'Incorrect current password.' });
         }
 
         console.log(`Password match for customer_id: ${customer_id}. Proceeding with password update.`);
 
-        if (user.password === new_password) {
+        if (current_password === new_password) {
             console.log(`New password is the same as the old password for customer_id: ${customer_id}`);
             return res.status(400).json({ message: 'New password cannot be the same as the current password.' });
         } else {
+            // Hash the new password before saving it
+            const hashedNewPassword = await bcrypt.hash(new_password, 10);  // Salt rounds can be adjusted (e.g., 10)
 
-            const updatePasswordQuery = 'UPDATE users SET password = ? WHERE customer_id = ? ';
-            console.log('Executing query:', updatePasswordQuery, [new_password, customer_id]);
-            const result = await db.query(updatePasswordQuery, [new_password, customer_id]);
+            const updatePasswordQuery = 'UPDATE users SET password = ? WHERE customer_id = ?';
+            console.log('Executing query:', updatePasswordQuery, [hashedNewPassword, customer_id]);
+
+            // Update the password in the database with the hashed new password
+            const result = await db.query(updatePasswordQuery, [hashedNewPassword, customer_id]);
             return res.status(200).json({ message: 'Password updated successfully.' });
-
         }
     } catch (error) {
         console.error('Error updating password:', error);
@@ -178,7 +185,6 @@ router.get('/admin-users-count', async (req, res) => {
         res.status(500).json({ error: 'Failed to retrieve users. Please try again.' });
     }
 });
-
 
 
 module.exports = router;

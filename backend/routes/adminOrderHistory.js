@@ -67,7 +67,6 @@ router.put('/admin-update-products/:product_code', async (req, res) => {
     }
 });
 
-
 router.get('/admin-order-history', async (req, res) => {
     try {
         const { status, searchTerm, exportToExcel, page = 1 } = req.query;
@@ -75,7 +74,7 @@ router.get('/admin-order-history', async (req, res) => {
         const offset = (page - 1) * pageSize;
 
         let query = `
-        SELECT 
+        SELECT
             \`order\`.*, 
             product.product_name, 
             order_details.order_details_id, 
@@ -86,9 +85,8 @@ router.get('/admin-order-history', async (req, res) => {
             order_details.total_price AS order_details_total_price, 
             order_details.quantity, 
             order_details.payment_status, 
-            order_details.payment_method, 
             product.price, 
-            product.product_image,
+            product.product_image, 
             users.customer_id, 
             users.first_name, 
             users.last_name, 
@@ -98,15 +96,23 @@ router.get('/admin-order-history', async (req, res) => {
             users.region, 
             users.postal_code, 
             order_details.order_status, 
-            \`order\`.total_price AS order_total_price
+            \`order\`.total_price AS order_total_price, 
+            shipment.streetname, 
+            shipment.address, 
+            shipment.city
         FROM
             \`order\`
-        INNER JOIN order_details ON \`order\`.order_id = order_details.order_id
-        INNER JOIN product ON order_details.product_id = product.product_code
-        INNER JOIN users ON \`order\`.customer_id = users.customer_id
-        WHERE order_details.order_status != 'Completed'
-    `;
-
+        INNER JOIN
+            order_details ON \`order\`.order_id = order_details.order_id
+        INNER JOIN
+            product ON order_details.product_id = product.product_code
+        INNER JOIN
+            users ON \`order\`.customer_id = users.customer_id
+        INNER JOIN
+            shipment ON \`order\`.order_id = shipment.order_id
+        WHERE
+            order_details.order_status <> 'Completed'
+        `;
 
         // Add where clause if status or searchTerm is provided
         const conditions = [];
@@ -118,7 +124,7 @@ router.get('/admin-order-history', async (req, res) => {
         }
 
         if (conditions.length) {
-            query += ' WHERE ' + conditions.join(' AND ');
+            query += ' AND ' + conditions.join(' AND ');
         }
 
         query += ` ORDER BY \`order\`.order_date DESC LIMIT ? OFFSET ?`;
@@ -140,7 +146,6 @@ router.get('/admin-order-history', async (req, res) => {
                     order_date: order.order_date,
                     order_total: order.order_total_price,
                     order_status: order.order_status,
-                    order_date: order.order_date,
                     order_update: order.order_update,
                     payment_status: order.payment_status,
                     payment_method: order.payment_method,
@@ -154,10 +159,14 @@ router.get('/admin-order-history', async (req, res) => {
                         region: order.region,
                         postal_code: order.postal_code,
                     },
+                    shipment: {
+                        streetname: order.streetname,
+                        address: order.address,
+                        city: order.city
+                    },
                     products: []
                 };
             }
-            console.log(order.order_total_price);
             // Add the current product to the products array
             acc[order.order_id].products.push({
                 order_details_id: order.order_details_id,
@@ -176,6 +185,7 @@ router.get('/admin-order-history', async (req, res) => {
         }, {});
 
         const ordersArray = Object.values(groupedOrders);
+
 
         // If the exportToExcel query parameter is set, generate and send Excel file
         if (exportToExcel === 'true') {
@@ -226,6 +236,7 @@ router.get('/admin-order-history', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 });
+
 
 
 router.get('/admin-order-history-payment', async (req, res) => {

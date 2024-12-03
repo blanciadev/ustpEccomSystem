@@ -98,13 +98,13 @@ const Shipments = () => {
           },
         }
       );
-  
+
       if (!response.ok) {
         throw new Error("Failed to export shipments");
       }
-  
+
       const blob = await response.blob();
-  
+
       // Get the current date and time
       const now = new Date();
       const formattedDateTime = now
@@ -112,14 +112,14 @@ const Shipments = () => {
         .replace(/[-:]/g, "") // Remove hyphens and colons
         .replace("T", "_") // Replace 'T' with an underscore
         .split(".")[0]; // Remove milliseconds
-  
+
       const fileName = `Shipment Records ${formattedDateTime}.xlsx`;
       saveAs(blob, fileName);
     } catch (error) {
       console.error("Error exporting to Excel:", error.message);
     }
   };
-  
+
 
   return (
     <div className="dash-con">
@@ -159,8 +159,8 @@ const Shipments = () => {
 
                 <div class="col-3">
                   <div class=" d-flex justify-content-end">
-                  <button onClick={exportToExcel} className="btn btn-primary">
-                    <i class="bx bx-export"></i> Export Shipment Record
+                    <button onClick={exportToExcel} className="btn btn-primary">
+                      <i class="bx bx-export"></i> Export Shipment Record
                     </button>
                   </div>
                 </div>
@@ -176,7 +176,7 @@ const Shipments = () => {
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
                       className="form-select"
-                      style={{width: "120px"}}
+                      style={{ width: "120px" }}
                     >
                       <option value="date">Date</option>
                       <option value="status">Status</option>
@@ -197,9 +197,9 @@ const Shipments = () => {
                     <table className="table table-hover">
                       <thead className="bg-light sticky-top">
                         <tr>
-                          <th>
+                          {/* <th>
                             <input type="checkbox" />
-                          </th>
+                          </th> */}
                           <th>Shipment ID</th>
                           <th>Order ID</th>
                           <th>Shipment Date</th>
@@ -213,9 +213,9 @@ const Shipments = () => {
                       <tbody>
                         {currentShipments.map((shipment) => (
                           <tr key={shipment.shipment_id}>
-                            <td>
+                            {/* <td>
                               <input type="checkbox" />
-                            </td>
+                            </td> */}
                             <td>{shipment.shipment_id}</td>
                             <td>{shipment.order_id}</td>
                             <td>

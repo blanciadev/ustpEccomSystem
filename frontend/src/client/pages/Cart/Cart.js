@@ -299,7 +299,15 @@ const CartContent = () => {
             <table className="table table-hover mb-4">
               <thead className="cart__table-header">
                 <tr>
-                  <th scope="col">Checkbox</th>
+
+                  <th> <input
+                    type="checkbox"
+                    checked={cartItems.every(
+                      (item) => selectedItems[item.product_code]
+                    )}
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                  />
+                  </th>
                   <th scope="col">Image</th>
                   <th scope="col text-start">Product</th>
                   <th scope="col">Quantity</th>
@@ -369,7 +377,7 @@ const CartContent = () => {
         )}
       </div>
       <Footer />
-    </div>
+    </div >
   );
 };
 
