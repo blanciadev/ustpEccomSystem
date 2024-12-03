@@ -42,8 +42,17 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
     fetchCategories();
   }, []);
 
+
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+
+    const customerId = localStorage.getItem('customer_id');
+
+    if (!customerId) {
+      setError("Customer ID is missing.");
+      return;
+    }
 
     if (
       !productName ||
@@ -73,6 +82,7 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
       expirationDate,
       imageURL,
       size: size === "Other" ? customSize : size,
+      customerId,
     };
 
     try {
@@ -340,7 +350,7 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
                 </form>
               </div>
 
-              
+
             </div>
           </div>
         </div>

@@ -38,11 +38,12 @@ router.post('/add-product', async (req, res) => {
         const productCode = await generateProductCode();
         console.log('Generated product code:', productCode);
 
-        // SQL query to insert product data into the database, including the image URL
+        // SQL query to insert product data into the database, including the image URL and current timestamp
         const query = `
-            INSERT INTO product (product_name, description, category_id, price, quantity, expiration_date, product_code, size, product_image)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `;
+INSERT INTO product (product_name, description, category_id, price, quantity, expiration_date, product_code, size, product_image, created_at)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+`;
+
         const values = [productName, description, category, price, quantity, expirationDate, productCode, size, imageURL];
 
         console.log('Executing query:', query);

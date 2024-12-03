@@ -38,21 +38,21 @@ const Transactions = () => {
     return (
       order.products.some((product) =>
         [
-          product.product_code.toString(),
+          product.product_code,
           product.product_name,
           product.category_name,
-          product.order_quantity.toString(),
-          product.price.toString(),
-          product.item_total.toString(),
-          product.product_quantity.toString(),
+          product.order_quantity,
+          product.price,
+          product.item_total,
+          product.product_quantity,
           (
             product.product_quantity - product.order_quantity
-          ).toString(),
+          ),
         ].some((field) => field.toLowerCase().includes(search))
       ) ||
       [
-        order.order_id.toString(),
-        order.customer_id.toString(),
+        order.order_id,
+        order.customer_id,
         `${order.customer_first_name} ${order.customer_last_name}`,
         new Date(order.order_date).toLocaleDateString(),
         order.order_status,
@@ -212,9 +212,9 @@ const Transactions = () => {
                           <td>{product.product_code}</td>
                           <td>{product.product_name}</td>
                           <td>{product.category_name}</td>
-                          <td>{product.order_quantity}</td>
-                          <td>₱{product.price.toFixed(2)}</td>
-                          <td>₱{product.item_total.toFixed(2)}</td>
+                          <td>{product.order_quantity || ""}</td>
+                          <td>₱{product.price}</td>
+                          <td>₱{product.item_total}</td>
                           <td>
                             {(order.order_date)}
                           </td>
@@ -223,9 +223,9 @@ const Transactions = () => {
                             {product.product_quantity - product.order_quantity}
                           </td>
                           <td>{order.order_id}</td>
-                          <td>{order.customer_id}</td>
+                          <td>{order.customer_id || "Staff"}</td>
                           <td>
-                            {order.shipment_id || "Not Available"}
+                            {order.shipment_id || ""}
                           </td>
                           <td>{order.payment_status}</td>
                         </tr>
