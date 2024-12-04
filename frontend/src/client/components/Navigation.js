@@ -217,7 +217,7 @@ const Navigation = () => {
             <Link to="/shop">shop</Link>
           </li>
           <li>
-            <Link to="/cart" className="cart">
+            <Link to="/cart#" className="cart">
               cart
             </Link>
           </li>
