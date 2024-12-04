@@ -457,7 +457,7 @@ const ProductList = ({ stickyComponents }) => {
                                 <StickyComponent className="" onSubmit={handleStickySubmit} />
 
                                 <div className='product-list-container'>
-                                    {paginatedProducts.map((product) => (
+                                    {/* {paginatedProducts.map((product) => (
                                         <ProductCard
                                             key={product.product_code}
                                             product={product}
@@ -467,7 +467,7 @@ const ProductList = ({ stickyComponents }) => {
                                             onBuyNow={handleBuyNow}
 
                                         />
-                                    ))}
+                                    ))} */}
                                 </div>
 
 
