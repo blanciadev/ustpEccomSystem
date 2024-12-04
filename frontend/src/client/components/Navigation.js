@@ -255,9 +255,9 @@ const Navigation = () => {
                 <a href="/signup">Sign Up</a>
               </li>
               <li>
-                <a href="/login" class="login">
+                <Link to="/login" className="login">
                   Login
-                </a>
+                </Link>
               </li>
             </>
           ) : (
