@@ -9,6 +9,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import start from '../../assets/start.png'
 import login_signup from '../../assets/img/login-signup.png'
 
+
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -24,7 +25,7 @@ const Login = () => {
         setLoading(true);
 
         try {
-            const response = await axios.post('http://localhost:5001/users-login', { email, password });
+            const response = await axios.post('https://ustp-eccom-server.vercel.app/api/users-login', { email, password });
 
             if (response.status === 200) {
                 setLoginStatus('Login successful');
