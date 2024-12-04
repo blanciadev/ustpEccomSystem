@@ -7,7 +7,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import ToastNotification from "../../public/components/ToastNotification";
 
 import { BsCart } from "react-icons/bs";
-import { IoIosSearch } from "react-icons/io";
 
 import { FaRegUser } from "react-icons/fa";
 import { MdOutlineShoppingBag } from "react-icons/md";
