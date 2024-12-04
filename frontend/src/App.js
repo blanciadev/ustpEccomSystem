@@ -37,39 +37,38 @@ function App() {
   const location = useLocation();
 
   return (
-    <Router basename={process.env.REACT_APP_BASE_URL || ''}> {/* Ensure the correct base URL */}
-      <TransitionGroup>
-        <CSSTransition key={location.key} classNames="fade" timeout={300}>
-          <Routes location={location}>
-            <Route path="*" element={<Navigate to="/" replace />} />
-            <Route index element={<Home />} />
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/user/purchase" element={<OrderHistory />} />
-            <Route path="/admin/dashboard" element={<Dashboard />} />
-            <Route path="/shop" element={<Shop />} />
-            <Route path="/admin/orders" element={<Orders />} />
-            <Route path="/admin/payments" element={<Payments />} />
-            <Route path="/admin/shipments" element={<Shipments />} />
-            <Route path="/admin/products" element={<Products />} />
-            <Route path="/admin/inventory" element={<Inventory />} />
-            <Route path="/admin/reports" element={<Reports />} />
-            <Route path="/admin/manage-users" element={<Users />} />
-            <Route path="/admin/profile" element={<Settings />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/verify" element={<Verification />} />
-            <Route path="/change-password" element={<ChangePassword />} />
-            <Route path="/user" element={<UserProfile />} />
-            <Route path="/admin/reports/sales" element={<Sales />} />
-            <Route path="/admin/reports/order-history" element={<AdminHistory />} />
-            <Route path="/admin/reports/transactions" element={<Transactions />} />
-          </Routes>
-        </CSSTransition>
-      </TransitionGroup>
-    </Router>
+    <TransitionGroup>
+      <CSSTransition key={location.key} classNames="fade" timeout={300}>
+        <Routes location={location}>
+          {/* Define Routes */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route index element={<Home />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/user/purchase" element={<OrderHistory />} />
+          <Route path="/admin/dashboard" element={<Dashboard />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/admin/orders" element={<Orders />} />
+          <Route path="/admin/payments" element={<Payments />} />
+          <Route path="/admin/shipments" element={<Shipments />} />
+          <Route path="/admin/products" element={<Products />} />
+          <Route path="/admin/inventory" element={<Inventory />} />
+          <Route path="/admin/reports" element={<Reports />} />
+          <Route path="/admin/manage-users" element={<Users />} />
+          <Route path="/admin/profile" element={<Settings />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/verify" element={<Verification />} />
+          <Route path="/change-password" element={<ChangePassword />} />
+          <Route path="/user" element={<UserProfile />} />
+          <Route path="/admin/reports/sales" element={<Sales />} />
+          <Route path="/admin/reports/order-history" element={<AdminHistory />} />
+          <Route path="/admin/reports/transactions" element={<Transactions />} />
+        </Routes>
+      </CSSTransition>
+    </TransitionGroup>
   );
 }
 
