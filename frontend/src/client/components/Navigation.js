@@ -218,9 +218,10 @@ const Navigation = () => {
           </li>
           <li>
             <Link to="/cart#" className="cart">
-              cart
+              Cart ({cartItemCount})
             </Link>
           </li>
+
           {!isLoggedIn ? (
             <>
               <li>
