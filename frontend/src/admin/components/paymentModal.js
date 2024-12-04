@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
+import ToastNotification from '../../public/components/ToastNotification';
 
 const PaymentModal = ({ show, handleClose, order, handleUpdate }) => {
   const [paymentMethod, setPaymentMethod] = useState('');
   const [orderStatus, setOrderStatus] = useState('');
   const [paymentStatus, setPaymentStatus] = useState('');
+  const [toastMessage, setToastMessage] = useState('');
 
   useEffect(() => {
     if (order) {
@@ -17,16 +19,26 @@ const PaymentModal = ({ show, handleClose, order, handleUpdate }) => {
 
   const handleSave = async () => {
     try {
-      await axios.post('http://localhost:5000/update-payment-details', {
+      await axios.post('http://localhost:5001/update-payment-details', {
         order_id: order.order_id,
         payment_method: paymentMethod,
         order_status: orderStatus,
         payment_status: paymentStatus,
       });
       console.log('Saved payment details:', { paymentMethod, orderStatus, paymentStatus });
-      handleUpdate(); // Notify parent to refresh the orders list
-      handleClose();  // Close the modal after saving
+
+
+      setToastMessage('Updated successfully');
+      setTimeout(() => {
+        setToastMessage('');
+        handleClose();
+        handleUpdate();
+      }, 2000);
     } catch (error) {
+      setToastMessage('Error Occurred!', error.message);
+      setTimeout(() => {
+        setToastMessage('');
+      }, 2000);
       console.error('Error saving payment details:', error.message);
     }
   };
@@ -37,6 +49,7 @@ const PaymentModal = ({ show, handleClose, order, handleUpdate }) => {
         <Modal.Title>Update Payment Details</Modal.Title>
       </Modal.Header>
       <Modal.Body>
+        <ToastNotification toastMessage={toastMessage} />
         <Form>
           <Form.Group controlId="formPaymentMethod">
             <Form.Label>Payment Method</Form.Label>
@@ -44,6 +57,7 @@ const PaymentModal = ({ show, handleClose, order, handleUpdate }) => {
               type="text"
               value={paymentMethod}
               onChange={(e) => setPaymentMethod(e.target.value)}
+              readOnly
             />
           </Form.Group>
 
@@ -53,6 +67,7 @@ const PaymentModal = ({ show, handleClose, order, handleUpdate }) => {
               type="text"
               value={orderStatus}
               onChange={(e) => setOrderStatus(e.target.value)}
+              readOnly
             />
           </Form.Group>
 
@@ -71,9 +86,6 @@ const PaymentModal = ({ show, handleClose, order, handleUpdate }) => {
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Close
-        </Button>
         <Button variant="primary" onClick={handleSave}>
           Save Changes
         </Button>

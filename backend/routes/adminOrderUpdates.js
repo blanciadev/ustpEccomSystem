@@ -3,76 +3,40 @@ const router = express.Router();
 const db = require('../db');
 
 
-
-// Route to update order status and subtract quantity if status is 'To Ship'
+// Route to update order status
 router.put('/update-order-status/:orderId', async (req, res) => {
     const { orderId } = req.params;
-    const { status, products } = req.body; 
+    const { status } = req.body;
 
-    // Check if status is provided
+
     if (!status) {
         return res.status(400).json({ message: 'Status is required' });
     }
 
     try {
-        // Begin transaction to ensure consistency
         await db.query('START TRANSACTION');
 
-        // Update the order status in the order_details table
+        let paymentStatus = null;
+        if (status === 'Completed') {
+            paymentStatus = 'Order Paid';
+        } else {
+            paymentStatus = 'Pending';
+        }
+
         const result = await db.query(
-            'UPDATE order_details SET order_status = ? WHERE order_id = ?',
-            [status, orderId]
+            'UPDATE order_details SET order_status = ?, payment_status = ?, order_update = NOW() WHERE order_id = ?',
+            [status, paymentStatus, orderId]
         );
 
-        // Check if the order was found and updated
         if (result.affectedRows === 0) {
             await db.query('ROLLBACK');
             return res.status(404).json({ message: 'Order not found' });
         }
 
-        // If the status is 'To Ship', subtract the quantity from the product table
-        if (status === 'To Ship') {
-            for (const product of products) {
-                const { product_id, quantity } = product;
-
-                // Check if the product has sufficient stock
-                const [productResult] = await db.query(
-                    'SELECT quantity FROM product WHERE product_code = ?',
-                    [product_id]
-                );
-
-                if (productResult.length === 0) {
-                    await db.query('ROLLBACK');
-                    return res.status(404).json({ message: `Product ID ${product_id} not found` });
-                }
-
-                if (productResult[0].quantity < quantity) {
-                    await db.query('ROLLBACK');
-                    return res.status(400).json({
-                        message: `Not enough stock for product ID ${product_id}. Available: ${productResult[0].quantity}`,
-                    });
-                }
-
-                // Subtract the quantity from the product table
-                const updateResult = await db.query(
-                    'UPDATE product SET quantity = quantity - ? WHERE product_code = ?',
-                    [quantity, product_id]
-                );
-
-                if (updateResult.affectedRows === 0) {
-                    await db.query('ROLLBACK');
-                    return res.status(404).json({ message: `Failed to update stock for product ID ${product_id}` });
-                }
-            }
-        }
-
-        // Commit the transaction after all updates
         await db.query('COMMIT');
-
-        // Respond with success
-        res.status(200).json({ message: 'Order status and product quantities updated successfully' });
+        res.status(200).json({ message: 'Order status updated successfully' });
     } catch (error) {
-        // Rollback transaction in case of error
+
         await db.query('ROLLBACK');
         console.error('Error updating order status:', error.message);
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
@@ -84,30 +48,228 @@ router.post('/update-payment-details', async (req, res) => {
     try {
         const { order_id, payment_method, order_status, payment_status } = req.body;
 
-        // Validate input
+        const order_status_final = 'Completed'
+        console.log('Order Status', order_status);
+
+
         if (!order_id || !payment_method || !order_status || !payment_status) {
             return res.status(400).json({ message: 'Missing required fields' });
         }
 
-        // SQL query to update the payment details
         const query = `
             UPDATE order_details
-            SET payment_method = ?, order_status = ?, payment_status = ?
+            SET payment_method = ?, order_status = ?, order_update = NOW() , payment_status = ?
             WHERE order_id = ?
         `;
 
-        // Execute the query
-        const [result] = await db.query(query, [payment_method, order_status, payment_status, order_id]);
 
-        // Check if the update was successful
-        if (result.affectedRows > 0) {
-            res.json({ message: 'Payment details updated successfully' });
-        } else {
-            res.status(404).json({ message: 'Order not found' });
+        const [result] = await db.query(query, [payment_method, order_status_final, payment_status, order_id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Order not found' });
         }
+
+        const shipmentUpdate = `
+            UPDATE shipment
+            SET shipment_status = ?
+            WHERE order_id = ?
+        `;
+
+
+        const [shipment] = await db.query(shipmentUpdate, ['Delivered', order_id]);
+
+        if (shipment.affectedRows === 0) {
+            return res.status(404).json({ message: 'Shipment not found' });
+        }
+
+        res.json({ message: 'Payment and shipment details updated successfully' });
+
     } catch (error) {
         console.error('Error updating payment details:', error.message);
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+});
+
+
+
+// Route to get users reports 
+router.get('/admin-users-report', async (req, res) => {
+    try {
+        const query = `SELECT * FROM users`;
+        const [results] = await db.execute(query);
+
+        res.json({
+            data: results
+        });
+    } catch (error) {
+        console.error('Error retrieving users:', error.message);
+        res.status(500).json({ error: 'Failed to retrieve users. Please try again.' });
+    }
+});
+
+router.get('/admin-users-details', async (req, res) => {
+    try {
+        const { customer_id } = req.query;
+
+        if (!customer_id) {
+            return res.status(400).json({ error: 'Customer ID is required.' });
+        }
+
+        const query = `SELECT * FROM users WHERE customer_id = ?`;
+        const [results] = await db.execute(query, [customer_id]);
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No user found with the provided customer ID.' });
+        }
+
+        res.json({
+            data: results
+        });
+    } catch (error) {
+        console.error('Error retrieving users:', error.message);
+        res.status(500).json({ error: 'Failed to retrieve users. Please try again.' });
+    }
+});
+
+
+router.put('/admin-users-details-update', async (req, res) => {
+    const { customer_id, first_name, email, phone_number } = req.body;
+
+    if (!customer_id || !first_name || !email || !phone_number) {
+        return res.status(400).json({ message: 'All fields are required.' });
+    }
+
+    try {
+        console.log(`Updating user with ID: ${customer_id}`);
+        console.log(`First Name: ${first_name}, Email: ${email}, Phone Number: ${phone_number}`);
+
+        const query = `
+            UPDATE users
+            SET first_name = ?, email = ?, phone_number = ?
+            WHERE customer_id = ?
+        `;
+        const result = await db.query(query, [first_name, email, phone_number, customer_id]);
+        console.log(result)
+
+        return res.status(200).json({ message: 'Personal information updated successfully.' });
+
+    } catch (error) {
+        console.error('Error updating personal information:', error);
+        return res.status(500).json({ message: 'Internal server error.' });
+    }
+});
+
+router.put('/admin-users-role-update', async (req, res) => {
+    const { customer_id, role_type, date_hired, address } = req.body;
+
+    if (!customer_id || !role_type) {
+        return res.status(400).json({ message: 'Customer ID and role type are required.' });
+    }
+
+    try {
+
+        const query = `
+            UPDATE users
+            SET role_type = ?, date_hired = ?, address = ?
+            WHERE customer_id = ?
+        `;
+
+        const result = await db.query(query, [role_type, date_hired || null, address || null, customer_id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'User not found or no changes made.' });
+        }
+
+        console.log('Update Result:', result);
+        return res.status(200).json({ message: 'User details updated successfully.' });
+    } catch (error) {
+        console.error('Error updating user details:', error);
+        return res.status(500).json({ message: 'Internal server error.' });
+    }
+});
+
+
+router.put('/admin-users-password-update', async (req, res) => {
+    const { customer_id, current_password, new_password } = req.body;
+
+    if (!customer_id || !current_password || !new_password) {
+        console.log('Missing fields in the request body:', req.body);
+        return res.status(400).json({ message: 'All fields are required.' });
+    }
+
+    try {
+        console.log(`Request to update password for customer_id: ${customer_id}`);
+
+        const userQuery = 'SELECT * FROM users WHERE customer_id = ?';
+        console.log('Executing query to fetch user with customer_id:', customer_id);
+        const userResult = await db.query(userQuery, [customer_id]);
+
+        console.log('Query result:', userResult);
+
+        if (userResult.length === 0) {
+            console.log(`User not found with customer_id: ${customer_id}`);
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const user = userResult[0][0];
+        console.log(`User found: ${user.customer_id}`);
+
+        // Compare current password with the hashed password stored in the database
+        const passwordMatch = await bcrypt.compare(current_password, user.password);
+
+        if (!passwordMatch) {
+            console.log(`Incorrect current password for customer_id: ${customer_id}`);
+            return res.status(403).json({ message: 'Incorrect current password.' });
+        }
+
+        console.log(`Password match for customer_id: ${customer_id}. Proceeding with password update.`);
+
+        if (current_password === new_password) {
+            console.log(`New password is the same as the old password for customer_id: ${customer_id}`);
+            return res.status(400).json({ message: 'New password cannot be the same as the current password.' });
+        } else {
+            // Hash the new password before saving it
+            const hashedNewPassword = await bcrypt.hash(new_password, 10);  // Salt rounds can be adjusted (e.g., 10)
+
+            const updatePasswordQuery = 'UPDATE users SET password = ? WHERE customer_id = ?';
+            console.log('Executing query:', updatePasswordQuery, [hashedNewPassword, customer_id]);
+
+            // Update the password in the database with the hashed new password
+            const result = await db.query(updatePasswordQuery, [hashedNewPassword, customer_id]);
+            return res.status(200).json({ message: 'Password updated successfully.' });
+        }
+    } catch (error) {
+        console.error('Error updating password:', error);
+        return res.status(500).json({ message: 'Internal server error.' });
+    }
+});
+
+
+
+
+
+
+// Route to get users counts
+router.get('/admin-users-count', async (req, res) => {
+    try {
+        const query = `SELECT * FROM users`;
+        const [results] = await db.execute(query);
+
+        // Count based on role_type
+        const customersCount = results.filter(user => user.role_type === 'Customer').length;
+        const adminsCount = results.filter(user => user.role_type === 'Admin').length;
+        const warehouseManagersCount = results.filter(user => user.role_type === 'Warehouse Manager').length;
+
+        res.json({
+            data: {
+                customers: customersCount, // Count of customers
+                admins: adminsCount,       // Count of admins
+                warehouseManagers: warehouseManagersCount, // Count of warehouse managers
+            }
+        });
+    } catch (error) {
+        console.error('Error retrieving users:', error.message);
+        res.status(500).json({ error: 'Failed to retrieve users. Please try again.' });
     }
 });
 

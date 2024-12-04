@@ -3,7 +3,6 @@ import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import '../admin.css';
 
-// Register the components needed for Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const SalesOrders = () => {
@@ -12,18 +11,18 @@ const SalesOrders = () => {
   useEffect(() => {
     const fetchSalesData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/sales');
+        const response = await fetch('http://localhost:5001/sales');
         const data = await response.json();
 
-        // Prepare the labels and data for the chart
+
         const labels = data.insights.map(item => {
           const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-          return monthNames[item.month - 1]; // Convert month number to month name
+          return monthNames[item.month - 1];
         });
         const salesCounts = data.insights.map(item => item.completed_sales);
         const totalSales = data.insights.map(item => item.total_sales_amount);
 
-        // Set the chart data
+
         setChartData({
           labels,
           datasets: [
@@ -93,9 +92,6 @@ const SalesOrders = () => {
       <div className='header'>
         <div className='title'>
           <h5>Sales Orders</h5>
-        </div>
-        <div className='see-all'>
-          <button>See all</button>
         </div>
       </div>
       <div className='bar-chart'>

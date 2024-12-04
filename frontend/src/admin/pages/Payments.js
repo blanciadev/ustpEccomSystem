@@ -1,41 +1,61 @@
-import React, { useState, useEffect } from 'react';
-import Pagination from 'react-bootstrap/Pagination';
-import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import '../admin.css';
-import AdminNav from '../components/AdminNav';
-import AdminHeader from '../components/AdminHeader';
-import PaymentModal from '../components/paymentModal'; // Import the PaymentModal component
+import React, { useState, useEffect } from "react";
+import Pagination from "react-bootstrap/Pagination";
+import axios from "axios";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "../admin.css";
+import AdminNav from "../components/AdminNav";
+import AdminHeader from "../components/AdminHeader";
+import PaymentModal from "../components/paymentModal";
+import { saveAs } from "file-saver";
 
 const Payments = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [orders, setOrders] = useState([]); // Store fetched orders
-  const [loading, setLoading] = useState(false); // Loading state
-  const [totalOrders, setTotalOrders] = useState(0); // Total orders count
-  const [sortBy, setSortBy] = useState('date'); // Sorting state
-  const [statusFilter, setStatusFilter] = useState(''); // Status filter
-  const [showModal, setShowModal] = useState(false); // Modal visibility state
-  const [selectedOrder, setSelectedOrder] = useState(null); // Selected order for the modal
-  const itemsPerPage = 15; // Change this based on your preference
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const itemsPerPage = 6;
+
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 425);
 
   useEffect(() => {
     fetchOrders();
-  }, [currentPage, sortBy, statusFilter]); // Fetch orders when page, sort, or filter changes
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [currentPage, statusFilter, searchTerm]);
+
+  const handleResize = () => {
+    setIsMobile(window.innerWidth <= 425);
+  };
 
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/admin-order-history', {
-        params: {
-          status: statusFilter,
-        },
-      });
+      const response = await axios.get(
+        "http://localhost:5001/admin-order-history-payment",
+        {
+          params: {
+            status: statusFilter,
+            search: searchTerm,
+          },
+        }
+      );
 
+      console.log("Fetched Orders:", response.data.orders); // Inspect the orders
       const ordersData = response.data.orders;
       setOrders(ordersData);
-      setTotalOrders(ordersData.length); // Assuming the total count comes from the response
+      setTotalOrders(ordersData.length);
+
+      // Store orders data in local storage
+      localStorage.setItem("ordersData", JSON.stringify(ordersData));
     } catch (error) {
-      console.error('Error fetching order history:', error.message);
+      console.error("Error fetching order history:", error.message);
     } finally {
       setLoading(false);
     }
@@ -45,12 +65,14 @@ const Payments = () => {
     setCurrentPage(pageNumber);
   };
 
-  const handleSortChange = (e) => {
-    setSortBy(e.target.value);
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
   };
 
   const handleStatusFilterChange = (e) => {
     setStatusFilter(e.target.value);
+    setCurrentPage(1);
   };
 
   const handleUpdateClick = (order) => {
@@ -64,145 +86,210 @@ const Payments = () => {
   };
 
   const handleUpdate = () => {
-    fetchOrders(); // Refresh the orders list
-    handleCloseModal(); // Close the modal
+    fetchOrders();
+    handleCloseModal();
   };
+
+  const exportToExcel = async () => {
+    setLoading(true);
+    try {
+      const ordersData = JSON.parse(localStorage.getItem("ordersData"));
+
+      const response = await axios.post(
+        "http://localhost:5001/admin-order-payment-export",
+        { orders: ordersData },
+        { responseType: "blob" } // Ensures response is treated as a file
+      );
+
+      // Generate the current date and time
+      const now = new Date();
+      const formattedDate = `${now.getFullYear()}-${String(
+        now.getMonth() + 1
+      ).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+      const formattedTime = `${String(now.getHours()).padStart(2, "0")}-${String(
+        now.getMinutes()
+      ).padStart(2, "0")}-${String(now.getSeconds()).padStart(2, "0")}`;
+      const filename = `Payment Records ${formattedDate}_${formattedTime}.xlsx`;
+
+      // Create a link to download the file
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error exporting to Excel:", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const totalPages = Math.ceil(totalOrders / itemsPerPage);
 
-  // Group orders by order_id and include payment status
-  const groupedOrders = orders.reduce((acc, order) => {
-    if (!acc[order.order_id]) {
-      acc[order.order_id] = {
-        order_id: order.order_id,
-        order_date: order.order_date,
-        order_total: order.order_total,
-        order_status: order.order_status,
-        payment_date: order.payment_date,
-        payment_status: order.payment_status,
-        payment_method: order.payment_method,
-        customer_id: order.customer_id,
-        customer_first_name: order.first_name,
-        customer_last_name: order.last_name,
-        customer_email: order.email,
-        customer_phone: order.phone_number,
-        customer_address: {
-          street_name: order.street_name,
-          region: order.region,
-          postal_code: order.postal_code,
-        },
-        products: [],
-      };
-    }
+  const filteredOrders = orders.filter((order) => {
+    const orderIdMatch = order.order_id
+      .toString()
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const customerNameMatch = `${order.first_name} ${order.last_name}`
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const statusMatch = statusFilter
+      ? order.payment_status === statusFilter
+      : true;
+    return (orderIdMatch || customerNameMatch) && statusMatch;
+  });
 
-    // Add the current product to the products array
-    acc[order.order_id].products.push({
-      order_details_id: order.order_details_id,
-      payment_date: order.payment_date,
-      product_id: order.product_id,
-      product_name: order.product_name,
-      price: order.price,
-      quantity: order.quantity,
-      item_total: order.total_price,
-      payment_status: order.payment_status,
-      payment_method: order.payment_method,
-    });
+  const ordersToDisplay = filteredOrders.length > 0 ? filteredOrders : orders;
 
-    return acc;
-  }, {});
-
-  const ordersToDisplay = Object.values(groupedOrders).slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const paginatedOrders = ordersToDisplay.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
-    <div className='dash-con'>
+    <div className="dash-con">
       <AdminNav />
-      <div className='dash-board'>
-        <div className='dash-header'>
-          <div className='header-title'>
-            <i className='bx bxs-wallet'></i>
+      <div className="dash-board">
+        <div className="dash-header">
+          <div className="header-title">
+            <i className="bx bxs-wallet"></i>
             <h1>Payments</h1>
           </div>
           <AdminHeader />
         </div>
-        <div className='dash-body'>
-          <div className='admin-payment'>
-            <div className='payment-header'>
-              <div className='payment-search'>
-                <form>
-                  <input type='search' />
-                  <button>Search</button>
-                </form>
-              </div>
-              <div className='payment-options'>
-                <div className='payment-print'>
-                  <button>Print Payment Summary</button>
+        <div className="body">
+          <div className="admin-payment">
+            <div class="container align-items-center mt-4 mb-4">
+              <div class="row align-items-center m-0 p-0">
+                <div class="col-4">
+                  <div class="search d-flex  ">
+                    {" "}
+                    <form>
+                      <input
+                        type="search"
+                        placeholder="Search by Order ID or Customer..."
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        className="form-control"
+                      />
+                    </form>
+                  </div>
                 </div>
-                <div className='payment-sort'>
-                  <label htmlFor="sort">Sort By</label>
-                  <select name="sort" id="sort" value={sortBy} onChange={handleSortChange}>
-                    <option value="date">Date</option>
-                    <option value="status">Status</option>
-                    <option value="id">ID</option>
-                    <option value="customer-id">Customer</option>
-                  </select>
+
+                <div class="col-1">
+                  <div class="d-flex justify-content-center ">
+                    {/* empty div */}
+                  </div>
+                </div>
+
+                <div class="col-3">
+                  <div class=" d-flex justify-content-end">
+                    <button onClick={exportToExcel} className="btn btn-primary">
+                      <i class="bx bx-export"></i> Export Payment Record
+                    </button>
+                  </div>
+                </div>
+
+                <div class="col-4">
+                  <div class="d-flex align-items-end justify-content-end">
+                    <label htmlFor="statusFilter" className="me-2">
+                      Filter By Status:
+                    </label>
+                    <select
+                      name="statusFilter"
+                      id="statusFilter"
+                      value={statusFilter}
+                      onChange={handleStatusFilterChange}
+                      className="form-select"
+                      style={{ width: "150px" }}
+                    >
+                      <option value="">All</option>
+                      <option value="Pending">Pending</option>
+                      <option value="Order Paid">Order Paid</option>
+                    </select>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className='payment-table'>
-              {loading ? (
-                <p>Loading...</p>
-              ) : (
-                <table>
-                  <thead>
-                    <tr>
-                      <th><input type='checkbox' /></th>
-                      <th>Order ID</th>
-                      <th>Customer ID</th>
-                      <th>Payment Date</th>
-                      <th>Payment Method</th>
-                      <th>Shipment Status</th>
-                      <th>Payment Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {ordersToDisplay.map((order, index) => (
-                      <tr key={index}>
-                        <td><input type='checkbox' /></td>
-                        <td>{order.order_id}</td>
-                        <td>{order.customer_id}</td>
-                        <td>{new Date(order.payment_date).toLocaleDateString()}</td> {/* Displaying payment_date */}
-                        <td>{order.payment_method}</td>
-                        <td>{order.order_status}</td>
-                        <td>{order.payment_status}</td>
-                        <td>
-                          <button onClick={() => handleUpdateClick(order)}>Update</button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
+            <div className="payment-table ">
+              <div className="mx-4" style={{ height: "400px" }}>
+                <div className="">
+                  {loading ? (
+                    <p>Loading...</p>
+                  ) : (
+                    <table className="table table-hover">
+                      <thead className="bg-light sticky-top">
+                        <tr>
+                          {/* <th>
+                            <input type="checkbox" />
+                          </th> */}
+                          <th>Order ID</th>
+                          <th>Customer ID</th>
+                          <th>Payment Date</th>
+                          <th>Order Total</th>
+                          <th>Payment Method</th>
+                          <th>Payment Status</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {paginatedOrders.map((order, index) => (
+                          <tr key={index}>
+                            {/* <td>
+                              <input type="checkbox" />
+                            </td> */}
+                            <td>{order.order_id}</td>
+                            <td>{order.customer_id}</td>
+                            <td>
+                              {order.order_update
+                                ? new Date(
+                                  order.order_update
+                                ).toLocaleDateString()
+                                : "N/A"}
+                            </td>
+                            <td>{order.order_total}</td>
+                            <td>{order.payment_method}</td>
 
-                </table>
-              )}
-            </div>
+                            <td>{order.payment_status}</td>
+                            <td>
+                              <button onClick={() => handleUpdateClick(order)}>
+                                Update
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+              </div>
 
-            <div className='pagination-container'>
-              <Pagination>
-                <Pagination.First onClick={() => handlePageChange(1)} disabled={currentPage === 1} />
-                <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
-                {[...Array(totalPages).keys()].map(pageNumber => (
-                  <Pagination.Item
-                    key={pageNumber + 1}
-                    active={pageNumber + 1 === currentPage}
-                    onClick={() => handlePageChange(pageNumber + 1)}
+              <div className="d-flex justify-content-center align-items-center">
+                <div className="d-flex justify-content-center align-items-center">
+                  <button
+                    className="me-2"
+                    disabled={currentPage === 1}
+                    onClick={() => handlePageChange(currentPage - 1)}
                   >
-                    {pageNumber + 1}
-                  </Pagination.Item>
-                ))}
-                <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
-                <Pagination.Last onClick={() => handlePageChange(totalPages)} disabled={currentPage === totalPages} />
-              </Pagination>
+                    Previous
+                  </button>
+                  <span className="px-2">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button
+                    className="me-2"
+                    disabled={currentPage === totalPages}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -212,7 +299,7 @@ const Payments = () => {
           show={showModal}
           handleClose={handleCloseModal}
           order={selectedOrder}
-          handleUpdate={handleUpdate} // Pass handleUpdate to the modal
+          handleUpdate={handleUpdate}
         />
       )}
     </div>

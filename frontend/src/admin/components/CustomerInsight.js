@@ -3,7 +3,6 @@ import '../admin.css';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 
-// Register the components needed for Chart.js
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const CustomerInsight = () => {
@@ -12,7 +11,7 @@ const CustomerInsight = () => {
   useEffect(() => {
     const fetchCustomerInsights = async () => {
       try {
-        const response = await fetch('http://localhost:5000/customer-insight', {
+        const response = await fetch('http://localhost:5001/customer-insight', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -20,15 +19,15 @@ const CustomerInsight = () => {
         });
         const data = await response.json();
 
-        // Prepare data for the chart
-        const userCount = data.insights[0]?.user_count || 0; // Get the user count
+
+        const userCount = data.insights[0]?.user_count || 0;
 
         setChartData({
-          labels: ['This Week'], // Only one label for the current week
+          labels: ['This Week'],
           datasets: [
             {
               label: 'New Customers',
-              data: [userCount], // Use the fetched user count
+              data: [userCount],
               fill: false,
               borderColor: 'rgb(127, 163, 255)',
               backgroundColor: 'rgb(127, 163, 255)',
@@ -67,7 +66,7 @@ const CustomerInsight = () => {
     scales: {
       x: {
         title: {
-          display: true,
+          display: false,
           text: 'Week',
         },
       },
@@ -84,7 +83,6 @@ const CustomerInsight = () => {
     <div className='customer-insight'>
       <div className='header'>
         <h5>Customers Insight</h5>
-        <button className='see-all'>See all</button>
       </div>
       <div className='line-chart'>
         <Line data={chartData} options={options} />

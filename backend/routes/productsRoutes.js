@@ -2,70 +2,49 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
-// Route to get products based on the most frequent category for the user
-router.get('/product-user', async (req, res) => {
-    try {
-        const customerId = req.query.customerId; // Retrieve customer ID from query parameters
-
-        if (!customerId) {
-            return res.status(400).send('customerId is required');
-        }
-
-        // Query to get products based on the most frequent category for the customer
-        let query = `
-        SELECT
-    p.product_id,
-    p.product_code,
-    p.product_name,
-    p.description,
-
-    p.price,
-    p.size,
-    p.expiration_date,
-    c.category_name
-FROM
-    product AS p
-JOIN
-    category AS c ON p.category_id = c.category_id
-WHERE
-    p.category_id = (
-        SELECT
-            p2.category_id
-        FROM
-            cart_items AS ci
-        JOIN
-            product AS p2 ON ci.product_code = p2.product_code
-        WHERE
-            ci.customer_id = ?
-        GROUP BY
-            p2.category_id
-        ORDER BY
-            COUNT(p2.category_id) DESC
-        LIMIT 1
-    );
-`;
-
-        // Execute the query, passing the customerId as a parameter
-        const [rows] = await db.query(query, [customerId]);
-
-        // Respond with product recommendations
-        res.json(rows);
-    } catch (error) {
-        console.error('Error fetching products based on the most frequent category:', error);
-        res.status(500).send('Error fetching products');
-    }
-});
-
 router.get('/products', async (req, res) => {
     try {
-        // Fetch all products and their categories
         const [rows] = await db.query(`
-            SELECT p.product_id, p.product_code, p.product_name, p.price ,p.description, p.quantity, c.category_name, p.product_image
-            FROM product p
-            INNER JOIN category c ON p.category_id = c.category_id
+          SELECT 
+    p.product_id, 
+    p.product_code, 
+    p.product_name, 
+    p.price, 
+    p.description, 
+    p.quantity, 
+    p.size, 
+    c.category_name, 
+    p.product_image, 
+    p.product_discount, 
+    p.product_status,
+    COALESCE(SUM(CASE WHEN user_product_interactions.interaction_type = 'view' THEN 1 ELSE 0 END), 0) AS view_count,
+    COALESCE(SUM(CASE WHEN user_product_interactions.interaction_type = 'cart' THEN 1 ELSE 0 END), 0) AS cart_count,
+    COALESCE(SUM(CASE WHEN user_product_interactions.interaction_type = 'order' THEN 1 ELSE 0 END), 0) AS order_count
+FROM 
+    product p
+INNER JOIN 
+    category c ON p.category_id = c.category_id
+LEFT JOIN 
+    user_product_interactions ON p.product_code = user_product_interactions.product_code
+GROUP BY 
+    p.product_id, 
+    p.product_code, 
+    p.product_name, 
+    p.price, 
+    p.description, 
+    p.quantity, 
+    p.size, 
+    c.category_name, 
+    p.product_image, 
+    p.product_discount, 
+    p.product_status
+ORDER BY 
+    view_count DESC, 
+    cart_count DESC, 
+    order_count DESC
+    
         `);
 
-        // Respond with product details including categories
         res.json(rows);
     } catch (error) {
         console.error('Error fetching products:', error);
@@ -73,46 +52,20 @@ router.get('/products', async (req, res) => {
     }
 });
 
-// Add this new route to your router
-router.get('/products/:productCode', async (req, res) => {
-    const { productCode } = req.params; // Get the product code from the request parameters
 
+
+// Route to get top 4 user-picked products for interaction view
+router.get('/products-top-picks', async (req, res) => {
     try {
-        // Query to fetch the product based on the product code
         const [rows] = await db.query(`
-            SELECT p.product_id, p.product_code, p.product_name, p.price, p.description, p.quantity, c.category_name, p.product_image
-            FROM product p
-            INNER JOIN category c ON p.category_id = c.category_id
-            WHERE p.product_code = ?
-        `, [productCode]);
-
-        // Check if product exists
-        if (rows.length === 0) {
-            return res.status(404).send('Product not found');
-        }
-
-        // Respond with the product details
-        res.json(rows[0]);
-    } catch (error) {
-        console.error('Error fetching product:', error);
-        res.status(500).send('Error fetching product');
-    }
-});
-
-
-
-// Route to get top products from different categories
-router.get('/products-top-mix-picks', async (req, res) => {
-    try {
-        // Fetch top products from different categories
-        const [rows] = await db.query(`
-       SELECT
+         SELECT
 	p.product_id, 
 	p.product_code, 
 	p.product_name, 
 	p.price, 
 	p.description, 
 	p.quantity, 
+    p.size, 
 	c.category_name, 
 	COUNT(DISTINCT user_product_interactions.product_code) AS interaction_count, 
 	p.product_image
@@ -135,63 +88,11 @@ GROUP BY
 	p.price, 
 	p.description, 
 	p.quantity, 
+    p.size, 
 	c.category_name
 ORDER BY
-	interaction_count DESC;
+	interaction_count DESC;`);
 
-
-        `);
-
-        // Respond with top picked products by category
-        res.json(rows);
-    } catch (error) {
-        console.error('Error fetching top user picks by category:', error);
-        res.status(500).send('Error fetching top user picks by category');
-    }
-});
-
-
-
-// Route to get top 4 user-picked products for interaction view
-router.get('/products-top-picks', async (req, res) => {
-    try {
-        // Fetch the top 4 products based on the highest interaction count
-        const [rows] = await db.query(`
-         SELECT
-	p.product_id, 
-	p.product_code, 
-	p.product_name, 
-	p.price, 
-	p.description, 
-	p.quantity, 
-	c.category_name, 
-	COUNT(DISTINCT user_product_interactions.product_code) AS interaction_count, 
-	p.product_image
-FROM
-	product AS p
-	JOIN
-	category AS c
-	ON 
-		p.category_id = c.category_id
-	JOIN
-	user_product_interactions
-	ON 
-		p.product_code = user_product_interactions.product_code
-WHERE
-	user_product_interactions.interaction_type = 'view'
-GROUP BY
-	p.product_id, 
-	p.product_code, 
-	p.product_name, 
-	p.price, 
-	p.description, 
-	p.quantity, 
-	c.category_name
-ORDER BY
-	interaction_count DESC
-LIMIT 4;`);
-
-        // Respond with top picked products
         res.json(rows);
     } catch (error) {
         console.error('Error fetching top user picks:', error);
@@ -199,53 +100,30 @@ LIMIT 4;`);
     }
 });
 
-// for cart recommended
-router.get('/recommend-products', async (req, res) => {
-    try {
-        // Fetch the top 4 cart interactions per product code
-        const [rankedInteractions] = await db.query(`
-           SELECT
-	p.product_id, 
-	p.product_code, 
-	p.product_name, 
-	p.price, 
-	p.description, 
-	p.quantity, 
-	c.category_name, 
-	COUNT(DISTINCT user_product_interactions.product_code) AS interaction_count, 
-	p.product_image
-FROM
-	product AS p
-	JOIN
-	category AS c
-	ON 
-		p.category_id = c.category_id
-	JOIN
-	user_product_interactions
-	ON 
-		p.product_code = user_product_interactions.product_code
-WHERE
-	user_product_interactions.interaction_type = 'order'
-GROUP BY
-	p.product_id, 
-	p.product_code, 
-	p.product_name, 
-	p.price, 
-	p.description, 
-	p.quantity, 
-	c.category_name
-ORDER BY
-	interaction_count DESC
-    ;
-        `);
 
-        res.json(rankedInteractions);
+router.post('/products-img', async (req, res) => {
+    const { product_codes } = req.body;
+
+    if (!product_codes || product_codes.length === 0) {
+        return res.status(400).send('No product codes provided');
+    }
+
+    try {
+        const placeholders = product_codes.map(() => '?').join(',');
+        const query = `
+        SELECT product_code, product_image
+        FROM product
+        WHERE product_code IN (${placeholders})
+      `;
+
+        const [rows] = await db.query(query, product_codes);
+
+        res.json(rows);
     } catch (error) {
-        console.error('Error recommending products:', error);
-        res.status(500).send('Error recommending products');
+        console.error('Error fetching products:', error);
+        res.status(500).send('Error fetching products');
     }
 });
-
 
 router.post('/products-recommendations', async (req, res) => {
     const { product_code } = req.body;
@@ -272,17 +150,26 @@ router.post('/products-recommendations', async (req, res) => {
         console.log(`Querying for recommended products in category: ${category_id} excluding product_id: ${product_id}`);
         const [recommendedProducts] = await db.query(`
             SELECT
-	p.product_id, 
-	p.category_id, 
-	p.product_code, 
-	p.product_name, 
-	p.price, 
-	p.description, 
-	p.quantity, 
-	p.product_image
-FROM
-	product AS p
-            WHERE p.category_id = ? AND p.product_id != ?
+                p.product_id, 
+                p.category_id, 
+                p.product_code, 
+                p.product_name, 
+                p.price, 
+                p.description, 
+                p.quantity, 
+				p.product_discount, 
+                p.product_image,
+                p.product_status
+            FROM
+                product AS p
+            WHERE 
+                p.category_id = ?
+                AND p.product_code != ?
+            ORDER BY
+                CASE 
+                    WHEN p.product_status = 'Discounted' THEN 1 
+                    ELSE 2 
+                END
         `, [category_id, product_id]);
 
         console.log(`Found ${recommendedProducts.length} recommended products`);
@@ -295,8 +182,122 @@ FROM
     }
 });
 
+router.get('/sticky-components', async (req, res) => {
+    const { hairType, hairTexture, hairVirgin, hairColor, hairRebonded, query } = req.query;
+
+    console.log('--------- STICKY COMPONENT REQUEST START -------');
+    console.log('Received parameters:', req.query);
+
+    try {
+        // Base query to fetch active products
+        let queryStr = 'SELECT * FROM product WHERE product_status IN ("active", "Discounted")';
+
+        // List of possible search terms
+        const searchTerms = [];
+        const queryParams = [];
+
+        // If query is provided, add the product name filter
+        if (query) {
+            console.log('Adding product name filter:', query);
+            searchTerms.push('LOWER(product_name) LIKE ?');
+            queryParams.push(`%${query.toLowerCase()}%`);
+        }
+
+        // Add filter terms if provided
+        if (hairType) {
+            console.log('Adding hair type filter:', hairType);
+            searchTerms.push('LOWER(description) LIKE ?');
+            queryParams.push(`%${hairType.toLowerCase()}%`);
+        }
+
+        if (hairTexture) {
+            console.log('Adding hair texture filter:', hairTexture);
+            searchTerms.push('LOWER(description) LIKE ?');
+            queryParams.push(`%${hairTexture.toLowerCase()}%`);
+        }
+
+        if (hairVirgin) {
+            console.log('Adding hair virgin filter:', hairVirgin);
+            searchTerms.push('LOWER(description) LIKE ?');
+            queryParams.push(`%${hairVirgin.toLowerCase()}%`);
+        }
+
+        if (hairColor) {
+            console.log('Adding hair color filter:', hairColor);
+            searchTerms.push('LOWER(description) LIKE ?');
+            queryParams.push(`%${hairColor.toLowerCase()}%`);
+        }
+
+        if (hairRebonded) {
+            console.log('Adding hair rebonded filter:', hairRebonded);
+            searchTerms.push('LOWER(description) LIKE ?');
+            queryParams.push(`%${hairRebonded.toLowerCase()}%`);
+        }
+
+        // Combine search terms if any are present
+        if (searchTerms.length > 0) {
+            queryStr += ' AND (' + searchTerms.join(' OR ') + ')';
+        }
+
+        queryStr += ' LIMIT 5';
+
+        console.log('Final SQL query to execute:', queryStr);
+        console.log('Query parameters:', queryParams);
+
+        // Execute the query with the provided filters
+        const [products] = await db.query(queryStr, queryParams);
+
+        console.log('Fetched products:', products);
+
+        console.log('--------- STICKY COMPONENT REQUEST END -------');
+
+        // Return the filtered products
+        res.json(products);
+    } catch (error) {
+        console.error('Error fetching products:', error.message);
+        console.error('Stack Trace:', error.stack);
+        res.status(500).send('Server error');
+    }
+});
 
 
+
+router.get('/products-bundle-recommendation', async (req, res) => {
+    console.log('--- BUNDLE PRODUCTS ---');
+
+    try {
+        // Fetch all products and their categories
+        const [rows] = await db.query(`
+         SELECT
+            p.product_id,
+            p.category_id,
+            p.product_code,
+            p.product_name,
+            p.price,
+            p.description,
+            p.quantity,
+            p.product_discount,
+            p.product_image,
+            p.product_status 
+        FROM
+            product AS p 
+        WHERE
+            p.product_status = 'Discounted' 
+        ORDER BY
+            CASE
+                WHEN p.product_status = 'Discounted' THEN 1 
+                ELSE 2 
+            END
+        LIMIT 4;  
+
+    `);
+
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        res.status(500).send('Error fetching products');
+    }
+});
 
 
 module.exports = router;
