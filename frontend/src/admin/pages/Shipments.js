@@ -28,7 +28,7 @@ const Shipments = () => {
   useEffect(() => {
     const fetchShipments = async () => {
       try {
-        const response = await fetch("http://localhost:5001/shipments");
+        const response = await fetch("https://ustp-eccom-server.vercel.app/api/shipments");
         if (!response.ok) {
           throw new Error("Failed to fetch shipments");
         }
@@ -89,7 +89,7 @@ const Shipments = () => {
   const exportToExcel = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5001/shipments?export=true",
+        "https://ustp-eccom-server.vercel.app/api/shipments?export=true",
         {
           method: "GET",
           headers: {

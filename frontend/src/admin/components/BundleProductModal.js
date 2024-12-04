@@ -39,7 +39,7 @@ const BundleProductModal = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        "http://localhost:5001/products-no-bundle"
+        "https://ustp-eccom-server.vercel.app/api/products-no-bundle"
       );
       setProducts(response.data);
     } catch (error) {
@@ -96,7 +96,7 @@ const BundleProductModal = () => {
     setLoading(true);
 
     try {
-      await axios.post("http://localhost:5001/bundles", bundleData);
+      await axios.post("https://ustp-eccom-server.vercel.app/api/bundles", bundleData);
       setToastMessage("Bundle Created!");
       setTimeout(() => {
         setToastMessage("");

@@ -38,7 +38,7 @@ const Payments = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        "http://localhost:5001/admin-order-history-payment",
+        "https://ustp-eccom-server.vercel.app/api/admin-order-history-payment",
         {
           params: {
             status: statusFilter,
@@ -96,7 +96,7 @@ const Payments = () => {
       const ordersData = JSON.parse(localStorage.getItem("ordersData"));
 
       const response = await axios.post(
-        "http://localhost:5001/admin-order-payment-export",
+        "https://ustp-eccom-server.vercel.app/api/admin-order-payment-export",
         { orders: ordersData },
         { responseType: "blob" } // Ensures response is treated as a file
       );

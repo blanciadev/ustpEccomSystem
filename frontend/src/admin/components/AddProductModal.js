@@ -22,7 +22,7 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("http://localhost:5001/product-category");
+        const response = await fetch("https://ustp-eccom-server.vercel.app/api/product-category");
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
@@ -86,7 +86,7 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
     };
 
     try {
-      const response = await fetch("http://localhost:5001/add-product", {
+      const response = await fetch("https://ustp-eccom-server.vercel.app/api/add-product", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

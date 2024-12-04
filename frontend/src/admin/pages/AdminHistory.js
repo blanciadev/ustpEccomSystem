@@ -30,7 +30,7 @@ const AdminHistory = () => {
   const fetchOrders = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5001/admin-order-history-general",
+        "https://ustp-eccom-server.vercel.app/api/admin-order-history-general",
         {
           params: { status, searchTerm, sortBy },
         }
@@ -134,7 +134,7 @@ const AdminHistory = () => {
   const handlePrintOrders = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5001/admin-order-history",
+        "https://ustp-eccom-server.vercel.app/api/admin-order-history",
         {
           params: { exportToExcel: "true" },
           responseType: "blob",

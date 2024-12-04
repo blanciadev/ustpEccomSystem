@@ -31,15 +31,15 @@ const ChangePassword = () => {
 
     try {
       // Send email and new password to the backend
-      const response = await axios.post('http://localhost:5001/password-reset', { email, password });
+      const response = await axios.post('https://ustp-eccom-server.vercel.app/api/password-reset', { email, password });
 
       // Handle success or error response
       if (response.data.message === 'Password updated successfully') {
         setToastMessage('Password successfully changed!');
         setTimeout(() => {
-            setToastMessage('');
-            navigate('/login');
-          }, 3000);
+          setToastMessage('');
+          navigate('/login');
+        }, 3000);
       } else {
         setToastMessage(response.data.message || 'Failed to update password.');
         setTimeout(() => setToastMessage(''), 3000);
@@ -53,42 +53,42 @@ const ChangePassword = () => {
 
   return (
     <div className="cp-con">
-        <Navigation/>
-        <ToastNotification toastMessage={toastMessage}/>
-        <div className="cp-form">
-          <h1>Change Password</h1>
-          <form onSubmit={handleSubmit}>
-            <div className="input-container">
-              <label>New Password</label>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <i
-                className={`bx ${showPassword ? 'bx-show' : 'bx-hide'}`}
-                onClick={() => setShowPassword(!showPassword)}
-              ></i>
-            </div>
+      <Navigation />
+      <ToastNotification toastMessage={toastMessage} />
+      <div className="cp-form">
+        <h1>Change Password</h1>
+        <form onSubmit={handleSubmit}>
+          <div className="input-container">
+            <label>New Password</label>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <i
+              className={`bx ${showPassword ? 'bx-show' : 'bx-hide'}`}
+              onClick={() => setShowPassword(!showPassword)}
+            ></i>
+          </div>
 
-            <div className="input-container">
-              <label>Confirm Password</label>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
-              <i
-                className={`bx ${showPassword ? 'bx-show' : 'bx-hide'}`}
-                onClick={() => setShowPassword(!showPassword)}
-              ></i>
-            </div>
+          <div className="input-container">
+            <label>Confirm Password</label>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+            <i
+              className={`bx ${showPassword ? 'bx-show' : 'bx-hide'}`}
+              onClick={() => setShowPassword(!showPassword)}
+            ></i>
+          </div>
 
-            <button type="submit">Submit</button>
-          </form>
-        </div>
+          <button type="submit">Submit</button>
+        </form>
+      </div>
     </div>
   );
 };

@@ -32,7 +32,7 @@ const Settings = () => {
 
       try {
         const response = await axios.get(
-          `http://localhost:5001/admin-users-details`,
+          `https://ustp-eccom-server.vercel.app/api/admin-users-details`,
           { params: { customer_id: customerId } }
         );
 
@@ -82,7 +82,7 @@ const Settings = () => {
 
     try {
       const response = await axios.put(
-        'http://localhost:5001/admin-users-details-update',
+        'https://ustp-eccom-server.vercel.app/api/admin-users-details-update',
         {
           customer_id: customerId,
           first_name: userData.firstName,
@@ -148,7 +148,7 @@ const Settings = () => {
     }
 
     try {
-      const response = await axios.put('http://localhost:5001/admin-users-password-update', {
+      const response = await axios.put('https://ustp-eccom-server.vercel.app/api/admin-users-password-update', {
         customer_id: customerId,
         current_password: passwordData.currentPassword,
         new_password: passwordData.newPassword,

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 // import '../../App.css'
 import './Login.css';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ToastNotification from '../components/ToastNotification';
 import { GoogleLogin } from '@react-oauth/google';
 import start from '../../assets/start.png'
@@ -217,7 +217,12 @@ const Login = () => {
                                                 {loginStatus && <p className='status'>{loginStatus}</p>}
                                                 <div class="row mb-4">
                                                     <div class="col-12">
-                                                        <p class="mb-0 mt-4 text-secondary text-center">Not Registered Yet? <a href="/signup" class="link-primary text-decoration-none">Register</a></p>
+                                                        <p className="mb-0 mt-4 text-secondary text-center">
+                                                            Not Registered Yet?{" "}
+                                                            <Link to="/signup" className="link-primary text-decoration-none">
+                                                                Register
+                                                            </Link>
+                                                        </p>
                                                     </div>
                                                 </div>
 
@@ -228,10 +233,10 @@ const Login = () => {
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </div >
+            </section >
 
-        </div>
+        </div >
 
     );
 };

@@ -12,7 +12,7 @@ const UserCountComponent = () => {
     useEffect(() => {
         const fetchUserCounts = async () => {
             try {
-                const response = await axios.get('http://localhost:5001/admin-users-count');
+                const response = await axios.get('https://ustp-eccom-server.vercel.app/api/admin-users-count');
                 const { customers, admins, warehouseManagers } = response.data.data;
 
                 setUserCounts({

@@ -15,7 +15,7 @@ const OrderProcessing = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          'http://localhost:5001/admin-order-history-total-component' // Your API endpoint
+          'https://ustp-eccom-server.vercel.app/api/admin-order-history-total-component' // Your API endpoint
         );
         const { statusCounts } = response.data;
 
