@@ -204,24 +204,6 @@ const Navigation = () => {
         </a>
       </div>
 
-      {/* <div className="d-flex align-items-center p-0 m-0">
-                <div className="searchbar d-flex justify-content-center mb-3">
-                    <form className="d-flex align-items-start p-0 m-0">
-                        <div className="input-group custom-border">
-                            <span className="input-group-text custom-icon">
-                                <IoIosSearch style={{ height: "20px", width: "20px" }} />
-                            </span>
-                            <input
-                                type="search"
-                                placeholder="Look for your perfect haircare products..."
-                                className="p-0 m-0"
-                                style={{ width: "350px", height: "40px" }}
-                            />
-                        </div>
-                    </form>
-                </div>
-            </div> */}
-
       <button className="menu-toggle" onClick={toggleMenu}>
         {isMenuOpen ? (
           <i className="bx bx-x"></i>
@@ -234,8 +216,8 @@ const Navigation = () => {
         <ul className={`linklist ${isMenuOpen ? "active" : ""}`}>
           {commonLinks.map((data) => (
             <li key={data.id}>
-              <a
-                href={data.link}
+              <Link
+                to={data.id === 3 ? "#" : data.link}
                 onClick={data.id === 3 ? handleCartClick : undefined}
               >
                 {data.id === 3 ? (
@@ -246,7 +228,7 @@ const Navigation = () => {
                 ) : (
                   data.page
                 )}
-              </a>
+              </Link>
             </li>
           ))}
           {!isLoggedIn ? (
@@ -289,7 +271,6 @@ const Navigation = () => {
                   </span>
 
                   {/* Dropdown Menu */}
-
                   <ul
                     className="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3"
                     aria-labelledby="profileDropdown"
@@ -351,8 +332,6 @@ const Navigation = () => {
                       </a>
                     </li>
                   </ul>
-
-                  <div className="d-flex justtify-content-start align-items-center"></div>
                 </div>
               </li>
             </>
