@@ -82,7 +82,7 @@ const Login = () => {
         const token = credentialResponse.credential;
 
         try {
-            const response = await axios.post('http://localhost:5001/verify-token', { token });
+            const response = await axios.post('https://ustp-eccom-server.vercel.app/api/verify-token', { token });
 
             if (response.status === 200) {
                 const userData = response.data.payload;
