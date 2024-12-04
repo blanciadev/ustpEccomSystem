@@ -57,7 +57,7 @@ const Navigation = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5001/users-details",
+        "https://ustp-eccom-server.vercel.app/api/users-details",
         { customer_id: customerId },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -109,7 +109,7 @@ const Navigation = () => {
 
     try {
       const response = await axios.get(
-        "http://localhost:5001/cart-item-count",
+        "https://ustp-eccom-server.vercel.app/api/cart-item-count",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -130,7 +130,7 @@ const Navigation = () => {
     if (token) {
       try {
         await axios.post(
-          "http://localhost:5001/logout",
+          "https://ustp-eccom-server.vercel.app/api/logout",
           {},
           {
             headers: { Authorization: `Bearer ${token}` },

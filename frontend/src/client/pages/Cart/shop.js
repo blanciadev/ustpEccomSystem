@@ -35,7 +35,7 @@ const Shop = () => {
 
         const fetchProducts = async () => {
             try {
-                const response = await axios.get('http://localhost:5001/products');
+                const response = await axios.get('https://ustp-eccom-server.vercel.app/api/products');
                 setProducts(response.data);
                 setFilteredProducts(response.data);
                 setCategories([...new Set(response.data.map(product => product.category_name))]);
@@ -48,7 +48,7 @@ const Shop = () => {
 
         const fetchTopPickedProducts = async () => {
             try {
-                const response = await axios.get('http://localhost:5001/products-top-picks');
+                const response = await axios.get('https://ustp-eccom-server.vercel.app/api/products-top-picks');
                 setTopPickedProducts(response.data);
             } catch (error) {
                 console.error('Error fetching top-picked products:', error.response ? error.response.data : error.message);
@@ -58,7 +58,7 @@ const Shop = () => {
 
         const fetchRecommendedProducts = async () => {
             try {
-                const response = await axios.get(`http://localhost:5001/product-bundles-general`);
+                const response = await axios.get(`https://ustp-eccom-server.vercel.app/api/product-bundles-general`);
 
                 if (response.data.length === 0) {
                     console.log('No recommended products found.');
@@ -128,7 +128,7 @@ const Shop = () => {
         const recordProductInteraction = async (payload) => {
             try {
                 console.log('Recording product interaction:', payload);
-                await axios.get('http://localhost:5001/products-interaction', { params: payload });
+                await axios.get('https://ustp-eccom-server.vercel.app/api/products-interaction', { params: payload });
                 console.log('Product interaction recorded successfully.');
             } catch (error) {
                 console.error('Error recording product interaction:', error);
@@ -183,7 +183,7 @@ const Shop = () => {
         try {
 
             await axios.post(
-                'http://localhost:5001/add-to-cart',
+                'https://ustp-eccom-server.vercel.app/api/add-to-cart',
                 { product_code: product.product_code, quantity: 1 },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -221,7 +221,7 @@ const Shop = () => {
 
         try {
             console.log('Recording product view interaction:', interactionPayload);
-            await axios.get('http://localhost:5001/products-interaction', { params: interactionPayload });
+            await axios.get('https://ustp-eccom-server.vercel.app/api/products-interaction', { params: interactionPayload });
             console.log('Product view interaction recorded successfully.');
         } catch (error) {
             console.error('Error recording product view interaction:', error);
@@ -279,7 +279,7 @@ const Shop = () => {
         }
 
         try {
-            const response = await axios.get(`http://localhost:5001/sticky-components`, {
+            const response = await axios.get(`https://ustp-eccom-server.vercel.app/api/sticky-components`, {
                 params: formData
             });
             console.log('Form data being sent:', formData);
@@ -415,7 +415,7 @@ const Shop = () => {
                     <h2 className='shop__title'>Discounted Bundles</h2>
                     <div className='shop__product-list'>
                         {recommendedProducts.map((product) => (
-                            <div key={product.product_code} className='bundle-card selected' style={{height:'370px', gridTemplateRows: '40% 40% 20%'}} onClick={() => openModal(product)}>
+                            <div key={product.product_code} className='bundle-card selected' style={{ height: '370px', gridTemplateRows: '40% 40% 20%' }} onClick={() => openModal(product)}>
                                 <div className="discount-badge">
                                     <p style={{ fontSize: '1.2rem' }}>{product.discount}%</p>
                                     <p style={{ lineHeight: '0.5' }}>OFF</p>
@@ -433,28 +433,28 @@ const Shop = () => {
                                     <p className="product-original-price">₱{product.price ? product.price.toFixed(2) : 'N/A'}</p>
                                 </div>
                                 <div className='btn-grp'>
-                                {product.quantity > 0 ? (
-                                    <button
-                                        className='shop__add-to-cart-button'
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleAddToCart(product);
-                                        }}
-                                    >
-                                        <i className='bx bxs-cart-alt cart-icon animated-cart-icon'></i>
-                                    </button>,
-                                    <button
-                                        className='shop__buy-now-button'
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleBuyNow(product);
-                                        }}
-                                    >
-                                        Buy Now
-                                    </button>
-                                ):(
-                                    <p style={{ color: 'red' }}>Sold Out</p>
-                                )}
+                                    {product.quantity > 0 ? (
+                                        <button
+                                            className='shop__add-to-cart-button'
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleAddToCart(product);
+                                            }}
+                                        >
+                                            <i className='bx bxs-cart-alt cart-icon animated-cart-icon'></i>
+                                        </button>,
+                                        <button
+                                            className='shop__buy-now-button'
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleBuyNow(product);
+                                            }}
+                                        >
+                                            Buy Now
+                                        </button>
+                                    ) : (
+                                        <p style={{ color: 'red' }}>Sold Out</p>
+                                    )}
                                 </div>
                             </div>
                         ))}

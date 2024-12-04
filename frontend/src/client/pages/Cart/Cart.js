@@ -24,7 +24,7 @@ const CartContent = () => {
       setLoading(true);
       try {
         if (isLoggedIn) {
-          const response = await fetch("http://localhost:5001/cart", {
+          const response = await fetch("https://ustp-eccom-server.vercel.app/api/cart", {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
@@ -43,7 +43,7 @@ const CartContent = () => {
 
           // Query the backend with product codes
           const productDetailsResponse = await fetch(
-            "http://localhost:5001/products-img",
+            "https://ustp-eccom-server.vercel.app/api/products-img",
             {
               method: "POST",
               headers: {
@@ -139,7 +139,7 @@ const CartContent = () => {
         selectedProducts.map(async (product) => {
           try {
             const response = await axios.get(
-              `http://localhost:5001/products-checkout/${product.product_code}`,
+              `https://ustp-eccom-server.vercel.app/api/products-checkout/${product.product_code}`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
@@ -188,7 +188,7 @@ const CartContent = () => {
 
       if (isLoggedIn) {
         const response = await fetch(
-          `http://localhost:5001/cart-update-quantity`,
+          `https://ustp-eccom-server.vercel.app/api/cart-update-quantity`,
           {
             method: "POST",
             headers: {
@@ -241,7 +241,7 @@ const CartContent = () => {
     try {
       if (isLoggedIn) {
         const response = await fetch(
-          `http://localhost:5001/cart-delete/${cartItemId}`,
+          `https://ustp-eccom-server.vercel.app/api/cart-delete/${cartItemId}`,
           {
             method: "DELETE",
             headers: {
