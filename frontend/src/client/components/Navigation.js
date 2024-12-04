@@ -153,24 +153,24 @@ const Navigation = () => {
       setToastMessage("");
     }, 3000);
     setIsLoggedIn(false);
-    navigate("/login");
+    <Link to="/login" />
   };
 
-  const handleCartClick = () => {
-    navigate("/cart");
-  };
+  const handleCartClick = () => (
+    <Link to="/cart" />
+  );
 
-  const handleProfileClick = () => {
-    navigate("/user");
-  };
+  const handleProfileClick = () => (
+    <Link to="/user" />
+  );
 
-  const handleOrderClick = () => {
-    navigate("/user/purchase");
-  };
+  const handleOrderClick = () => (
+    <Link to="/user/purchase" />
+  );
 
-  const handleHomeClick = () => {
-    navigate("/");
-  };
+  const handleHomeClick = () => (
+    <Link to="/" />
+  );
 
   const commonLinks = [
     { id: 1, page: "Shop", link: "/shop" },
@@ -213,23 +213,14 @@ const Navigation = () => {
 
       <div className="navlinks">
         <ul className={`linklist ${isMenuOpen ? "active" : ""}`}>
-          {commonLinks.map((data) => (
-            <li key={data.id}>
-              <Link
-                to={data.id === 3 ? "#" : data.link}
-                onClick={data.id === 3 ? handleCartClick : undefined}
-              >
-                {data.id === 3 ? (
-                  <>
-                    <BsCart style={{ height: "20px", width: "20px" }} />{" "}
-                    {data.page}
-                  </>
-                ) : (
-                  data.page
-                )}
-              </Link>
-            </li>
-          ))}
+          <li>
+            <Link to="/shop">shop</Link>
+          </li>
+          <li>
+            <Link to="/cart" className="cart">
+              cart
+            </Link>
+          </li>
           {!isLoggedIn ? (
             <>
               <li>
