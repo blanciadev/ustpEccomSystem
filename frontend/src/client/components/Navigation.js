@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { cartEventEmitter } from "./eventEmitter";
 import "../../App.css";
@@ -251,9 +251,9 @@ const Navigation = () => {
           ))}
           {!isLoggedIn ? (
             <>
-              <li>
-                <a href="/signup">Sign Up</a>
-              </li>
+              <Link to="/signup" className="signup">
+                Sign Up
+              </Link>
               <li>
                 <Link to="/login" className="login">
                   Login
