@@ -11,24 +11,25 @@ const OrderHistory = () => {
   const [error, setError] = useState(null);
   const [statusFilter, setStatusFilter] = useState("");
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  const [activeButton, setActiveButton] = useState(""); // Track active button
-
+  const [activeButton, setActiveButton] = useState("");
   useEffect(() => {
     window.addEventListener("resize", handleResize);
+
+    // Get customer_id from localStorage
+    const customerId = localStorage.getItem('customer_id');
 
     const fetchOrders = async () => {
       try {
         const response = await axios.get(
           "https://ustp-eccom-server.vercel.app/api/order-history",
           {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
             params: {
+              customer_id: customerId,
               status: statusFilter,
             },
           }
         );
+
         if (Array.isArray(response.data)) {
           setOrders(response.data);
         } else {
@@ -42,10 +43,12 @@ const OrderHistory = () => {
     };
 
     fetchOrders();
+
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, [statusFilter]);
+
 
   const handleStatusClick = (status) => {
     setStatusFilter(status);
@@ -205,8 +208,8 @@ const OrderHistory = () => {
                                   handleCancelOrder(order.order_id)
                                 }
                                 className={`btn btn-danger mt-2 ${order.order_status === "Pending"
-                                    ? ""
-                                    : "disabled"
+                                  ? ""
+                                  : "disabled"
                                   }`}
                                 disabled={order.order_status !== "Pending"}
                               >

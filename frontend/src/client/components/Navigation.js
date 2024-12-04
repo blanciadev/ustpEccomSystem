@@ -261,7 +261,6 @@ const Navigation = () => {
                     )}
                   </span>
 
-                  {/* Dropdown Menu */}
                   <ul
                     className="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3"
                     aria-labelledby="profileDropdown"
@@ -272,55 +271,52 @@ const Navigation = () => {
                     }}
                   >
                     <li>
-                      <a
-                        className="dropdown-item d-flex align-items-center"
-                        onClick={handleHomeClick}
-                      >
+                      <Link to="/" className="dropdown-item d-flex align-items-center">
                         <MdOutlineHome
                           className="me-2"
                           size={26}
                           style={{ color: "orange" }}
                         />
                         <span style={{ fontSize: "16px" }}>Home</span>
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a
-                        className="dropdown-item d-flex align-items-center"
-                        onClick={handleProfileClick}
-                      >
+                      <Link to="/user" className="dropdown-item d-flex align-items-center">
                         <FaRegUser
                           className="me-2"
                           size={24}
                           style={{ color: "green" }}
                         />
                         <span style={{ fontSize: "16px" }}>Profile</span>
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a
-                        className="dropdown-item d-flex align-items-center"
-                        onClick={handleOrderClick}
-                      >
+                      <Link to="/user/purchase" className="dropdown-item d-flex align-items-center">
                         <MdOutlineShoppingBag
                           className="me-2"
                           size={24}
                           style={{ color: "blue" }}
                         />
                         <span style={{ fontSize: "16px" }}>My Orders</span>
-                      </a>
+                      </Link>
                     </li>
                     <li>
                       <hr className="dropdown-divider" />
                     </li>
                     <li>
-                      <a
+                      <button
                         className="dropdown-item d-flex align-items-center text-danger"
                         onClick={() => setShowLogoutModal(true)}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          padding: "0",
+                          cursor: "pointer",
+                        }}
                       >
                         <MdLogout className="me-2" size={24} />
                         <span style={{ fontSize: "16px" }}>Logout</span>
-                      </a>
+                      </button>
                     </li>
                   </ul>
                 </div>

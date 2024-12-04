@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import '../pages/Transactions/Transaction.css';
 
 const UserSideNav = () => {
@@ -92,8 +92,8 @@ const UserSideNav = () => {
         </div>
 
         <div className='side-navlinks'>
-          <a
-            href='/user'
+          <Link
+            to="/user"
             className={location.pathname === '/user' ? 'active-link' : ''}
           >
             {isMobile ? (
@@ -101,10 +101,10 @@ const UserSideNav = () => {
             ) : (
               <p style={{ fontWeight: '500' }}>Profile</p>
             )}
-          </a>
+          </Link>
 
-          <a
-            href='/user/purchase'
+          <Link
+            to="/user/purchase"
             className={location.pathname === '/user/purchase' ? 'active-link' : ''}
           >
             {isMobile ? (
@@ -112,7 +112,7 @@ const UserSideNav = () => {
             ) : (
               <p style={{ fontWeight: '500' }}>My Orders</p>
             )}
-          </a>
+          </Link>
         </div>
 
       </div>

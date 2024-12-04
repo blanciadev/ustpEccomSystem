@@ -282,10 +282,81 @@ router.post('/update-customer-details/:customer_id', authenticateToken, async (r
 });
 
 
+// // Route to get order history for a user with optional status filter
+// router.get('/order-history', authenticateToken, async (req, res) => {
+//     try {
+//         const { customer_id } = req.user;
+//         const { status } = req.query;
+
+//         let query = `
+//             SELECT
+//                 o.order_id, 
+//                 o.order_date, 
+//                 o.total_price AS order_total, 
+//                 od.product_id, 
+//                 p.product_name,
+//                 p.product_image,
+//                 p.price,
+//                 od.quantity, 
+//                 od.order_status,
+//                 od.total_price AS item_total, 
+//                 od.payment_method
+//             FROM
+//                 \`order\` o
+//             INNER JOIN
+//                 \`order_details\` od
+//             ON 
+//                 o.order_id = od.order_id
+//             INNER JOIN
+//                 \`product\` p
+//             ON 
+//                 od.product_id = p.product_code
+//             WHERE
+//                 o.customer_id = ?
+//         `;
+
+//         if (status) {
+//             query += ` AND od.order_status = ?`;
+//         }
+
+//         query += ` ORDER BY o.order_date DESC`;
+
+//         const [orders] = await db.query(query, status ? [customer_id, status] : [customer_id]);
+
+//         const groupedOrders = orders.reduce((acc, order) => {
+//             if (!acc[order.order_id]) {
+//                 acc[order.order_id] = {
+//                     order_id: order.order_id,
+//                     order_date: order.order_date,
+//                     order_total: order.order_total,
+//                     order_status: order.order_status,
+//                     products: []
+//                 };
+//             }
+//             acc[order.order_id].products.push({
+//                 product_name: order.product_name,
+//                 product_image: order.product_image,
+//                 price: order.price,
+//                 quantity: order.quantity,
+//                 item_total: order.item_total
+//             });
+//             return acc;
+//         }, {});
+
+
+//         res.json(Object.values(groupedOrders));
+
+//     } catch (error) {
+//         console.error('Error fetching order history:', error.message);
+//         res.status(500).json({ message: 'Internal Server Error' });
+//     }
+// });
+
+
 // Route to get order history for a user with optional status filter
-router.get('/order-history', authenticateToken, async (req, res) => {
+router.get('/order-history', async (req, res) => {
     try {
-        const { customer_id } = req.user;
+        const { customer_id } = req.query;
         const { status } = req.query;
 
         let query = `
@@ -342,7 +413,6 @@ router.get('/order-history', authenticateToken, async (req, res) => {
             });
             return acc;
         }, {});
-
 
         res.json(Object.values(groupedOrders));
 
