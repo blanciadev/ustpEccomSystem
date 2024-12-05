@@ -2,7 +2,7 @@ import './App.css';
 import './transition.css'
 import React, { useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 
 import Home from './public/pages/Home';
