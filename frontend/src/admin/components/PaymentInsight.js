@@ -4,43 +4,42 @@ import { Bar } from 'react-chartjs-2';
 import axios from 'axios';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
-// Register the components needed for Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const PaymentInsight = () => {
-    const [monthlyCounts, setMonthlyCounts] = useState([]); // State to hold monthly order counts
-    const [loading, setLoading] = useState(true); // State for loading
-    const [error, setError] = useState(null); // State for error handling
+    const [monthlyCounts, setMonthlyCounts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchPaymentInsight = async () => {
             try {
-                const response = await axios.get('http://localhost:5001/payment-insight');
-                setMonthlyCounts(response.data.monthlyCounts); // Set monthly counts from the response
+                const response = await axios.get('https://ustp-eccom-server.vercel.app/api/payment-insight');
+                setMonthlyCounts(response.data.monthlyCounts);
             } catch (error) {
                 console.error('Error fetching payment insight:', error);
-                setError('Failed to fetch data.'); // Set error message
+                setError('Failed to fetch data.');
             } finally {
-                setLoading(false); // Set loading to false after fetching
+                setLoading(false);
             }
         };
 
         fetchPaymentInsight();
     }, []);
 
-    // Prepare data for the chart
     const data = {
-        labels: monthlyCounts.map(mc => `Month ${mc.month}`), // Create labels for each month
+        labels: monthlyCounts.map(mc => mc.month),
         datasets: [
             {
-                label: 'Completed Orders', // Update label to reflect the data
-                data: monthlyCounts.map(mc => mc.count), // Use the counts from the monthlyCounts
-                backgroundColor: 'rgba(255, 99, 132, 0.6)', // Bar color
-                borderColor: 'rgba(255, 99, 132, 1)', // Border color of bars
-                borderWidth: 1, // Border width
+                label: 'Completed Orders',
+                data: monthlyCounts.map(mc => mc.count),
+                backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1,
             },
         ],
     };
+
 
     const options = {
         responsive: true,
@@ -58,7 +57,7 @@ const PaymentInsight = () => {
             tooltip: {
                 callbacks: {
                     label: function (tooltipItem) {
-                        return `${tooltipItem.dataset.label}: ${tooltipItem.raw}`; // Use template literals for readability
+                        return `${tooltipItem.dataset.label}: ${tooltipItem.raw}`;
                     },
                 },
                 backgroundColor: 'rgba(0,0,0,0.7)',
@@ -85,13 +84,12 @@ const PaymentInsight = () => {
         },
     };
 
-    // Loading and error states
     if (loading) {
-        return <div>Loading...</div>; // Show loading indicator
+        return <div>Loading...</div>;
     }
 
     if (error) {
-        return <div>{error}</div>; // Show error message if there's an error
+        return <div>{error}</div>;
     }
 
     return (

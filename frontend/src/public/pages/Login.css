@@ -1,0 +1,33 @@
+
+
+.login-con{
+    margin-top: 30px;
+    margin-bottom: 30px;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(255, 255, 255);
+    
+}
+
+.login-box{
+    width: 80%;
+    height: 100%;
+    background-color: rgb(255, 255, 255);
+    
+ 
+    
+}
+
+
+.col-gradient {
+  background: linear-gradient(to bottom right, transparent 60%, #fdb7d2 130%);
+}
+
+
+
+.form-check-label {
+    font-size: 13px;
+}

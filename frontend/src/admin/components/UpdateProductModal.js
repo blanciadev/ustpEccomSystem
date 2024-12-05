@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import './modal.css'
+import './modal.css';
 import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
+import ToastNotification from '../../public/components/ToastNotification';
 
 const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
     const [formData, setFormData] = useState({
@@ -19,6 +20,7 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
     });
     const [error, setError] = useState('');
     const [categories, setCategories] = useState([]);
+    const [toastMessage, setToastMessage] = useState('');
 
     useEffect(() => {
         if (product) {
@@ -37,10 +39,9 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
             });
         }
 
-        // Fetch categories
         const fetchCategories = async () => {
             try {
-                const response = await axios.get('http://localhost:5001/categories');
+                const response = await axios.get('https://ustp-eccom-server.vercel.app/api/categories');
                 setCategories(response.data.categories);
             } catch (error) {
                 console.error('Error fetching categories:', error);
@@ -53,7 +54,7 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prevFormData => ({
+        setFormData((prevFormData) => ({
             ...prevFormData,
             [name]: value
         }));
@@ -67,9 +68,14 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
                     ...formData,
                     size: formData.size === 'Other' ? formData.custom_size : formData.size
                 };
-                await axios.put(`http://localhost:5001/admin-update-products/${formData.product_code}`, dataToSend);
-                handleUpdate();
-                handleClose();
+                await axios.put(`https://ustp-eccom-server.vercel.app/api/admin-update-products/${formData.product_code}`, dataToSend);
+
+                setToastMessage('Updated Successfully!');
+                setTimeout(() => {
+                    setToastMessage('');
+                    handleUpdate();
+                    handleClose();
+                }, 2000);
             } else {
                 console.error('Product code is undefined');
                 setError('Product code is missing.');
@@ -81,11 +87,18 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
     };
 
     return (
-        <Modal className='modal-lg' show={show} onHide={handleClose}>
+        <Modal
+            className="modal-lg"
+            show={show}
+            onHide={handleClose}
+            centered
+            dialogClassName="custom-dialog"
+        >
             <Modal.Header closeButton>
                 <Modal.Title>Update Product</Modal.Title>
             </Modal.Header>
-            <Modal.Body className='mbody one'>
+            <Modal.Body className="mbody one">
+                <ToastNotification toastMessage={toastMessage} />
                 {error && <div className="alert alert-danger">{error}</div>}
                 <Form onSubmit={handleSubmit}>
                     <img src={product.product_image} alt="Product" />
@@ -130,9 +143,8 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
                             required
                         >
                             <option value="">
-                                {formData.category_name ? `${formData.category_name}` : "Select a category"}
+                                {formData.category_name ? `${formData.category_name}` : 'Select a category'}
                             </option>
-
                             {categories.map((category) => (
                                 <option key={category.category_id} value={category.category_id}>
                                     {category.category_name}
@@ -140,7 +152,6 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
                             ))}
                         </Form.Control>
                     </Form.Group>
-
                     <Form.Group controlId="formSize">
                         <Form.Label>Size</Form.Label>
                         <Form.Control

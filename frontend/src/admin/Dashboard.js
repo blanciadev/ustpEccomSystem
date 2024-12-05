@@ -12,6 +12,8 @@ import TopProduct from './components/TopProduct';
 import AdminHeader from './components/AdminHeader';
 
 const Dashboard = () => {
+
+
     return (
         <div className='dash-con'>
             <AdminNav />
@@ -26,13 +28,13 @@ const Dashboard = () => {
 
                 </div>
                 <div className='dash-body'>
-                        <OrderSummary />
-                        <CustomerInsight />
-                        <SalesOrders />
-                        <PaymentInsight />
-                        <AverageOrders />
-                        <OrderProcessing />
-                        <TopProduct />
+                    <OrderSummary />
+                    <CustomerInsight />
+                    <SalesOrders />
+                    <PaymentInsight />
+                    <AverageOrders />
+                    <OrderProcessing />
+                    <TopProduct />
                 </div>
             </div>
         </div>

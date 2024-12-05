@@ -23,7 +23,7 @@ router.post('/add-product', async (req, res) => {
 
         const { productName, description, category, price, quantity, expirationDate, size, imageURL } = req.body;
 
-        // Log all the product details for debugging
+
         console.log('Product details:');
         console.log('Name:', productName);
         console.log('Description:', description);
@@ -32,17 +32,18 @@ router.post('/add-product', async (req, res) => {
         console.log('Quantity:', quantity);
         console.log('Expiration Date:', expirationDate);
         console.log('Size:', size);
-        console.log('Image URL:', imageURL); 
+        console.log('Image URL:', imageURL);
 
         // Generate unique product code
         const productCode = await generateProductCode();
         console.log('Generated product code:', productCode);
 
-        // SQL query to insert product data into the database, including the image URL
+        // SQL query to insert product data into the database, including the image URL and current timestamp
         const query = `
-            INSERT INTO product (product_name, description, category_id, price, quantity, expiration_date, product_code, size, product_image)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `;
+INSERT INTO product (product_name, description, category_id, price, quantity, expiration_date, product_code, size, product_image, created_at)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+`;
+
         const values = [productName, description, category, price, quantity, expirationDate, productCode, size, imageURL];
 
         console.log('Executing query:', query);
@@ -72,9 +73,8 @@ router.get('/product-category', async (req, res) => {
         `;
 
         const [rows] = await db.query(query);
-        // Respond with product categories
         res.json(rows);
-        // console.error('output', rows);
+
     } catch (error) {
         console.error('Error fetching product categories:', error);
         res.status(500).send('Error fetching product categories');
@@ -144,7 +144,7 @@ router.get('/admin-products', async (req, res) => {
 });
 
 router.get('/admin-products-targeted', async (req, res) => {
-    const { product_code } = req.query; 
+    const { product_code } = req.query;
 
     try {
         let query = `
@@ -154,16 +154,14 @@ router.get('/admin-products-targeted', async (req, res) => {
         `;
         let queryParams = [];
 
-        // If product_code is provided, filter the results by product_code
         if (product_code) {
             query += ` WHERE p.product_code = ?`;
             queryParams.push(product_code);
         }
 
-        // Execute the query
         const [rows] = await db.query(query, queryParams);
 
-        // Respond with the product details
+
         res.json(rows);
     } catch (error) {
         console.error('Error fetching products:', error);

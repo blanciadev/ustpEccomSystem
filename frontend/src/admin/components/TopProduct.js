@@ -4,11 +4,10 @@ import '../admin.css';
 const TopProduct = () => {
   const [data, setData] = useState([]);
 
-  // Fetch top products data from the backend
   useEffect(() => {
     const fetchTopProducts = async () => {
       try {
-        const response = await fetch('http://localhost:5001/top-products');
+        const response = await fetch('https://ustp-eccom-server.vercel.app/api/top-products');
         const result = await response.json();
         setData(result.products);
       } catch (error) {
@@ -19,7 +18,6 @@ const TopProduct = () => {
     fetchTopProducts();
   }, []);
 
-  // Sort data by cart_quantity (descending)
   const sortedData = [...data].sort((a, b) => b.cart_quantity - a.cart_quantity);
 
   return (
@@ -30,20 +28,20 @@ const TopProduct = () => {
         </div>
       </div>
 
-      <div className="top-product__table-wrapper">
-        <table className="top-product__table">
-          <thead class="bg-light sticky-top">
+      <div className="table-responsive top-product__table-wrapper">
+        <table className="table top-product__table">
+          <thead className="bg-light sticky-top">
             <tr className="top-product__table-header">
               <th>#</th>
               <th>Product</th>
-              <th>Progress</th>
+              <th>Popularity</th>
               <th>Available</th>
             </tr>
           </thead>
           <tbody>
             {sortedData.map((item, index) => (
               <tr key={item.id} className="top-product__table-row">
-                <td>{index + 1}</td>
+                <td><strong>{index + 1}</strong></td>
                 <td>{item.product}</td>
                 <td>
                   <div className="top-product__progress-bar-container">
@@ -61,6 +59,7 @@ const TopProduct = () => {
           </tbody>
         </table>
       </div>
+
     </div>
   );
 };

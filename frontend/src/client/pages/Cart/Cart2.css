@@ -1,0 +1,25 @@
+
+
+  .cart__table-header {
+    background-color: lightpink;
+  }
+  
+
+  .cart__checkout-button {
+    background-color: #ff69b4; /* Pink background */
+    color: #fff; /* White text */
+    border: none; /* Removes border */
+    border-radius: 0; /* No rounding */
+    font-size: 1rem; /* Bigger text */
+    padding: 15px 40px; /* Adds size */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .cart__checkout-button:hover {
+    transform: scale(1.05); /* Slight zoom on hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Enhance shadow on hover */
+  }
+  
+
+  

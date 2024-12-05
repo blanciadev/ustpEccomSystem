@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Table } from 'react-bootstrap';
 import axios from 'axios';
-import './DiscountProducts.css'; // Optional: Custom CSS for additional styling
+import './DiscountProducts.css';
 
 const RemoveDiscountProduct = ({ show, handleClose, order, handleUpdate }) => {
   const [products, setProducts] = useState([]);
 
-  // Fetch the products when the modal is shown
   useEffect(() => {
     if (show) {
       axios
-        .get('http://localhost:5001/products-disable-bundle') 
+        .get('https://ustp-eccom-server.vercel.app/api/products-disable-bundle')
         .then((response) => {
-          setProducts(response.data); 
+          setProducts(response.data);
         })
         .catch((error) => {
           console.error('Error fetching products:', error);
@@ -20,14 +19,12 @@ const RemoveDiscountProduct = ({ show, handleClose, order, handleUpdate }) => {
     }
   }, [show]);
 
-  // Function to remove the discount from the product using product_code
   const handleRemoveDiscount = (productCode) => {
     axios
-      .post(`http://localhost:5001/remove-discount/${productCode}`) // 
+      .post(`https://ustp-eccom-server.vercel.app/api/remove-discount/${productCode}`)
       .then((response) => {
-        // Update the products list after discount is removed
         setProducts(products.filter((product) => product.product_code !== productCode));
-        handleUpdate(); 
+        handleUpdate();
       })
       .catch((error) => {
         console.error('Error removing discount:', error);
@@ -59,14 +56,14 @@ const RemoveDiscountProduct = ({ show, handleClose, order, handleUpdate }) => {
                 <td>{product.product_code}</td>
                 <td>{product.product_name}</td>
                 <td>{product.category_name}</td>
-                <td>${product.price.toFixed(2)}</td>
+                <td>P{product.price.toFixed(2)}</td>
                 <td>{product.product_discount}%</td>
                 <td>
                   <Button
                     variant="danger"
                     onClick={() => handleRemoveDiscount(product.product_code)} // Pass product_code to the function
                   >
-                    Remove Discount
+                    <i class='bx bxs-trash' ></i>
                   </Button>
                 </td>
               </tr>
