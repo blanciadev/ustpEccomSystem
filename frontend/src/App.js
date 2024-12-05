@@ -46,7 +46,7 @@ function App() {
         timeout={300}
       >
         <Routes location={location}>
-          {/* Redirect any undefined route to Home */}
+          {/* Redirect any undefined route to Home TEST EDIT */}
           <Route path="*" element={<Navigate to="/" replace />} />
           <Route index element={<Home />} />
           <Route path="/" element={<Home />} />
