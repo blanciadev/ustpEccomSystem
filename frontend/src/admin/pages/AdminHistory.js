@@ -12,7 +12,7 @@ const AdminHistory = () => {
   const [status, setStatus] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("date");
-  const [statusOptions, setStatusOptions] = useState([
+  const [statusOptions] = useState([
     "To Ship",
     "To Receive",
     "Completed",
@@ -20,9 +20,9 @@ const AdminHistory = () => {
     "Return/Refund",
     "Pending",
   ]);
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [modalShow, setModalShow] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 425);
+  const [setSelectedOrder] = useState(null);
+  const [setModalShow] = useState(false);
+  const [setIsMobile] = useState(window.innerWidth <= 425);
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
@@ -55,20 +55,20 @@ const AdminHistory = () => {
     setIsMobile(window.innerWidth <= 425);
   };
 
-  const handleOpenModal = (order) => {
-    setSelectedOrder(order);
-    setModalShow(true);
-  };
+  // const handleOpenModal = (order) => {
+  //   setSelectedOrder(order);
+  //   setModalShow(true);
+  // };
 
-  const handleCloseModal = () => {
-    setSelectedOrder(null);
-    setModalShow(false);
-    fetchOrders();
-  };
+  // const handleCloseModal = () => {
+  //   setSelectedOrder(null);
+  //   setModalShow(false);
+  //   fetchOrders();
+  // };
 
-  const refreshOrders = () => {
-    fetchOrders();
-  };
+  // const refreshOrders = () => {
+  //   fetchOrders();
+  // };
 
   const highlightText = (text, searchTerm) => {
     if (!searchTerm) return text;
@@ -125,11 +125,11 @@ const AdminHistory = () => {
 
   const sortedFilteredOrders = sortOrders(filteredOrders);
 
-  const totalPages = Math.ceil(sortedFilteredOrders.length / pageSize);
+  // const totalPages = Math.ceil(sortedFilteredOrders.length / pageSize);
 
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
+  // const handlePageChange = (pageNumber) => {
+  //   setCurrentPage(pageNumber);
+  // };
 
   const handlePrintOrders = async () => {
     try {
@@ -150,10 +150,10 @@ const AdminHistory = () => {
     }
   };
 
-  const paginatedOrders = sortedFilteredOrders.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+  // const paginatedOrders = sortedFilteredOrders.slice(
+  //   (currentPage - 1) * pageSize,
+  //   currentPage * pageSize
+  // );
 
   return (
     <div className="dash-con">

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import {
   Button,
-  Modal,
+  // Modal,
   Form,
-  Table,
+  // Table,
   Pagination,
-  Alert,
+  //Alert,
   Spinner,
 } from "react-bootstrap";
 import axios from "axios";

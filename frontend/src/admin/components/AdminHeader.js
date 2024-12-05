@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import '../admin.css';
-import Dropdown from 'react-bootstrap/Dropdown';
+// import Dropdown from 'react-bootstrap/Dropdown';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaRegUser } from "react-icons/fa";
 import { MdLogout } from "react-icons/md";
 
@@ -93,8 +93,6 @@ const AdminHeader = () => {
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                 >
-
-
                     <img
                         src={
                             profileImage ||
@@ -124,18 +122,13 @@ const AdminHeader = () => {
                 >
 
                     <li>
-                        <a
+                        <Link
                             className="dropdown-item d-flex align-items-center"
                             // onClick={handleProfileClick}
-                            href='/admin/profile'
+                            to='/admin/profile'
                         >
-                            <FaRegUser
-                                className="me-2"
-                                size={24}
-                                style={{ color: "green" }}
-                            />
-                            <span style={{ fontSize: "16px" }}>Profile</span>
-                        </a>
+                            Profile
+                        </Link>
                     </li>
 
 

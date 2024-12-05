@@ -146,7 +146,8 @@ const AdminNav = () => {
           </Link>
         )}
 
-        <a
+        <Link
+          to="/reports"
           onClick={(e) => {
             e.preventDefault();
             toggleDropdown();
@@ -154,7 +155,7 @@ const AdminNav = () => {
           className={`dropdown-toggle ${isDropdownOpen ? 'active2' : ''}`}
         >
           {!isMobile && <span><HiOutlineDocumentReport className='mb-1 me-2' />Reports</span>}
-        </a>
+        </Link>
 
         {isDropdownOpen && (
           <div className='dropdown-content'>

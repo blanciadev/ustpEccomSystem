@@ -19,14 +19,15 @@ const Inventory = () => {
   const [discontinuedCount, setDiscontinuedCount] = useState(0);
   const [discontinuedQuantity, setDiscontinuedQuantity] = useState(0);
   const [productNames, setProductNames] = useState([]);
-  const [inventoryItems, setInventoryItems] = useState([]);
-  const [showModal, setShowModal] = useState(false);
+  // const [inventoryItems, setInventoryItems] = useState([]);
+  const [ //showModal,
+    setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [stockStatusFilter, setStockStatusFilter] = useState(""); // New state for filter
 
-  const handleCloseModal = () => setShowModal(false);
-  const handleShowModal = () => setShowModal(true);
+  // const handleCloseModal = () => setShowModal(false);
+  // const handleShowModal = () => setShowModal(true);
 
   const fetchProductStatistics = async () => {
     try {

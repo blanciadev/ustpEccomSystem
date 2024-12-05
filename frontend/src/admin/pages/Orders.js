@@ -12,7 +12,9 @@ const Orders = () => {
   const [status, setStatus] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("date");
-  const [statusOptions, setStatusOptions] = useState([
+  const [statusOptions,
+    //setStatusOptions
+  ] = useState([
     "To Ship",
     "To Receive",
     "Cancelled",
@@ -21,7 +23,8 @@ const Orders = () => {
   ]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalShow, setModalShow] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 425);
+  const [//isMobile, 
+    setIsMobile] = useState(window.innerWidth <= 425);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 6;
 
