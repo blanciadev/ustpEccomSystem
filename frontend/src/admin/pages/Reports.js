@@ -167,7 +167,7 @@ const Reports = () => {
                                         </select>
                                     </div>
                                     <button onClick={() => exportReport(selectedMonth, selectedYear)}>
-                                        <i class='bx bx-export'></i> Export Report
+                                        <i className='bx bx-export'></i> Export Report
                                     </button>
                                 </div>
                             </div>

@@ -134,10 +134,10 @@ const Shipments = () => {
         </div>
         <div className="body">
           <div className="admin-ship">
-            <div class="container align-items-center mt-4 mb-4">
-              <div class="row align-items-center m-0 p-0">
-                <div class="col-4">
-                  <div class="search d-flex  ">
+            <div className="container align-items-center mt-4 mb-4">
+              <div className="row align-items-center m-0 p-0">
+                <div className="col-4">
+                  <div className="search d-flex  ">
                     {" "}
                     <form onSubmit={(e) => e.preventDefault()}>
                       <input
@@ -151,22 +151,22 @@ const Shipments = () => {
                   </div>
                 </div>
 
-                <div class="col-2">
-                  <div class="d-flex justify-content-center ">
+                <div className="col-2">
+                  <div className="d-flex justify-content-center ">
                     {/* empty div */}
                   </div>
                 </div>
 
-                <div class="col-3">
-                  <div class=" d-flex justify-content-end">
+                <div className="col-3">
+                  <div className=" d-flex justify-content-end">
                     <button onClick={exportToExcel} className="btn btn-primary">
-                      <i class="bx bx-export"></i> Export Shipment Record
+                      <i className="bx bx-export"></i> Export Shipment Record
                     </button>
                   </div>
                 </div>
 
-                <div class="col-3">
-                  <div class="d-flex justify-content-end align-items-center">
+                <div className="col-3">
+                  <div className="d-flex justify-content-end align-items-center">
                     <label htmlFor="sort" className="me-2">
                       Sort By:
                     </label>

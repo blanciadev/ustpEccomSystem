@@ -94,45 +94,45 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
             <ToastNotification toastMessage={toastMessage} />
             {order && (
               <div>
-                <div class="customer-details text-start  ps-4">
+                <div className="customer-details text-start  ps-4">
                   <div>
                     <h5 className="modal-title">Customer Details</h5>
                   </div>
-                  <div class="row align-items-center">
-                    <div class="col">
+                  <div className="row align-items-center">
+                    <div className="col">
                       <p>
                         <strong>Order ID</strong>
                       </p>
                     </div>
-                    <div class="col">
+                    <div className="col">
                       <p>{order.order_id}</p>
                     </div>
                   </div>
 
-                  <div class="row align-items-center">
-                    <div class="col">
+                  <div className="row align-items-center">
+                    <div className="col">
                       <p>
                         <strong>Customer ID</strong>
                       </p>
                     </div>
-                    <div class="col">
+                    <div className="col">
                       <p>{order.customer_id}</p>
                     </div>
                   </div>
 
-                  <div class="row align-items-center">
-                    <div class="col">
+                  <div className="row align-items-center">
+                    <div className="col">
                       <p>
                         <strong>Customer Name</strong>
                       </p>
                     </div>
-                    <div class="col">
+                    <div className="col">
                       <p>{`${order.customer_first_name} ${order.customer_last_name}`}</p>
                     </div>
                   </div>
 
-                  <div class="row align-items-center">
-                    <div class="col">
+                  <div className="row align-items-center">
+                    <div className="col">
                       <p>
                         <strong>Delivery Address</strong>
                       </p>
@@ -143,31 +143,31 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
 
                   </div>
 
-                  <div class="row align-items-center">
-                    <div class="col">
+                  <div className="row align-items-center">
+                    <div className="col">
                       <p>
                         <strong>Order Date</strong>
                       </p>
                     </div>
-                    <div class="col">
+                    <div className="col">
                       <p>{new Date(order.order_date).toLocaleDateString()}</p>
                     </div>
                   </div>
 
-                  <div class="row align-items-center">
-                    <div class="col">
+                  <div className="row align-items-center">
+                    <div className="col">
                       <p>
                         <strong>Current Order Status</strong>
                       </p>
                     </div>
-                    <div class="col">
+                    <div className="col">
                       <p className="text-danger fw-bold">
                         {order.order_status}
                       </p>
                     </div>
                   </div>
 
-                  <div class="d-flex align-items-center">
+                  <div className="d-flex align-items-center">
                     <label htmlFor="status">Order Status</label>
                     <select
                       className=""
@@ -203,10 +203,10 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
 
                 <br />
 
-                <div class="product-details-order">
+                <div className="product-details-order">
                   <h5 className="modal-title text-start ps-4">Product Details</h5>
 
-                  <table class="table">
+                  <table className="table">
                     <thead>
                       <tr>
                         <th scope="col">Images</th>
@@ -257,13 +257,13 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                     </tbody>
                   </table>
                   <div className="mx-2">
-                    <div class="row align-items-center ">
-                      <div class="col-9 text-end  ">
+                    <div className="row align-items-center ">
+                      <div className="col-9 text-end  ">
                         <p>
                           <strong>Total for Products</strong>
                         </p>
                       </div>
-                      <div class="col-3 text-end">
+                      <div className="col-3 text-end">
                         <p className="text-danger fw-bold">
                           {" "}
                           ₱ {totalProductCost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -272,13 +272,13 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                       </div>
                     </div>
 
-                    <div class="row align-items-center ">
-                      <div class="col-9 text-end  ">
+                    <div className="row align-items-center ">
+                      <div className="col-9 text-end  ">
                         <p>
                           <strong>Shipping Cost</strong>
                         </p>
                       </div>
-                      <div class="col-3 text-end">
+                      <div className="col-3 text-end">
                         <p className="text-danger fw-bold">
                           ₱ {shippingCost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
 
@@ -287,13 +287,13 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                       </div>
                     </div>
 
-                    <div class="row align-items-center ">
-                      <div class="col-9 text-end  ">
+                    <div className="row align-items-center ">
+                      <div className="col-9 text-end  ">
                         <p>
                           <strong>Grand Total</strong>
                         </p>
                       </div>
-                      <div class="col-3 text-end">
+                      <div className="col-3 text-end">
                         <p className="text-danger fw-bold">
                           {" "}
                           ₱ {grandTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}

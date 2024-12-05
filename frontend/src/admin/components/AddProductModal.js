@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
+// import { Modal, Button, Form } from "react-bootstrap";
 import ToastNotification from "../../public/components/ToastNotification";
 import "./modal.css";
 
@@ -17,7 +17,7 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
   const [customSize, setCustomSize] = useState("");
   const [toastMessage, setToastMessage] = useState("");
 
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {

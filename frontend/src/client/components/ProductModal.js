@@ -246,11 +246,11 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
             <div className="promodal-content" onClick={(e) => e.stopPropagation()}>
                 <div className="promodal-body">
                     <ToastNotification toastMessage={toastMessage} />
-                    <div class="product-image">
+                    <div className="product-image">
                         <img
                             src={product.product_image}
                             alt="" height="400" width="300" />
-                        <div class="price-stock">
+                        <div className="price-stock">
                             <p><strong>Price</strong></p>
 
                             <h3 className="" style={{ fontSize: "1.2rem" }}>
@@ -261,7 +261,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                             <p>{product.quantity}</p>
                         </div>
                     </div>
-                    <div class="product-info px-4 mb-4">
+                    <div className="product-info px-4 mb-4">
                         <p>HAIRCARE • {product.size}</p><br></br>
                         <h3>{product.product_name}</h3>
                         <p><strong>Description: </strong>
@@ -276,14 +276,14 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                                 <input
                                     type="text"
                                     value={quantity}
-                                    class="text-center "
+                                    className="text-center "
                                     readOnly
                                     style={{ width: '70px', border: '1px solid gray', outline: 'none', borderRadius: '0' }}
                                 />
                                 <button onClick={incrementQuantity}><FaPlus class="text-dark" /></button>
                             </div>
                         </div>
-                        <div class="buttons">
+                        <div className="buttons">
                             {product.quantity > 0 ? (
                                 <>
 

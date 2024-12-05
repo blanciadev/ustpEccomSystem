@@ -78,7 +78,7 @@ const StickyComponent = ({ onSubmit }) => {
   return (
     <div>
       <div className={`sticky-card ${isClicked ? 'clicked' : ''}`} onClick={handleClick}>
-        <p class="fw-bold text-white">Find Your Perfect Haircare Match</p>
+        <p className="fw-bold text-white">Find Your Perfect Haircare Match</p>
         <i className='bx bx-chevron-right' style={{ fontSize: '26pt' }}></i>
       </div>
 
@@ -91,11 +91,11 @@ const StickyComponent = ({ onSubmit }) => {
               <form onSubmit={handleSubmit}>
 
 
-              <div class="container-fluid full-height d-flex flex-column">
-                <div class="row-1 flex-shrink-0">
+              <div className="container-fluid full-height d-flex flex-column">
+                <div className="row-1 flex-shrink-0">
 
                   {/* Search Bar */}
-                  <div class="">
+                  <div className="">
                     <label htmlFor="search">Search:</label>
                     <input
                       type="text"
@@ -114,11 +114,11 @@ const StickyComponent = ({ onSubmit }) => {
 
                 </div>
 
-                <div class="row-2 ">
+                <div className="row-2 ">
 
 
-                  <div class="row">
-                  <div class="col-md-6">
+                  <div className="row">
+                  <div className="col-md-6">
 
 
 
@@ -184,7 +184,7 @@ const StickyComponent = ({ onSubmit }) => {
       </div>
 
                     </div>
-                    <div class="col-md-6 ">
+                    <div className="col-md-6 ">
 
 
                     <div>
@@ -272,7 +272,7 @@ const StickyComponent = ({ onSubmit }) => {
                 </div>
 
 
-                <div class="row-3 d-flex justify-content-center">
+                <div className="row-3 d-flex justify-content-center">
                   <button type='submit'>Find Products</button>
                 </div>
               </div>

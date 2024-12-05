@@ -163,10 +163,10 @@ const Payments = () => {
         </div>
         <div className="body">
           <div className="admin-payment">
-            <div class="container align-items-center mt-4 mb-4">
-              <div class="row align-items-center m-0 p-0">
-                <div class="col-4">
-                  <div class="search d-flex  ">
+            <div className="container align-items-center mt-4 mb-4">
+              <div className="row align-items-center m-0 p-0">
+                <div className="col-4">
+                  <div className="search d-flex  ">
                     {" "}
                     <form>
                       <input
@@ -180,22 +180,22 @@ const Payments = () => {
                   </div>
                 </div>
 
-                <div class="col-1">
-                  <div class="d-flex justify-content-center ">
+                <div className="col-1">
+                  <div className="d-flex justify-content-center ">
                     {/* empty div */}
                   </div>
                 </div>
 
-                <div class="col-3">
-                  <div class=" d-flex justify-content-end">
+                <div className="col-3">
+                  <div className=" d-flex justify-content-end">
                     <button onClick={exportToExcel} className="btn btn-primary">
-                      <i class="bx bx-export"></i> Export Payment Record
+                      <i className="bx bx-export"></i> Export Payment Record
                     </button>
                   </div>
                 </div>
 
-                <div class="col-4">
-                  <div class="d-flex align-items-end justify-content-end">
+                <div className="col-4">
+                  <div className="d-flex align-items-end justify-content-end">
                     <label htmlFor="statusFilter" className="me-2">
                       Filter By Status:
                     </label>

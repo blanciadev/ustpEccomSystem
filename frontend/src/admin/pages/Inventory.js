@@ -162,7 +162,7 @@ const Inventory = () => {
         <div className="body">
           <div className="inventory-con">
             <div className="w-100">
-              <div class=" mb-3">
+              <div className=" mb-3">
                 <ProductStatistics
                   bestSellingCount={bestSellingCount}
                   totalQuantity={totalQuantity}
@@ -177,10 +177,10 @@ const Inventory = () => {
               </div>
               <div>
                 <div className="product-two">
-                  <div class="container align-items-center mb-2">
-                    <div class="row align-items-center m-0 p-0">
-                      <div class="col-4">
-                        <div class="search d-flex  ">
+                  <div className="container align-items-center mb-2">
+                    <div className="row align-items-center m-0 p-0">
+                      <div className="col-4">
+                        <div className="search d-flex  ">
                           {" "}
                           <form onSubmit={handleSearch}>
                             <input
@@ -195,20 +195,20 @@ const Inventory = () => {
                       </div>
 
 
-                      <div class="col-3 ">
-                        <div class="d-flex justify-content-center ">
+                      <div className="col-3 ">
+                        <div className="d-flex justify-content-center ">
                           <ExportButton />
                         </div>
                       </div>
 
-                      <div class="col-2">
-                        <div class=" d-flex ">
+                      <div className="col-2">
+                        <div className=" d-flex ">
                           {/* empty div */}
                         </div>
                       </div>
 
-                      <div class="col-3">
-                        <div class="d-flex ">
+                      <div className="col-3">
+                        <div className="d-flex ">
                           <label htmlFor="status" className="me-2">
                             Filter By Status:
                           </label>
@@ -275,7 +275,7 @@ const Inventory = () => {
                                   </td> */}
                                   <td>{product.product_id}</td>
                                   <td>{product.product_code}</td>
-                                  <td class="text-left">
+                                  <td className="text-left">
                                     {product.product_name}
                                   </td>
                                   <td>

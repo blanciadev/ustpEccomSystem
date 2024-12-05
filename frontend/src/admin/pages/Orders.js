@@ -176,12 +176,12 @@ const Orders = () => {
           <div className="admin-order">
 
 
-            <div class="container align-items-center mt-4 mb-4">
+            <div className="container align-items-center mt-4 mb-4">
 
-              <div class="row align-items-center m-0 p-0 ">
+              <div className="row align-items-center m-0 p-0 ">
 
-                <div class="col-4">
-                  <div class="search d-flex  ">
+                <div className="col-4">
+                  <div className="search d-flex  ">
                     {" "}
                     <form>
                       <input
@@ -195,21 +195,21 @@ const Orders = () => {
                   </div>
                 </div>
 
-                <div class="col-3 ">
-                  <div class="d-flex justify-content-center ">
+                <div className="col-3 ">
+                  <div className="d-flex justify-content-center ">
                     <button
                       onClick={handlePrintOrders}
                       className="btn btn-primary"
                     >
 
-                      <i class="bx bx-export"></i> Export Order Record
+                      <i className="bx bx-export"></i> Export Order Record
 
                     </button>
                   </div>
                 </div>
 
-                <div class="col-2 ">
-                  <div class="d-flex align-items-center" >
+                <div className="col-2 ">
+                  <div className="d-flex align-items-center" >
                     <label htmlFor="sort" className="me-2">
                       Sort By:
                     </label>
@@ -227,8 +227,8 @@ const Orders = () => {
                   </div>
                 </div>
 
-                <div class="col-3">
-                  <div class="d-flex align-items-center">
+                <div className="col-3">
+                  <div className="d-flex align-items-center">
                     <label htmlFor="status" className="me-2">
                       Filter By Status:
                     </label>

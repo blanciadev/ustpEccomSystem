@@ -114,35 +114,35 @@ const Signup = () => {
 
 
   return (
-    <div class="d-flex justify-content-center">
-      <section class="signup-con">
-        <div class="container">
-          <div class="row">
-            <div class="col-12 col-xxl-11 d-flex justify-content-center">
-              <div class="signup-box card border-light-subtle shadow-sm">
+    <div className="d-flex justify-content-center">
+      <section className="signup-con">
+        <div className="container">
+          <div className="row">
+            <div className="col-12 col-xxl-11 d-flex justify-content-center">
+              <div className="signup-box card border-light-subtle shadow-sm">
 
-                <div class="row g-0">
+                <div className="row g-0">
 
-                  <div class="col-12 col-md-6">
+                  <div className="col-12 col-md-6">
                     <a href="/">
-                      <img class="img-fluid rounded-start w-100 h-100 object-fit-cover" loading="lazy" src={login_signup} alt="login-image" />
+                      <img className="img-fluid rounded-start w-100 h-100 object-fit-cover" loading="lazy" src={login_signup} alt="login-image" />
                     </a>
                   </div>
 
-                  <div class="col-gradient col-12 col-md-6 d-flex justify-content-center">
-                    <div class="col-12 col-lg-11 col-xl-10">
-                      <div class="card-body p-0">
-                        <div class="row">
-                          <div class="col-12 mt-4">
-                            <div class="mb-4">
+                  <div className="col-gradient col-12 col-md-6 d-flex justify-content-center">
+                    <div className="col-12 col-lg-11 col-xl-10">
+                      <div className="card-body p-0">
+                        <div className="row">
+                          <div className="col-12 mt-4">
+                            <div className="mb-4">
 
-                              <h2 class=" text-center">Registration</h2>
+                              <h2 className=" text-center">Registration</h2>
                             </div>
                           </div>
                         </div>
-                        <div class="row">
-                          <div class="col-12">
-                            <div class="d-flex gap-3 flex-column">
+                        <div className="row">
+                          <div className="col-12">
+                            <div className="d-flex gap-3 flex-column">
                               <GoogleLogin
                                 className="btn btn-outline-danger"
                                 onSuccess={handleGoogleSignup}
@@ -152,112 +152,112 @@ const Signup = () => {
                                 }}
                               />
                             </div>
-                            <div class="row d-flex justify-content-center align-items-center">
-                              <div class="col"><hr></hr></div>
-                              <div class="col-6"><p class="text-center mt-2 mb-2 text-secondary">Or Register with N&B</p></div>
-                              <div class="col"><hr></hr></div>
+                            <div className="row d-flex justify-content-center align-items-center">
+                              <div className="col"><hr></hr></div>
+                              <div className="col-6"><p className="text-center mt-2 mb-2 text-secondary">Or Register with N&B</p></div>
+                              <div className="col"><hr></hr></div>
                             </div>
 
                           </div>
                         </div>
 
-                        <form onSubmit={handleSubmit} class="d-flex justify-content-center">
-                          <div class="row gy-3 overflow-hidden d-flex justify-content-center">
+                        <form onSubmit={handleSubmit} className="d-flex justify-content-center">
+                          <div className="row gy-3 overflow-hidden d-flex justify-content-center">
 
-                            <div class="row gy-3 d-flex justify-content-between m-0 p-0">
+                            <div className="row gy-3 d-flex justify-content-between m-0 p-0">
 
-                              <div class="col">
-                                <div class="form-floating">
-                                  <input type="text" class="form-control" name="firstName" id="firstName" placeholder="First Name"
+                              <div className="col">
+                                <div className="form-floating">
+                                  <input type="text" className="form-control" name="firstName" id="firstName" placeholder="First Name"
                                     value={firstName}
                                     onChange={(e) => setFirstName(e.target.value)} required
                                   />
-                                  <label for="firstName" class="form-label">First Name</label>
+                                  <label htmlFor="firstName" className="form-label">First Name</label>
                                 </div>
                               </div>
-                              <div class="col">
-                                <div class="form-floating">
-                                  <input type="text" class="form-control" name="lastName" id="lastName" placeholder="First Name"
+                              <div className="col">
+                                <div className="form-floating">
+                                  <input type="text" className="form-control" name="lastName" id="lastName" placeholder="First Name"
                                     value={lastName}
                                     onChange={(e) => setLastName(e.target.value)} required
                                   />
-                                  <label for="lastName" class="form-label">Last Name</label>
+                                  <label htmlFor="lastName" className="form-label">Last Name</label>
                                 </div>
                               </div>
                             </div>
 
 
-                            <div class="col-12">
-                              <div class="form-floating">
-                                <input type="email" class="form-control" name="email" id="email" placeholder="name@example.com"
+                            <div className="col-12">
+                              <div className="form-floating">
+                                <input type="email" className="form-control" name="email" id="email" placeholder="name@example.com"
                                   value={email}
                                   onChange={(e) => setEmail(e.target.value)} required
                                 />
-                                <label for="email" class="form-label">Email</label>
+                                <label htmlFor="email" className="form-label">Email</label>
                               </div>
                             </div>
 
-                            <div class="row gy-3 d-flex justify-content-between m-0 p-0">
-                              <div class="col">
-                                <div class="form-floating">
-                                  <input type="address" class="form-control" name="address" id="address" placeholder="Address"
+                            <div className="row gy-3 d-flex justify-content-between m-0 p-0">
+                              <div className="col">
+                                <div className="form-floating">
+                                  <input type="address" className="form-control" name="address" id="address" placeholder="Address"
                                     value={address}
                                     onChange={(e) => setAddress(e.target.value)} required
                                   />
-                                  <label for="address" class="form-label">Address</label>
+                                  <label htmlFor="address" className="form-label">Address</label>
                                 </div>
                               </div>
-                              <div class="col">
-                                <div class="form-floating">
-                                  <input type="phone-number" class="form-control" name="phone-number" id="phone-number" placeholder="Phone Number"
+                              <div className="col">
+                                <div className="form-floating">
+                                  <input type="phone-number" className="form-control" name="phone-number" id="phone-number" placeholder="Phone Number"
                                     value={phoneNumber}
                                     onChange={(e) => setPhoneNumber(e.target.value)} required
                                   />
-                                  <label for="phone-number" class="form-label">Phone Number</label>
+                                  <label htmlFor="phone-number" className="form-label">Phone Number</label>
                                 </div>
                               </div>
                             </div>
 
-                            <div class="row gy-3 d-flex justify-content-between m-0 p-0">
-                              <div class="col">
-                                <div class="form-floating">
-                                  <input type="password" class="form-control" name="password" id="password" placeholder="Password"
+                            <div className="row gy-3 d-flex justify-content-between m-0 p-0">
+                              <div className="col">
+                                <div className="form-floating">
+                                  <input type="password" className="form-control" name="password" id="password" placeholder="Password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)} required
                                   />
-                                  <label for="password" class="form-label">Password</label>
+                                  <label htmlFor="password" className="form-label">Password</label>
                                 </div>
                               </div>
-                              <div class="col">
-                                <div class="form-floating">
-                                  <input type="password" class="form-control" name="confirm-password" id="confirm-password" placeholder="Confirm Password"
+                              <div className="col">
+                                <div className="form-floating">
+                                  <input type="password" className="form-control" name="confirm-password" id="confirm-password" placeholder="Confirm Password"
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)} required
                                   />
-                                  <label for="confirm-password" class="form-label">Confirm Password</label>
+                                  <label htmlFor="confirm-password" className="form-label">Confirm Password</label>
                                 </div>
                               </div>
                             </div>
 
-                            <div class="col-12 p-0">
-                              <div class="form-check m-0 p-0 text-center">
+                            <div className="col-12 p-0">
+                              <div className="form-check m-0 p-0 text-center">
                                 {/* <input class="form-check-input" type="checkbox" value="" name="iAgree" id="iAgree" required/> */}
-                                <label class="form-check-label text-secondary m-0 p-0 text-center" for="iAgree">
-                                  By signing up, you agree to N&B’s <a href="#!" class="link-primary text-decoration-none">Terms of Service</a> & <a href="#!" class="link-primary text-decoration-none">Privacy Policy</a>
+                                <label className="form-check-label text-secondary m-0 p-0 text-center" htmlFor="iAgree">
+                                  By signing up, you agree to N&B’s <a href="#!" className="link-primary text-decoration-none">Terms of Service</a> & <a href="#!" className="link-primary text-decoration-none">Privacy Policy</a>
                                 </label>
                               </div>
                             </div>
 
-                            <div class="col-12">
-                              <div class="d-grid">
-                                <button class="btn btn-dark btn-lg" type="submit">Sign Up</button>
+                            <div className="col-12">
+                              <div className="d-grid">
+                                <button className="btn btn-dark btn-lg" type="submit">Sign Up</button>
                               </div>
                             </div>
                           </div>
                         </form>
-                        <div class="row mb-4">
-                          <div class="col-12">
-                            <p class="mb-0 mt-4 text-secondary text-center">Already have an account? <a href="/login" class="link-primary text-decoration-none">Login</a></p>
+                        <div className="row mb-4">
+                          <div className="col-12">
+                            <p className="mb-0 mt-4 text-secondary text-center">Already have an account? <a href="/login" className="link-primary text-decoration-none">Login</a></p>
                           </div>
                         </div>
                         {error && <p className='error'>{error}</p>}

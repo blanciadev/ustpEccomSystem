@@ -34,7 +34,7 @@ import AdminHistory from './admin/pages/AdminHistory';
 
 
 function App() {
-  const [loginStatus, setLoginStatus] = useState('');
+  // const [loginStatus, setLoginStatus] = useState('');
   const [error, setError] = useState('');
   const location = useLocation();
 

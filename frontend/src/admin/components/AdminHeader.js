@@ -111,7 +111,7 @@ const AdminHeader = () => {
                     />
 
 
-                    <p class="ms-2">{firstName ? firstName + ' ' + lastName : username}</p>
+                    <p className="ms-2">{firstName ? firstName + ' ' + lastName : username}</p>
 
                 </span>
 

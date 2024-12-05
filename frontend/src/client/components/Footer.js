@@ -66,8 +66,8 @@ const Footer = () => {
           {/* Social Media & Payments Section */}
           <Col md={3} className="text-center">
             <h6 className="text-uppercase fw-bold">Connect with Us</h6>
-            <div class=''>
-              <div class=''>
+            <div className=''>
+              <div className=''>
                 <a href='https://www.facebook.com/nandbcorp?mibextid=kFxxJD'><BsFacebook class='mx-2' style={{ height: '20px', width: '20px'}}/></a>
                 <a href='https://www.instagram.com/nandbbeauty?igsh=MW5pd3Rndzl6YzkzeA=='><AiFillInstagram class='mx-2'  style={{ height: '20px', width: '20px'}}/></a>
                 

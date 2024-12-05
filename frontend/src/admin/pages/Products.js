@@ -180,7 +180,7 @@ const Products = () => {
         <div className="body">
           <div className="inventory-con">
             <div className="w-100">
-              <div class=" mb-3">
+              <div className=" mb-3">
                 <ProductStatistics
                   bestSellingCount={bestSellingCount}
                   totalQuantity={totalQuantity}
@@ -195,10 +195,10 @@ const Products = () => {
               </div>
               <div>
                 <div className="product-two">
-                  <div class="container align-items-center mb-2">
-                    <div class="row align-items-center m-0 p-0">
-                      <div class="col-6">
-                        <div class="search d-flex  ">
+                  <div className="container align-items-center mb-2">
+                    <div className="row align-items-center m-0 p-0">
+                      <div className="col-6">
+                        <div className="search d-flex  ">
                           {" "}
                           <form>
                             <input
@@ -227,8 +227,8 @@ const Products = () => {
                         </div>
                       </div> */}
 
-                      <div class="col-2 ">
-                        <div class="d-flex justify-content-center align-items-center">
+                      <div className="col-2 ">
+                        <div className="d-flex justify-content-center align-items-center">
                           <Button
                             variant="primary"
                             onClick={handleShowAddModal}
@@ -238,8 +238,8 @@ const Products = () => {
                         </div>
                       </div>
 
-                      <div class="col-2 ">
-                        <div class=" d-flex justify-content-end">
+                      <div className="col-2 ">
+                        <div className=" d-flex justify-content-end">
                           {/* <VscCombine /> */}
                           <BundleProduct
 
@@ -250,14 +250,14 @@ const Products = () => {
                         </div>
                       </div>
 
-                      <div class="col-2 ">
-                        <div class="d-flex justify-content-end">
+                      <div className="col-2 ">
+                        <div className="d-flex justify-content-end">
                           <Button
                             variant="danger"
                             onClick={handleShowDiscountProductModal}
                           >
                             {isMobile ? (
-                              <i class="bx bxs-trash"></i>
+                              <i className="bx bxs-trash"></i>
                             ) : (
                               "Remove Bundle"
                             )}

@@ -63,7 +63,7 @@ const RemoveDiscountProduct = ({ show, handleClose, order, handleUpdate }) => {
                     variant="danger"
                     onClick={() => handleRemoveDiscount(product.product_code)} // Pass product_code to the function
                   >
-                    <i class='bx bxs-trash' ></i>
+                    <i className='bx bxs-trash' ></i>
                   </Button>
                 </td>
               </tr>

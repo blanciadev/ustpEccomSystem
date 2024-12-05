@@ -385,26 +385,26 @@ const Checkout = () => {
       <Navigation />
       <div className="checkout-wrapper">
         <h1>
-          <i class="bx bxs-shopping-bag"></i>Checkout
+          <i className="bx bxs-shopping-bag"></i>Checkout
         </h1>
 
-        <div class="container">
-          <div class="row">
-            <div class="col-12 col-md-6 ">
+        <div className="container">
+          <div className="row">
+            <div className="col-12 col-md-6 ">
               <div
-                class="p-3 text-black text-start"
+                className="p-3 text-black text-start"
                 style={{ border: "5px solid #f0cac8" }}
               >
-                <div class="container">
-                  <h2 class="mb-4">Delivery Information Form</h2>
+                <div className="container">
+                  <h2 className="mb-4">Delivery Information Form</h2>
                   <form onSubmit={handleSubmit}>
-                    <div class="mb-2">
-                      <label for="fullName" class="form-label">
+                    <div className="mb-2">
+                      <label htmlFor="fullName" className="form-label">
                         Full Name
                       </label>
                       <input
                         type="text"
-                        class="form-control"
+                        className="form-control"
                         id="fullName"
                         name="fullName"
                         placeholder="Enter your full name"
@@ -436,13 +436,13 @@ const Checkout = () => {
                       />
                     </div>
 
-                    <div class="mb-2">
-                      <label for="streetname" class="form-label">
+                    <div className="mb-2">
+                      <label htmlFor="streetname" className="form-label">
                         Street Name
                       </label>
                       <input
                         type="text"
-                        class="form-control"
+                        className="form-control"
                         id="streetname"
                         name="streetname"
                         placeholder="Enter your street name"
@@ -452,13 +452,13 @@ const Checkout = () => {
                       />
                     </div>
 
-                    <div class="mb-2">
-                      <label for="address" class="form-label">
+                    <div className="mb-2">
+                      <label htmlFor="address" className="form-label">
                         Address
                       </label>
                       <input
                         type="text"
-                        class="form-control"
+                        className="form-control"
                         id="address"
                         placeholder="Enter your address"
                         name="address"
@@ -468,13 +468,13 @@ const Checkout = () => {
                       />
                     </div>
 
-                    <div class="mb-2">
-                      <label for="region" class="form-label">
+                    <div className="mb-2">
+                      <label htmlFor="region" className="form-label">
                         Region
                       </label>
                       <input
                         type="text"
-                        class="form-control"
+                        className="form-control"
                         id="region"
                         placeholder="Enter your region"
                         name="region"
@@ -504,9 +504,9 @@ const Checkout = () => {
 
                     </div>
 
-                    <div class="mb-2">
+                    <div className="mb-2">
                       <h5>Payment Method</h5>
-                      <label class="form-label" htmlFor="paymentMethod">
+                      <label className="form-label" htmlFor="paymentMethod">
                         <input
                           type="radio"
                           name="paymentMethod"
@@ -519,10 +519,10 @@ const Checkout = () => {
                       </label>
                     </div>
 
-                    <div class="d-grid">
+                    <div className="d-grid">
                       <button
                         type="submit"
-                        class="place-order-btn"
+                        className="place-order-btn"
                         disabled={loading}
                       >
                         {loading ? "Processing..." : "Place Order"}
@@ -533,12 +533,12 @@ const Checkout = () => {
               </div>
             </div>
 
-            <div class="col-12 col-md-6">
+            <div className="col-12 col-md-6">
               <div
-                class="p-3 text-white text-center"
+                className="p-3 text-white text-center"
                 style={{ backgroundColor: "#f0cac8" }}
               >
-                <h3 class="fw-bold text-dark">Order Summary</h3>
+                <h3 className="fw-bold text-dark">Order Summary</h3>
 
                 {savedProducts.map((product, index) => {
                   const effectiveDiscount = product.discount || 0;
@@ -554,12 +554,12 @@ const Checkout = () => {
                   console.log("Saved Products data", savedProducts);
 
                   return (
-                    <div class="container my-1" key={index}>
+                    <div className="container my-1" key={index}>
                       <div
-                        class="card p-3"
+                        className="card p-3"
                         style={{ backgroundColor: "white" }}
                       >
-                        <div class="row align-items-start">
+                        <div className="row align-items-start">
                           <div className="col-md-3 text-start align-items-center">
                             <img
                               src={
@@ -580,12 +580,12 @@ const Checkout = () => {
                             />
                           </div>
 
-                          <div class="col-md-9">
-                            <p class="text-start mb-1">
+                          <div className="col-md-9">
+                            <p className="text-start mb-1">
                               {product.product_name}
                             </p>
 
-                            <div class="d-flex justify-content-between align-content-center">
+                            <div className="d-flex justify-content-between align-content-center">
                               <div className="row">
                                 <div className="col border">
                                   <p
@@ -602,7 +602,7 @@ const Checkout = () => {
                                   </p>
                                 </div>
                                 <div className="col border">
-                                  <span class="text-danger">
+                                  <span className="text-danger">
                                     ₱
                                     {total.toLocaleString("en-US", {
                                       minimumFractionDigits: 2,
@@ -624,10 +624,10 @@ const Checkout = () => {
                               </div>
                             </div>
 
-                            <div class="d-flex align-items-center">
+                            <div className="d-flex align-items-center">
                               <input
                                 type="number"
-                                class="text-center"
+                                className="text-center"
                                 min="1"
                                 value={quantities[index]}
                                 onChange={(e) => handleQuantityChange(index, e)}
@@ -659,11 +659,11 @@ const Checkout = () => {
                     fontWeight: "bold",
                   }}
                 >
-                  <span class="text-dark">Shipping Fee:</span>
-                  <span class="text-danger">₱150.00</span>
+                  <span className="text-dark">Shipping Fee:</span>
+                  <span className="text-danger">₱150.00</span>
                 </div>
 
-                <hr class="text-danger"></hr>
+                <hr className="text-danger"></hr>
 
                 <div
                   className="total-price mx-4"
@@ -676,8 +676,8 @@ const Checkout = () => {
                     fontWeight: "bold",
                   }}
                 >
-                  <span class="text-dark">Total Price:</span>
-                  <span class="text-danger">
+                  <span className="text-dark">Total Price:</span>
+                  <span className="text-danger">
                     ₱
                     {calculateTotalPrice().toLocaleString("en-US", {
                       minimumFractionDigits: 2,

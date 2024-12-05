@@ -284,7 +284,7 @@ const CartContent = () => {
         <h1 className="cart__title mt-4">
           <i
             style={{ fontSize: "1.7rem", paddingLeft: "5px" }}
-            class="bx bxs-cart-alt"
+            className="bx bxs-cart-alt"
           ></i>
           Shopping Cart
         </h1>

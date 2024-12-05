@@ -170,11 +170,11 @@ const OrderHistory = () => {
                           padding: "20px",
                         }}
                       >
-                        <div class="">
-                          <div class="row">
-                            <div class="col-6">
-                              <div class="">
-                                <div class="">
+                        <div className="">
+                          <div className="row">
+                            <div className="col-6">
+                              <div className="">
+                                <div className="">
                                   <h4>Order ID: {order.order_id}</h4>
                                   <p>
                                     Order Date:{" "}
@@ -202,7 +202,7 @@ const OrderHistory = () => {
                                 </div>
                               </div>
                             </div>
-                            <div class="col-6 d-flex justify-content-end align-items-end">
+                            <div className="col-6 d-flex justify-content-end align-items-end">
                               <button
                                 onClick={() =>
                                   handleCancelOrder(order.order_id)
@@ -219,7 +219,7 @@ const OrderHistory = () => {
                           </div>
                         </div>
 
-                        <div class="">
+                        <div className="">
                           {Array.isArray(order.products) &&
                             order.products.length > 0 ? (
                             <table className="table table-striped table-bordered">

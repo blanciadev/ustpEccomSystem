@@ -379,7 +379,7 @@ const ProductList = ({ stickyComponents }) => {
 
 
     return (
-        <div class="mx-2">
+        <div className="mx-2">
             <div>
                 {/* <h2 class="text-center mt-4 ">HAIRCARE BEAUTY OFFERS</h2> */}
                 {/* Buttons */}
@@ -442,11 +442,11 @@ const ProductList = ({ stickyComponents }) => {
                 </div>
 
 
-                <div class="mx-2 ">
+                <div className="mx-2 ">
 
-                    <div class="row">
+                    <div className="row">
 
-                        <div class="left-product-list col-12 col-lg-9 text-white p-3">
+                        <div className="left-product-list col-12 col-lg-9 text-white p-3">
                             <div>
                                 {showRecommendedHeading && <h2 className="text-center text-danger mt-2 mb-2 fw-bold">RECOMMENDED PRODUCTS</h2>}
                                 {showHaircareHeading && <h2 className="text-center text-danger mt-2 mb-2 fw-bold">HAIRCARE BEAUTY OFFERS</h2>}
@@ -514,13 +514,13 @@ const ProductList = ({ stickyComponents }) => {
                         </div>
 
 
-                        <div class="right-product-list col-12 col-lg-3 text-white">
+                        <div className="right-product-list col-12 col-lg-3 text-white">
 
 
-                            <h3 class="mt-4 text-center fw-bold">TOP PICKS FOR YOU</h3>
+                            <h3 className="mt-4 text-center fw-bold">TOP PICKS FOR YOU</h3>
 
-                            <div class="container ">
-                                <div class="row">
+                            <div className="container ">
+                                <div className="row">
 
 
                                     <div className="right-product-list col-12  text-white">

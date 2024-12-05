@@ -142,10 +142,10 @@ const Sales = () => {
           <div className="user-con">
             <ReportSalesComponent />
             <div className="report-list">
-              <div class="container align-items-center">
-                <div class="row align-items-center m-0 p-0">
-                  <div class="col-4">
-                    <div class="search d-flex  ">
+              <div className="container align-items-center">
+                <div className="row align-items-center m-0 p-0">
+                  <div className="col-4">
+                    <div className="search d-flex  ">
                       {" "}
                       <form>
                         <input
@@ -158,13 +158,13 @@ const Sales = () => {
                     </div>
                   </div>
 
-                  <div class="col-1">
-                    <div class="d-flex justify-content-end ">
+                  <div className="col-1">
+                    <div className="d-flex justify-content-end ">
                       {/* empty div */}
                     </div>
                   </div>
 
-                  <div class="col-2">
+                  <div className="col-2">
                     <div className="col">
                       <select
                         value={selectedMonth}
@@ -188,8 +188,8 @@ const Sales = () => {
                     </div>
                   </div>
 
-                  <div class="col-2">
-                    <div class="d-flex justify-content-end ">
+                  <div className="col-2">
+                    <div className="d-flex justify-content-end ">
                       <select
                         value={selectedYear}
                         onChange={handleYearChange}
@@ -204,15 +204,15 @@ const Sales = () => {
                       </select>
                     </div>
                   </div>
-                  <div class="col-3">
-                    <div class="d-flex justify-content-end ">
+                  <div className="col-3">
+                    <div className="d-flex justify-content-end ">
                       <button
                         onClick={() =>
                           exportReport(selectedMonth, selectedYear)
                         }
                         className="btn btn-primary"
                       >
-                        <i class="bx bx-export"></i> Export Sales Record
+                        <i className="bx bx-export"></i> Export Sales Record
                       </button>
                     </div>
                   </div>

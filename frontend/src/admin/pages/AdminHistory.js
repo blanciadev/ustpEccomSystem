@@ -49,7 +49,7 @@ const AdminHistory = () => {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [status, searchTerm, sortBy]);
+  }, [status, searchTerm, sortBy, fetchOrders]);
 
   const handleResize = () => {
     setIsMobile(window.innerWidth <= 425);
@@ -168,10 +168,10 @@ const AdminHistory = () => {
         </div>
         <div className="body">
           <div className="admin-order border">
-            <div class="container align-items-center mb-2">
-              <div class="row align-items-center m-0 p-0 ">
-                <div class="col-4">
-                  <div class="search d-flex  ">
+            <div className="container align-items-center mb-2">
+              <div className="row align-items-center m-0 p-0 ">
+                <div className="col-4">
+                  <div className="search d-flex  ">
                     {" "}
                     <form>
                       <input
@@ -185,19 +185,19 @@ const AdminHistory = () => {
                   </div>
                 </div>
 
-                <div class="col-3 ">
-                  <div class="d-flex justify-content-center ">
+                <div className="col-3 ">
+                  <div className="d-flex justify-content-center ">
                     <button
                       onClick={handlePrintOrders}
                       className="btn btn-primary"
                     >
-                      <i class="bx bx-export"></i> Export Order History
+                      <i className="bx bx-export"></i> Export Order History
                     </button>
                   </div>
                 </div>
 
-                <div class="col-2 ">
-                  <div class="d-flex align-items-center justify-content-end">
+                <div className="col-2 ">
+                  <div className="d-flex align-items-center justify-content-end">
                     <label htmlFor="sort" className="me-2">
                       Sort By:
                     </label>
@@ -216,8 +216,8 @@ const AdminHistory = () => {
                   </div>
                 </div>
 
-                <div class="col-3">
-                  <div class="d-flex align-items-center justify-content-end">
+                <div className="col-3">
+                  <div className="d-flex align-items-center justify-content-end">
                     <label htmlFor="status" className="me-2">
                       Filter By Status:
                     </label>

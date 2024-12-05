@@ -120,40 +120,40 @@ const Login = () => {
 
     return (
 
-        <div class="d-flex justify-content-center">
-            <section class="login-con">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-12 col-xxl-11 d-flex justify-content-center">
-                            <div class="login-box card border-light-subtle shadow-sm">
+        <div className="d-flex justify-content-center">
+            <section className="login-con">
+                <div className="container">
+                    <div className="row">
+                        <div className="col-12 col-xxl-11 d-flex justify-content-center">
+                            <div className="login-box card border-light-subtle shadow-sm">
 
 
 
-                                <div class="row g-0">
+                                <div className="row g-0">
 
 
-                                    <div class="col-12 col-md-6">
+                                    <div className="col-12 col-md-6">
                                         <a href="/">
-                                            <img class="img-fluid rounded-start w-100 h-100 object-fit-cover" loading="lazy" src={login_signup} alt="login-image" />
+                                            <img className="img-fluid rounded-start w-100 h-100 object-fit-cover" loading="lazy" src={login_signup} alt="login-image" />
                                         </a>
                                     </div>
 
-                                    <div class="col-gradient col-12 col-md-6 d-flex justify-content-center">
-                                        <div class="col-12 col-lg-11 col-xl-10">
-                                            <div class="card-body p-0">
-                                                <div class="row">
-                                                    <div class="col-12 mt-4">
-                                                        <div class="mb-4">
+                                    <div className="col-gradient col-12 col-md-6 d-flex justify-content-center">
+                                        <div className="col-12 col-lg-11 col-xl-10">
+                                            <div className="card-body p-0">
+                                                <div className="row">
+                                                    <div className="col-12 mt-4">
+                                                        <div className="mb-4">
 
-                                                            <h2 class=" text-center">Login</h2>
+                                                            <h2 className=" text-center">Login</h2>
                                                             <ToastNotification toastMessage={toastMessage} />
 
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="row">
-                                                    <div class="col-12">
-                                                        <div class="d-flex gap-3 flex-column">
+                                                <div className="row">
+                                                    <div className="col-12">
+                                                        <div className="d-flex gap-3 flex-column">
 
                                                             <GoogleLogin
                                                                 class="d-flex btn btn-outline-danger justify-content-center align-items-center"
@@ -162,51 +162,51 @@ const Login = () => {
                                                             />
 
                                                         </div>
-                                                        <div class="row d-flex justify-content-center align-items-center">
-                                                            <div class="col"><hr></hr></div>
-                                                            <div class="col-6"><p class="text-center mt-2 mb-2 text-secondary">Or Login with N&B</p></div>
-                                                            <div class="col"><hr></hr></div>
+                                                        <div className="row d-flex justify-content-center align-items-center">
+                                                            <div className="col"><hr></hr></div>
+                                                            <div className="col-6"><p className="text-center mt-2 mb-2 text-secondary">Or Login with N&B</p></div>
+                                                            <div className="col"><hr></hr></div>
                                                         </div>
 
                                                     </div>
                                                 </div>
 
-                                                <form onSubmit={handleSubmit} class="d-flex justify-content-center">
-                                                    <div class="row gy-3 overflow-hidden d-flex justify-content-center">
+                                                <form onSubmit={handleSubmit} className="d-flex justify-content-center">
+                                                    <div className="row gy-3 overflow-hidden d-flex justify-content-center">
 
-                                                        <div class="col-12">
-                                                            <div class="form-floating">
-                                                                <input type="email" class="form-control" name="email" id="email" placeholder="name@example.com"
+                                                        <div className="col-12">
+                                                            <div className="form-floating">
+                                                                <input type="email" className="form-control" name="email" id="email" placeholder="name@example.com"
                                                                     value={email}
                                                                     onChange={(e) => setEmail(e.target.value)} required
                                                                 />
-                                                                <label for="email" class="form-label">Email</label>
+                                                                <label htmlFor="email" className="form-label">Email</label>
                                                             </div>
                                                         </div>
 
-                                                        <div class="col-12">
-                                                            <div class="form-floating">
-                                                                <input type="password" class="form-control" name="password" id="password" placeholder="name@example.com"
+                                                        <div className="col-12">
+                                                            <div className="form-floating">
+                                                                <input type="password" className="form-control" name="password" id="password" placeholder="name@example.com"
                                                                     value={password}
                                                                     onChange={(e) => setPassword(e.target.value)} required
                                                                 />
-                                                                <label for="password" class="form-label">Password</label>
+                                                                <label htmlFor="password" className="form-label">Password</label>
                                                             </div>
                                                         </div>
 
 
-                                                        <div class="col-12">
-                                                            <div class="form-check d-flex justify-content-end">
+                                                        <div className="col-12">
+                                                            <div className="form-check d-flex justify-content-end">
                                                                 {/* <input class="form-check-input" type="checkbox" value="" name="iAgree" id="iAgree" required/> */}
                                                                 <a href='/forgot-password'>Forgot Password?</a>
                                                             </div>
                                                         </div>
-                                                        <div class="col-12">
-                                                            <div class="d-grid">
-                                                                <button class="btn bsb-btn-xl btn-dark fs-5" type='submit' disabled={loading}>
+                                                        <div className="col-12">
+                                                            <div className="d-grid">
+                                                                <button className="btn bsb-btn-xl btn-dark fs-5" type='submit' disabled={loading}>
                                                                     {loading ? 'Logging in...' : 'Login'}
                                                                 </button>
-                                                                {error && <p class='error text-danger text-center mt-2'>{error}</p>}
+                                                                {error && <p className='error text-danger text-center mt-2'>{error}</p>}
 
                                                             </div>
                                                         </div>
@@ -215,8 +215,8 @@ const Login = () => {
 
 
                                                 {loginStatus && <p className='status'>{loginStatus}</p>}
-                                                <div class="row mb-4">
-                                                    <div class="col-12">
+                                                <div className="row mb-4">
+                                                    <div className="col-12">
                                                         <p className="mb-0 mt-4 text-secondary text-center">
                                                             Not Registered Yet?{" "}
                                                             <Link to="/signup" className="link-primary text-decoration-none">
