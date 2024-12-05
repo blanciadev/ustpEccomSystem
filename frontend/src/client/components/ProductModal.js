@@ -190,13 +190,10 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
             existingProducts.push(productData);
             localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
 
-            // Set the redirect to checkout after login
             localStorage.setItem('redirectTo', '/checkout');
 
-            // Redirect to login page
             navigate('/login');
         } else {
-            // User is logged in, proceed to save the selected product for checkout
             const existingProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
             existingProducts.push(productData);
             localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));

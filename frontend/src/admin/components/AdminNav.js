@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import '../admin.css';
 
 
@@ -53,6 +53,8 @@ const AdminNav = () => {
     setIsDropdownOpen(newDropdownState);
     localStorage.setItem('isDropdownOpen', JSON.stringify(newDropdownState));
   }
+
+
   return (
     <div className='nav-con mt-4 mb-4 '>
 
@@ -65,95 +67,83 @@ const AdminNav = () => {
         />
       </div>
       <div className='nav-links'>
-        <a
-          href='/admin/dashboard'
+        <Link
+          to='/admin/dashboard'
           className={location.pathname === '/admin/dashboard' ? 'active' : ''}
         >
           {isMobile ? (
-            <i class="bx bxs-dashboard"></i>
+            <i className="bx bxs-dashboard"></i>
           ) : (
-            
-            <span><RxDashboard className='mb-1 me-2'/>Dashboard</span>
-          )
-          }
+            <span><RxDashboard className='mb-1 me-2' />Dashboard</span>
+          )}
+        </Link>
 
-        </a>
-        <a
-          href='/admin/orders'
+        <Link
+          to='/admin/orders'
           className={location.pathname === '/admin/orders' ? 'active' : ''}
         >
           {isMobile ? (
-            <i class="bx bxs-package"></i>
+            <i className="bx bxs-package"></i>
           ) : (
-            
-            <span><IoBagHandleOutline className='mb-1 me-2'/>Orders</span>
-          )
-          }
+            <span><IoBagHandleOutline className='mb-1 me-2' />Orders</span>
+          )}
+        </Link>
 
-        </a>
-        <a
-          href='/admin/payments'
+        <Link
+          to='/admin/payments'
           className={location.pathname === '/admin/payments' ? 'active' : ''}
         >
           {isMobile ? (
-            <i class="bx bxs-wallet"></i>
+            <i className="bx bxs-wallet"></i>
           ) : (
-            
-            <span><MdOutlinePayments className='mb-1 me-2'/>Payments</span>
-          )
-          }
-        </a>
-        <a
-          href='/admin/shipments'
+            <span><MdOutlinePayments className='mb-1 me-2' />Payments</span>
+          )}
+        </Link>
+
+        <Link
+          to='/admin/shipments'
           className={location.pathname === '/admin/shipments' ? 'active' : ''}
         >
           {isMobile ? (
-            <i class="bx bxs-truck"></i>
+            <i className="bx bxs-truck"></i>
           ) : (
-            
-            <span><LiaShippingFastSolid className='mb-1 me-2'/>Shipments</span>
-          )
-          }
-        </a>
-        <a
-          href='/admin/products'
+            <span><LiaShippingFastSolid className='mb-1 me-2' />Shipments</span>
+          )}
+        </Link>
+
+        <Link
+          to='/admin/products'
           className={location.pathname === '/admin/products' ? 'active' : ''}
         >
           {isMobile ? (
-            <i class="bx bxs-spa"></i>
+            <i className="bx bxs-spa"></i>
           ) : (
-          
-            <span><AiOutlineProduct className='mb-1 me-2'/>Products</span>
-          )
-          }
-        </a>
-        <a
-          href='/admin/inventory'
+            <span><AiOutlineProduct className='mb-1 me-2' />Products</span>
+          )}
+        </Link>
+
+        <Link
+          to='/admin/inventory'
           className={location.pathname === '/admin/inventory' ? 'active' : ''}
         >
           {isMobile ? (
-            <i class="bx bx-clipboard"></i>
+            <i className="bx bx-clipboard"></i>
           ) : (
-            
-            <span><MdOutlineInventory className='mb-1 me-2'/>Inventory</span>
-          )
-          }
-        </a>
+            <span><MdOutlineInventory className='mb-1 me-2' />Inventory</span>
+          )}
+        </Link>
 
         {roleType === 'Admin' && (
-          <a
-            href='/admin/manage-users'
+          <Link
+            to='/admin/manage-users'
             className={location.pathname === '/admin/manage-users' ? 'active' : ''}
           >
             {isMobile ? (
               <i className="bx bxs-user-account" style={{ textAlign: 'center' }}></i>
             ) : (
-              <>
-                
-                <span><FiUsers className='mb-1 me-2'/>Users</span>
-              </>
+              <span><FiUsers className='mb-1 me-2' />Users</span>
             )}
-          </a>
+          </Link>
         )}
 
         <a
@@ -161,44 +151,36 @@ const AdminNav = () => {
             e.preventDefault();
             toggleDropdown();
           }}
-
           className={`dropdown-toggle ${isDropdownOpen ? 'active2' : ''}`}
         >
-          
-          {!isMobile && <span><HiOutlineDocumentReport   className='mb-1 me-2'/>Reports</span>}
+          {!isMobile && <span><HiOutlineDocumentReport className='mb-1 me-2' />Reports</span>}
         </a>
 
         {isDropdownOpen && (
           <div className='dropdown-content'>
-            <a
-              href='/admin/reports/sales'
+            <Link
+              to='/admin/reports/sales'
               className={location.pathname === '/admin/reports/sales' ? 'active' : ''}
             >
-              <GoGraph className='mb-1 me-2'/>
+              <GoGraph className='mb-1 me-2' />
               Sales
-            </a>
-            <a
-              href='/admin/reports/order-history'
-              className={
-                location.pathname === '/admin/reports/order-history' ? 'active' : ''
-              }
+            </Link>
+            <Link
+              to='/admin/reports/order-history'
+              className={location.pathname === '/admin/reports/order-history' ? 'active' : ''}
             >
-              <LuHistory className='mb-1 me-2'/>
+              <LuHistory className='mb-1 me-2' />
               Order History
-            </a>
-            <a
-              href='/admin/reports/transactions'
-              className={
-                location.pathname === '/admin/reports/transactions' ? 'active' : ''
-              }
+            </Link>
+            <Link
+              to='/admin/reports/transactions'
+              className={location.pathname === '/admin/reports/transactions' ? 'active' : ''}
             >
-              <GrTransaction className='mb-1 me-2'/>
+              <GrTransaction className='mb-1 me-2' />
               Transactions
-            </a>
+            </Link>
           </div>
         )}
-
-
       </div>
     </div>
   );

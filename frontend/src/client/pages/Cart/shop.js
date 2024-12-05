@@ -7,7 +7,7 @@ import ProductModal from '../../components/ProductModal';
 import ToastNotification from '../../../public/components/ToastNotification';
 import ClientHomeLoader from '../../../public/components/Loaders/ClientHomeLoader';
 
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Shop = () => {
     const navigate = useNavigate()
@@ -100,13 +100,12 @@ const Shop = () => {
         }, 3000);
 
         if (token) {
-            window.location.href = '/checkout';
-        } else {
+            console.log("redirecting to checkout")
             localStorage.setItem('redirectTo', '/checkout');
-
-            navigate('/login');
+        } else {
+            localStorage.setItem('redirectTo', '/login');
         }
-        console.log(productData);
+
 
     };
 
@@ -114,6 +113,7 @@ const Shop = () => {
         return 'CART-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
     }
 
+    const redirectTo = localStorage.getItem('redirectTo');
 
     const handleAddToCart = async (product) => {
         const token = localStorage.getItem('token');
@@ -296,6 +296,8 @@ const Shop = () => {
         <div className='shop'>
             <Navigation />
             <ToastNotification toastMessage={toastMessage} />
+
+
             <div className='d-flex justify-content-center w-50 ms-4 mt-2'>
                 {/* <label htmlFor="search">Search:</label> */}
                 <input
@@ -348,11 +350,12 @@ const Shop = () => {
                                             className='shop__buy-now-button'
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                handleBuyNow(product, product.quantity);
+                                                handleBuyNow(product);
                                             }}
                                         >
                                             Buy Now
                                         </button>
+
                                     </div>
                                 </div>
                             ))}
@@ -536,6 +539,14 @@ const Shop = () => {
                     product={selectedProduct}
                     onAddToCart={handleAddToCart}
                     onClose={closeModal}
+                />
+            )}
+
+            {redirectTo && (
+                <Link
+                    to={redirectTo}
+                    style={{ display: 'none' }}
+                    replace
                 />
             )}
         </div>

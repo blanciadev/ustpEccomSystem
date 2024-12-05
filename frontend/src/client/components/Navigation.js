@@ -144,38 +144,22 @@ const Navigation = () => {
       }
     }
 
-    localStorage.clear();
-    setUsername("");
-    setFirstName("");
-    setToastMessage("Logged Out!");
+    if (!token) {
+      localStorage.setItem('redirectTo', '/');
+      setRedirectToLogin(true);
+    }
 
+    // localStorage.clear();
+    setToastMessage("Logged Out!");
+    // window.location.href = "/login";
     setTimeout(() => {
       setToastMessage("");
+
     }, 3000);
-    setIsLoggedIn(false);
-    <Link to="/login" />
   };
 
-  const handleCartClick = () => (
-    <Link to="/cart" />
-  );
 
-  const handleProfileClick = () => (
-    <Link to="/user" />
-  );
-
-  const handleOrderClick = () => (
-    <Link to="/user/purchase" />
-  );
-
-  const handleHomeClick = () => (
-    <Link to="/" />
-  );
-
-  const commonLinks = [
-    { id: 1, page: "Shop", link: "/shop" },
-    { id: 3, page: `Cart (${cartItemCount})`, link: "#" },
-  ];
+  const [redirectToHome, setRedirectToLogin] = useState(false);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -316,7 +300,9 @@ const Navigation = () => {
                       >
                         <MdLogout className="me-2" size={24} />
                         <span style={{ fontSize: "16px" }}>Logout</span>
+
                       </button>
+
                     </li>
                   </ul>
                 </div>
@@ -363,6 +349,9 @@ const Navigation = () => {
               >
                 Logout
               </button>
+              {redirectToHome && <Link to="/">Redirecting to Login...</Link>}
+
+
             </div>
           </div>
         </div>
