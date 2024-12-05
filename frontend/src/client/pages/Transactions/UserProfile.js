@@ -144,7 +144,7 @@ const UserProfile = () => {
   };
 
 
-
+  // static resized
   const handleResize = () => {
     setIsMobile(window.innerWidth <= 768);
   };
