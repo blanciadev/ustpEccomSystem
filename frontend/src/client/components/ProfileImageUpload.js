@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import Cropper from 'react-easy-crop';
 import { Button, Modal, Spinner } from 'react-bootstrap';
-import { getCroppedImg } from './cropImageHelper';
+// import { getCroppedImg } from './cropImageHelper';
 import axios from 'axios';
 import ToastNotification from '../../public/components/ToastNotification';
 
@@ -39,7 +39,7 @@ function ProfileImageUpload({ formData }) {
     const uploadImage = async () => {
         try {
             setIsUploading(true);
-            const croppedImageData = await getCroppedImg(imageSrc, croppedAreaPixels);
+            // const croppedImageData = await getCroppedImg(imageSrc, croppedAreaPixels);
 
             if (!(croppedImageData instanceof Blob)) {
                 throw new Error('Cropped image data is not a Blob.');
