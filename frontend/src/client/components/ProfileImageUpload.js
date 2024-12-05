@@ -37,46 +37,46 @@ function ProfileImageUpload({ formData }) {
 
 
     const uploadImage = async () => {
-        try {
-            setIsUploading(true);
-            // const croppedImageData = await getCroppedImg(imageSrc, croppedAreaPixels);
+        // try {
+        //     setIsUploading(true);
+        //     const croppedImageData = await getCroppedImg(imageSrc, croppedAreaPixels);
 
-            if (!(croppedImageData instanceof Blob)) {
-                throw new Error('Cropped image data is not a Blob.');
-            }
+        //     if (!(croppedImageData instanceof Blob)) {
+        //         throw new Error('Cropped image data is not a Blob.');
+        //     }
 
-            const formData = new FormData();
-            formData.append('profile_img', croppedImageData, 'profile-image.jpg');
+        //     const formData = new FormData();
+        //     formData.append('profile_img', croppedImageData, 'profile-image.jpg');
 
-            const customerId = localStorage.getItem('customer_id');
-            const token = localStorage.getItem('token');
+        //     const customerId = localStorage.getItem('customer_id');
+        //     const token = localStorage.getItem('token');
 
-            await axios.post(`https://ustp-eccom-server.vercel.app/api/upload-profile-image?customer_id=${customerId}`, formData, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+        //     await axios.post(`https://ustp-eccom-server.vercel.app/api/upload-profile-image?customer_id=${customerId}`, formData, {
+        //         headers: {
+        //             'Authorization': `Bearer ${token}`,
+        //             'Content-Type': 'multipart/form-data',
+        //         },
+        //     });
 
-            setToastMessage('Image Upload Successfull!');
+        //     setToastMessage('Image Upload Successfull!');
 
-            setTimeout(() => {
-                setToastMessage('');
-            }, 3000);
+        //     setTimeout(() => {
+        //         setToastMessage('');
+        //     }, 3000);
 
-        } catch (error) {
-            console.error('Error uploading image:', error.response ? error.response.data : error.message);
-            console.log(`Error uploading image: ${error.response?.data?.message || error.message}`);
-            setToastMessage(`Error uploading image: ${error.response?.data?.message || error.message}`);
+        // } catch (error) {
+        //     console.error('Error uploading image:', error.response ? error.response.data : error.message);
+        //     console.log(`Error uploading image: ${error.response?.data?.message || error.message}`);
+        //     setToastMessage(`Error uploading image: ${error.response?.data?.message || error.message}`);
 
-            setTimeout(() => {
-                setToastMessage('');
-            }, 3000);
+        //     setTimeout(() => {
+        //         setToastMessage('');
+        //     }, 3000);
 
-        } finally {
-            setIsUploading(false);
-            setShowModal(false);
-        }
+        // } finally {
+        //     setIsUploading(false);
+        //     setShowModal(false);
+        // }
     };
 
     useEffect(() => {
