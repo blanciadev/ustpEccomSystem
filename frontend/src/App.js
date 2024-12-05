@@ -72,7 +72,6 @@ function App() {
           <Route path='/admin/reports/sales' element={<Sales />} />
           <Route path='/admin/reports/order-history' element={<AdminHistory />} />
           <Route path='/admin/reports/transactions' element={<Transactions />} />
-
         </Routes>
       </CSSTransition>
     </TransitionGroup>
