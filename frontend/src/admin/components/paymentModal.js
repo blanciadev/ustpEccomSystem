@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
-import ToastNotification from '../../components/ToastNotification';
+import ToastNotification from '../../public/components/ToastNotification';
 
 const PaymentModal = ({ show, handleClose, order, handleUpdate }) => {
   const [paymentMethod, setPaymentMethod] = useState('');
@@ -19,7 +19,7 @@ const PaymentModal = ({ show, handleClose, order, handleUpdate }) => {
 
   const handleSave = async () => {
     try {
-      await axios.post('http://localhost:5001/update-payment-details', {
+      await axios.post('https://ustp-eccom-server.vercel.app/api/update-payment-details', {
         order_id: order.order_id,
         payment_method: paymentMethod,
         order_status: orderStatus,
@@ -57,6 +57,7 @@ const PaymentModal = ({ show, handleClose, order, handleUpdate }) => {
               type="text"
               value={paymentMethod}
               onChange={(e) => setPaymentMethod(e.target.value)}
+              readOnly
             />
           </Form.Group>
 
@@ -66,6 +67,7 @@ const PaymentModal = ({ show, handleClose, order, handleUpdate }) => {
               type="text"
               value={orderStatus}
               onChange={(e) => setOrderStatus(e.target.value)}
+              readOnly
             />
           </Form.Group>
 

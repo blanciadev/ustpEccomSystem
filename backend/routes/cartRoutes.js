@@ -160,6 +160,7 @@ router.get('/cart', authenticateToken, async (req, res) => {
                 p.description,
                 p.price,
                 p.size,
+                p.product_image,
                 p.expiration_date,
                 c.category_name,
                 ci.cart_items_id,  
@@ -173,6 +174,9 @@ router.get('/cart', authenticateToken, async (req, res) => {
             WHERE
                 ci.customer_id = ? AND ci.status = 'Order Pending'
         `, [user_id]);
+
+        // Log the product_image for debugging
+        console.log("Fetched product images:", rows.map(item => item.product_image));
 
         if (!rows || rows.length === 0) {
             return res.status(200).json({ items: [], totalPrice: 0 });
@@ -191,6 +195,7 @@ router.get('/cart', authenticateToken, async (req, res) => {
                 price: item.price,
                 quantity: item.quantity,
                 size: item.size,
+                product_image: item.product_image,
                 expiration_date: item.expiration_date,
                 sub_total: item.price * item.quantity
             })),
@@ -201,6 +206,7 @@ router.get('/cart', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
 
 // Update cart item quantity
 router.post('/cart-update-quantity', authenticateToken, async (req, res) => {
@@ -240,7 +246,7 @@ router.post('/cart-update-quantity', authenticateToken, async (req, res) => {
 // CheckOut Page Backend
 router.get('/products-checkout/:productCode', async (req, res) => {
     const { productCode } = req.params;
-    console.log(productCode);
+
     try {
         // Query to fetch the product based on the product code
         const [rows] = await db.query(`
@@ -262,7 +268,7 @@ router.get('/products-checkout/:productCode', async (req, res) => {
                     p.category_id = c.category_id
                         WHERE p.product_code = ?
         `, [productCode]);
-
+        console.log(rows);
         // Check if product exists
         if (rows.length === 0) {
             return res.status(404).send('Product not found');

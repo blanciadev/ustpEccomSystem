@@ -2,14 +2,47 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
-
 router.get('/products', async (req, res) => {
     try {
         const [rows] = await db.query(`
-            SELECT p.product_id, p.product_code, p.product_name, p.price ,p.description, p.quantity, c.category_name, p.product_image,  p.product_discount, 
-                p.product_status
-            FROM product p
-            INNER JOIN category c ON p.category_id = c.category_id
+          SELECT 
+    p.product_id, 
+    p.product_code, 
+    p.product_name, 
+    p.price, 
+    p.description, 
+    p.quantity, 
+    p.size, 
+    c.category_name, 
+    p.product_image, 
+    p.product_discount, 
+    p.product_status,
+    COALESCE(SUM(CASE WHEN user_product_interactions.interaction_type = 'view' THEN 1 ELSE 0 END), 0) AS view_count,
+    COALESCE(SUM(CASE WHEN user_product_interactions.interaction_type = 'cart' THEN 1 ELSE 0 END), 0) AS cart_count,
+    COALESCE(SUM(CASE WHEN user_product_interactions.interaction_type = 'order' THEN 1 ELSE 0 END), 0) AS order_count
+FROM 
+    product p
+INNER JOIN 
+    category c ON p.category_id = c.category_id
+LEFT JOIN 
+    user_product_interactions ON p.product_code = user_product_interactions.product_code
+GROUP BY 
+    p.product_id, 
+    p.product_code, 
+    p.product_name, 
+    p.price, 
+    p.description, 
+    p.quantity, 
+    p.size, 
+    c.category_name, 
+    p.product_image, 
+    p.product_discount, 
+    p.product_status
+ORDER BY 
+    view_count DESC, 
+    cart_count DESC, 
+    order_count DESC
+    
         `);
 
         res.json(rows);
@@ -18,6 +51,7 @@ router.get('/products', async (req, res) => {
         res.status(500).send('Error fetching products');
     }
 });
+
 
 
 // Route to get top 4 user-picked products for interaction view
@@ -31,6 +65,7 @@ router.get('/products-top-picks', async (req, res) => {
 	p.price, 
 	p.description, 
 	p.quantity, 
+    p.size, 
 	c.category_name, 
 	COUNT(DISTINCT user_product_interactions.product_code) AS interaction_count, 
 	p.product_image
@@ -45,7 +80,7 @@ FROM
 	ON 
 		p.product_code = user_product_interactions.product_code
 WHERE
-	user_product_interactions.interaction_type = 'view'
+	user_product_interactions.interaction_type = 'Order'
 GROUP BY
 	p.product_id, 
 	p.product_code, 
@@ -53,10 +88,10 @@ GROUP BY
 	p.price, 
 	p.description, 
 	p.quantity, 
+    p.size, 
 	c.category_name
 ORDER BY
-	interaction_count DESC
-LIMIT 4;`);
+	interaction_count DESC;`);
 
         res.json(rows);
     } catch (error) {
@@ -65,6 +100,30 @@ LIMIT 4;`);
     }
 });
 
+
+router.post('/products-img', async (req, res) => {
+    const { product_codes } = req.body;
+
+    if (!product_codes || product_codes.length === 0) {
+        return res.status(400).send('No product codes provided');
+    }
+
+    try {
+        const placeholders = product_codes.map(() => '?').join(',');
+        const query = `
+        SELECT product_code, product_image
+        FROM product
+        WHERE product_code IN (${placeholders})
+      `;
+
+        const [rows] = await db.query(query, product_codes);
+
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        res.status(500).send('Error fetching products');
+    }
+});
 
 router.post('/products-recommendations', async (req, res) => {
     const { product_code } = req.body;
@@ -124,64 +183,83 @@ router.post('/products-recommendations', async (req, res) => {
 });
 
 router.get('/sticky-components', async (req, res) => {
-    const { hairType, hairTexture, hairVirgin, hairColor, hairRebonded } = req.query;
+    const { hairType, hairTexture, hairVirgin, hairColor, hairRebonded, query } = req.query;
 
-    console.log('--------- STICKY COMPONENT -------');
+    console.log('--------- STICKY COMPONENT REQUEST START -------');
     console.log('Received parameters:', req.query);
 
     try {
         // Base query to fetch active products
-        let query = 'SELECT * FROM product WHERE product_status IN ("active", "Discounted")';
+        let queryStr = 'SELECT * FROM product WHERE product_status IN ("active", "Discounted")';
 
         // List of possible search terms
         const searchTerms = [];
         const queryParams = [];
 
-        // Check each parameter and add to searchTerms array if provided
+        // If query is provided, add the product name filter
+        if (query) {
+            console.log('Adding product name filter:', query);
+            searchTerms.push('LOWER(product_name) LIKE ?');
+            queryParams.push(`%${query.toLowerCase()}%`);
+        }
+
+        // Add filter terms if provided
         if (hairType) {
+            console.log('Adding hair type filter:', hairType);
             searchTerms.push('LOWER(description) LIKE ?');
             queryParams.push(`%${hairType.toLowerCase()}%`);
         }
 
         if (hairTexture) {
+            console.log('Adding hair texture filter:', hairTexture);
             searchTerms.push('LOWER(description) LIKE ?');
             queryParams.push(`%${hairTexture.toLowerCase()}%`);
         }
 
         if (hairVirgin) {
+            console.log('Adding hair virgin filter:', hairVirgin);
             searchTerms.push('LOWER(description) LIKE ?');
             queryParams.push(`%${hairVirgin.toLowerCase()}%`);
         }
 
         if (hairColor) {
+            console.log('Adding hair color filter:', hairColor);
             searchTerms.push('LOWER(description) LIKE ?');
             queryParams.push(`%${hairColor.toLowerCase()}%`);
         }
 
         if (hairRebonded) {
+            console.log('Adding hair rebonded filter:', hairRebonded);
             searchTerms.push('LOWER(description) LIKE ?');
             queryParams.push(`%${hairRebonded.toLowerCase()}%`);
         }
 
+        // Combine search terms if any are present
         if (searchTerms.length > 0) {
-            query += ' AND (' + searchTerms.join(' OR ') + ')';
+            queryStr += ' AND (' + searchTerms.join(' OR ') + ')';
         }
 
-        query += ' LIMIT 4';
+        queryStr += ' LIMIT 5';
 
-        console.log('Final query to execute:', query);
+        console.log('Final SQL query to execute:', queryStr);
         console.log('Query parameters:', queryParams);
 
-        const [products] = await db.query(query, queryParams);
+        // Execute the query with the provided filters
+        const [products] = await db.query(queryStr, queryParams);
 
         console.log('Fetched products:', products);
 
+        console.log('--------- STICKY COMPONENT REQUEST END -------');
+
+        // Return the filtered products
         res.json(products);
     } catch (error) {
         console.error('Error fetching products:', error.message);
+        console.error('Stack Trace:', error.stack);
         res.status(500).send('Server error');
     }
 });
+
 
 
 router.get('/products-bundle-recommendation', async (req, res) => {

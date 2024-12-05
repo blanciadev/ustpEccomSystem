@@ -10,6 +10,7 @@ const ProductStatistics = ({
 }) => {
     return (
         <div className='product-qty'>
+            
             <div className='best-selling'>
                 <div className='qty'>
                     <i className='bx bxs-spa'></i>
@@ -53,11 +54,11 @@ const ProductStatistics = ({
 
             <div className='out-of-stock'>
                 <div className='qty'>
-                    <i className='bx bxs-spa'></i>
-                    <h6>{outOfStockCount}</h6>
+                    <i className='bx bxs-spa text-dark'></i>
+                    <h6 class="text-dark">{outOfStockCount}</h6>
                 </div>
                 <div>
-                    <h6>Out of Stock</h6>
+                    <h6 class="text-dark">Out of Stock</h6>
                 </div>
             </div>
 

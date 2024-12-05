@@ -3,12 +3,15 @@ const app = express();
 const db = require('./db');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const { OAuth2Client } = require('google-auth-library'); // Import the Google OAuth client
+const { OAuth2Client } = require('google-auth-library');
+const dotenv = require('dotenv');
+
+
+app.use(cors());
+dotenv.config();
 
 // Set your Google Client ID
-const GOOGLE_CLIENT_ID = '604163930378-hefd54geho5pkurgd149svlovu50j81t.apps.googleusercontent.com'; // Replace with your actual Google Client ID
-
-// Create a new OAuth2 client
+const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 // Port configuration
@@ -27,28 +30,26 @@ const adminOrderUpdates = require('./routes/adminOrderUpdates.js');
 const adminProduct = require('./routes/adminProduct.js');
 const adminProductUpdate = require('./routes/adminProductUpdates.js');
 const AdminBundleOrder = require('./routes/AdminBundleOrder.js');
-const AdminUsersRoutes = require('./routes/AdminUsersRoutes.js');
+// const AdminUsersRoutes = require('./routes/AdminUsersRoutes.js');
 const token = require('./routes/tokenValidation.js');
 const customerData = require('./routes/customerData.js');
 const handleLogout = require('./routes/handlelogout.js');
 const nodemailer = require('./routes/NodeMailer.js');
 
-app.use(cors());
+
+
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
-
-
 const crypto = require('crypto');
-const TOKEN_EXPIRATION_TIME = 3600000; // 1 hour
+const TOKEN_EXPIRATION_TIME = 3600000;
+
 
 app.post('/verify-token', async (req, res) => {
   const { token } = req.body;
 
   try {
-    // Verify the Google token
     const ticket = await client.verifyIdToken({
       idToken: token,
       audience: GOOGLE_CLIENT_ID,
@@ -56,25 +57,18 @@ app.post('/verify-token', async (req, res) => {
     console.error('Token Validation', token);
 
     const payload = ticket.getPayload();
-    const email = payload.email; // Get the email from the payload
+    const email = payload.email;
 
-    // Query the database to check if the user exists
     const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
 
     if (rows.length > 0) {
-      // User exists, retrieve their data
       const user = rows[0];
 
-      // Generate a new random token
-      //  const token = crypto.randomBytes(64).toString('hex');
-
-      // Check if a token already exists for the user
       const [existingTokenRows] = await db.query('SELECT * FROM tokens WHERE user_id = ? AND token_status = ?', [user.customer_id, 'Active']);
 
       if (existingTokenRows.length > 0) {
         const existingToken = existingTokenRows[0];
 
-        // Check if the token has expired
         const now = new Date();
         if (new Date(existingToken.expires_at) > now) {
           return res.status(200).json({
@@ -90,12 +84,10 @@ app.post('/verify-token', async (req, res) => {
           });
         }
 
-        // If token expired, delete the old token
         await db.query('DELETE FROM tokens WHERE id = ?', [existingToken.id]);
       }
 
 
-      // Insert the new token into the tokens table with an expiration time
       await db.query('INSERT INTO tokens (user_id, token, token_status, expires_at) VALUES (?, ?, ?, ?)', [
         user.customer_id,
         token,
@@ -104,7 +96,6 @@ app.post('/verify-token', async (req, res) => {
       ]);
 
 
-      // Respond with user data and the newly generated token
       return res.status(200).json({
         message: 'User verified',
         payload: payload,
@@ -117,7 +108,6 @@ app.post('/verify-token', async (req, res) => {
         profile_img: user.profile_img,
       });
     } else {
-      // User does not exist
       return res.status(200).json({
         message: 'User not registered',
         payload,
@@ -131,31 +121,131 @@ app.post('/verify-token', async (req, res) => {
 });
 
 
+app.post('/google-signup', async (req, res) => {
+  const { token } = req.body;
+
+  if (!token) {
+    return res.status(400).json({ message: 'Google token is required' });
+  }
+
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const googleEmail = payload.email;
+    const firstName = payload.given_name || '';
+    const lastName = payload.family_name || '';
+
+    const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [googleEmail]);
+
+    if (rows.length > 0) {
+      const user = rows[0];
+
+      const [activeTokens] = await db.query(
+        'SELECT * FROM tokens WHERE user_id = ? AND token_status = ?',
+        [user.customer_id, 'Active']
+      );
+
+      const now = new Date();
+      if (activeTokens.length > 0) {
+        const activeToken = activeTokens[0];
+
+        if (new Date(activeToken.expires_at) > now) {
+          return res.status(200).json({
+            message: 'User verified',
+            status: 'registered',
+            user_id: user.customer_id,
+            username: user.username,
+            first_name: user.first_name,
+            role_type: user.role_type,
+            profile_img: user.profile_img,
+            token: activeToken.token,
+          });
+        }
+
+        await db.query('DELETE FROM tokens WHERE id = ?', [activeToken.id]);
+      }
 
 
-// Routes
-app.use('/', cartRoutes);
-app.use('/', customerSignUpRoutes);
-app.use('/', customerLoginRoutes);
-app.use('/', productRoutes);
-app.use('/', OrderRoutes);
-app.use('/', viewTransactionsRoute);
-app.use('/', userInteraction);
-app.use('/', adminOrderHistory);
-app.use('/', adminOrderUpdates);
-app.use('/', adminProduct);
-app.use('/', adminProductUpdate);
-app.use('/', AdminBundleOrder);
-app.use('/', customerData);
-app.use('/', AdminUsersRoutes);
-app.use('/', handleLogout);
-app.use('/', token);
-app.use('/', nodemailer);
+      const newToken = generateToken();
+      const expiresAt = new Date(Date.now() + TOKEN_EXPIRATION_TIME);
 
+      await db.query('INSERT INTO tokens (user_id, token, token_status, expires_at) VALUES (?, ?, ?, ?)', [
+        user.customer_id,
+        newToken,
+        'Active',
+        expiresAt,
+      ]);
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+      return res.status(200).json({
+        message: 'User verified',
+        status: 'registered',
+        user_id: user.customer_id,
+        username: user.username,
+        first_name: user.first_name,
+        role_type: user.role_type,
+        profile_img: user.profile_img,
+        token: newToken,
+      });
+    } else {
+      const [result] = await db.query(
+        'INSERT INTO users (first_name, last_name, email, password) VALUES (?, ?, ?, ?)',
+        [firstName, lastName, googleEmail, null]);
+
+      const newUserId = result.insertId;
+
+      const newToken = generateToken();
+      const expiresAt = new Date(Date.now() + TOKEN_EXPIRATION_TIME);
+
+      await db.query('INSERT INTO tokens (user_id, token, token_status, expires_at) VALUES (?, ?, ?, ?)', [
+        newUserId,
+        newToken,
+        'Active',
+        expiresAt,
+      ]);
+
+      return res.status(201).json({
+        message: 'User registered successfully',
+        status: 'registered',
+        user_id: newUserId,
+        first_name: firstName,
+        last_name: lastName,
+        email: googleEmail,
+        token: newToken,
+        role_type: 'Customer',
+        profile_img: payload.picture || '',
+      });
+    }
+  } catch (error) {
+    console.error('Token verification error or signup error:', error.message);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
 });
 
+function generateToken() {
+  return require('crypto').randomBytes(48).toString('hex');
+}
 
+// Routes
+const routes = [
+  cartRoutes, customerSignUpRoutes, customerLoginRoutes, productRoutes,
+  OrderRoutes, viewTransactionsRoute, userInteraction, adminOrderHistory,
+  adminOrderUpdates, adminProduct, adminProductUpdate, AdminBundleOrder,
+  token, customerData, handleLogout, nodemailer
+  // AdminUsersRoutes,
+];
+
+routes.forEach(route => {
+  app.use('/api', route);
+});
+
+app.use("/", (req, res) => {
+  res.send("Server is Running. ");
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

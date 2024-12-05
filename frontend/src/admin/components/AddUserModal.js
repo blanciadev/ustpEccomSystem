@@ -26,7 +26,7 @@ const AddUserModal = ({ show, onClose }) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:5001/admin-signup', {
+      const response = await axios.post('https://ustp-eccom-server.vercel.app/api/admin-signup', {
         firstName: formData.fName,
         lastName: formData.lName,
         email: formData.email,

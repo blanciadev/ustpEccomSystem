@@ -14,7 +14,7 @@ const PaymentInsight = () => {
     useEffect(() => {
         const fetchPaymentInsight = async () => {
             try {
-                const response = await axios.get('http://localhost:5001/payment-insight');
+                const response = await axios.get('https://ustp-eccom-server.vercel.app/api/payment-insight');
                 setMonthlyCounts(response.data.monthlyCounts);
             } catch (error) {
                 console.error('Error fetching payment insight:', error);
@@ -28,7 +28,7 @@ const PaymentInsight = () => {
     }, []);
 
     const data = {
-        labels: monthlyCounts.map(mc => `Month ${mc.month}`),
+        labels: monthlyCounts.map(mc => mc.month),
         datasets: [
             {
                 label: 'Completed Orders',
@@ -39,6 +39,7 @@ const PaymentInsight = () => {
             },
         ],
     };
+
 
     const options = {
         responsive: true,
@@ -56,7 +57,7 @@ const PaymentInsight = () => {
             tooltip: {
                 callbacks: {
                     label: function (tooltipItem) {
-                        return `${tooltipItem.dataset.label}: ${tooltipItem.raw}`; // Use template literals for readability
+                        return `${tooltipItem.dataset.label}: ${tooltipItem.raw}`;
                     },
                 },
                 backgroundColor: 'rgba(0,0,0,0.7)',

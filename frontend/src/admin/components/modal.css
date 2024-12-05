@@ -1,6 +1,7 @@
+
 .modal-dialog{
-    display: flex;
     justify-content: center;
+    width: 1500px;
 }
 .modal.fade{
     backdrop-filter: contrast(0.5);
@@ -79,4 +80,56 @@
     grid-column-start: 1;
     grid-column-end: 3;
 }
+.modal-header{
+    justify-content: space-between;
+    padding: 0;
+}
+.order-head button{
+    background-color: var(---white);
+    color: black;
+    font-size: 1.3rem;
+}
+.modal-content{
+    padding: 10px 15px;
+}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.customer-details  {
+    width: 500px;
+    border-left: 4px solid #d81c4b;
+
+}
+
+.product-details-order  {
+ 
+    border-left: 4px solid #d81c4b;
+
+}
+
+#status {
+    margin-left: 158px;
+
+}
+
+/* #status .option1 {
+    width: 200px;
+
+} */

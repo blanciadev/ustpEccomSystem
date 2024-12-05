@@ -27,7 +27,7 @@ const Reports = () => {
             setLoading(true);
             setError(false); // Reset error state on each fetch attempt
             try {
-                const response = await axios.get('http://localhost:5001/product-reports-per-month');
+                const response = await axios.get('https://ustp-eccom-server.vercel.app/api/product-reports-per-month');
 
                 // Check if the response contains data
                 if (response.data && response.data.data) {
@@ -94,7 +94,7 @@ const Reports = () => {
             }
 
             // Send the data to the backend to generate the report
-            const response = await axios.post('http://localhost:5001/product-reports-export', {
+            const response = await axios.post('https://ustp-eccom-server.vercel.app/api/product-reports-export', {
                 month,
                 year,
                 data: storedReports
@@ -190,7 +190,7 @@ const Reports = () => {
                                     <table className='table table-hover'>
                                         <thead className='bg-light sticky-top'>
                                             <tr>
-                                                <th><input type='checkbox' /></th>
+                                                {/* <th><input type='checkbox' /></th> */}
                                                 <th>Period</th>
                                                 <th>Product Code</th>
                                                 <th>Product Name</th>
@@ -201,7 +201,7 @@ const Reports = () => {
                                         <tbody>
                                             {filteredReports.map((report, index) => (
                                                 <tr key={index}>
-                                                    <td><input type='checkbox' /></td>
+                                                    {/* <td><input type='checkbox' /></td> */}
                                                     <td>{report.period}</td>
                                                     <td>{report.product_code}</td>
                                                     <td>{report.product_name}</td>

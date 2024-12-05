@@ -7,7 +7,8 @@
 * {
     margin: 0%;
     padding: 0%;
-    font-family: "Poppins";
+    padding-top: 1px;
+    font-family:'Times New Roman', Times, serif
 }
 
 body {
@@ -18,8 +19,38 @@ body {
     justify-content: center;
 }
 
-/* Home */
-/* Navigation */
+:root{
+    --white: #fff;
+    --black: #000;
+    --primaryColor:#ff728a;
+
+    --lGray: #f5f5f5;
+    --mGray:#ccc;
+    --dGray: #4d4d4d;
+
+    --accentOne:#ffb3b9;
+    --accentTwo:#A3E4DB;
+    --accentThree:#D1B3FF;
+    --accentFour:#FF9AA2;
+
+    --neutralOne: #F8E8D0;
+    --neutralTwo: #333;
+
+    --borderRad: 4px;
+
+    --paddingOne:8px 10px;
+}
+
+/* Buttons */
+.primary-btn{
+    background-color: var(--primaryColor);
+    color: var(--white);
+    border: none;
+    border-radius: 3px;
+    padding: var(--paddingOne);
+    cursor: pointer;
+    font-size: 0.8em;
+}
 
 
 .notification-bell {
@@ -72,17 +103,33 @@ body {
 }
 
 
+.login {
+    border:   2px rgb(240, 95, 119);
+    color: white;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.login:hover {
+    background-color:  none;
+
+}
+
 
 .nav-container {
     display: flex;
     align-items: center;
     justify-content: space-around;
-    border-bottom: 1px solid black;
-    width: 98vw;
-    height: 50px;
-    align-content: center;
-    flex-wrap: wrap;
-    flex-direction: row;
+    border-bottom: 1px solid rgb(255, 74, 192);
+    width: 100vw;
+    height: 58px;
+
+        position: sticky;
+        top: 0;
+        z-index: 1020; /* Ensure it stays above other elements */
+    background-color: white;
 }
 
 .nav-container>.logo>a {
@@ -118,6 +165,7 @@ body {
     text-align: center;
     margin: 0%;
     padding: 0%;
+    
 }
 
 .nav-container>.navlinks>.linklist>li {
@@ -135,6 +183,7 @@ body {
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    
 }
 
 .nav-container>.navlinks>.linklist>li>a {
@@ -146,25 +195,20 @@ body {
     text-decoration: none;
     color: black;
     gap: 2px;
+    font-size: 19px;
 }
 
 .nav-container>.navlinks>.linklist>li>a:hover,
 .nav-container>.navlinks>.linklist>li>a:active,
 .linkactive {
+
     font-weight: 600;
-    text-decoration: underline;
     color: rgb(240, 95, 119);
 }
 
 .nav-container>.navlinks>.linklist>li>a>i {
     font-size: 1.3rem;
     text-decoration: none;
-}
-
-.nav-container>.navlinks>.linklist>.partition {
-    font-size: 1.5rem;
-    width: 20px;
-
 }
 
 .login-btn {
@@ -176,45 +220,40 @@ body {
 
 }
 
-.nav-container .searchbar {
-    width: 20vw;
-    height: 5vh;
-
+.custom-border {
+    border: 2px solid pink !important; 
+    
 }
 
-.nav-container .searchbar form {
-    display: flex;
-    align-items: center;
-    align-content: center;
-    flex-wrap: wrap;
-    justify-content: center;
-    flex-direction: row;
+.custom-border .input-group-text {
+    background-color: transparent; 
+    border: none; 
+    
 }
 
-.nav-container .searchbar form input {
-    width: 50%;
-    height: 5vh;
-    border: 2px solid rgb(240, 95, 119);
+
+.custom-border input {
+    border: none !important; 
     outline: none;
-    padding: 1px 4px 1px 7px;
-    transition: ease-in 1.5s;
+    
 }
 
-.nav-container .searchbar form input:focus,
-.nav-container .searchbar form input:hover {
-    width: 80%;
-
+.custom-border input:focus {
+    border: 2px solid pink;
+    
 }
 
-.nav-container .searchbar form button {
-    width: 30px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid rgb(240, 95, 119);
-    background-color: rgb(240, 95, 119);
+.custom-border:hover .input-group-text .custom-icon {
+    color: pink;
 }
+
+.custom-border .input-group-text .custom-icon {
+    transition: color 0.3s ease;
+}
+
+
+
+
   .menu-toggle {
     display: none;
     background: none;
@@ -245,6 +284,9 @@ body {
     height: 80vh;
     object-fit: cover;
     border-radius: 10px;
+}
+.slideshow-con button{
+    padding: 0;
 }
 
 /* Products */
@@ -426,9 +468,7 @@ body {
     }
 }
 @media (max-width:425px) {
-    .nav-container .searchbar{
-        width: 45vw;
-    }
+  
     .nav-container .navlinks>.linklist {
         display: none;
         flex-direction: column;
@@ -491,6 +531,10 @@ body {
     background-color: gray;
     color: white;
 }
+
+
+
+
 
 /* transitions */
 .fade-enter {

@@ -30,12 +30,11 @@ const upload = multer({
     },
 });
 
-// Profile image upload endpoint
+
 router.post('/upload-profile-image', upload.single('profile_img'), async (req, res) => {
     console.log('--- New Upload Request ---');
     const { customer_id } = req.query;
 
-    // Log customer ID and request details
     console.log('Upload request received:', {
         customer_id: customer_id,
         timestamp: new Date().toISOString(),
@@ -43,20 +42,17 @@ router.post('/upload-profile-image', upload.single('profile_img'), async (req, r
         queryParams: req.query,
     });
 
-    // Check if a file is uploaded
     if (!req.file) {
         console.error('No file uploaded. Returning 400 response.');
         return res.status(400).send({ error: 'No file uploaded.' });
     }
 
-    // Debug file info
     console.log('Uploaded file details:', {
         originalname: req.file.originalname,
         size: req.file.size,
         mimetype: req.file.mimetype,
     });
 
-    // Validate if the file is too small
     if (req.file.size < 1000) {
         console.error('File is too small or possibly corrupted. Returning 400 response.');
         return res.status(400).send({ error: 'File too small or possibly corrupted.' });
@@ -72,7 +68,6 @@ router.post('/upload-profile-image', upload.single('profile_img'), async (req, r
         const sql = 'UPDATE users SET profile_img = ? WHERE customer_id = ?';
         console.log('Executing SQL query:', sql);
 
-        // Perform the database update
         db.query(sql, [imageBuffer, customer_id], (err, result) => {
             if (err) {
                 console.error('Database update failed:', {
@@ -82,7 +77,6 @@ router.post('/upload-profile-image', upload.single('profile_img'), async (req, r
                 return res.status(500).send({ error: 'Database update failed.' });
             }
 
-            // Log success and DB result
             console.log('Profile image updated successfully for customer ID:', customer_id);
             console.log('Database response:', result);
 
@@ -137,7 +131,7 @@ router.get('/get-customer-details', async (req, res) => {
 });
 
 
-router.post('/users-details', (req, res) => {
+router.post('/users-details-img', (req, res) => {
     const { customer_id } = req.body;
     const sql = 'SELECT * FROM users WHERE customer_id = ?';
 
@@ -148,7 +142,6 @@ router.post('/users-details', (req, res) => {
             return res.status(500).send({ error: 'Error fetching user details.' });
         }
 
-        // Check if user was found
         if (result.length === 0) {
             return res.status(404).send({ error: 'User not found.' });
         }
@@ -166,10 +159,8 @@ router.post('/users-details', (req, res) => {
             result[0].profile_img = null;
         }
 
-        // Log the final user details to debug
         console.log('User Details:', result[0]);
 
-        // Return user details
         res.status(200).send(result[0]);
     });
 });
