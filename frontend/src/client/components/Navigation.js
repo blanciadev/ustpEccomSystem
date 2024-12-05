@@ -151,7 +151,8 @@ const Navigation = () => {
 
     // localStorage.clear();
     setToastMessage("Logged Out!");
-    // window.location.href = "/login";
+    window.location.replace("/login");
+
     setTimeout(() => {
       setToastMessage("");
 
@@ -349,7 +350,7 @@ const Navigation = () => {
               >
                 Logout
               </button>
-              {redirectToHome && <Link to="/">Redirecting to Login...</Link>}
+              {/* {redirectToHome && <Link to="/login">Redirecting to Login...</Link>} */}
 
 
             </div>

@@ -71,7 +71,9 @@ const AdminHeader = () => {
                 );
                 localStorage.removeItem("token");
                 localStorage.clear();
-                navigate("/");
+                // navigate("/");
+
+                window.location.replace("/login");
             } catch (error) {
                 console.error(
                     "Error logging out:",
