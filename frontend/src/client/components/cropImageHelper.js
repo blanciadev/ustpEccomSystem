@@ -1,50 +1,51 @@
-export const getCroppedImg = (imageSrc, croppedAreaPixels) => {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.src = imageSrc;
+// export const getCroppedImg = (imageSrc, croppedAreaPixels) => {
 
-    image.onload = () => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
+//   return new Promise((resolve, reject) => {
+//     const image = new Image();
+//     image.src = imageSrc;
 
-      // Set canvas size
-      canvas.width = croppedAreaPixels.width;
-      canvas.height = croppedAreaPixels.height;
+//     image.onload = () => {
+//       const canvas = document.createElement('canvas');
+//       const ctx = canvas.getContext('2d');
 
-      ctx.drawImage(
-        image,
-        croppedAreaPixels.x,
-        croppedAreaPixels.y,
-        croppedAreaPixels.width,
-        croppedAreaPixels.height,
-        0,
-        0,
-        croppedAreaPixels.width,
-        croppedAreaPixels.height,
-      );
+//       // Set canvas size
+//       canvas.width = croppedAreaPixels.width;
+//       canvas.height = croppedAreaPixels.height;
 
-      // Convert to Blob and resolve
-      canvas.toBlob((blob) => {
-        if (!blob) {
-          reject(new Error('Canvas is empty'));
-          return;
-        }
+//       ctx.drawImage(
+//         image,
+//         croppedAreaPixels.x,
+//         croppedAreaPixels.y,
+//         croppedAreaPixels.width,
+//         croppedAreaPixels.height,
+//         0,
+//         0,
+//         croppedAreaPixels.width,
+//         croppedAreaPixels.height,
+//       );
 
-        const reader = new FileReader();
-        reader.onload = () => {
-          // Convert ArrayBuffer to a new Blob
-          const arrayBuffer = reader.result;
-          const longBlob = new Blob([arrayBuffer], { type: 'image/jpeg' });
-          resolve(longBlob);
-        };
+//       // Convert to Blob and resolve
+//       canvas.toBlob((blob) => {
+//         if (!blob) {
+//           reject(new Error('Canvas is empty'));
+//           return;
+//         }
 
-        // Read the blob as an ArrayBuffer
-        reader.readAsArrayBuffer(blob);
-      }, 'image/jpeg');
-    };
+//         const reader = new FileReader();
+//         reader.onload = () => {
+//           // Convert ArrayBuffer to a new Blob
+//           const arrayBuffer = reader.result;
+//           const longBlob = new Blob([arrayBuffer], { type: 'image/jpeg' });
+//           resolve(longBlob);
+//         };
 
-    image.onerror = () => {
-      reject(new Error('Failed to load image'));
-    };
-  });
-};
+//         // Read the blob as an ArrayBuffer
+//         reader.readAsArrayBuffer(blob);
+//       }, 'image/jpeg');
+//     };
+
+//     image.onerror = () => {
+//       reject(new Error('Failed to load image'));
+//     };
+//   });
+// };

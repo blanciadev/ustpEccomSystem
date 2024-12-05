@@ -3,7 +3,7 @@ import axios from 'axios';
 import Navigation from '../../components/Navigation';
 import UserSideNav from '../../components/UserSideNav';
 import './UserProfile.css';
-import ProfileImageUpload from '../../components/ProfileImageUpload';
+// import ProfileImageUpload from '../../components/ProfileImageUpload';
 import ToastNotification from '../../../public/components/ToastNotification';
 
 const UserProfile = () => {
@@ -165,7 +165,7 @@ const UserProfile = () => {
               </button>
             </div> */}
 
-            <ProfileImageUpload formData={formData} />
+            {/* <ProfileImageUpload formData={formData} /> */}
 
             {loading ? (
               <div className='cskeleton-item' style={{ gridColumn: 'span 2' }}></div>
