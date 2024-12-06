@@ -563,11 +563,10 @@ router.get('/admin-order-history-payment', async (req, res) => {
     }
 });
 
-
 router.get('/admin-order-history-general-records', async (req, res) => {
     try {
         const { status, searchTerm, exportToExcel, page = 1 } = req.query;
-        const pageSize = 20;  // Define the number of results per page
+        const pageSize = 20;
         const offset = (page - 1) * pageSize;
 
         let query = `
@@ -578,16 +577,18 @@ router.get('/admin-order-history-general-records', async (req, res) => {
             order_details.order_date, 
             order_details.payment_method, 
             order_details.total_price AS order_details_total_price, 
-            order_details.quantity AS order_quantity,  -- Order quantity per product
+            order_details.quantity AS order_quantity,  
             order_details.payment_status, 
             product.price, 
             order_details.order_status, 
             \`order\`.total_price AS order_total_price, 
             shipment.shipment_id, 
             category.category_name, 
-            product.quantity AS product_quantity,  -- Total stock quantity of the product
+            product.quantity AS product_quantity, 
             \`order\`.order_id, 
             users.customer_id,
+            users.first_name AS customer_first_name,
+            users.last_name AS customer_last_name,
             product.product_code
         FROM
             \`order\`
@@ -613,11 +614,15 @@ router.get('/admin-order-history-general-records', async (req, res) => {
             product.category_id = category.category_id `;
 
         const conditions = [];
+        const queryParams = [];
+
         if (status) {
             conditions.push('order_details.payment_status = ?');
+            queryParams.push(status);
         }
         if (searchTerm) {
             conditions.push(`(users.first_name LIKE ? OR users.last_name LIKE ? OR \`order\`.order_id LIKE ?)`);
+            queryParams.push(`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`);
         }
 
         if (conditions.length) {
@@ -625,17 +630,11 @@ router.get('/admin-order-history-general-records', async (req, res) => {
         }
 
         query += ` ORDER BY \`order\`.order_date DESC LIMIT ? OFFSET ?`;
-
-        const queryParams = [
-            ...(status ? [status] : []),
-            ...(searchTerm ? [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`] : []),
-            pageSize,
-            offset
-        ];
+        queryParams.push(pageSize, offset);
 
         const [orders] = await db.query(query, queryParams);
 
-        // Group orders by order_id without recalculating total_price
+        // Group orders by order_id
         const groupedOrders = orders.reduce((acc, order) => {
             if (!acc[order.order_id]) {
                 acc[order.order_id] = {
@@ -643,28 +642,18 @@ router.get('/admin-order-history-general-records', async (req, res) => {
                     order_date: order.order_date,
                     order_total: order.order_total_price,
                     order_status: order.order_status,
-                    order_update: order.order_update,
                     payment_status: order.payment_status,
                     payment_method: order.payment_method,
                     shipment_id: order.shipment_id,
                     customer_id: order.customer_id,
-                    customer_first_name: order.first_name,
-                    customer_last_name: order.last_name,
-                    customer_email: order.email,
-                    customer_phone: order.phone_number,
-                    customer_address: {
-                        street_name: order.street_name,
-                        region: order.region,
-                        postal_code: order.postal_code,
-                    },
+                    customer_first_name: order.customer_first_name,
+                    customer_last_name: order.customer_last_name,
                     products: []
                 };
             }
 
-            // Add the current product to the products array, including both quantities
             acc[order.order_id].products.push({
                 order_details_id: order.order_details_id,
-                payment_date: order.payment_date,
                 product_id: order.product_id,
                 product_name: order.product_name,
                 product_code: order.product_code,
@@ -672,10 +661,8 @@ router.get('/admin-order-history-general-records', async (req, res) => {
                 product_quantity: order.product_quantity,
                 order_quantity: order.order_quantity,
                 price: order.price,
-                quantity: order.order_quantity,
                 item_total: order.order_details_total_price,
                 payment_status: order.payment_status,
-                payment_method: order.payment_method,
             });
 
             return acc;
@@ -693,9 +680,9 @@ router.get('/admin-order-history-general-records', async (req, res) => {
                 { header: 'Category', key: 'category_name', width: 20 },
                 { header: 'Order Quantity', key: 'order_quantity', width: 15 },
                 { header: 'Price', key: 'price', width: 15 },
-                { header: 'Total Price', key: 'total_price', width: 15 },
-                { header: 'Date', key: 'order_date', width: 20 },
-                { header: 'Current Quantity', key: 'current_quantity', width: 15 },
+                { header: 'Total Price', key: 'item_total', width: 15 },
+                { header: 'Order Date', key: 'order_date', width: 20 },
+                { header: 'Current Quantity', key: 'product_quantity', width: 15 },
                 { header: 'Running Balance', key: 'running_balance', width: 20 },
                 { header: 'Order ID', key: 'order_id', width: 10 },
                 { header: 'Customer ID', key: 'customer_id', width: 15 },
@@ -711,25 +698,23 @@ router.get('/admin-order-history-general-records', async (req, res) => {
                         category_name: product.category_name,
                         order_quantity: product.order_quantity,
                         price: product.price,
-                        total_price: product.item_total,
+                        item_total: product.item_total,
                         order_date: new Date(order.order_date).toLocaleDateString(),
-                        current_quantity: product.product_quantity,
+                        product_quantity: product.product_quantity,
                         running_balance: product.product_quantity - product.order_quantity,
                         order_id: order.order_id,
-                        customer_id: `${order.customer_id}`,
+                        customer_id: order.customer_id,
                         shipment_id: order.shipment_id,
                         payment_status: product.payment_status,
                     });
                 });
             });
 
-            // Send the Excel file
             res.setHeader(
                 'Content-Type',
                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             );
             res.setHeader('Content-Disposition', 'attachment; filename=orders.xlsx');
-
             await workbook.xlsx.write(res);
             res.end();
             return;
@@ -742,7 +727,6 @@ router.get('/admin-order-history-general-records', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 });
-
 
 
 
