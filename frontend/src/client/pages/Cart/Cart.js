@@ -85,11 +85,12 @@ const CartContent = () => {
   const computeTotalPrice = () => {
     return cartItems.reduce((total, item) => {
       if (selectedItems[item.product_code]) {
-        return total + item.sub_total;
+        return total + (item.price * item.quantity);
       }
       return total;
     }, 0);
   };
+
 
   useEffect(() => {
     setTotalPrice(computeTotalPrice());
