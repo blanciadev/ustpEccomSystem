@@ -19,7 +19,7 @@ const OrderHistory = () => {
     const fetchOrders = async () => {
       try {
         const response = await axios.get(
-          "https://ustp-eccom-server.vercel.app/api//order-history",
+          "https://ustp-eccom-server.vercel.app/api/order-history",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -56,7 +56,7 @@ const OrderHistory = () => {
   const handleCancelOrder = async (orderId) => {
     try {
       await axios.post(
-        "https://ustp-eccom-server.vercel.app/api//cancel-order",
+        "https://ustp-eccom-server.vercel.app/api/cancel-order",
         {
           order_id: orderId,
         },

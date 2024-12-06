@@ -51,7 +51,7 @@ function ProfileImageUpload({ formData }) {
             const customerId = localStorage.getItem('customer_id');
             const token = localStorage.getItem('token');
 
-            await axios.post(`https://ustp-eccom-server.vercel.app/api//upload-profile-image?customer_id=${customerId}`, formData, {
+            await axios.post(`https://ustp-eccom-server.vercel.app/api/upload-profile-image?customer_id=${customerId}`, formData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data',

@@ -25,7 +25,7 @@ const UserSideNav = () => {
 
     if (token && customerId) {
       try {
-        const response = await fetch('https://ustp-eccom-server.vercel.app/api//users-details', {
+        const response = await fetch('https://ustp-eccom-server.vercel.app/api/users-details', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

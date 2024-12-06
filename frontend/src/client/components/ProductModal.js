@@ -29,7 +29,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
             setLoading(true);
             setError(null);
 
-            const fetchRecommendations = fetch('https://ustp-eccom-server.vercel.app/api//products-recommendations', {
+            const fetchRecommendations = fetch('https://ustp-eccom-server.vercel.app/api/products-recommendations', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -37,7 +37,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                 body: JSON.stringify({ product_code: product.product_code }),
             });
 
-            const fetchBundles = fetch('https://ustp-eccom-server.vercel.app/api//product-bundles', {
+            const fetchBundles = fetch('https://ustp-eccom-server.vercel.app/api/product-bundles', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

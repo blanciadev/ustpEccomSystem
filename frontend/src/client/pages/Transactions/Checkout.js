@@ -51,7 +51,7 @@ const Checkout = () => {
           savedProducts.map((product) =>
             axios
               .get(
-                `https://ustp-eccom-server.vercel.app/api//products-checkout/${product.product_code}`,
+                `https://ustp-eccom-server.vercel.app/api/products-checkout/${product.product_code}`,
                 {
                   headers: {
                     Authorization: `Bearer ${token}`,
@@ -226,7 +226,7 @@ const Checkout = () => {
     try {
       // Send order data to the server
       const response = await axios.post(
-        "https://ustp-eccom-server.vercel.app/api//insert-order",
+        "https://ustp-eccom-server.vercel.app/api/insert-order",
         orderData,
         {
           headers: {
@@ -263,7 +263,7 @@ const Checkout = () => {
   const recordProductInteraction = async (payload) => {
     try {
       console.log("Recording product interaction:", payload);
-      await axios.get("https://ustp-eccom-server.vercel.app/api//products-interaction", {
+      await axios.get("https://ustp-eccom-server.vercel.app/api/products-interaction", {
         params: payload,
       });
       console.log("Product interaction recorded successfully.");
