@@ -389,104 +389,100 @@ router.get('/admin-order-history-payment', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 });
-
 router.get('/admin-order-history-general', async (req, res) => {
     try {
         const { status, searchTerm, exportToExcel, page = 1 } = req.query;
-        const pageSize = 20;  // Define the number of results per page
+        const pageSize = 20;
         const offset = (page - 1) * pageSize;
 
-        // Define the query for fetching order history and newly created products in the last week
+        // Base query with backticks to escape `order` (reserved keyword)
         let query = `
-        (
-            -- Existing order details query
-            SELECT
-                product.product_name, 
-                order_details.order_details_id, 
-                order_details.product_id, 
-                order_details.order_date, 
-                order_details.payment_method, 
-                order_details.total_price AS order_details_total_price, 
-                order_details.quantity AS order_quantity, 
-                order_details.payment_status, 
-                product.price, 
-                order_details.order_status, 
-                \`order\`.total_price AS order_total_price, 
-                shipment.shipment_id, 
-                category.category_name, 
-                product.quantity AS product_quantity, 
-                \`order\`.order_id, 
-                users.customer_id, 
-                product.product_code, 
-                product.created_at, 
-                product.product_update
-            FROM
-                \`order\`
+            (
+                SELECT
+                    product.product_name,
+                    order_details.order_details_id,
+                    order_details.product_id,
+                    order_details.order_date,
+                    order_details.payment_method,
+                    order_details.total_price AS order_details_total_price,
+                    order_details.quantity AS order_quantity,
+                    order_details.payment_status,
+                    product.price,
+                    order_details.order_status,
+                    \`order\`.total_price AS order_total_price,
+                    shipment.shipment_id,
+                    category.category_name,
+                    product.quantity AS product_quantity,
+                    \`order\`.order_id,
+                    users.customer_id,
+                    product.product_code,
+                    product.created_at,
+                    product.product_update
+                FROM
+                    \`order\`
                 INNER JOIN order_details ON \`order\`.order_id = order_details.order_id
                 INNER JOIN product ON order_details.product_id = product.product_code
                 INNER JOIN users ON \`order\`.customer_id = users.customer_id
                 INNER JOIN shipment ON \`order\`.order_id = shipment.order_id
                 INNER JOIN category ON product.category_id = category.category_id
-        )
-        UNION ALL
-        (
-            -- Newly created products query
-            SELECT
-                product.product_name, 
-                NULL AS order_details_id, 
-                product.product_code AS product_id, 
-                NULL AS order_date, 
-                NULL AS payment_method, 
-                NULL AS order_details_total_price, 
-                NULL AS order_quantity, 
-                NULL AS payment_status, 
-                product.price, 
-                NULL AS order_status, 
-                NULL AS order_total_price, 
-                NULL AS shipment_id, 
-                category.category_name, 
-                product.quantity AS product_quantity, 
-                NULL AS order_id, 
-                product.customer_id, 
-                product.product_code, 
-                product.created_at, 
-                product.product_update
-            FROM
-                product
+            )
+            UNION ALL
+            (
+                SELECT
+                    product.product_name,
+                    NULL AS order_details_id,
+                    product.product_code AS product_id,
+                    NULL AS order_date,
+                    NULL AS payment_method,
+                    NULL AS order_details_total_price,
+                    NULL AS order_quantity,
+                    NULL AS payment_status,
+                    product.price,
+                    NULL AS order_status,
+                    NULL AS order_total_price,
+                    NULL AS shipment_id,
+                    category.category_name,
+                    product.quantity AS product_quantity,
+                    NULL AS order_id,
+                    product.customer_id,
+                    product.product_code,
+                    product.created_at,
+                    product.product_update
+                FROM
+                    product
                 INNER JOIN category ON product.category_id = category.category_id
-            WHERE
-                product.created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-        )
-        ORDER BY
-            created_at DESC
-        LIMIT ? OFFSET ?;
+                WHERE
+                    product.created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+            )
         `;
 
-        // Add filters to the query if necessary
+        // Conditions and filtering
         const conditions = [];
+        const queryParams = [];
+
         if (status) {
             conditions.push('order_details.payment_status = ?');
+            queryParams.push(status);
         }
+
         if (searchTerm) {
-            conditions.push(`(users.first_name LIKE ? OR users.last_name LIKE ? OR \`order\`.order_id LIKE ?)`);
+            conditions.push(`(
+                users.first_name LIKE ? OR 
+                users.last_name LIKE ? OR 
+                \`order\`.order_id LIKE ?
+            )`);
+            queryParams.push(`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`);
         }
 
-        if (conditions.length) {
-            query = query.replace('ORDER BY created_at DESC', `WHERE ${conditions.join(' AND ')} ORDER BY created_at DESC`);
-        }
+        const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
 
-        // Prepare query parameters
-        const queryParams = [
-            ...(status ? [status] : []),
-            ...(searchTerm ? [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`] : []),
-            pageSize,
-            offset
-        ];
+        query = `SELECT * FROM (${query}) as combined_query ${whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?`;
+        queryParams.push(pageSize, offset);
 
-        // Execute the query
+        // Execute query
         const [orders] = await db.query(query, queryParams);
 
-        // Group orders by order_id without recalculating total_price
+        // Group orders by order_id
         const groupedOrders = orders.reduce((acc, order) => {
             if (!acc[order.order_id]) {
                 acc[order.order_id] = {
@@ -494,103 +490,65 @@ router.get('/admin-order-history-general', async (req, res) => {
                     order_date: order.order_date,
                     order_total: order.order_total_price,
                     order_status: order.order_status,
-                    order_update: order.order_update,
                     payment_status: order.payment_status,
                     payment_method: order.payment_method,
                     shipment_id: order.shipment_id,
                     customer_id: order.customer_id,
-                    customer_first_name: order.first_name,
-                    customer_last_name: order.last_name,
-                    customer_email: order.email,
-                    customer_phone: order.phone_number,
-                    customer_address: {
-                        street_name: order.street_name,
-                        region: order.region,
-                        postal_code: order.postal_code,
-                    },
                     products: []
                 };
             }
-
-            // Add the current product to the products array, including both quantities
             acc[order.order_id].products.push({
-                order_details_id: order.order_details_id,
-                payment_date: order.payment_date,
                 product_id: order.product_id,
                 product_name: order.product_name,
-                product_code: order.product_code,
                 category_name: order.category_name,
                 product_quantity: order.product_quantity,
                 order_quantity: order.order_quantity,
                 price: order.price,
-                quantity: order.order_quantity,
-                item_total: order.order_details_total_price,
-                payment_status: order.payment_status,
-                payment_method: order.payment_method,
-                product_customer_id: order.product_customer_id,
+                item_total: order.order_details_total_price
             });
-
             return acc;
         }, {});
 
         const ordersArray = Object.values(groupedOrders);
 
-        // Export to Excel if requested
+        // Handle Excel export
         if (exportToExcel === 'true') {
             const workbook = new ExcelJS.Workbook();
             const worksheet = workbook.addWorksheet('Orders');
 
             worksheet.columns = [
-                { header: 'Product Code', key: 'product_code', width: 15 },
+                { header: 'Order ID', key: 'order_id', width: 15 },
+                { header: 'Customer ID', key: 'customer_id', width: 15 },
                 { header: 'Product Name', key: 'product_name', width: 30 },
                 { header: 'Category', key: 'category_name', width: 20 },
-                { header: 'Order Quantity', key: 'order_quantity', width: 15 },
+                { header: 'Quantity', key: 'order_quantity', width: 15 },
                 { header: 'Price', key: 'price', width: 15 },
-                { header: 'Total Price', key: 'total_price', width: 15 },
-                { header: 'Date', key: 'order_date', width: 20 },
-                { header: 'Current Quantity', key: 'current_quantity', width: 15 },
-                { header: 'Running Balance', key: 'running_balance', width: 20 },
-                { header: 'Order ID', key: 'order_id', width: 10 },
-                { header: 'Customer ID', key: 'customer_id', width: 15 },
-                { header: 'Shipment ID', key: 'shipment_id', width: 15 },
-                { header: 'Payment Status', key: 'payment_status', width: 15 },
+                { header: 'Total', key: 'item_total', width: 20 }
             ];
 
             ordersArray.forEach(order => {
                 order.products.forEach(product => {
                     worksheet.addRow({
-                        product_code: product.product_code,
+                        order_id: order.order_id,
+                        customer_id: order.customer_id,
                         product_name: product.product_name,
                         category_name: product.category_name,
                         order_quantity: product.order_quantity,
                         price: product.price,
-                        total_price: product.item_total,
-                        order_date: new Date(order.order_date).toLocaleDateString(),
-                        current_quantity: product.product_quantity,
-                        running_balance: product.product_quantity - product.order_quantity,
-                        order_id: order.order_id,
-                        customer_id: `${order.customer_id}`,
-                        shipment_id: order.shipment_id,
-                        payment_status: product.payment_status,
+                        item_total: product.item_total
                     });
                 });
             });
 
-            // Send the Excel file
-            res.setHeader(
-                'Content-Type',
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            );
+            res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             res.setHeader('Content-Disposition', 'attachment; filename=orders.xlsx');
-
             await workbook.xlsx.write(res);
             res.end();
             return;
         }
 
-        // Return the order data in JSON format
+        // Return JSON response
         res.json({ orders: ordersArray });
-
     } catch (error) {
         console.error('Error fetching order history:', error.message);
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
