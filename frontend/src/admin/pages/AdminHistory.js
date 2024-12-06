@@ -26,15 +26,11 @@ const AdminHistory = () => {
       const response = await axios.get('https://ustp-eccom-server.vercel.app/api/admin-order-history-general-records', {
         params: { status, searchTerm, sortBy }
       });
-
-      // Ensure response has a valid 'orders' array
-      const fetchedOrders = response.data.orders || []; // Default to empty array if not present
-      setOrders(fetchedOrders);  // Set state with the valid array
+      setOrders(response.data.orders);
     } catch (error) {
       console.error('Error fetching orders:', error.message);
     }
   };
-
 
   useEffect(() => {
     fetchOrders();
@@ -50,8 +46,6 @@ const AdminHistory = () => {
     setIsMobile(window.innerWidth <= 425);
   };
 
-
-
   const highlightText = (text, searchTerm) => {
     if (!searchTerm) return text;
 
@@ -65,7 +59,7 @@ const AdminHistory = () => {
     );
   };
 
-  const filteredOrders = orders.filter(order => {
+  const filteredOrders = (orders || []).filter(order => {
     const search = searchTerm.toLowerCase();
 
     return (
@@ -78,6 +72,7 @@ const AdminHistory = () => {
       (order.order_total?.toString() ?? '').toLowerCase().includes(search)
     );
   });
+
 
   const sortOrders = (orders) => {
     return [...orders].sort((a, b) => {
@@ -204,34 +199,29 @@ const AdminHistory = () => {
                     <th>Date</th>
                     <th>Current Quantity</th>
                     <th>Running Balance</th>
-                    <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {orders.map((order) => (
-                    order.products.map((product, index) => (
+                  {(orders || []).map((order) => (
+                    (order.products || []).map((product, index) => (
                       <tr key={`${order.order_id}-${product.product_id}-${index}`}>
                         <td><input type="checkbox" /></td>
                         <td>{highlightText(order.customer_id?.toString() ?? 'N/A', searchTerm)}</td>
                         <td>{highlightText(order.order_id?.toString() ?? 'N/A', searchTerm)}</td>
-                        <td>{highlightText(order.shipment_id?.toString() ?? 'Not Available', searchTerm)}</td>
+                        <td>{highlightText(order.shipment?.shipment_id?.toString() ?? 'Not Available', searchTerm)}</td>
                         <td>{highlightText(product.product_id?.toString() ?? 'N/A', searchTerm)}</td>
-                        <td>{highlightText(product.product_name ?? 'N/A', searchTerm)}</td>
+                        <td>{highlightText(product.product_name, searchTerm)}</td>
                         <td>{highlightText(product.category_name ?? 'N/A', searchTerm)}</td>
-                        <td>{highlightText(product.order_quantity?.toString() ?? 'N/A', searchTerm)}</td>
+                        <td>{highlightText(product.quantity?.toString() ?? 'N/A', searchTerm)}</td>
                         <td>₱{highlightText(product.price?.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? 'N/A', searchTerm)}</td>
                         <td>₱{highlightText(product.item_total?.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? 'N/A', searchTerm)}</td>
                         <td>{highlightText(new Date(order.order_date).toLocaleDateString(), searchTerm)}</td>
-                        <td>{highlightText(product.product_quantity?.toString() ?? 'N/A', searchTerm)}</td>
-                        <td>{highlightText((product.product_quantity - product.order_quantity)?.toString() ?? 'N/A', searchTerm)}</td>
-                        <td>{highlightText((product.product_quantity - product.order_quantity)?.toString() ?? 'N/A', searchTerm)}</td>
-                        <td>{highlightText(product.payment_status ?? 'N/A', searchTerm)}</td> {/* Payment Status */}
-
+                        <td>{highlightText(product.current_quantity?.toString() ?? 'N/A', searchTerm)}</td>
+                        <td>{highlightText(product.running_balance?.toString() ?? 'N/A', searchTerm)}</td>
                       </tr>
                     ))
                   ))}
                 </tbody>
-
 
 
               </table>
