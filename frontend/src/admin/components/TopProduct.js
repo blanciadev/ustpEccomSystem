@@ -7,7 +7,7 @@ const TopProduct = () => {
   useEffect(() => {
     const fetchTopProducts = async () => {
       try {
-        const response = await fetch('http://localhost:5001/api/top-products');
+        const response = await fetch('https://ustp-eccom-server.vercel.app/api/top-products');
         const result = await response.json();
         setData(result.products);
       } catch (error) {

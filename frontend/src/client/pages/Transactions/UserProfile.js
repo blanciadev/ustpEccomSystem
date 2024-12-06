@@ -31,7 +31,7 @@ const UserProfile = () => {
       window.addEventListener('resize', handleResize);
 
       try {
-        const response = await axios.post('http://localhost:5001/api//users-details', { customer_id: customerId }, {
+        const response = await axios.post('https://ustp-eccom-server.vercel.app/api//users-details', { customer_id: customerId }, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -80,7 +80,7 @@ const UserProfile = () => {
     console.log(updatedData);
 
     try {
-      const response = await axios.put('http://localhost:5001/api//users-details', updatedData, {
+      const response = await axios.put('https://ustp-eccom-server.vercel.app/api//users-details', updatedData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -119,7 +119,7 @@ const UserProfile = () => {
     };
 
     try {
-      const response = await axios.put('http://localhost:5001/api//update-password', passwordData, {
+      const response = await axios.put('https://ustp-eccom-server.vercel.app/api//update-password', passwordData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

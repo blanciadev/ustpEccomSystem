@@ -31,7 +31,7 @@ const Inventory = () => {
   const fetchProductStatistics = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5001/api/admin-products-with-interaction"
+        "https://ustp-eccom-server.vercel.app/api/admin-products-with-interaction"
       );
       const {
         total,
@@ -61,7 +61,7 @@ const Inventory = () => {
 
   const fetchProductNames = async () => {
     try {
-      const response = await axios.get("http://localhost:5001/api/admin-products-inventory");
+      const response = await axios.get("https://ustp-eccom-server.vercel.app/api/admin-products-inventory");
       setProductNames(response.data);
       console.log("Product Names:", response.data);
     } catch (error) {
@@ -71,7 +71,7 @@ const Inventory = () => {
 
   // const fetchInventoryItems = async () => {
   //   try {
-  //     const response = await axios.get("http://localhost:5001/api/admin-inventory");
+  //     const response = await axios.get("https://ustp-eccom-server.vercel.app/api/admin-inventory");
   //     setInventoryItems(response.data);
   //     console.log("Inventory Items:", response.data);
   //   } catch (error) {
@@ -93,7 +93,7 @@ const Inventory = () => {
 
   const ExportButton = () => {
     const handleExport = () => {
-      const url = 'http://localhost:5001/api/admin-products-inventory?export=excel';
+      const url = 'https://ustp-eccom-server.vercel.app/api/admin-products-inventory?export=excel';
 
       const link = document.createElement('a');
       link.href = url;

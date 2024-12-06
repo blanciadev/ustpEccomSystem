@@ -43,7 +43,7 @@ const Products = () => {
 
   const fetchProduct = async () => {
     try {
-      const response = await axios.get("http://localhost:5001/api/admin-products");
+      const response = await axios.get("https://ustp-eccom-server.vercel.app/api/admin-products");
       setProducts(response.data);
       setFilteredProducts(response.data);
     } catch (error) {
@@ -67,7 +67,7 @@ const Products = () => {
   const fetchProductStatistics = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5001/api/admin-products-with-interaction"
+        "https://ustp-eccom-server.vercel.app/api/admin-products-with-interaction"
       );
       const {
         total,
@@ -124,7 +124,7 @@ const Products = () => {
 
   const handleAddProduct = async (newProduct) => {
     try {
-      await axios.post("http://localhost:5001/api/admin-products", newProduct);
+      await axios.post("https://ustp-eccom-server.vercel.app/api/admin-products", newProduct);
       handleCloseAddModal();
       fetchProduct();
     } catch (error) {

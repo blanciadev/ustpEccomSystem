@@ -39,7 +39,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5001/api/users-signup', {
+      const response = await fetch('https://ustp-eccom-server.vercel.app/api/users-signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -73,7 +73,7 @@ const Signup = () => {
     const token = credentialResponse.credential;
 
     try {
-      const response = await axios.post('http://localhost:5001/api/google-signup', { token });
+      const response = await axios.post('https://ustp-eccom-server.vercel.app/api/google-signup', { token });
 
 
       if (response.status === 200) {

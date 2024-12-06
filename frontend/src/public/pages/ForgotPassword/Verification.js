@@ -79,7 +79,7 @@ const Verification = () => {
 
     try {
       // Send token to the backend for verification
-      const response = await axios.post('http://localhost:5001/api/verify-reset-token', { email, token });
+      const response = await axios.post('https://ustp-eccom-server.vercel.app/api/verify-reset-token', { email, token });
 
       // Handle success (redirect to reset password page or similar)
       if (response.data.success) {

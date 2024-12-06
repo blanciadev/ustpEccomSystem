@@ -1,5 +1,5 @@
 export const listenForDatabaseChanges = () => {
-    const eventSource = new EventSource('http://localhost:5001/api/events');
+    const eventSource = new EventSource('https://ustp-eccom-server.vercel.app/api/events');
 
     return eventSource;
 };

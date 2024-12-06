@@ -11,7 +11,7 @@ const SalesOrders = () => {
   useEffect(() => {
     const fetchSalesData = async () => {
       try {
-        const response = await fetch('http://localhost:5001/api/sales');
+        const response = await fetch('https://ustp-eccom-server.vercel.app/api/sales');
         const data = await response.json();
 
 

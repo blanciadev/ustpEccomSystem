@@ -35,7 +35,7 @@ const Users = () => {
     const fetchUsers = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5001/api/admin-users-report"
+          "https://ustp-eccom-server.vercel.app/api/admin-users-report"
         );
         setUsers(response.data.data);
         setLoading(false);

@@ -31,7 +31,7 @@ const ChangePassword = () => {
 
     try {
       // Send email and new password to the backend
-      const response = await axios.post('http://localhost:5001/api/password-reset', { email, password });
+      const response = await axios.post('https://ustp-eccom-server.vercel.app/api/password-reset', { email, password });
 
       // Handle success or error response
       if (response.data.message === 'Password updated successfully') {

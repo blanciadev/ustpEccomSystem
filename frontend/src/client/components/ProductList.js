@@ -117,7 +117,7 @@ const ProductList = ({ stickyComponents }) => {
         }
 
         try {
-            const response = await axios.get(`http://localhost:5001/api//sticky-components`, {
+            const response = await axios.get(`https://ustp-eccom-server.vercel.app/api//sticky-components`, {
                 params: formData
             });
             console.log('Form data being sent:', formData);
@@ -171,7 +171,7 @@ const ProductList = ({ stickyComponents }) => {
         console.log("payload", payload);
 
         try {
-            const response = await axios.get('http://localhost:5001/api//products-interaction', { params: payload });
+            const response = await axios.get('https://ustp-eccom-server.vercel.app/api//products-interaction', { params: payload });
 
             console.log('API response:', response.data);
         } catch (error) {
@@ -189,7 +189,7 @@ const ProductList = ({ stickyComponents }) => {
         const fetchProducts = async () => {
             setLoading(true);
             try {
-                const response = await axios.get(`http://localhost:5001/api//products`);
+                const response = await axios.get(`https://ustp-eccom-server.vercel.app/api//products`);
                 setProducts(response.data);
                 setError(null);
                 setShowHaircareHeading(true); // Show the heading
@@ -202,7 +202,7 @@ const ProductList = ({ stickyComponents }) => {
 
         const fetchTopPicks = async () => {
             try {
-                const response = await axios.get('http://localhost:5001/api//products-top-picks');
+                const response = await axios.get('https://ustp-eccom-server.vercel.app/api//products-top-picks');
                 // Limit to top 4 picks if there are more
                 const limitedPicks = response.data.slice(0, 5);
                 setTopPicks(limitedPicks);
@@ -245,7 +245,7 @@ const ProductList = ({ stickyComponents }) => {
         const recordProductInteraction = async () => {
             try {
                 console.log('Recording product interaction:', payload);
-                const response = await axios.get('http://localhost:5001/api//products-interaction', { params: payload });
+                const response = await axios.get('https://ustp-eccom-server.vercel.app/api//products-interaction', { params: payload });
                 console.log('Product interaction response:', response.data);
             } catch (error) {
                 console.error('Error recording product interaction:', error);
@@ -303,7 +303,7 @@ const ProductList = ({ stickyComponents }) => {
 
         try {
             console.log('User is logged in, adding item to server-side cart');
-            const response = await axios.post('http://localhost:5001/api//add-to-cart', {
+            const response = await axios.post('https://ustp-eccom-server.vercel.app/api//add-to-cart', {
                 customer_id: customerId,
                 product_code: product.product_code,
                 quantity,

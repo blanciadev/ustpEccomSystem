@@ -16,7 +16,7 @@ const RequestResetPassword = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5001/api/request-reset-password', { email });
+      const response = await axios.post('https://ustp-eccom-server.vercel.app/api/request-reset-password', { email });
       localStorage.setItem('resetEmail', email);
       setToastMessage(response.data.message);
 

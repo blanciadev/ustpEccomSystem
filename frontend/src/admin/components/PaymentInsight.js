@@ -14,7 +14,7 @@ const PaymentInsight = () => {
     useEffect(() => {
         const fetchPaymentInsight = async () => {
             try {
-                const response = await axios.get('http://localhost:5001/api/payment-insight');
+                const response = await axios.get('https://ustp-eccom-server.vercel.app/api/payment-insight');
                 setMonthlyCounts(response.data.monthlyCounts);
             } catch (error) {
                 console.error('Error fetching payment insight:', error);

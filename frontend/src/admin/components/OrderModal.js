@@ -34,7 +34,7 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
       }
 
       await axios.put(
-        `http://localhost:5001/api/update-order-status/${order.order_id}`,
+        `https://ustp-eccom-server.vercel.app/api/update-order-status/${order.order_id}`,
         {
           status,
           products,
