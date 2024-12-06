@@ -33,33 +33,32 @@ const Transactions = () => {
     fetchOrders();
   }, [status]);
 
-  const filteredOrders = orders.filter((order) => {
+  const filteredOrders = (orders || []).filter((order) => {
     const search = searchTerm.toLowerCase();
     return (
-      order.products.some((product) =>
+      order.products?.some((product) =>
         [
           product.product_code,
           product.product_name,
           product.category_name,
-          product.order_quantity,
-          product.price,
-          product.item_total,
-          product.product_quantity,
-          (
-            product.product_quantity - product.order_quantity
-          ),
-        ].some((field) => field.toLowerCase().includes(search))
+          product.order_quantity?.toString(),
+          product.price?.toString(),
+          product.item_total?.toString(),
+          product.product_quantity?.toString(),
+          (product.product_quantity - product.order_quantity)?.toString(),
+        ].some((field) => field?.toLowerCase().includes(search))
       ) ||
       [
-        order.order_id,
-        order.customer_id,
-        `${order.customer_first_name} ${order.customer_last_name}`,
-        new Date(order.order_date).toLocaleDateString(),
-        order.order_status,
-        order.payment_status,
-      ].some((field) => field.toLowerCase().includes(search))
+        order.order_id?.toString(),
+        order.customer_id?.toString(),
+        `${order.customer_first_name} ${order.customer_last_name}`.toLowerCase(),
+        new Date(order.order_date).toLocaleDateString().toLowerCase(),
+        order.order_status?.toLowerCase(),
+        order.payment_status?.toLowerCase(),
+      ].some((field) => field?.includes(search))
     );
   });
+
 
   const sortOrders = (orders) => {
     return [...orders].sort((a, b) => {
@@ -85,7 +84,7 @@ const Transactions = () => {
   const handlePrintOrders = async () => {
     try {
       const response = await axios.get(
-        "https://ustp-eccom-server.vercel.app/api/admin-order-history-general",
+        "http://localhost:5001/admin-order-history-general",
         {
           params: { exportToExcel: "true" },
           responseType: "blob",

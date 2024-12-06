@@ -23,7 +23,7 @@ const AdminHistory = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get('http://localhost:5001/admin-order-history-general', {
+      const response = await axios.get('https://ustp-eccom-server.vercel.app/api/admin-order-history-general', {
         params: { status, searchTerm, sortBy }
       });
       setOrders(response.data.orders);
@@ -78,13 +78,13 @@ const AdminHistory = () => {
     const search = searchTerm.toLowerCase();
 
     return (
-      order.order_id.toString().toLowerCase().includes(search) ||
-      order.customer_id.toString().toLowerCase().includes(search) ||
+      (order.order_id?.toString() ?? '').toLowerCase().includes(search) ||
+      (order.customer_id?.toString() ?? '').toLowerCase().includes(search) ||
       `${order.customer_first_name} ${order.customer_last_name}`.toLowerCase().includes(search) ||
       new Date(order.order_date).toLocaleDateString().toLowerCase().includes(search) ||
       order.order_status.toLowerCase().includes(search) ||
       order.payment_status.toLowerCase().includes(search) ||
-      order.order_total.toString().toLowerCase().includes(search)
+      (order.order_total?.toString() ?? '').toLowerCase().includes(search)
     );
   });
 
@@ -113,7 +113,7 @@ const AdminHistory = () => {
 
   const handlePrintOrders = async () => {
     try {
-      const response = await axios.get('http://localhost:5001/admin-order-history', {
+      const response = await axios.get('https://ustp-eccom-server.vercel.app/api/admin-order-history', {
         params: { exportToExcel: 'true' },
         responseType: 'blob',
       });
@@ -213,7 +213,6 @@ const AdminHistory = () => {
                     <th>Date</th>
                     <th>Current Quantity</th>
                     <th>Running Balance</th>
-
                   </tr>
                 </thead>
                 <tbody>
@@ -221,20 +220,20 @@ const AdminHistory = () => {
                     order.products.map((product, index) => (
                       <tr key={`${order.order_id}-${product.product_id}-${index}`}>
                         <td><input type="checkbox" /></td>
-                        <td>{highlightText(order.customer_id.toString(), searchTerm)}</td>
-                        <td>{highlightText(order.order_id.toString(), searchTerm)}</td>
-                        <td>{highlightText(order.shipment_id ? order.shipment_id.toString() : 'Not Available', searchTerm)}</td>
-                        <td>{highlightText(product.product_code.toString(), searchTerm)}</td>
+                        <td>{highlightText(order.customer_id?.toString() ?? 'N/A', searchTerm)}</td>
+                        <td>{highlightText(order.order_id?.toString() ?? 'N/A', searchTerm)}</td>
+                        <td>{highlightText(order.shipment_id?.toString() ?? 'Not Available', searchTerm)}</td>
+                        <td>{highlightText(product.product_code?.toString() ?? 'N/A', searchTerm)}</td>
                         <td>{highlightText(product.product_name, searchTerm)}</td>
                         <td>{highlightText(product.category_name, searchTerm)}</td>
-                        <td>{highlightText(product.order_quantity.toString(), searchTerm)}</td>
-                        <td>₱{highlightText(product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), searchTerm)}</td>
-                        <td>₱{highlightText(product.item_total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), searchTerm)}</td>
+                        <td>{highlightText(product.order_quantity?.toString() ?? 'N/A', searchTerm)}</td>
+                        <td>₱{highlightText(product.price?.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? 'N/A', searchTerm)}</td>
+                        <td>₱{highlightText(product.item_total?.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? 'N/A', searchTerm)}</td>
                         <td>{highlightText(new Date(order.order_date).toLocaleDateString(), searchTerm)}</td>
-                        <td>{highlightText(product.product_quantity.toString(), searchTerm)}</td>
+                        <td>{highlightText(product.product_quantity?.toString() ?? 'N/A', searchTerm)}</td>
                         <td>
                           {highlightText(
-                            (product.product_quantity - product.order_quantity).toString(),
+                            (product.product_quantity - product.order_quantity)?.toString() ?? 'N/A',
                             searchTerm
                           )}
                         </td>
@@ -243,23 +242,29 @@ const AdminHistory = () => {
                   ))}
                 </tbody>
               </table>
-
-              <div className='pagination'>
-                {Array.from({ length: totalPages }, (_, index) => (
-                  <button
-                    key={index + 1}
-                    onClick={() => handlePageChange(index + 1)}
-                    className={index + 1 === currentPage ? 'active' : ''}
-                  >
-                    {index + 1}
-                  </button>
-                ))}
+              <div className="pagination">
+                <button onClick={() => handlePageChange(1)}>&lt;&lt;</button>
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  &lt;
+                </button>
+                <span>
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  &gt;
+                </button>
+                <button onClick={() => handlePageChange(totalPages)}>&gt;&gt;</button>
               </div>
             </div>
           </div>
         </div>
       </div>
-
     </div>
   );
 };
