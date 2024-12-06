@@ -349,4 +349,6 @@ const CartContent = () => {
   );
 };
 
+// added support in cart calculations
+
 export default CartContent;
