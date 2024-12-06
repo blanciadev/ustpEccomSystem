@@ -10,7 +10,7 @@ const ProductStatistics = ({
 }) => {
     return (
         <div className='product-qty'>
-            
+
             <div className='best-selling'>
                 <div className='qty'>
                     <i className='bx bxs-spa'></i>

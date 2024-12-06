@@ -5,7 +5,7 @@ const db = require('../db');
 router.get('/products', async (req, res) => {
     try {
         const [rows] = await db.query(`
-          SELECT 
+         SELECT 
     p.product_id, 
     p.product_code, 
     p.product_name, 
@@ -39,10 +39,8 @@ GROUP BY
     p.product_discount, 
     p.product_status
 ORDER BY 
-    view_count DESC, 
-    cart_count DESC, 
-    order_count DESC
-    
+    RAND()
+
         `);
 
         res.json(rows);
