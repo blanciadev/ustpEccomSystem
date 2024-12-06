@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 // import '../public.css';
 // import '../../App.css'
 import './Signup.css';
@@ -23,7 +23,7 @@ const Signup = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const navigate = useNavigate();
+//   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -61,7 +61,8 @@ const Signup = () => {
         setPassword('');
         setConfirmPassword('');
 
-        navigate('/login');
+        window.location.href = '/login';
+        // navigate('/login');
       }
     } catch (error) {
       setError('Error during signup');
@@ -92,12 +93,14 @@ const Signup = () => {
           localStorage.setItem('role', response.data.role_type);
           localStorage.setItem('profile_img', response.data.profile_img);
 
-          navigate('/forgot-password');
+        window.location.href = '/forgot-password';
+        // navigate('/forgot-password');
           console.log(token);
         } else {
 
           console.log('Google signup ');
-          navigate('/signup');
+        window.location.href = '/signup';
+        // navigate('/signup');
         }
       }
     } catch (err) {

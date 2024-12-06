@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 // import '../../App.css'
 import './Login.css';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import ToastNotification from '../components/ToastNotification';
 import { GoogleLogin } from '@react-oauth/google';
 import start from '../../assets/start.png'
@@ -16,7 +16,7 @@ const Login = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [loginStatus, setLoginStatus] = useState('');
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const [toastMessage, setToastMessage] = useState('');
 
     const handleSubmit = async (e) => {
@@ -39,13 +39,19 @@ const Login = () => {
                 const redirectTo = localStorage.getItem('redirectTo');
                 if (redirectTo) {
                     localStorage.removeItem('redirectTo');
-                    navigate(redirectTo);
+                    window.location.href = redirectTo;
+
+                    // navigate(redirectTo);
                 } else {
                     const roleType = response.data.role_type;
                     if (roleType === 'Admin' || roleType === 'Warehouse Manager') {
-                        navigate('/admin/dashboard');
+                        window.location.href = '/admin/dashboard';
+
+                        // navigate('/admin/dashboard');
                     } else {
-                        navigate('/');
+                    window.location.href = '/';
+
+                        // navigate('/');
                     }
 
                 }
@@ -99,11 +105,14 @@ const Login = () => {
                     localStorage.setItem('role', response.data.role_type);
                     localStorage.setItem('profile_img', response.data.profile_img);
 
-
-                    navigate('/');
+                    window.location.href = '/';
+                    
+                    // navigate('/');
                     console.log(token);
                 } else {
-                    navigate('/signup');
+                    window.location.href = '/signup';
+
+                    // navigate('/signup');
                 }
             }
         } catch (err) {

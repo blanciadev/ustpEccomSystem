@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Forgot.css';
 import ToastNotification from '../../components/ToastNotification';
@@ -10,7 +10,7 @@ const ChangePassword = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
-  const navigate = useNavigate();
+//   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,7 +38,8 @@ const ChangePassword = () => {
         setToastMessage('Password successfully changed!');
         setTimeout(() => {
           setToastMessage('');
-          navigate('/login');
+        window.location.href = '/login';
+        // navigate('/login');
         }, 3000);
       } else {
         setToastMessage(response.data.message || 'Failed to update password.');

@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import "./Transaction.css";
 import Navigation from "../../components/Navigation";
 import Footer from "../../components/Footer";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
 import ToastNotification from "../../../public/components/ToastNotification";
 
 const Checkout = () => {
   const location = useLocation();
-  const navigate = useNavigate();
+//   const navigate = useNavigate();
 
   const customerId = localStorage.getItem("customer_id");
   const authToken = localStorage.getItem("token");
@@ -147,8 +147,9 @@ const Checkout = () => {
       setToastMessage("Redirecting to Cart");
       setTimeout(() => {
         setToastMessage("");
+        window.location.href = '/cart';
 
-        navigate("/cart");
+        // navigate("/cart");
       }, 3000);
     }
 
@@ -167,7 +168,9 @@ const Checkout = () => {
     // Redirect to login if token is missing
     if (!token) {
       localStorage.setItem("redirectTo", "/checkout");
-      navigate("/login");
+      window.location.href = '/login';
+
+    //   navigate("/login");
       return;
     }
 
@@ -245,7 +248,9 @@ const Checkout = () => {
         setToastMessage("Order Successful!");
         setTimeout(() => {
           setToastMessage("");
-          navigate("/user/purchase");
+        window.location.href = '/user/purchase';
+
+        //   navigate("/user/purchase");
         }, 3000);
 
         console.log("Toast should display T-T");

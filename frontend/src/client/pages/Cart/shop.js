@@ -7,10 +7,10 @@ import ProductModal from '../../components/ProductModal';
 import ToastNotification from '../../../public/components/ToastNotification';
 import ClientHomeLoader from '../../../public/components/Loaders/ClientHomeLoader';
 
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const Shop = () => {
-    const navigate = useNavigate()
+    // const navigate = useNavigate()
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [loading, setLoading] = useState(true);

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import Navigation from '../../../client/components/Navigation';
 import ToastNotification from '../../components/ToastNotification';
 
@@ -9,7 +9,7 @@ const RequestResetPassword = () => {
   const [toastmessage, setToastMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [isFocused, setIsFocused] = useState(false); // State to manage focus
-  const navigate = useNavigate();
+//   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,7 +22,8 @@ const RequestResetPassword = () => {
 
       setTimeout(() => {
         setToastMessage('');
-        navigate('/verify');
+        window.location.href = '/verify';
+        // navigate('/verify');
       }, 3000);
     } catch (error) {
       console.error('Error sending reset token:', error);

@@ -4,7 +4,7 @@ import Navigation from "../../components/Navigation";
 import Footer from "../../components/Footer";
 import CartProduct from "../../components/CartProduct";
 import cartEventEmitter from "../../components/cartEventEmitter";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import ToastNotification from "../../../public/components/ToastNotification";
 import axios from "axios";
 
@@ -14,7 +14,7 @@ const CartContent = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
+//   const navigate = useNavigate();
   const [toastMessage, setToastMessage] = useState("");
 
   const isLoggedIn = !!localStorage.getItem("token");
@@ -164,15 +164,18 @@ const CartContent = () => {
       );
 
       localStorage.setItem("selectedProducts", JSON.stringify(updatedProducts));
+      localStorage.setItem("totalPrice", totalPrice);
 
+      
       if (!token) {
         localStorage.setItem("redirectTo", "/checkout");
-
-        navigate("/login");
+        window.location.href = '/login';
+        // navigate("/login");
       } else {
-        navigate("/checkout", {
-          state: { selectedProducts: updatedProducts, totalPrice },
-        });
+        window.location.href = '/checkout';
+        // navigate("/checkout", {
+        //   state: { selectedProducts: updatedProducts, totalPrice },
+        // });
       }
     } catch (error) {
       console.error("Error fetching product details:", error);

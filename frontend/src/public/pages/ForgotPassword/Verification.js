@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import './Forgot.css';
 import axios from 'axios'; // To handle API requests
-import { useNavigate } from 'react-router-dom'; // For navigation after successful submission
+// import { useNavigate } from 'react-router-dom'; // For navigation after successful submission
 import Navigation from '../../../client/components/Navigation';
 import ToastNotification from '../../components/ToastNotification';
 
@@ -18,7 +18,7 @@ const Verification = () => {
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [toastMessage, setToastMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const navigate = useNavigate();
+//   const navigate = useNavigate();
 
   // Handle input change
   const handleInputChange = (e, index) => {
@@ -89,7 +89,8 @@ const Verification = () => {
           setToastMessage('');
         }, 3000);
         setTimeout(() => {
-          navigate('/change-password');
+        window.location.href = '/change-password';
+        // navigate('/change-password');
         }, 2000);
       } else {
         setToastMessage(response.data.message || 'Invalid token, please try again.');
