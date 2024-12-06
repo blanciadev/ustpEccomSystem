@@ -180,7 +180,7 @@ const Payments = () => {
                   </div>
                 </div>
 
-                <div class="col-2">
+                <div class="col-1">
                   <div class="d-flex justify-content-center ">
                     {/* empty div */}
                   </div>
@@ -189,17 +189,13 @@ const Payments = () => {
                 <div class="col-3">
                   <div class=" d-flex justify-content-end">
                     <button onClick={exportToExcel} className="btn btn-primary">
-                      {isMobile ? (
-                        <i className="bx bx-printer"></i>
-                      ) : (
-                        "Export Payment Record"
-                      )}
+                      <i class="bx bx-export"></i> Export Payment Record
                     </button>
                   </div>
                 </div>
 
-                <div class="col-3">
-                  <div class="d-flex justify-content-end">
+                <div class="col-4">
+                  <div class="d-flex align-items-end justify-content-end">
                     <label htmlFor="statusFilter" className="me-2">
                       Filter By Status:
                     </label>
@@ -208,7 +204,8 @@ const Payments = () => {
                       id="statusFilter"
                       value={statusFilter}
                       onChange={handleStatusFilterChange}
-                      className=""
+                      className="form-select"
+                      style={{ width: "150px" }}
                     >
                       <option value="">All</option>
                       <option value="Pending">Pending</option>
@@ -228,9 +225,9 @@ const Payments = () => {
                     <table className="table table-hover">
                       <thead className="bg-light sticky-top">
                         <tr>
-                          <th>
+                          {/* <th>
                             <input type="checkbox" />
-                          </th>
+                          </th> */}
                           <th>Order ID</th>
                           <th>Customer ID</th>
                           <th>Payment Date</th>
@@ -243,9 +240,9 @@ const Payments = () => {
                       <tbody>
                         {paginatedOrders.map((order, index) => (
                           <tr key={index}>
-                            <td>
+                            {/* <td>
                               <input type="checkbox" />
-                            </td>
+                            </td> */}
                             <td>{order.order_id}</td>
                             <td>{order.customer_id}</td>
                             <td>

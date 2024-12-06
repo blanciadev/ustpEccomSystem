@@ -71,11 +71,11 @@ router.put('/admin-update-products/:product_code', async (req, res) => {
 router.get('/admin-order-history', async (req, res) => {
     try {
         const { status, searchTerm, exportToExcel, page = 1 } = req.query;
-        const pageSize = 10;  // Define the number of results per page
+        const pageSize = 10;
         const offset = (page - 1) * pageSize;
 
         let query = `
-        SELECT 
+        SELECT
             \`order\`.*, 
             product.product_name, 
             order_details.order_details_id, 
@@ -86,9 +86,8 @@ router.get('/admin-order-history', async (req, res) => {
             order_details.total_price AS order_details_total_price, 
             order_details.quantity, 
             order_details.payment_status, 
-            order_details.payment_method, 
             product.price, 
-            product.product_image,
+            product.product_image, 
             users.customer_id, 
             users.first_name, 
             users.last_name, 
@@ -98,15 +97,23 @@ router.get('/admin-order-history', async (req, res) => {
             users.region, 
             users.postal_code, 
             order_details.order_status, 
-            \`order\`.total_price AS order_total_price
+            \`order\`.total_price AS order_total_price, 
+            shipment.streetname, 
+            shipment.address, 
+            shipment.city
         FROM
             \`order\`
-        INNER JOIN order_details ON \`order\`.order_id = order_details.order_id
-        INNER JOIN product ON order_details.product_id = product.product_code
-        INNER JOIN users ON \`order\`.customer_id = users.customer_id
-        WHERE order_details.order_status != 'Completed'
-    `;
-
+        INNER JOIN
+            order_details ON \`order\`.order_id = order_details.order_id
+        INNER JOIN
+            product ON order_details.product_id = product.product_code
+        INNER JOIN
+            users ON \`order\`.customer_id = users.customer_id
+        INNER JOIN
+            shipment ON \`order\`.order_id = shipment.order_id
+        WHERE
+            order_details.order_status <> 'Completed'
+        `;
 
         // Add where clause if status or searchTerm is provided
         const conditions = [];
@@ -118,7 +125,7 @@ router.get('/admin-order-history', async (req, res) => {
         }
 
         if (conditions.length) {
-            query += ' WHERE ' + conditions.join(' AND ');
+            query += ' AND ' + conditions.join(' AND ');
         }
 
         query += ` ORDER BY \`order\`.order_date DESC LIMIT ? OFFSET ?`;
@@ -140,7 +147,6 @@ router.get('/admin-order-history', async (req, res) => {
                     order_date: order.order_date,
                     order_total: order.order_total_price,
                     order_status: order.order_status,
-                    order_date: order.order_date,
                     order_update: order.order_update,
                     payment_status: order.payment_status,
                     payment_method: order.payment_method,
@@ -154,10 +160,14 @@ router.get('/admin-order-history', async (req, res) => {
                         region: order.region,
                         postal_code: order.postal_code,
                     },
+                    shipment: {
+                        streetname: order.streetname,
+                        address: order.address,
+                        city: order.city
+                    },
                     products: []
                 };
             }
-            console.log(order.order_total_price);
             // Add the current product to the products array
             acc[order.order_id].products.push({
                 order_details_id: order.order_details_id,
@@ -176,6 +186,7 @@ router.get('/admin-order-history', async (req, res) => {
         }, {});
 
         const ordersArray = Object.values(groupedOrders);
+
 
         // If the exportToExcel query parameter is set, generate and send Excel file
         if (exportToExcel === 'true') {
@@ -379,56 +390,79 @@ router.get('/admin-order-history-payment', async (req, res) => {
     }
 });
 
-
-
 router.get('/admin-order-history-general', async (req, res) => {
     try {
         const { status, searchTerm, exportToExcel, page = 1 } = req.query;
         const pageSize = 20;  // Define the number of results per page
         const offset = (page - 1) * pageSize;
 
+        // Define the query for fetching order history and newly created products in the last week
         let query = `
-        SELECT
-            product.product_name, 
-            order_details.order_details_id, 
-            order_details.product_id, 
-            order_details.order_date, 
-            order_details.payment_method, 
-            order_details.total_price AS order_details_total_price, 
-            order_details.quantity AS order_quantity,  -- Order quantity per product
-            order_details.payment_status, 
-            product.price, 
-            order_details.order_status, 
-            \`order\`.total_price AS order_total_price, 
-            shipment.shipment_id, 
-            category.category_name, 
-            product.quantity AS product_quantity,  -- Total stock quantity of the product
-            \`order\`.order_id, 
-            users.customer_id,
-            product.product_code
-        FROM
-            \`order\`
-        INNER JOIN
-            order_details
-        ON 
-            \`order\`.order_id = order_details.order_id
-        INNER JOIN
-            product
-        ON 
-            order_details.product_id = product.product_code
-        INNER JOIN
-            users
-        ON 
-            \`order\`.customer_id = users.customer_id
-        INNER JOIN
-            shipment
-        ON 
-            \`order\`.order_id = shipment.order_id
-        INNER JOIN
-            category
-        ON 
-            product.category_id = category.category_id `;
+        (
+            -- Existing order details query
+            SELECT
+                product.product_name, 
+                order_details.order_details_id, 
+                order_details.product_id, 
+                order_details.order_date, 
+                order_details.payment_method, 
+                order_details.total_price AS order_details_total_price, 
+                order_details.quantity AS order_quantity, 
+                order_details.payment_status, 
+                product.price, 
+                order_details.order_status, 
+                \`order\`.total_price AS order_total_price, 
+                shipment.shipment_id, 
+                category.category_name, 
+                product.quantity AS product_quantity, 
+                \`order\`.order_id, 
+                users.customer_id, 
+                product.product_code, 
+                product.created_at, 
+                product.product_update
+            FROM
+                \`order\`
+                INNER JOIN order_details ON \`order\`.order_id = order_details.order_id
+                INNER JOIN product ON order_details.product_id = product.product_code
+                INNER JOIN users ON \`order\`.customer_id = users.customer_id
+                INNER JOIN shipment ON \`order\`.order_id = shipment.order_id
+                INNER JOIN category ON product.category_id = category.category_id
+        )
+        UNION ALL
+        (
+            -- Newly created products query
+            SELECT
+                product.product_name, 
+                NULL AS order_details_id, 
+                product.product_code AS product_id, 
+                NULL AS order_date, 
+                NULL AS payment_method, 
+                NULL AS order_details_total_price, 
+                NULL AS order_quantity, 
+                NULL AS payment_status, 
+                product.price, 
+                NULL AS order_status, 
+                NULL AS order_total_price, 
+                NULL AS shipment_id, 
+                category.category_name, 
+                product.quantity AS product_quantity, 
+                NULL AS order_id, 
+                product.customer_id, 
+                product.product_code, 
+                product.created_at, 
+                product.product_update
+            FROM
+                product
+                INNER JOIN category ON product.category_id = category.category_id
+            WHERE
+                product.created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+        )
+        ORDER BY
+            created_at DESC
+        LIMIT ? OFFSET ?;
+        `;
 
+        // Add filters to the query if necessary
         const conditions = [];
         if (status) {
             conditions.push('order_details.payment_status = ?');
@@ -438,11 +472,10 @@ router.get('/admin-order-history-general', async (req, res) => {
         }
 
         if (conditions.length) {
-            query += ' WHERE ' + conditions.join(' AND ');
+            query = query.replace('ORDER BY created_at DESC', `WHERE ${conditions.join(' AND ')} ORDER BY created_at DESC`);
         }
 
-        query += ` ORDER BY \`order\`.order_date DESC LIMIT ? OFFSET ?`;
-
+        // Prepare query parameters
         const queryParams = [
             ...(status ? [status] : []),
             ...(searchTerm ? [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`] : []),
@@ -450,6 +483,7 @@ router.get('/admin-order-history-general', async (req, res) => {
             offset
         ];
 
+        // Execute the query
         const [orders] = await db.query(query, queryParams);
 
         // Group orders by order_id without recalculating total_price
@@ -493,6 +527,7 @@ router.get('/admin-order-history-general', async (req, res) => {
                 item_total: order.order_details_total_price,
                 payment_status: order.payment_status,
                 payment_method: order.payment_method,
+                product_customer_id: order.product_customer_id,
             });
 
             return acc;
@@ -500,6 +535,7 @@ router.get('/admin-order-history-general', async (req, res) => {
 
         const ordersArray = Object.values(groupedOrders);
 
+        // Export to Excel if requested
         if (exportToExcel === 'true') {
             const workbook = new ExcelJS.Workbook();
             const worksheet = workbook.addWorksheet('Orders');
@@ -552,6 +588,7 @@ router.get('/admin-order-history-general', async (req, res) => {
             return;
         }
 
+        // Return the order data in JSON format
         res.json({ orders: ordersArray });
 
     } catch (error) {

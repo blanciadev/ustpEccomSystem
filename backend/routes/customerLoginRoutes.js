@@ -12,6 +12,70 @@ const saltRounds = 10;
 const TOKEN_EXPIRATION_TIME = 1900000;
 
 
+// router.post('/users-login', async (req, res) => {
+//     const { email, password } = req.body;
+
+//     if (!email || !password) {
+//         return res.status(400).json({ message: 'Email and password are required' });
+//     }
+
+//     try {
+//         const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+
+//         if (rows.length === 0) {
+//             return res.status(401).json({ message: 'Invalid email or password' });
+//         }
+
+//         const user = rows[0];
+
+//         const isPasswordValid = await bcryptjs.compare(password, user.password);
+//         if (!isPasswordValid) {
+//             return res.status(401).json({ message: 'Invalid email or password' });
+//         }
+
+//         const [existingTokenRows] = await db.query(
+//             'SELECT * FROM tokens WHERE user_id = ? AND token_status = ?',
+//             [user.customer_id, 'Active']
+//         );
+
+//         if (existingTokenRows.length > 0) {
+//             const existingToken = existingTokenRows[0];
+
+//             const now = new Date();
+//             if (new Date(existingToken.expires_at) > now) {
+//                 return res.status(400).json({ message: 'User already logged in' });
+//             } else {
+//                 await db.query('DELETE FROM tokens WHERE token = ?', [existingToken.token]);
+//                 console.log('Expired token deleted:', existingToken.token);
+//             }
+//         }
+
+//         const token = crypto.randomBytes(64).toString('hex');
+
+//         await db.query(
+//             'INSERT INTO tokens (user_id, token, token_status, expires_at) VALUES (?, ?, ?, ?)',
+//             [
+//                 user.customer_id,
+//                 token,
+//                 'Active',
+//                 new Date(Date.now() + TOKEN_EXPIRATION_TIME)
+//             ]
+//         );
+
+//         res.json({
+//             message: 'Login successful',
+//             token: token,
+//             user_id: user.customer_id,
+//             username: user.username,
+//             first_name: user.first_name,
+//             role_type: user.role_type
+//         });
+//     } catch (err) {
+//         console.error('Token Validation Backend Error during login:', err.message);
+//         res.status(500).json({ message: 'Internal server error' });
+//     }
+// });
+
 router.post('/users-login', async (req, res) => {
     const { email, password } = req.body;
 
@@ -33,25 +97,18 @@ router.post('/users-login', async (req, res) => {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        const [existingTokenRows] = await db.query(
-            'SELECT * FROM tokens WHERE user_id = ? AND token_status = ?',
+        // Delete any existing active tokens for the user
+        await db.query(
+            'DELETE FROM tokens WHERE user_id = ? AND token_status = ?',
             [user.customer_id, 'Active']
         );
 
-        if (existingTokenRows.length > 0) {
-            const existingToken = existingTokenRows[0];
+        console.log('Deleted existing active tokens for user:', user.customer_id);
 
-            const now = new Date();
-            if (new Date(existingToken.expires_at) > now) {
-                return res.status(400).json({ message: 'User already logged in' });
-            } else {
-                await db.query('DELETE FROM tokens WHERE token = ?', [existingToken.token]);
-                console.log('Expired token deleted:', existingToken.token);
-            }
-        }
-
+        // Generate a new token
         const token = crypto.randomBytes(64).toString('hex');
 
+        // Insert the new token into the database
         await db.query(
             'INSERT INTO tokens (user_id, token, token_status, expires_at) VALUES (?, ?, ?, ?)',
             [
@@ -75,7 +132,6 @@ router.post('/users-login', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
-
 
 
 router.route('/users-details')

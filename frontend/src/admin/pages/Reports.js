@@ -190,7 +190,7 @@ const Reports = () => {
                                     <table className='table table-hover'>
                                         <thead className='bg-light sticky-top'>
                                             <tr>
-                                                <th><input type='checkbox' /></th>
+                                                {/* <th><input type='checkbox' /></th> */}
                                                 <th>Period</th>
                                                 <th>Product Code</th>
                                                 <th>Product Name</th>
@@ -201,7 +201,7 @@ const Reports = () => {
                                         <tbody>
                                             {filteredReports.map((report, index) => (
                                                 <tr key={index}>
-                                                    <td><input type='checkbox' /></td>
+                                                    {/* <td><input type='checkbox' /></td> */}
                                                     <td>{report.period}</td>
                                                     <td>{report.product_code}</td>
                                                     <td>{report.product_name}</td>

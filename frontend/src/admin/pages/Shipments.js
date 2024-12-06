@@ -157,20 +157,16 @@ const Shipments = () => {
                   </div>
                 </div>
 
-                <div class="col-4">
+                <div class="col-3">
                   <div class=" d-flex justify-content-end">
                     <button onClick={exportToExcel} className="btn btn-primary">
-                      {isMobile ? (
-                        <i className="bx bx-download"></i>
-                      ) : (
-                        "Export Shipment Record"
-                      )}
+                      <i class="bx bx-export"></i> Export Shipment Record
                     </button>
                   </div>
                 </div>
 
-                <div class="col-2">
-                  <div class="d-flex justify-content-end">
+                <div class="col-3">
+                  <div class="d-flex justify-content-end align-items-center">
                     <label htmlFor="sort" className="me-2">
                       Sort By:
                     </label>
@@ -179,7 +175,8 @@ const Shipments = () => {
                       id="sort"
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
-                      className=""
+                      className="form-select"
+                      style={{ width: "120px" }}
                     >
                       <option value="date">Date</option>
                       <option value="status">Status</option>
@@ -200,9 +197,9 @@ const Shipments = () => {
                     <table className="table table-hover">
                       <thead className="bg-light sticky-top">
                         <tr>
-                          <th>
+                          {/* <th>
                             <input type="checkbox" />
-                          </th>
+                          </th> */}
                           <th>Shipment ID</th>
                           <th>Order ID</th>
                           <th>Shipment Date</th>
@@ -216,9 +213,9 @@ const Shipments = () => {
                       <tbody>
                         {currentShipments.map((shipment) => (
                           <tr key={shipment.shipment_id}>
-                            <td>
+                            {/* <td>
                               <input type="checkbox" />
-                            </td>
+                            </td> */}
                             <td>{shipment.shipment_id}</td>
                             <td>{shipment.order_id}</td>
                             <td>

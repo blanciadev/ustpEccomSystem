@@ -253,7 +253,7 @@ const Products = () => {
                       <div class="col-2 ">
                         <div class="d-flex justify-content-end">
                           <Button
-                            variant="primary"
+                            variant="danger"
                             onClick={handleShowDiscountProductModal}
                           >
                             {isMobile ? (
@@ -320,9 +320,9 @@ const Products = () => {
                             style={{ position: "sticky", top: 0, zIndex: 1 }}
                           >
                             <tr className="">
-                              <th style={{ width: "5%" }}>
+                              {/* <th style={{ width: "5%" }}>
                                 <input type="checkbox" />
-                              </th>
+                              </th> */}
                               <th style={{ width: "10%" }}>Product Code</th>
                               <th style={{ width: "30%" }}>Product Name</th>
                               <th style={{ width: "15%" }}>Price</th>
@@ -334,9 +334,9 @@ const Products = () => {
                           <tbody>
                             {paginatedProducts.map((product) => (
                               <tr key={product.product_id}>
-                                <td>
+                                {/* <td>
                                   <input type="checkbox" />
-                                </td>
+                                </td> */}
                                 <td>{product.product_code}</td>
                                 <td>{product.product_name}</td>
                                 <td>

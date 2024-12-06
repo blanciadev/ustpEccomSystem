@@ -178,7 +178,7 @@ const Orders = () => {
 
             <div class="container align-items-center mt-4 mb-4">
 
-              <div class="row align-items-center m-0 p-0">
+              <div class="row align-items-center m-0 p-0 ">
 
                 <div class="col-4">
                   <div class="search d-flex  ">
@@ -201,26 +201,25 @@ const Orders = () => {
                       onClick={handlePrintOrders}
                       className="btn btn-primary"
                     >
-                      {isMobile ? (
-                        <i className="bx bx-printer"></i>
-                      ) : (
-                        "Export Order Record"
-                      )}
+
+                      <i class="bx bx-export"></i> Export Order Record
+
                     </button>
                   </div>
                 </div>
 
-                <div class="col-2">
-                  <div class=" d-flex ">
+                <div class="col-2 ">
+                  <div class="d-flex align-items-center" >
                     <label htmlFor="sort" className="me-2">
                       Sort By:
                     </label>
                     <select
-                      name="sort"
-                      id="sort"
+                      name=""
+                      id=""
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
-                      className=""
+                      className="form-select"
+                      style={{ width: "90px" }}
                     >
                       <option value="date">Date</option>
                       <option value="status">Status</option>
@@ -229,16 +228,16 @@ const Orders = () => {
                 </div>
 
                 <div class="col-3">
-                  <div class="d-flex ">
+                  <div class="d-flex align-items-center">
                     <label htmlFor="status" className="me-2">
                       Filter By Status:
                     </label>
+
                     <select
-                      name="status"
-                      id=""
                       value={status}
                       onChange={(e) => setStatus(e.target.value)}
-                      className=""
+                      className="form-select"
+                      style={{ width: "130px" }}
                     >
                       <option value="">All</option>
                       {statusOptions.map((option) => (
@@ -246,6 +245,7 @@ const Orders = () => {
                           {option}
                         </option>
                       ))}
+
                     </select>
                   </div>
                 </div>
@@ -261,9 +261,9 @@ const Orders = () => {
                   <table className="table table-hover">
                     <thead className="bg-light sticky-top">
                       <tr>
-                        <th>
+                        {/* <th>
                           <input type="checkbox" />
-                        </th>
+                        </th> */}
                         <th>Order ID</th>
                         <th>Customer ID</th>
                         <th>Order Date</th>
@@ -283,9 +283,9 @@ const Orders = () => {
                           onClick={() => handleOpenModal(order)}
                           className=""
                         >
-                          <td>
+                          {/* <td>
                             <input type="checkbox" />
-                          </td>
+                          </td> */}
                           <td>
                             {highlightText(order.order_id.toString(), searchTerm)}
                           </td>

@@ -1,0 +1,34 @@
+.custom-scrollbar {
+    scrollbar-width: thin;
+    /* For Firefox */
+    scrollbar-color: #d10081 #ffd1ea;
+    /* Handle color and background color */
+    margin-left: 30px;
+}
+
+/* For Chrome, Edge, and Safari */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 10px;
+    /* Width of the vertical scrollbar */
+    height: 10px;
+    /* Height of the horizontal scrollbar */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #227cca;
+    /* Color of the draggable part */
+    border-radius: 5px;
+    /* Rounded corners */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #ff00bf;
+    /* Darker on hover */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #cacaca;
+    /* Background of the scrollbar track */
+    border-radius: 5px;
+
+}
