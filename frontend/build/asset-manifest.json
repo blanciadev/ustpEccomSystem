@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.css": "/%20//blanciadev.github.io/nandbeautyvault/static/css/main.099f09b3.css",
-    "main.js": "/%20//blanciadev.github.io/nandbeautyvault/static/js/main.f2d75a70.js",
-    "static/js/919.a4935aa1.chunk.js": "/%20//blanciadev.github.io/nandbeautyvault/static/js/919.a4935aa1.chunk.js",
-    "static/media/login-signup.png": "/%20//blanciadev.github.io/nandbeautyvault/static/media/login-signup.4f8eda1e0130e65bc043.png",
-    "static/media/start.png": "/%20//blanciadev.github.io/nandbeautyvault/static/media/start.4f8eda1e0130e65bc043.png",
-    "static/media/banner2.png": "/%20//blanciadev.github.io/nandbeautyvault/static/media/banner2.70b4a3b52bf542885905.png",
-    "static/media/banner1.png": "/%20//blanciadev.github.io/nandbeautyvault/static/media/banner1.7040b25c6e0d194b9979.png",
-    "static/media/banner3.png": "/%20//blanciadev.github.io/nandbeautyvault/static/media/banner3.122100735d31a5ac28d2.png",
-    "static/media/logo.png": "/%20//blanciadev.github.io/nandbeautyvault/static/media/logo.08090a309e09133f35fb.png",
-    "static/media/qrcode.jpg": "/%20//blanciadev.github.io/nandbeautyvault/static/media/qrcode.fc23159d824cf094ed3c.jpg",
-    "index.html": "/%20//blanciadev.github.io/nandbeautyvault/index.html",
-    "main.099f09b3.css.map": "/%20//blanciadev.github.io/nandbeautyvault/static/css/main.099f09b3.css.map",
-    "main.f2d75a70.js.map": "/%20//blanciadev.github.io/nandbeautyvault/static/js/main.f2d75a70.js.map",
-    "919.a4935aa1.chunk.js.map": "/%20//blanciadev.github.io/nandbeautyvault/static/js/919.a4935aa1.chunk.js.map"
+    "main.css": "/ustpEccomSystem/frontend/static/css/main.099f09b3.css",
+    "main.js": "/ustpEccomSystem/frontend/static/js/main.beefa5d5.js",
+    "static/js/919.a4935aa1.chunk.js": "/ustpEccomSystem/frontend/static/js/919.a4935aa1.chunk.js",
+    "static/media/login-signup.png": "/ustpEccomSystem/frontend/static/media/login-signup.4f8eda1e0130e65bc043.png",
+    "static/media/start.png": "/ustpEccomSystem/frontend/static/media/start.4f8eda1e0130e65bc043.png",
+    "static/media/banner2.png": "/ustpEccomSystem/frontend/static/media/banner2.70b4a3b52bf542885905.png",
+    "static/media/banner1.png": "/ustpEccomSystem/frontend/static/media/banner1.7040b25c6e0d194b9979.png",
+    "static/media/banner3.png": "/ustpEccomSystem/frontend/static/media/banner3.122100735d31a5ac28d2.png",
+    "static/media/logo.png": "/ustpEccomSystem/frontend/static/media/logo.08090a309e09133f35fb.png",
+    "static/media/qrcode.jpg": "/ustpEccomSystem/frontend/static/media/qrcode.fc23159d824cf094ed3c.jpg",
+    "index.html": "/ustpEccomSystem/frontend/index.html",
+    "main.099f09b3.css.map": "/ustpEccomSystem/frontend/static/css/main.099f09b3.css.map",
+    "main.beefa5d5.js.map": "/ustpEccomSystem/frontend/static/js/main.beefa5d5.js.map",
+    "919.a4935aa1.chunk.js.map": "/ustpEccomSystem/frontend/static/js/919.a4935aa1.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.099f09b3.css",
-    "static/js/main.f2d75a70.js"
+    "static/js/main.beefa5d5.js"
   ]
 }
