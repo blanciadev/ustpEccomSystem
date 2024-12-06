@@ -50,46 +50,45 @@ ORDER BY
     }
 });
 
-
-
 // Route to get top 4 user-picked products for interaction view
 router.get('/products-top-picks', async (req, res) => {
     try {
         const [rows] = await db.query(`
-         SELECT
-	p.product_id, 
-	p.product_code, 
-	p.product_name, 
-	p.price, 
-	p.description, 
-	p.quantity, 
+        SELECT
+    p.product_id, 
+    p.product_code, 
+    p.product_name, 
+    p.price, 
+    p.description, 
+    p.quantity, 
     p.size, 
-	c.category_name, 
-	COUNT(DISTINCT user_product_interactions.product_code) AS interaction_count, 
-	p.product_image
+    c.category_name, 
+    COUNT(user_product_interactions.interaction_id) AS interaction_count, 
+    p.product_image
 FROM
-	product AS p
-	JOIN
-	category AS c
-	ON 
-		p.category_id = c.category_id
-	JOIN
-	user_product_interactions
-	ON 
-		p.product_code = user_product_interactions.product_code
-WHERE
-	user_product_interactions.interaction_type = 'Order'
+    product AS p
+JOIN
+    category AS c
+    ON p.category_id = c.category_id
+LEFT JOIN
+    user_product_interactions
+    ON p.product_code = user_product_interactions.product_code
+    AND user_product_interactions.interaction_type = 'Cart'
 GROUP BY
-	p.product_id, 
-	p.product_code, 
-	p.product_name, 
-	p.price, 
-	p.description, 
-	p.quantity, 
+    p.product_id, 
+    p.product_code, 
+    p.product_name, 
+    p.price, 
+    p.description, 
+    p.quantity, 
     p.size, 
-	c.category_name
+    c.category_name, 
+    p.product_image
 ORDER BY
-	interaction_count DESC;`);
+    interaction_count DESC
+LIMIT 4;
+
+    ;`);
 
         res.json(rows);
     } catch (error) {

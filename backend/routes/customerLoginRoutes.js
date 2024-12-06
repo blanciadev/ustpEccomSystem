@@ -9,7 +9,7 @@ const saltRounds = 10;
 
 
 
-const TOKEN_EXPIRATION_TIME = 1900000;
+const TOKEN_EXPIRATION_TIME = 5400000;
 
 
 // router.post('/users-login', async (req, res) => {
