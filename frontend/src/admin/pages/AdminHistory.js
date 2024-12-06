@@ -23,7 +23,7 @@ const AdminHistory = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get('https://ustp-eccom-server.vercel.app/api/admin-order-history-general-records', {
+      const response = await axios.get('https://ustp-eccom-server.vercel.app/api/admin-order-history', {
         params: { status, searchTerm, sortBy }
       });
       setOrders(response.data.orders);
@@ -99,7 +99,7 @@ const AdminHistory = () => {
 
   const handlePrintOrders = async () => {
     try {
-      const response = await axios.get('https://ustp-eccom-server.vercel.app/api/admin-order-history-general-records', {
+      const response = await axios.get('https://ustp-eccom-server.vercel.app/api/admin-order-history-records', {
         params: { exportToExcel: 'true' },
         responseType: 'blob',
       });
@@ -199,6 +199,7 @@ const AdminHistory = () => {
                     <th>Date</th>
                     <th>Current Quantity</th>
                     <th>Running Balance</th>
+                    <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -216,15 +217,20 @@ const AdminHistory = () => {
                         <td>₱{highlightText(product.price?.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? 'N/A', searchTerm)}</td>
                         <td>₱{highlightText(product.item_total?.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? 'N/A', searchTerm)}</td>
                         <td>{highlightText(new Date(order.order_date).toLocaleDateString(), searchTerm)}</td>
-                        <td>{highlightText(product.current_quantity?.toString() ?? 'N/A', searchTerm)}</td>
+                        <td>{highlightText(product.original_quantity?.toString() ?? 'N/A', searchTerm)}</td>
+                        <td>
+                          {highlightText(
+                            (product.original_quantity - product.quantity || 0).toString(),
+                            searchTerm
+                          )}
+                        </td>
                         <td>{highlightText(product.running_balance?.toString() ?? 'N/A', searchTerm)}</td>
                       </tr>
                     ))
                   ))}
                 </tbody>
-
-
               </table>
+
               <div className="pagination">
                 <button onClick={() => handlePageChange(1)}>&lt;&lt;</button>
                 <button

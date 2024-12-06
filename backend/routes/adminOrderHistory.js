@@ -99,7 +99,9 @@ router.get('/admin-order-history', async (req, res) => {
             \`order\`.total_price AS order_total_price, 
             shipment.streetname, 
             shipment.address, 
-            shipment.city
+            shipment.city, 
+            category.category_name,  
+            product.quantity
         FROM
             \`order\`
         INNER JOIN
@@ -110,9 +112,11 @@ router.get('/admin-order-history', async (req, res) => {
             users ON \`order\`.customer_id = users.customer_id
         INNER JOIN
             shipment ON \`order\`.order_id = shipment.order_id
+        INNER JOIN
+            category ON product.category_id = category.category_id
         WHERE
             order_details.order_status <> 'Completed'
-        `;
+    `;
 
         // Add where clause if status or searchTerm is provided
         const conditions = [];
@@ -167,6 +171,7 @@ router.get('/admin-order-history', async (req, res) => {
                     products: []
                 };
             }
+
             // Add the current product to the products array
             acc[order.order_id].products.push({
                 order_details_id: order.order_details_id,
@@ -179,10 +184,14 @@ router.get('/admin-order-history', async (req, res) => {
                 item_total: order.total_price,
                 payment_status: order.payment_status,
                 payment_method: order.payment_method,
+                category_name: order.category_name,
+                product_quantity: order.quantity,
+                order_quantity: order.order_quantity,
             });
 
             return acc;
         }, {});
+
 
         const ordersArray = Object.values(groupedOrders);
 
@@ -769,124 +778,107 @@ LIMIT ? OFFSET ?
     }
 });
 
-router.get('/admin-order-history-general-records', async (req, res) => {
-    try {
-        const { status, searchTerm, sortBy, page = 1 } = req.query;
-        const pageSize = 20;  // Define the number of results per page
-        const offset = (page - 1) * pageSize;
 
-        // Define the query for fetching order history (removing the second query for products)
-        let query = `
-            SELECT
-                product.product_name, 
-                order_details.order_details_id, 
-                order_details.product_id, 
-                order_details.order_date, 
-                order_details.payment_method, 
-                order_details.total_price AS order_details_total_price, 
-                order_details.quantity AS order_quantity, 
-                order_details.payment_status, 
-                product.price, 
-                order_details.order_status, 
-                \`order\`.total_price AS order_total_price, 
-                shipment.shipment_id, 
-                category.category_name, 
-                product.quantity AS product_quantity, 
-                \`order\`.order_id, 
-                users.customer_id, 
-                product.product_code, 
-                product.created_at, 
-                product.product_update
-            FROM
-                \`order\`
-            INNER JOIN order_details ON \`order\`.order_id = order_details.order_id
-            INNER JOIN product ON order_details.product_id = product.product_code
-            INNER JOIN users ON \`order\`.customer_id = users.customer_id
-            INNER JOIN shipment ON \`order\`.order_id = shipment.order_id
-            INNER JOIN category ON product.category_id = category.category_id
-            ORDER BY product.created_at DESC
-            LIMIT ? OFFSET ?
-        `;
+// router.get('/admin-order-history-general-records', async (req, res) => {
+//     try {
+//         const page = req.query.page || 1;  // Default to page 1 if not specified
+//         const pageSize = 20;  // Define the number of results per page
+//         const offset = (page - 1) * pageSize;
 
-        // Add filters to the query if necessary
-        const conditions = [];
-        if (status) {
-            conditions.push('order_details.payment_status = ?');
-        }
-        if (searchTerm) {
-            conditions.push(`(users.first_name LIKE ? OR users.last_name LIKE ? OR \`order\`.order_id LIKE ?)`);
-        }
+//         // Define the query for fetching order history (removed conditionals and query parameters)
+//         let query = `
+//             SELECT
+//                 product.product_name, 
+//                 order_details.order_details_id, 
+//                 order_details.product_id, 
+//                 order_details.order_date, 
+//                 order_details.payment_method, 
+//                 order_details.total_price AS order_details_total_price, 
+//                 order_details.quantity AS order_quantity, 
+//                 order_details.payment_status, 
+//                 product.price, 
+//                 order_details.order_status, 
+//                 \`order\`.total_price AS order_total_price, 
+//                 shipment.shipment_id, 
+//                 category.category_name, 
+//                 product.quantity AS product_quantity, 
+//                 \`order\`.order_id, 
+//                 users.customer_id, 
+//                 product.product_code, 
+//                 product.created_at, 
+//                 product.product_update
+//             FROM
+//                 \`order\`
+//             INNER JOIN order_details ON \`order\`.order_id = order_details.order_id
+//             INNER JOIN product ON order_details.product_id = product.product_code
+//             INNER JOIN users ON \`order\`.customer_id = users.customer_id
+//             INNER JOIN shipment ON \`order\`.order_id = shipment.order_id
+//             INNER JOIN category ON product.category_id = category.category_id
+//             LIMIT ? OFFSET ?
+//         `;
 
-        if (conditions.length) {
-            query = query.replace('ORDER BY product.created_at DESC', `WHERE ${conditions.join(' AND ')} ORDER BY product.created_at DESC`);
-        }
+//         // Prepare query parameters
+//         const queryParams = [pageSize, offset];
 
-        // Prepare query parameters
-        const queryParams = [
-            ...(status ? [status] : []),
-            ...(searchTerm ? [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`] : []),
-            pageSize,
-            offset
-        ];
+//         // Execute the query
+//         const [orders] = await db.query(query, queryParams);
 
-        // Execute the query
-        const [orders] = await db.query(query, queryParams);
+//         // Group orders by order_id without recalculating total_price
+//         const groupedOrders = orders.reduce((acc, order) => {
+//             if (!acc[order.order_id]) {
+//                 acc[order.order_id] = {
+//                     order_id: order.order_id,
+//                     order_date: order.order_date,
+//                     order_total: order.order_total_price,
+//                     order_status: order.order_status,
+//                     order_update: order.order_update,
+//                     payment_status: order.payment_status,
+//                     payment_method: order.payment_method,
+//                     shipment_id: order.shipment_id,
+//                     customer_id: order.customer_id,
+//                     customer_first_name: order.first_name,
+//                     customer_last_name: order.last_name,
+//                     customer_email: order.email,
+//                     customer_phone: order.phone_number,
+//                     customer_address: {
+//                         street_name: order.street_name,
+//                         region: order.region,
+//                         postal_code: order.postal_code,
+//                     },
+//                     products: []
+//                 };
+//             }
 
-        // Group orders by order_id without recalculating total_price
-        const groupedOrders = orders.reduce((acc, order) => {
-            if (!acc[order.order_id]) {
-                acc[order.order_id] = {
-                    order_id: order.order_id,
-                    order_date: order.order_date,
-                    order_total: order.order_total_price,
-                    order_status: order.order_status,
-                    order_update: order.order_update,
-                    payment_status: order.payment_status,
-                    payment_method: order.payment_method,
-                    shipment_id: order.shipment_id,
-                    customer_id: order.customer_id,
-                    customer_first_name: order.first_name,
-                    customer_last_name: order.last_name,
-                    customer_email: order.email,
-                    customer_phone: order.phone_number,
-                    customer_address: {
-                        street_name: order.street_name,
-                        region: order.region,
-                        postal_code: order.postal_code,
-                    },
-                    products: []
-                };
-            }
+//             // Add the current product to the products array
+//             acc[order.order_id].products.push({
+//                 order_details_id: order.order_details_id,
+//                 product_id: order.product_id,
+//                 product_name: order.product_name,
+//                 product_code: order.product_code,
+//                 category_name: order.category_name,
+//                 product_quantity: order.product_quantity,
+//                 order_quantity: order.order_quantity,
+//                 price: order.price,
+//                 quantity: order.order_quantity,
+//                 item_total: order.order_details_total_price,
+//                 payment_status: order.payment_status,
+//                 payment_method: order.payment_method,
+//             });
 
-            // Add the current product to the products array
-            acc[order.order_id].products.push({
-                order_details_id: order.order_details_id,
-                product_id: order.product_id,
-                product_name: order.product_name,
-                product_code: order.product_code,
-                category_name: order.category_name,
-                product_quantity: order.product_quantity,
-                order_quantity: order.order_quantity,
-                price: order.price,
-                quantity: order.order_quantity,
-                item_total: order.order_details_total_price,
-                payment_status: order.payment_status,
-                payment_method: order.payment_method,
-            });
+//             return acc;
+//         }, {});
 
-            return acc;
-        }, {});
+//         const ordersArray = Object.values(groupedOrders);
 
-        const ordersArray = Object.values(groupedOrders);
+//         // Return the order data in JSON format
+//         res.json({ orders: ordersArray });
 
-        // Return the order data in JSON format
-        res.json({ orders: ordersArray });
+//     } catch (error) {
+//         console.error('Error fetching order history:', error.message);
+//         res.status(500).json({ message: 'Internal Server Error', error: error.message });
+//     }
+// });
 
-    } catch (error) {
-        console.error('Error fetching order history:', error.message);
-        res.status(500).json({ message: 'Internal Server Error', error: error.message });
-    }
-});
 
 
 
