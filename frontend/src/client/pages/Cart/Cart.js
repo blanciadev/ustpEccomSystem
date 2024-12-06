@@ -82,26 +82,11 @@ const CartContent = () => {
     fetchCartItems();
   }, [isLoggedIn]);
 
-  const computeTotalPrice = () => {
-    return cartItems.reduce((total, item) => {
-      if (selectedItems[item.product_code]) {
-        return total + (item.price * item.quantity);
-      }
-      return total;
-    }, 0);
-  };
-
-
   useEffect(() => {
     setTotalPrice(computeTotalPrice());
   }, [selectedItems, cartItems]);
 
-  const toggleItemSelection = (productCode) => {
-    setSelectedItems((prevSelected) => ({
-      ...prevSelected,
-      [productCode]: !prevSelected[productCode],
-    }));
-  };
+
 
   const handleSelectAll = (selectAll) => {
     const newSelection = {};
@@ -126,6 +111,7 @@ const CartContent = () => {
   const handleCheckout = async () => {
     const token = localStorage.getItem("token");
 
+    // Get selected products based on selection
     const selectedProducts = cartItems.filter(
       (item) => selectedItems[item.product_code]
     );
@@ -136,6 +122,7 @@ const CartContent = () => {
     }
 
     try {
+      // Update product details, including `sub_total`
       const updatedProducts = await Promise.all(
         selectedProducts.map(async (product) => {
           try {
@@ -147,12 +134,16 @@ const CartContent = () => {
                 },
               }
             );
+
             const productDetails = response.data;
 
+            // Return updated product with `sub_total` included
             return {
               ...product,
-              product_image:
-                productDetails.product_image || product.product_image,
+              product_image: productDetails.product_image || product.product_image,
+              quantity: product.quantity,
+              price: product.price, // Ensure price is included
+              sub_total: product.price * product.quantity, // Calculate `sub_total`
             };
           } catch (error) {
             console.error(
@@ -168,7 +159,6 @@ const CartContent = () => {
 
       if (!token) {
         localStorage.setItem("redirectTo", "/checkout");
-
         navigate("/login");
       } else {
         navigate("/checkout", {
@@ -176,67 +166,48 @@ const CartContent = () => {
         });
       }
     } catch (error) {
-      console.error("Error fetching product details:", error);
       alert("There was an error retrieving product details. Please try again.");
     }
   };
 
-  const updateCartQuantity = async (cartItemId, newQuantity) => {
-    try {
-      console.log(
-        `Attempting to update quantity for cart item ID: ${cartItemId} to new quantity: ${newQuantity}`
-      );
 
-      if (isLoggedIn) {
-        const response = await fetch(
-          `https://ustp-eccom-server.vercel.app/api/cart-update-quantity`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-            body: JSON.stringify({
-              cart_items_id: cartItemId,
-              newQuantity: newQuantity,
-            }),
-          }
-        );
-
-        console.log(`Server response status: ${response.status}`);
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error("Error from server:", errorData);
-          throw new Error("Failed to update quantity");
-        }
-
-        console.log("Quantity updated successfully on the server");
-      } else {
-        const updatedItems = cartItems.map((item) => {
-          console.log(`Checking item: `, item);
-
-          if (item.cart_items_id === cartItemId) {
-            const updatedItem = {
-              ...item,
-              quantity: newQuantity,
-              sub_total: item.price * newQuantity,
-            };
-            console.log(`Updated item: `, updatedItem);
-            return updatedItem;
-          }
-          return item;
-        });
-
-        setCartItems(updatedItems);
-        localStorage.setItem("cart", JSON.stringify(updatedItems));
-        console.log("Local storage updated with new cart items:", updatedItems);
+  const updateCartQuantity = (cartItemId, newQuantity) => {
+    const updatedItems = cartItems.map(item => {
+      if (item.cart_items_id === cartItemId) {
+        const updatedItem = {
+          ...item,
+          quantity: newQuantity,
+          sub_total: item.price * newQuantity,
+        };
+        return updatedItem;
       }
-    } catch (err) {
-      console.error("Error updating quantity:", err);
-      setError("Error updating quantity. Please try again later.");
-    }
+      return item;
+    });
+
+    setCartItems(updatedItems);
+    localStorage.setItem("cart", JSON.stringify(updatedItems));
   };
+
+  const computeTotalPrice = () => {
+    let total = 0;
+
+    cartItems.forEach(item => {
+      if (selectedItems[item.product_code]) {
+        total += item.sub_total;
+      }
+    });
+
+    return total;
+  };
+
+  const toggleItemSelection = (productCode) => {
+    setSelectedItems((prevSelected) => ({
+      ...prevSelected,
+      [productCode]: !prevSelected[productCode],
+    }));
+  };
+
+
 
   const removeFromCart = async (cartItemId) => {
     try {
@@ -335,12 +306,10 @@ const CartContent = () => {
               </tbody>
               <tfoot>
                 <tr>
-                  {/* Align "Total" with the "Price" column */}
                   <td colSpan="4"></td>
                   <td style={{ textAlign: "center", fontWeight: "bold" }}>
                     Total
                   </td>
-                  {/* Align totalPrice with the "Sub-total" column */}
                   <td
                     style={{
                       textAlign: "center",

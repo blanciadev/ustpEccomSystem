@@ -17,8 +17,10 @@ const Checkout = () => {
     JSON.parse(localStorage.getItem("globalDiscounts")) || [];
 
   const [discounts, setDiscounts] = useState([]);
+
   const savedProducts =
     JSON.parse(localStorage.getItem("selectedProducts")) || [];
+
   const [quantities, setQuantities] = useState(
     savedProducts.map((product) => product.quantity || 1)
   );
@@ -61,8 +63,6 @@ const Checkout = () => {
               .then((response) => response.data)
           )
         );
-
-        console.log("CHECKOUT API TRIGGERED");
 
         const productQuantities = productData.map((item) => item.quantity);
         setOriginalQuantities(productQuantities);
@@ -193,11 +193,14 @@ const Checkout = () => {
       order_details: savedProducts.map((product, index) => {
         const discountedPrice = product.price * (1 - discounts[index] / 100);
         const productTotal = discountedPrice * quantities[index];
+        const subtotal = (product.price * quantities[index]).toFixed(2); // Add subtotal price
+
         return {
           cart_items: product.cart_items_id,
           product_id: product.product_code,
           quantity: quantities[index],
           totalprice: productTotal.toFixed(2),
+          subtotal, // Include subtotal in order details
           payment_method: "COD",
           payment_status: "Pending",
         };
@@ -220,8 +223,6 @@ const Checkout = () => {
       customerId: customerId,
       interaction_type: "order",
     };
-
-    console.log("Payload Entry:", payload);
 
     try {
       // Send order data to the server
@@ -248,8 +249,6 @@ const Checkout = () => {
           navigate("/user/purchase");
         }, 3000);
 
-        console.log("Toast should display T-T");
-
         await recordProductInteraction(payload);
       }
     } catch (error) {
@@ -260,13 +259,12 @@ const Checkout = () => {
     }
   };
 
+
   const recordProductInteraction = async (payload) => {
     try {
-      console.log("Recording product interaction:", payload);
       await axios.get("https://ustp-eccom-server.vercel.app/api/products-interaction", {
         params: payload,
       });
-      console.log("Product interaction recorded successfully.");
     } catch (error) {
       console.error("Error recording product interaction:", error);
     }
@@ -283,22 +281,18 @@ const Checkout = () => {
 
     if (savedProducts.length === 0) return 0;
 
-    // console.log("----- Receipt -----");
 
     let totalCost = 0;
     const generalDiscount = allValuesEqual(globalDiscounts)
       ? globalDiscounts[0]
       : 0;
     const hasGeneralDiscount = generalDiscount > 0;
-    // console.log("----- GENERAL DISCOUNT  -----");
-    // console.log(effectiveGlobalDiscount);
 
     savedProducts.forEach((product, index) => {
       const quantity = quantities[index] || 0;
       let effectivePrice = 0;
       let discountApplied = 0;
 
-      // console.log(hasGeneralDiscount);
 
       if (product.discounted_price) {
         discountApplied = allValuesEqual(globalDiscounts)
@@ -309,33 +303,20 @@ const Checkout = () => {
           discountApplied
         );
 
-        // console.log(`Product: ${product.product_name} (Discounted)`);
       } else {
         discountApplied = hasGeneralDiscount ? generalDiscount : 0;
         effectivePrice = getEffectivePrice(product.price, discountApplied);
 
-        // console.log(`Product: ${product.product_name} (Non-Bundled)`);
       }
 
-      // console.log(`  Discount: ${discountApplied}%`);
-      // console.log(`  Price per unit: $${effectivePrice.toFixed(2)}`);
-      // console.log(`  Quantity: ${quantity}`);
 
       const totalForProduct = effectivePrice * quantity;
       totalCost += totalForProduct;
 
-      // console.log(`  Total for ${product.product_name}: $${totalForProduct.toFixed(2)}`);
-
-      // console.log("------------------------------");
     });
 
     const shippingCost = 150;
     const transactionTotal = totalCost + shippingCost;
-
-    console.log(`Subtotal: $${totalCost.toFixed(2)}`);
-    console.log(`Shipping: $${shippingCost.toFixed(2)}`);
-    console.log(`Transaction Total: $${transactionTotal.toFixed(2)}`);
-    console.log("----- End of Receipt -----");
 
     return transactionTotal;
   };
@@ -548,10 +529,7 @@ const Checkout = () => {
                   );
                   const total = discountedPrice * quantities[index];
                   effectiveGlobalDiscount = effectiveDiscount;
-                  console.log(
-                    "GLOBAL EFFECTIVE DISCOUNT : " + effectiveGlobalDiscount
-                  );
-                  console.log("Saved Products data", savedProducts);
+
 
                   return (
                     <div class="container my-1" key={index}>
