@@ -27,6 +27,7 @@ const AdminHistory = () => {
         params: { status, searchTerm, sortBy }
       });
       setOrders(response.data.orders);
+      console.log(response.data.orders);
     } catch (error) {
       console.error('Error fetching orders:', error.message);
     }
@@ -99,7 +100,7 @@ const AdminHistory = () => {
 
   const handlePrintOrders = async () => {
     try {
-      const response = await axios.get('https://ustp-eccom-server.vercel.app/api/admin-order-history-records', {
+      const response = await axios.get('https://ustp-eccom-server.vercel.app/api/admin-order-history', {
         params: { exportToExcel: 'true' },
         responseType: 'blob',
       });
@@ -199,7 +200,7 @@ const AdminHistory = () => {
                     <th>Date</th>
                     <th>Current Quantity</th>
                     <th>Running Balance</th>
-                    <th>Status</th>
+
                   </tr>
                 </thead>
                 <tbody>
@@ -212,24 +213,25 @@ const AdminHistory = () => {
                         <td>{highlightText(order.shipment?.shipment_id?.toString() ?? 'Not Available', searchTerm)}</td>
                         <td>{highlightText(product.product_id?.toString() ?? 'N/A', searchTerm)}</td>
                         <td>{highlightText(product.product_name, searchTerm)}</td>
-                        <td>{highlightText(product.category_name ?? 'N/A', searchTerm)}</td>
-                        <td>{highlightText(product.quantity?.toString() ?? 'N/A', searchTerm)}</td>
+                        <td>{highlightText(product.category_name ?? 'N/A', searchTerm)}</td> {/* Category */}
+                        <td>{highlightText(product.quantity?.toString() ?? 'N/A', searchTerm)}</td> {/* Order Quantity */}
                         <td>₱{highlightText(product.price?.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? 'N/A', searchTerm)}</td>
                         <td>₱{highlightText(product.item_total?.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? 'N/A', searchTerm)}</td>
                         <td>{highlightText(new Date(order.order_date).toLocaleDateString(), searchTerm)}</td>
-                        <td>{highlightText(product.original_quantity?.toString() ?? 'N/A', searchTerm)}</td>
+                        <td>{highlightText(product.original_quantity?.toString() ?? 'N/A', searchTerm)}</td> {/* Current Quantity (Original Quantity) */}
                         <td>
                           {highlightText(
-                            (product.original_quantity - product.quantity || 0).toString(),
+                            (product.original_quantity - product.quantity || 0).toString(),  // Running balance logic
                             searchTerm
                           )}
-                        </td>
+                        </td> {/* Running Balance (Original Quantity - Order Quantity) */}
                         <td>{highlightText(product.running_balance?.toString() ?? 'N/A', searchTerm)}</td>
                       </tr>
                     ))
                   ))}
                 </tbody>
               </table>
+
 
               <div className="pagination">
                 <button onClick={() => handlePageChange(1)}>&lt;&lt;</button>

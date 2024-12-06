@@ -70,7 +70,7 @@ router.put('/admin-update-products/:product_code', async (req, res) => {
 router.get('/admin-order-history', async (req, res) => {
     try {
         const { status, searchTerm, exportToExcel, page = 1 } = req.query;
-        const pageSize = 10;  // Define the number of results per page
+        const pageSize = 10; // Define the number of results per page
         const offset = (page - 1) * pageSize;
 
         let query = `
@@ -83,10 +83,11 @@ router.get('/admin-order-history', async (req, res) => {
             order_details.order_update, 
             order_details.payment_method, 
             order_details.total_price AS order_details_total_price, 
-            order_details.quantity, 
+            order_details.quantity AS order_quantity, 
             order_details.payment_status, 
             product.price, 
             product.product_image, 
+            product.quantity AS original_quantity, 
             users.customer_id, 
             users.first_name, 
             users.last_name, 
@@ -100,8 +101,7 @@ router.get('/admin-order-history', async (req, res) => {
             shipment.streetname, 
             shipment.address, 
             shipment.city, 
-            category.category_name,  
-            product.quantity
+            category.category_name
         FROM
             \`order\`
         INNER JOIN
@@ -116,7 +116,7 @@ router.get('/admin-order-history', async (req, res) => {
             category ON product.category_id = category.category_id
         WHERE
             order_details.order_status <> 'Completed'
-    `;
+        `;
 
         // Add where clause if status or searchTerm is provided
         const conditions = [];
@@ -142,7 +142,7 @@ router.get('/admin-order-history', async (req, res) => {
 
         const [orders] = await db.query(query, queryParams);
 
-        // Group orders by order_id without recalculating total_price
+        // Group orders by order_id and calculate running balance
         const groupedOrders = orders.reduce((acc, order) => {
             if (!acc[order.order_id]) {
                 acc[order.order_id] = {
@@ -175,26 +175,23 @@ router.get('/admin-order-history', async (req, res) => {
             // Add the current product to the products array
             acc[order.order_id].products.push({
                 order_details_id: order.order_details_id,
-                payment_date: order.payment_date,
                 product_id: order.product_id,
                 product_name: order.product_name,
                 product_image: order.product_image,
                 price: order.price,
-                quantity: order.quantity,
-                item_total: order.total_price,
+                quantity: order.order_quantity,
+                item_total: order.order_details_total_price,
                 payment_status: order.payment_status,
                 payment_method: order.payment_method,
                 category_name: order.category_name,
-                product_quantity: order.quantity,
-                order_quantity: order.order_quantity,
+                current_quantity: order.original_quantity,
+                running_balance: order.original_quantity - order.order_quantity
             });
 
             return acc;
         }, {});
 
-
         const ordersArray = Object.values(groupedOrders);
-
 
         // If the exportToExcel query parameter is set, generate and send Excel file
         if (exportToExcel === 'true') {
@@ -210,18 +207,34 @@ router.get('/admin-order-history', async (req, res) => {
                 { header: 'Payment Status', key: 'payment_status', width: 15 },
                 { header: 'Payment Method', key: 'payment_method', width: 15 },
                 { header: 'Total Price', key: 'total_price', width: 15 },
+                { header: 'Product ID', key: 'product_id', width: 15 },
+                { header: 'Product Name', key: 'product_name', width: 30 },
+                { header: 'Category', key: 'category_name', width: 20 },
+                { header: 'Price', key: 'price', width: 10 },
+                { header: 'Quantity', key: 'quantity', width: 10 },
+                { header: 'Current Quantity', key: 'current_quantity', width: 20 },
+                { header: 'Running Balance', key: 'running_balance', width: 20 }
             ];
 
             // Add rows
             ordersArray.forEach(order => {
-                worksheet.addRow({
-                    order_id: order.order_id,
-                    customer_id: `${order.customer_id}`,
-                    order_date: new Date(order.order_date).toLocaleDateString(),
-                    order_status: order.order_status,
-                    payment_status: order.payment_status,
-                    payment_method: order.payment_method,
-                    total_price: order.order_total,
+                order.products.forEach(product => {
+                    worksheet.addRow({
+                        order_id: order.order_id,
+                        customer_id: `${order.customer_id}`,
+                        order_date: new Date(order.order_date).toLocaleDateString(),
+                        order_status: order.order_status,
+                        payment_status: order.payment_status,
+                        payment_method: order.payment_method,
+                        total_price: order.order_total,
+                        product_id: product.product_id,
+                        product_name: product.product_name,
+                        category_name: product.category_name,
+                        price: product.price,
+                        quantity: product.quantity,
+                        current_quantity: product.current_quantity,
+                        running_balance: product.running_balance
+                    });
                 });
             });
 
@@ -245,6 +258,7 @@ router.get('/admin-order-history', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 });
+
 
 
 router.get('/admin-order-history-records', async (req, res) => {
