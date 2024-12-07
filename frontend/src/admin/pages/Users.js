@@ -19,34 +19,37 @@ const Users = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 10;
   const [selectedUser, setSelectedUser] = useState(null);
-
   const [sortType, setSortType] = useState("id");
   const [sortDirection, setSortDirection] = useState("asc");
 
-  const toggleAddUserModal = () => {
-    setShowAddUserModal(!showAddUserModal);
-  };
-
-  const toggleUserModal = () => {
-    setShowUserModal(!showUserModal);
-  };
+  const toggleAddUserModal = () => setShowAddUserModal((prev) => !prev);
+  const toggleUserModal = () => setShowUserModal((prev) => !prev);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(
-          "https://ustp-eccom-server.vercel.app/api/admin-users-report"
-        );
-        setUsers(response.data.data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching users:", error);
+        const response = await axios.get("https://ustp-eccom-server.vercel.app/api/admin-users-report");
+
+        if (response.data && response.data.data) {
+          setUsers(response.data.data);
+        } else {
+          console.error("Unexpected API response structure:", response);
+          setError("Invalid data received from the server.");
+        }
+      } catch (err) {
+        console.error("Error fetching users:", err);
         setError("Failed to fetch users. Please try again later.");
+      } finally {
         setLoading(false);
       }
     };
 
     fetchUsers();
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 425);
+    };
+
     window.addEventListener("resize", handleResize);
 
     return () => {
@@ -54,53 +57,41 @@ const Users = () => {
     };
   }, []);
 
-  const handleResize = () => {
-    setIsMobile(window.innerWidth <= 425);
-  };
-
-  const filteredUsers = users.filter((user) => {
+  const filteredUsers = (users || []).filter((user) => {
     const searchValue = searchTerm.toLowerCase();
     return (
-      user.first_name.toLowerCase().includes(searchValue) ||
-      user.last_name.toLowerCase().includes(searchValue) ||
-      user.role_type.toLowerCase().includes(searchValue)
+      user.first_name?.toLowerCase().includes(searchValue) ||
+      user.last_name?.toLowerCase().includes(searchValue) ||
+      user.role_type?.toLowerCase().includes(searchValue)
     );
   });
 
   const sortedUsers = [...filteredUsers].sort((a, b) => {
     if (sortType === "type") {
-      if (a.role_type.toLowerCase() < b.role_type.toLowerCase()) {
-        return sortDirection === "asc" ? -1 : 1;
-      }
-      if (a.role_type.toLowerCase() > b.role_type.toLowerCase()) {
-        return sortDirection === "asc" ? 1 : -1;
-      }
-      return 0;
+      return sortDirection === "asc"
+        ? a.role_type.localeCompare(b.role_type)
+        : b.role_type.localeCompare(a.role_type);
     } else if (sortType === "id") {
       return sortDirection === "asc"
         ? a.customer_id - b.customer_id
         : b.customer_id - a.customer_id;
     }
+    return 0;
   });
 
+  const totalPages = Math.ceil(filteredUsers.length / recordsPerPage);
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentUsers = sortedUsers.slice(
-    indexOfFirstRecord,
-    indexOfLastRecord
-  );
+  const currentUsers = sortedUsers.slice(indexOfFirstRecord, indexOfLastRecord);
 
-  const totalPages = Math.ceil(filteredUsers.length / recordsPerPage);
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+    }
+  };
 
   const handleSortChange = (e) => {
-    const value = e.target.value;
-    if (value === "type") {
-      setSortType("type");
-    } else if (value === "id") {
-      setSortType("id");
-    }
+    setSortType(e.target.value);
   };
 
   const toggleSortDirection = () => {
@@ -221,9 +212,7 @@ const Users = () => {
                           ) : (
                             currentUsers.map((user) => (
                               <tr key={user.customer_id}>
-                                {/* <td>
-                                  <input type="checkbox" />
-                                </td> */}
+
                                 <td>{user.customer_id}</td>
                                 <td>{user.first_name}</td>
                                 <td>{user.last_name}</td>

@@ -321,13 +321,45 @@ router.get('/product-reports-per-month', async (req, res) => {
     }
 });
 
-// Route to receive product reports data and generate Excel file
+
 router.post('/product-reports-export', async (req, res) => {
     try {
         const { month, year, data } = req.body;
 
+        let reportData = [];
         if (!month || !year || !data || !Array.isArray(data) || data.length === 0) {
-            return res.status(400).json({ error: 'Month, year, and valid data are required.' });
+            const query = `
+                SELECT
+                    CONCAT(YEAR(order_details.order_date), '-', MONTH(order_details.order_date)) AS period,
+                    product.product_code,
+                    product.product_name,
+                    SUM(order_details.quantity) AS total_quantity,
+                    SUM(order_details.total_price) AS total_sales
+                FROM
+                    product
+                INNER JOIN order_details ON product.product_code = order_details.product_id
+                GROUP BY
+                    period, product.product_code, product.product_name
+                ORDER BY
+                    period DESC, product.product_name ASC;
+            `;
+
+            const [results] = await db.query(query);
+            reportData = results.map(result => ({
+                period: result.period,
+                product_code: result.product_code,
+                product_name: result.product_name,
+                total_quantity: result.total_quantity || 0,
+                total_sales: parseFloat(result.total_sales || 0).toFixed(2),
+            }));
+        } else {
+            reportData = data.map(result => ({
+                period: result.period,
+                product_code: result.product_code,
+                product_name: result.product_name,
+                total_quantity: result.total_quantity || 0,
+                total_sales: parseFloat(result.total_sales || 0).toFixed(2),
+            }));
         }
 
         const workbook = new ExcelJS.Workbook();
@@ -341,16 +373,16 @@ router.post('/product-reports-export', async (req, res) => {
             { header: 'Total Sales (PHP)', key: 'total_sales', width: 20 },
         ];
 
-        data.forEach(result => {
+        // Populate worksheet with data
+        reportData.forEach(result => {
             worksheet.addRow({
                 period: result.period,
                 product_code: result.product_code,
                 product_name: result.product_name,
                 total_quantity: result.total_quantity,
-                total_sales: parseFloat(result.total_sales).toFixed(2), // Format sales to two decimal places
+                total_sales: result.total_sales,
             });
         });
-
 
         res.setHeader(
             'Content-Type',
@@ -358,7 +390,7 @@ router.post('/product-reports-export', async (req, res) => {
         );
         res.setHeader(
             'Content-Disposition',
-            `attachment; filename=product-report-${month}-${year}.xlsx`
+            `attachment; filename=product-report-${month || 'general'}-${year || 'all'}.xlsx`
         );
 
         // Write the workbook to the response
@@ -370,6 +402,7 @@ router.post('/product-reports-export', async (req, res) => {
         res.status(500).json({ error: 'Failed to generate product report. Please try again.' });
     }
 });
+
 
 
 

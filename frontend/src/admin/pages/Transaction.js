@@ -20,6 +20,7 @@ const Transactions = () => {
       try {
         const response = await axios.get(
           "https://ustp-eccom-server.vercel.app/api/admin-order-history-general",
+          // "http://localhost:5001/api/admin-order-history-general",
           {
             params: { status },
           }
@@ -84,21 +85,23 @@ const Transactions = () => {
   const handlePrintOrders = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5001/admin-order-history-general",
+        "https://ustp-eccom-server.vercel.app/api/admin-order-history-general",
         {
           params: { exportToExcel: "true" },
-          responseType: "blob",
+          responseType: "arraybuffer",
         }
       );
 
       const blob = new Blob([response.data], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
+
       saveAs(blob, "order_summary.xlsx");
     } catch (error) {
       console.error("Error exporting orders to Excel:", error.message);
     }
   };
+
 
   const paginatedOrders = sortedFilteredOrders.slice(
     (currentPage - 1) * pageSize,
@@ -204,9 +207,6 @@ const Transactions = () => {
                         <tr
                           key={`${order.order_id}-${product.product_id}-${index}`}
                         >
-                          {/* <td>
-                            <input type="checkbox" />
-                          </td> */}
                           <td>{product.product_code}</td>
                           <td>{product.product_name}</td>
                           <td>{product.category_name}</td>

@@ -205,18 +205,23 @@ const AdminHistory = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {(orders || []).map((order) => (
-                    (order.products || []).map((product, index) => (
-                      <tr key={`${order.order_id}-${product.product_id}-${index}`}>
-                        <td><input type="checkbox" /></td>
-                        <td>{highlightText(order.customer_id?.toString() ?? 'N/A', searchTerm)}</td>
-                        <td>{highlightText(order.order_id?.toString() ?? 'N/A', searchTerm)}</td>
-                        <td>
-                          {highlightText(
-                            `${order.shipment?.streetname || 'N/A'}, ${order.shipment?.address || ''} ${order.shipment?.city || ''}`,
-                            searchTerm
-                          )}
-                        </td>
+                  {(orders || []).map((order, orderIndex) => (
+                    (order.products || []).map((product, productIndex) => (
+                      <tr key={`${order.order_id}-${product.product_id}-${productIndex}`}>
+                        {productIndex === 0 && (
+                          <>
+                            <td rowSpan={order.products.length}><input type="checkbox" /></td>
+                            <td rowSpan={order.products.length}>{highlightText(order.customer_id?.toString() ?? 'N/A', searchTerm)}</td>
+                            <td rowSpan={order.products.length}>{highlightText(order.order_id?.toString() ?? 'N/A', searchTerm)}</td>
+                            <td rowSpan={order.products.length}>
+                              {highlightText(
+                                `${order.shipment?.streetname || 'N/A'}, ${order.shipment?.address || ''} ${order.shipment?.city || ''}`,
+                                searchTerm
+                              )}
+                            </td>
+                          </>
+                        )}
+
                         <td>{highlightText(product.product_id?.toString() ?? 'N/A', searchTerm)}</td>
                         <td>{highlightText(product.product_name?.trim() ?? 'N/A', searchTerm)}</td>
                         <td>{highlightText(product.category_name ?? 'N/A', searchTerm)}</td>
@@ -225,14 +230,14 @@ const AdminHistory = () => {
                         <td>₱{highlightText(product.item_total?.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? 'N/A', searchTerm)}</td>
                         <td>{highlightText(new Date(order.order_date).toLocaleDateString(), searchTerm)}</td>
                         <td>{highlightText(product.current_quantity?.toString() ?? 'N/A', searchTerm)}</td>
-                        {/* <td>{highlightText(product.current_quantity?.toString() ?? 'N/A', searchTerm)}</td> */}
                         <td>{highlightText(product.running_balance?.toString() ?? 'N/A', searchTerm)}</td>
                         <td>{highlightText(product.payment_status?.toString() ?? 'N/A', searchTerm)}</td>
-
                       </tr>
                     ))
                   ))}
                 </tbody>
+
+
               </table>
 
 

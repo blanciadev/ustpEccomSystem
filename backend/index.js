@@ -30,7 +30,7 @@ const adminOrderUpdates = require('./routes/adminOrderUpdates.js');
 const adminProduct = require('./routes/adminProduct.js');
 const adminProductUpdate = require('./routes/adminProductUpdates.js');
 const AdminBundleOrder = require('./routes/AdminBundleOrder.js');
-// const AdminUsersRoutes = require('./routes/AdminUsersRoutes.js');
+const adminUsersRoutes = require('./routes/adminUsersRoutes.js');
 const token = require('./routes/tokenValidation.js');
 const customerData = require('./routes/customerData.js');
 const handleLogout = require('./routes/handlelogout.js');
@@ -234,8 +234,8 @@ const routes = [
   cartRoutes, customerSignUpRoutes, customerLoginRoutes, productRoutes,
   OrderRoutes, viewTransactionsRoute, userInteraction, adminOrderHistory,
   adminOrderUpdates, adminProduct, adminProductUpdate, AdminBundleOrder,
-  token, customerData, handleLogout, nodemailer
-  //  AdminUsersRoutes,
+  token, customerData, handleLogout, nodemailer,
+  adminUsersRoutes
 ];
 
 routes.forEach(route => {
