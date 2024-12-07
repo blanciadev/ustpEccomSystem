@@ -161,7 +161,6 @@ const Transactions = () => {
                       style={{ width: "90px" }}
                     >
                       <option value="date">Date</option>
-                      <option value="status">Status</option>
                       <option value="customer-id">Customer ID</option>
                     </select>
                   </div>
@@ -222,7 +221,7 @@ const Transactions = () => {
                             {product.product_quantity - product.order_quantity}
                           </td>
                           <td>{order.order_id}</td>
-                          <td>{order.customer_id || "Staff"}</td>
+                          <td>{order.customer_id || "STAFF"}</td>
                           <td>
                             {order.shipment_id || ""}
                           </td>

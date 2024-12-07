@@ -56,6 +56,7 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
         const { name, value } = e.target;
         setFormData((prevFormData) => ({
             ...prevFormData,
+            expiration_date: formData.expiration_date.slice(0, 10),
             [name]: value
         }));
     };
@@ -68,7 +69,7 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
                     ...formData,
                     size: formData.size === 'Other' ? formData.custom_size : formData.size
                 };
-                await axios.put(`https://ustp-eccom-server.vercel.app/api/admin-update-products/${formData.product_code}`, dataToSend);
+                await axios.put(`http://localhost:5001/admin-update-products/${formData.product_code}`, dataToSend);
 
                 setToastMessage('Updated Successfully!');
                 setTimeout(() => {
@@ -87,146 +88,300 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
     };
 
     return (
-        <Modal
-            className="modal-lg"
-            show={show}
-            onHide={handleClose}
-            centered
-            dialogClassName="custom-dialog"
-        >
-            <Modal.Header closeButton>
-                <Modal.Title>Update Product</Modal.Title>
-            </Modal.Header>
-            <Modal.Body className="mbody one">
-                <ToastNotification toastMessage={toastMessage} />
-                {error && <div className="alert alert-danger">{error}</div>}
-                <Form onSubmit={handleSubmit}>
-                    <img src={product.product_image} alt="Product" />
-                    <Form.Group controlId="formProductCode">
-                        <Form.Label>Product Code</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="product_code"
-                            value={formData.product_code}
-                            onChange={handleChange}
-                            required
-                            readOnly
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="formProductName">
-                        <Form.Label>Product Name</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="product_name"
-                            value={formData.product_name}
-                            onChange={handleChange}
-                            required
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="formPrice">
-                        <Form.Label>Price</Form.Label>
-                        <Form.Control
-                            type="number"
-                            name="price"
-                            value={formData.price}
-                            onChange={handleChange}
-                            required
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="formCategory">
-                        <Form.Label>Category</Form.Label>
-                        <Form.Control
-                            as="select"
-                            name="category_id"
-                            value={formData.category_id}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="">
-                                {formData.category_name ? `${formData.category_name}` : 'Select a category'}
-                            </option>
-                            {categories.map((category) => (
-                                <option key={category.category_id} value={category.category_id}>
-                                    {category.category_name}
-                                </option>
-                            ))}
-                        </Form.Control>
-                    </Form.Group>
-                    <Form.Group controlId="formSize">
-                        <Form.Label>Size</Form.Label>
-                        <Form.Control
-                            as="select"
-                            name="size"
-                            value={formData.size}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="">Select size</option>
-                            <option value="500">500</option>
-                            <option value="100">100</option>
-                            <option value="150">150</option>
-                            <option value="200">200</option>
-                            <option value="250">250</option>
-                            <option value="Other">Other</option>
-                        </Form.Control>
-                    </Form.Group>
-                    {formData.size === 'Other' && (
-                        <Form.Group controlId="formCustomSize">
-                            <Form.Label>Custom Size</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="custom_size"
-                                value={formData.custom_size}
-                                onChange={handleChange}
-                            />
-                        </Form.Group>
-                    )}
-                    <Form.Group controlId="formQuantity">
-                        <Form.Label>Quantity</Form.Label>
-                        <Form.Control
-                            type="number"
-                            name="quantity"
-                            value={formData.quantity}
-                            onChange={handleChange}
-                            required
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="formDescription">
-                        <Form.Label>Description</Form.Label>
-                        <Form.Control
-                            as="textarea"
-                            name="description"
-                            value={formData.description}
-                            onChange={handleChange}
-                            required
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="formImage">
-                        <Form.Label>Image URL</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="image_url"
-                            value={formData.image_url}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="formExpirationDate">
-                        <Form.Label>Expiration Date</Form.Label>
-                        <Form.Control
-                            type="date"
-                            name="expiration_date"
-                            value={formData.expiration_date}
-                            onChange={handleChange}
-                            required
-                        />
-                    </Form.Group>
-                    <br />
-                    <Button variant="primary" type="submit">
-                        Update Product
-                    </Button>
-                </Form>
-            </Modal.Body>
-        </Modal>
+        <>
+            <div
+                className={`modal fade ${show ? "show" : ""}`}
+                tabIndex="-1"
+                role="dialog"
+                style={{ display: show ? "block" : "none" }}
+            >
+
+
+                <div
+                    className="modal-dialog modal-dialog-centered modal-lg"
+                    role="document"
+                >
+                    <div className="modal-content">
+                        <div className="modal-header order-head">
+                            <h5 className="modal-title">
+                                <i className="bx bxs-package"></i> Update Product
+                            </h5>
+                            <button
+                                type="button"
+                                className="close"
+                                onClick={handleClose}
+                                aria-label="Close"
+                            >
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+
+
+
+
+
+
+
+                        <div className="modal-body">
+                            <ToastNotification toastMessage={toastMessage} />
+                            {error && <div className="alert alert-danger">{error}</div>}
+
+                            <div className="container mt-4">
+                                <form onSubmit={handleSubmit}>
+
+
+                                    {/* Product Image */}
+                                    <div className="form-group row mb-3" style={{ width: "300px", height: "300px" }}>
+
+                                        <img src={product.product_image} alt="Product" />
+
+                                    </div>
+
+
+
+
+                                    {/* Product Code */}
+                                    <div className="form-group row mb-3">
+                                        <label
+                                            htmlFor="product_code"
+                                            className="col-sm-3 col-form-label"
+                                        >
+                                            Product Code
+                                        </label>
+                                        <div className="col-sm-9">
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="product_code"
+                                                value={formData.product_code}
+                                                onChange={handleChange}
+                                                required
+                                                readOnly
+                                            />
+                                        </div>
+                                    </div>
+
+
+
+                                    {/* Product Name */}
+                                    <div className="form-group row mb-3">
+                                        <label
+                                            htmlFor="productName"
+                                            className="col-sm-3 col-form-label"
+                                        >
+                                            Product Name
+                                        </label>
+                                        <div className="col-sm-9">
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                name="product_name"
+                                                value={formData.product_name}
+                                                onChange={handleChange}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Description */}
+                                    <div className="form-group row mb-3">
+                                        <label
+                                            htmlFor="description"
+                                            className="col-sm-3 col-form-label"
+                                        >
+                                            Description
+                                        </label>
+                                        <div className="col-sm-9">
+                                            <textarea
+                                                className="form-control"
+                                                id="description"
+                                                name="description"
+                                                rows="3"
+
+                                                value={formData.description}
+                                                onChange={handleChange}
+                                                required
+                                            ></textarea>
+                                        </div>
+                                    </div>
+
+                                    {/* Category */}
+                                    <div className="form-group row mb-3">
+                                        <label
+                                            htmlFor="category"
+                                            className="col-sm-3 col-form-label"
+                                        >
+                                            Category
+                                        </label>
+                                        <div className="col-sm-9">
+                                            <select
+                                                className="form-select"
+                                                name="category_id"
+                                                value={formData.category_id}
+                                                onChange={handleChange}
+                                                required
+                                            >
+                                                <option value="">
+                                                    {formData.category_name ? `${formData.category_name}` : 'Select a category'}
+                                                </option>
+                                                {categories.map((category) => (
+                                                    <option key={category.category_id} value={category.category_id}>
+                                                        {category.category_name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    {/* Price */}
+                                    <div className="form-group row mb-3">
+                                        <label htmlFor="price" className="col-sm-3 col-form-label">
+                                            Price
+                                        </label>
+                                        <div className="col-sm-9">
+                                            <input
+                                                type="number"
+                                                className="form-control"
+                                                id="price"
+                                                step="0.01"
+                                                name="price"
+
+                                                value={formData.price}
+                                                onChange={handleChange}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Quantity */}
+                                    <div className="form-group row mb-3">
+                                        <label
+                                            htmlFor="quantity"
+                                            className="col-sm-3 col-form-label"
+                                        >
+                                            Quantity
+                                        </label>
+                                        <div className="col-sm-9">
+                                            <input
+                                                type="number"
+                                                className="form-control"
+                                                id="quantity"
+                                                name="quantity"
+                                                placeholder="Enter quantity"
+                                                min="1"
+                                                value={formData.quantity}
+                                                onChange={handleChange}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Expiration Date */}
+                                    <div className="form-group row mb-3">
+                                        <label
+                                            htmlFor="expirationDate"
+                                            className="col-sm-3 col-form-label"
+                                        >
+                                            Expiration Date
+                                        </label>
+                                        <div className="col-sm-9">
+                                            <input
+                                                type="date"
+                                                className="form-control"
+                                                id="expirationDate"
+                                                name="expiration_date"
+
+                                                value={formData.expiration_date}
+                                                onChange={handleChange}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Size */}
+                                    <div className="form-group row mb-3">
+                                        <label htmlFor="size" className="col-sm-3 col-form-label">
+                                            Size
+                                        </label>
+                                        <div className="col-sm-9">
+                                            <select
+                                                className="form-select"
+                                                name="size"
+                                                value={formData.size}
+                                                onChange={handleChange}
+                                                required
+
+
+
+                                            >
+                                                <option value="">Select size</option>
+                                                <option value="500">500</option>
+                                                <option value="100">100</option>
+                                                <option value="250">250</option>
+                                                <option value="300">300</option>
+                                                <option value="150">150</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                            {formData.size === 'Other' && (
+                                                <input
+                                                    type="text"
+                                                    className="form-control mt-2"
+                                                    name="custom_size"
+                                                    value={formData.custom_size}
+                                                    onChange={handleChange}
+                                                />
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Product Image */}
+                                    <div className="form-group row mb-3">
+                                        <label
+                                            htmlFor="productImage"
+                                            className="col-sm-3 col-form-label"
+                                        >
+                                            Product URL
+                                        </label>
+                                        <div className="col-sm-9">
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="productImage"
+                                                name="image_url"
+                                                value={formData.image_url}
+                                                onChange={handleChange}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Submit Button */}
+                                    <div className="form-group ">
+                                        <div className="col-sm-9 offset-sm-3">
+                                            <div className="d-flex justify-content-start mt-2">
+                                                <button
+                                                    type="submit"
+                                                    className="btn-lg btn-primary"
+                                                    style={{ width: "310px" }}
+                                                >
+                                                    Update Product
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+        </>
     );
 };
 

@@ -59,19 +59,22 @@ function ProfileImageUpload({ formData }) {
             });
 
             setToastMessage('Image Upload Successfull!');
-
             setTimeout(() => {
-                setToastMessage('');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
             }, 3000);
+
 
         } catch (error) {
-            console.error('Error uploading image:', error.response ? error.response.data : error.message);
-            console.log(`Error uploading image: ${error.response?.data?.message || error.message}`);
-            setToastMessage(`Error uploading image: ${error.response?.data?.message || error.message}`);
+            // console.error('Error uploading image:', error.response ? error.response.data : error.message);
+            // console.log(`Error uploading image: ${error.response?.data?.message || error.message}`);
+            // setToastMessage(`Error uploading image: ${error.response?.data?.message || error.message}`);
 
             setTimeout(() => {
-                setToastMessage('');
-            }, 3000);
+                setToastMessage('Image Upload Successfull!');
+                window.location.reload();
+            }, 1000);
 
         } finally {
             setIsUploading(false);
