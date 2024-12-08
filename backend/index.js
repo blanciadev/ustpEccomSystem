@@ -5,13 +5,14 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const { OAuth2Client } = require('google-auth-library');
 const dotenv = require('dotenv');
+const bcrypt = require('bcryptjs');
 
 
 app.use(cors());
 dotenv.config();
 
 // Set your Google Client ID
-const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_ID = '604163930378-hefd54geho5pkurgd149svlovu50j81t.apps.googleusercontent.com';
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 // Port configuration
@@ -42,93 +43,84 @@ const nodemailer = require('./routes/NodeMailer.js');
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
 const crypto = require('crypto');
-const TOKEN_EXPIRATION_TIME = 3600000;
-
-
-app.post('/verify-token', async (req, res) => {
+const TOKEN_EXPIRATION_TIME = 5400000;
+app.post('/api/verify-token', async (req, res) => {
   const { token } = req.body;
 
+  if (!token) {
+    return res.status(400).json({ message: 'Token is required' });
+  }
+
   try {
+    // Verify the Google token
     const ticket = await client.verifyIdToken({
       idToken: token,
       audience: GOOGLE_CLIENT_ID,
     });
-    console.error('Token Validation', token);
 
     const payload = ticket.getPayload();
-    const email = payload.email;
+    const { email, name, picture } = payload;
 
+    console.log('Google token verified. User payload:', payload);
+
+    // Query the database for the user
     const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
 
     if (rows.length > 0) {
       const user = rows[0];
 
-      const [existingTokenRows] = await db.query('SELECT * FROM tokens WHERE user_id = ? AND token_status = ?', [user.customer_id, 'Active']);
+      // Check for and delete any existing active token for the user
+      await db.query('DELETE FROM tokens WHERE user_id = ? AND token_status = ?', [user.customer_id, 'Active']);
+      console.log('Existing active token deleted.');
 
-      if (existingTokenRows.length > 0) {
-        const existingToken = existingTokenRows[0];
+      // Generate a new token
+      const newToken = crypto.randomBytes(64).toString('hex');
 
-        const now = new Date();
-        if (new Date(existingToken.expires_at) > now) {
-          return res.status(200).json({
-            message: 'User verified',
-            payload: payload,
-            status: 'registered',
-            token: token,
-            user_id: user.customer_id,
-            username: user.username,
-            first_name: user.first_name,
-            role_type: user.role_type,
-            profile_img: user.profile_img,
-          });
-        }
-
-        await db.query('DELETE FROM tokens WHERE id = ?', [existingToken.id]);
-      }
-
-
+      // Insert new token into the tokens table
       await db.query('INSERT INTO tokens (user_id, token, token_status, expires_at) VALUES (?, ?, ?, ?)', [
         user.customer_id,
-        token,
+        newToken,
         'Active',
         new Date(Date.now() + TOKEN_EXPIRATION_TIME),
       ]);
 
-
       return res.status(200).json({
-        message: 'User verified',
-        payload: payload,
         status: 'registered',
-        token: token,
-        user_id: user.customer_id,
-        username: user.username,
-        first_name: user.first_name,
-        role_type: user.role_type,
-        profile_img: user.profile_img,
+        payload: {
+          user_id: user.customer_id,
+          username: user.username,
+          first_name: user.first_name,
+          role_type: user.role_type,
+          profile_img: user.profile_img,
+        },
+        token: newToken,
       });
     } else {
+      // User does not exist, return unregistered status
       return res.status(200).json({
-        message: 'User not registered',
-        payload,
         status: 'unregistered',
+        payload: { email, name, picture },
       });
     }
   } catch (error) {
-    console.error('Token verification error:', error);
-    return res.status(400).json({ message: 'Invalid token' });
+    console.error('Error verifying Google token:', error);
+    res.status(500).json({ message: 'Failed to verify token' });
   }
 });
 
-
-app.post('/google-signup', async (req, res) => {
+app.post('/api/google-signup', async (req, res) => {
   const { token } = req.body;
 
   if (!token) {
+    console.log('No token provided');
     return res.status(400).json({ message: 'Google token is required' });
   }
 
   try {
+    console.log('Verifying Google token...');
+    // Verify the Google token
     const ticket = await client.verifyIdToken({
       idToken: token,
       audience: GOOGLE_CLIENT_ID,
@@ -139,40 +131,26 @@ app.post('/google-signup', async (req, res) => {
     const firstName = payload.given_name || '';
     const lastName = payload.family_name || '';
 
+    console.log(`Google token verified for email: ${googleEmail}`);
+
+    // Check if the user exists in the database
     const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [googleEmail]);
+
+    let responsePayload = {};
 
     if (rows.length > 0) {
       const user = rows[0];
+      console.log(`User found in database: ${googleEmail}`);
 
-      const [activeTokens] = await db.query(
-        'SELECT * FROM tokens WHERE user_id = ? AND token_status = ?',
-        [user.customer_id, 'Active']
-      );
+      // Check for existing active token for this user and delete it if it exists
+      await db.query('DELETE FROM tokens WHERE user_id = ? AND token_status = ?', [user.customer_id, 'Active']);
+      console.log('Existing active token deleted.');
 
-      const now = new Date();
-      if (activeTokens.length > 0) {
-        const activeToken = activeTokens[0];
-
-        if (new Date(activeToken.expires_at) > now) {
-          return res.status(200).json({
-            message: 'User verified',
-            status: 'registered',
-            user_id: user.customer_id,
-            username: user.username,
-            first_name: user.first_name,
-            role_type: user.role_type,
-            profile_img: user.profile_img,
-            token: activeToken.token,
-          });
-        }
-
-        await db.query('DELETE FROM tokens WHERE id = ?', [activeToken.id]);
-      }
-
-
+      // Generate a new token
       const newToken = generateToken();
       const expiresAt = new Date(Date.now() + TOKEN_EXPIRATION_TIME);
 
+      // Insert new token into the tokens table
       await db.query('INSERT INTO tokens (user_id, token, token_status, expires_at) VALUES (?, ?, ?, ?)', [
         user.customer_id,
         newToken,
@@ -180,7 +158,7 @@ app.post('/google-signup', async (req, res) => {
         expiresAt,
       ]);
 
-      return res.status(200).json({
+      responsePayload = {
         message: 'User verified',
         status: 'registered',
         user_id: user.customer_id,
@@ -189,17 +167,26 @@ app.post('/google-signup', async (req, res) => {
         role_type: user.role_type,
         profile_img: user.profile_img,
         token: newToken,
-      });
+      };
+
     } else {
+      console.log(`User not found. Registering new user: ${googleEmail}`);
+
+      const defaultPassword = 'password';
+      const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+
       const [result] = await db.query(
         'INSERT INTO users (first_name, last_name, email, password) VALUES (?, ?, ?, ?)',
-        [firstName, lastName, googleEmail, null]);
+        [firstName, lastName, googleEmail, hashedPassword]
+      );
 
       const newUserId = result.insertId;
+      console.log(`New user created with ID: ${newUserId}`);
 
       const newToken = generateToken();
       const expiresAt = new Date(Date.now() + TOKEN_EXPIRATION_TIME);
 
+      // Insert the new token into the tokens table
       await db.query('INSERT INTO tokens (user_id, token, token_status, expires_at) VALUES (?, ?, ?, ?)', [
         newUserId,
         newToken,
@@ -207,7 +194,9 @@ app.post('/google-signup', async (req, res) => {
         expiresAt,
       ]);
 
-      return res.status(201).json({
+      console.log('New user successfully registered and token generated.');
+
+      responsePayload = {
         message: 'User registered successfully',
         status: 'registered',
         user_id: newUserId,
@@ -217,13 +206,16 @@ app.post('/google-signup', async (req, res) => {
         token: newToken,
         role_type: 'Customer',
         profile_img: payload.picture || '',
-      });
+      };
     }
+
+    return res.status(200).json(responsePayload);
   } catch (error) {
     console.error('Token verification error or signup error:', error.message);
     return res.status(500).json({ message: 'Internal server error' });
   }
 });
+
 
 function generateToken() {
   return require('crypto').randomBytes(48).toString('hex');

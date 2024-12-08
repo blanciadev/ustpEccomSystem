@@ -8,9 +8,6 @@ import start from '../../assets/start.png'
 import axios from 'axios';
 
 import { GoogleLogin } from '@react-oauth/google';
-
-
-
 import login_signup from '../../assets/img/login-signup.png'
 
 const Signup = () => {
@@ -68,48 +65,49 @@ const Signup = () => {
       console.error('Error during signup:', error);
     }
   };
-
   const handleGoogleSignup = async (credentialResponse) => {
     const token = credentialResponse.credential;
 
     try {
+      // Log the token before sending to the backend for debugging
+      console.log("Google token sent for signup:", token);
+
       const response = await axios.post('https://ustp-eccom-server.vercel.app/api/google-signup', { token });
 
+      console.log("Server response:", response);
 
       if (response.status === 200) {
-        const userData = response.data.payload;
+        const userData = response.data;
         const userStatus = response.data.status;
 
-        console.log('User Info:', userData);
+        console.log("User Info:", userData);
 
         if (userStatus === 'registered') {
           console.log('Google signup success');
-          // setLoginStatus('Login successful');
-          localStorage.setItem('token', token);
-          localStorage.setItem('customer_id', response.data.user_id);
-          localStorage.setItem('username', response.data.username);
-          localStorage.setItem('first_name', response.data.first_name);
-          localStorage.setItem('role', response.data.role_type);
-          localStorage.setItem('profile_img', response.data.profile_img);
 
+          // Store user data in localStorage for session management
+          localStorage.setItem('token', userData.token);
+          localStorage.setItem('customer_id', userData.user_id);
+          localStorage.setItem('username', userData.username);
+          localStorage.setItem('first_name', userData.first_name);
+          localStorage.setItem('role', userData.role_type);
+          localStorage.setItem('profile_img', userData.profile_img);
+
+          // Log token for debugging
+          console.log('Token stored in localStorage:', userData.token);
+
+          // Redirect to forgot password page after storing data
           navigate('/forgot-password');
-          console.log(token);
         } else {
-
-          console.log('Google signup ');
-          navigate('/signup');
+          console.log('User is not registered, navigating to login');
+          navigate('/login');
         }
       }
     } catch (err) {
-
-      console.error('Error during Google login:', err);
-      // setToastMessage('Failed to login with Google. Please try again.');
-
-      // setTimeout(() => {
-      //   setToastMessage('');
-      // }, 3000);
+      console.error('Error during Google signup:', err);
     }
   };
+
 
 
 

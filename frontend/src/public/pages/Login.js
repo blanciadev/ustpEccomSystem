@@ -80,28 +80,43 @@ const Login = () => {
     const handleGoogleLogin = async (credentialResponse) => {
         const token = credentialResponse.credential;
 
+        console.log('Google credential received:', token);
+
         try {
+            console.log('Sending token to server for verification...');
+
+            // Send token to backend for verification
             const response = await axios.post('https://ustp-eccom-server.vercel.app/api/verify-token', { token });
+
+            console.log('Server response:', response);
 
             if (response.status === 200) {
                 const userData = response.data.payload;
                 const userStatus = response.data.status;
 
-                console.log('User Info:', userData);
+                // console.log('User Info:', userData);
+                // console.log('User Status:', userStatus);
 
                 if (userStatus === 'registered') {
                     setLoginStatus('Login successful');
-                    localStorage.setItem('token', token);
-                    localStorage.setItem('customer_id', response.data.user_id);
-                    localStorage.setItem('username', response.data.username);
-                    localStorage.setItem('first_name', response.data.first_name);
-                    localStorage.setItem('role', response.data.role_type);
-                    localStorage.setItem('profile_img', response.data.profile_img);
 
+                    localStorage.setItem('token', response.data.token);
+                    localStorage.setItem('customer_id', userData.user_id);
+                    localStorage.setItem('username', userData.username);
+                    localStorage.setItem('first_name', userData.first_name);
+                    localStorage.setItem('role', userData.role_type);
+                    localStorage.setItem('profile_img', userData.profile_img);
 
+                    // Redirect to home page
                     navigate('/');
-                    console.log(token);
                 } else {
+                    // console.log('User is not registered. Redirecting to signup page...');
+                    // Store Google info for potential use in signup
+                    localStorage.setItem('google_email', userData.email);
+                    localStorage.setItem('google_name', userData.name);
+                    localStorage.setItem('google_picture', userData.picture);
+
+                    // Redirect to signup
                     navigate('/signup');
                 }
             }
@@ -109,11 +124,15 @@ const Login = () => {
             console.error('Error during Google login:', err);
             setToastMessage('Failed to login with Google. Please try again.');
 
+            // Clear toast message after 3 seconds
             setTimeout(() => {
                 setToastMessage('');
             }, 3000);
         }
     };
+
+
+
 
 
 
@@ -157,7 +176,7 @@ const Login = () => {
                                                             <GoogleLogin
                                                                 class="d-flex btn btn-outline-danger justify-content-center align-items-center"
                                                                 onSuccess={handleGoogleLogin}
-                                                                onError={(error) => console.error('Google login error:', error)} // Handle error response
+                                                                onError={(error) => console.error('Google login error:', error)}
                                                             />
 
                                                         </div>
