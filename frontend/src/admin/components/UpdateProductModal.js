@@ -3,7 +3,6 @@ import './modal.css';
 import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
 import ToastNotification from '../../public/components/ToastNotification';
-
 const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
     const [formData, setFormData] = useState({
         product_code: '',
@@ -13,7 +12,7 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
         category_name: '',
         quantity: '',
         description: '',
-        image_url: '',
+        product_image: '',
         size: '',
         custom_size: '',
         expiration_date: ''
@@ -32,10 +31,10 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
                 category_name: product.category_name || '',
                 quantity: product.quantity || '',
                 description: product.description || '',
-                image_url: product.product_image || '',
+                product_image: product.product_image || '',
                 size: product.size || '',
                 custom_size: product.size && !['500', '100', '150', '200', '250'].includes(product.size) ? product.size : '', // Handle custom size
-                expiration_date: product.expiration_date || ''
+                expiration_date: formatDate(product.expiration_date) || ''
             });
         }
 
@@ -52,12 +51,17 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
         fetchCategories();
     }, [product]);
 
+    const formatDate = (datetime) => {
+        if (!datetime) return "";
+        const date = new Date(datetime);
+        return date.toISOString().split("T")[0];
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevFormData) => ({
             ...prevFormData,
-            expiration_date: formData.expiration_date.slice(0, 10),
-            [name]: value
+            [name]: name === 'expiration_date' ? formatDate(value) : value
         }));
     };
 
@@ -69,11 +73,10 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
                     ...formData,
                     size: formData.size === 'Other' ? formData.custom_size : formData.size
                 };
-                await axios.put(`http://localhost:5001/admin-update-products/${formData.product_code}`, dataToSend);
+                await axios.put(`https://ustp-eccom-server.vercel.app/api/admin-update-products/${formData.product_code}`, dataToSend);
 
                 setToastMessage('Updated Successfully!');
                 setTimeout(() => {
-                    setToastMessage('');
                     handleUpdate();
                     handleClose();
                 }, 2000);
@@ -86,6 +89,8 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
             setError('Failed to update product. Please try again.');
         }
     };
+
+
 
     return (
         <>
@@ -246,7 +251,6 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
                                                 id="price"
                                                 step="0.01"
                                                 name="price"
-
                                                 value={formData.price}
                                                 onChange={handleChange}
                                                 required
@@ -289,12 +293,12 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
                                             <input
                                                 type="date"
                                                 className="form-control"
-                                                id="expirationDate"
+                                                id="expiration_date"
                                                 name="expiration_date"
-
-                                                value={formData.expiration_date}
+                                                value={formatDate(formData.expiration_date)}
                                                 onChange={handleChange}
                                                 required
+
                                             />
                                         </div>
                                     </div>
@@ -311,9 +315,6 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
                                                 value={formData.size}
                                                 onChange={handleChange}
                                                 required
-
-
-
                                             >
                                                 <option value="">Select size</option>
                                                 <option value="500">500</option>
@@ -347,9 +348,9 @@ const UpdateProductModal = ({ show, product, handleClose, handleUpdate }) => {
                                             <input
                                                 type="text"
                                                 className="form-control"
-                                                id="productImage"
-                                                name="image_url"
-                                                value={formData.image_url}
+                                                id="product_image"
+                                                name="product_image"
+                                                value={formData.product_image}
                                                 onChange={handleChange}
                                                 required
                                             />

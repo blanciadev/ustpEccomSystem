@@ -79,14 +79,12 @@ router.get('/product-category', async (req, res) => {
         res.status(500).send('Error fetching product categories');
     }
 });
-
 router.put('/admin-update-products/:product_code', async (req, res) => {
     const { product_code } = req.params;
     const updateData = req.body;
 
     console.log(`Received request to update product with code: ${product_code}`);
 
-    // SQL query with parameter placeholders
     const query = `
         UPDATE products
         SET
@@ -94,17 +92,20 @@ router.put('/admin-update-products/:product_code', async (req, res) => {
             description = COALESCE(NULLIF($2, ''), description),
             category_id = COALESCE(NULLIF($3, ''), category_id),
             price = COALESCE(NULLIF($4, ''), price),
-            quantity = COALESCE(NULLIF($5, ''), quantity)
-        WHERE product_code = $6;
+            quantity = COALESCE(NULLIF($5, ''), quantity),
+            expiration_date = COALESCE(NULLIF($6, ''), expiration_date),
+            product_image = COALESCE(NULLIF($7, ''), product_image)
+        WHERE product_code = $8;
     `;
 
-    // Extract values from the updateData object
     const values = [
         updateData.product_name,
         updateData.description,
         updateData.category_id,
         updateData.price,
         updateData.quantity,
+        updateData.expiration_date,
+        updateData.product_image,
         product_code
     ];
 
@@ -129,9 +130,22 @@ router.get('/admin-products', async (req, res) => {
     try {
         // Fetch all products and their categories
         const [rows] = await db.query(`
-            SELECT p.product_id, p.product_code, p.product_name, p.price ,p.description, p.quantity, c.category_name, p.product_image
-            FROM product p
-            INNER JOIN category c ON p.category_id = c.category_id
+            SELECT
+            p.product_id, 
+            p.product_code, 
+            p.product_name, 
+            p.price, 
+            p.description, 
+            p.quantity, 
+            c.category_name, 
+            p.product_image, 
+            p.expiration_date
+        FROM
+            product AS p
+            INNER JOIN
+            category AS c
+            ON 
+		p.category_id = c.category_id
         `);
 
         // Respond with product details including categories
@@ -141,6 +155,8 @@ router.get('/admin-products', async (req, res) => {
         res.status(500).send('Error fetching products');
     }
 });
+
+
 
 router.get('/admin-products-targeted', async (req, res) => {
     const { product_code } = req.query;
