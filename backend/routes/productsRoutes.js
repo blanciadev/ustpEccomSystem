@@ -195,9 +195,16 @@ router.get('/sticky-components', async (req, res) => {
 
         // If query is provided, add the product name filter
         if (query) {
-            console.log('Adding product name filter:', query);
-            searchTerms.push('LOWER(product_name) LIKE ?');
-            queryParams.push(`%${query.toLowerCase()}%`);
+            console.log('Adding product name and description filters for each word:', query);
+        
+            // Split the query into individual words
+            const words = query.toLowerCase().split(/\s+/); // Split by whitespace
+        
+            // Add conditions for each word
+            words.forEach((word) => {
+                searchTerms.push('(LOWER(product_name) LIKE ? OR LOWER(description) LIKE ?)');
+                queryParams.push(`%${word}%`, `%${word}%`);
+            });
         }
 
         // Add filter terms if provided

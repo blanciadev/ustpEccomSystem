@@ -327,7 +327,7 @@ const Checkout = () => {
 
   const formatPhoneNumber = (input) => {
     const formattedInput = input.replace(/\D/g, "");
-    const phonePrefix = "+639";
+    const phonePrefix = "09";
     const mainNumber = formattedInput.slice(3);
 
     return mainNumber.length > 0
@@ -338,15 +338,31 @@ const Checkout = () => {
       : phonePrefix;
   };
 
+  // const handlePhoneNumberChange = (e) => {
+  //   let input = e.target.value.replace(/\D/g, "");
+
+  //   if (!input.startsWith("09")) {
+  //     input = "09" + input;
+  //   }
+
+  //   setFormData({ ...formData, phoneNumber: `${input}` });
+  // };
+
+
   const handlePhoneNumberChange = (e) => {
     let input = e.target.value.replace(/\D/g, "");
-
+  
     if (!input.startsWith("09")) {
       input = "09" + input;
     }
-
+  
+    if (input.length > 11) {
+      input = input.slice(0, 11); // Limit input to 11 digits
+    }
+  
     setFormData({ ...formData, phoneNumber: `${input}` });
   };
+  
 
   const formatPhoneNumberOnBlur = () => {
     const formattedPhone = formatPhoneNumber(formData.phoneNumber);
@@ -411,7 +427,7 @@ const Checkout = () => {
                         placeholder="Enter your phone number"
                         value={formData.phoneNumber}
                         onChange={handlePhoneNumberChange}
-                        onBlur={formatPhoneNumberOnBlur}
+                        // onBlur={formatPhoneNumberOnBlur}
                         maxLength="12"
                         required
                       />
@@ -559,13 +575,15 @@ const Checkout = () => {
                           </div>
 
                           <div class="col-md-9">
+                            <div>
                             <p class="text-start mb-1">
                               {product.product_name}
                             </p>
+                            </div>
 
-                            <div class="d-flex justify-content-between align-content-center">
-                              <div className="row">
-                                <div className="col border">
+                            <div class="">
+                              <div className="row ">
+                                <div className="col-6 ">
                                   <p
                                     className={`mb-1 ${effectiveDiscount > 0
                                       ? "text-decoration-line-through text-muted"
@@ -579,7 +597,7 @@ const Checkout = () => {
                                     })}
                                   </p>
                                 </div>
-                                <div className="col border">
+                                <div className="col-6 ">
                                   <span class="text-danger">
                                     ₱
                                     {total.toLocaleString("en-US", {
@@ -591,10 +609,13 @@ const Checkout = () => {
 
                                 {/* Discounted Price column */}
                                 {effectiveDiscount > 0 && (
-                                  <div className="col-12 border">
+                                  <div className="col-12 ">
                                     <p className="mb-2 text-success fw-bold">
                                       Discounted Price: ₱
-                                      {discountedPrice.toFixed(2)} at{" "}
+                                      {discountedPrice.toLocaleString("en-US", {
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2,
+                                    })} at{" "}
                                       {effectiveDiscount}% Off
                                     </p>
                                   </div>

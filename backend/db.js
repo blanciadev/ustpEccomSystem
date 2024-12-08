@@ -3,18 +3,18 @@ const mysql = require('mysql2/promise');
 // Create a connection pool
 const pool = mysql.createPool({
 
-    host: '85.31.233.19',
-    user: 'root',
-    password: '2020303757',
-    port: 3306,
-    database: 'ustpecom',
-
-
-
-
-    // host: 'localhost',
+    // host: '85.31.233.19',
     // user: 'root',
-    // // port: '3306',
+    // password: '2020303757',
+    // port: 3306,
+    // database: 'ustpecom',
+
+
+
+
+    host: 'localhost',
+    user: 'root',
+    port: '3306',
     // // password: '',
 
     // // PORT KURT 
@@ -22,10 +22,10 @@ const pool = mysql.createPool({
     // password: 'root',
 
     // //SAM
-    // // password: "sam12345",
+    password: "sam12345",
 
     // // password: '',
-    // database: 'ustpecom',
+    database: 'ustpecom',
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0

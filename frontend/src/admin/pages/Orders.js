@@ -23,7 +23,7 @@ const Orders = () => {
   const [modalShow, setModalShow] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 425);
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 6;
+  const pageSize = 10;
 
   const fetchOrders = async () => {
     try {

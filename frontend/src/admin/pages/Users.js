@@ -17,7 +17,7 @@ const Users = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 425);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 10;
+  const recordsPerPage = 4;
   const [selectedUser, setSelectedUser] = useState(null);
   const [sortType, setSortType] = useState("id");
   const [sortDirection, setSortDirection] = useState("asc");
@@ -175,7 +175,7 @@ const Users = () => {
               </div>
 
               <div className="ship-table">
-                <div className="mx-4" style={{ height: "400px" }}>
+                <div className="mx-4" style={{ height: "260px" }}>
                   <div>
                     {loading ? (
                       <p>Loading...</p>

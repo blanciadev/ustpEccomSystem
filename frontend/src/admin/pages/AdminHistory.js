@@ -131,59 +131,89 @@ const AdminHistory = () => {
         </div>
         <div className='body'>
           <div className='admin-order'>
-            <div className='cheader'>
-              <div className='search'>
-                <form>
-                  <input
-                    type='search'
-                    placeholder='Search orders...'
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </form>
-              </div>
 
-              <div className='options'>
-                <div className='print'>
-                  <button onClick={handlePrintOrders}>
-                    {isMobile ? (
-                      <i className='bx bx-printer'></i>
-                    ) : (
-                      'Export Order Record'
-                    )}
-                  </button>
-                </div>
-                <div className='sort'>
-                  <label htmlFor='sort'>Sort By:</label>
-                  <select
-                    name='sort'
-                    id='sort'
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                  >
-                    <option value='date'>Date</option>
-                    <option value='status'>Status</option>
-                    <option value='customer-id'>Customer ID</option>
-                  </select>
-                </div>
-                <div className='order-filter'>
-                  <label htmlFor='status'>Filter By Status:</label>
-                  <select
-                    name='status'
-                    id='status'
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value)}
-                  >
-                    <option value=''>All</option>
-                    {statusOptions.map(option => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
+
+            <div class="container align-items-center mt-4 mb-4">
+
+<div class="row align-items-center m-0 p-0 ">
+
+  <div class="col-4">
+    <div class="search d-flex  ">
+      {" "}
+      <form>
+        <input
+          type="search"
+          placeholder="Search orders..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="form-control"
+        />
+      </form>
+    </div>
+  </div>
+
+  <div class="col-3 ">
+    <div class="d-flex justify-content-center ">
+      <button
+        onClick={handlePrintOrders}
+        className="btn btn-primary"
+      >
+
+        <i class="bx bx-export"></i> Export Order Record
+
+      </button>
+    </div>
+  </div>
+
+  <div class="col-2 ">
+    <div class="d-flex align-items-center" >
+      <label htmlFor="sort" className="me-2">
+        Sort By:
+      </label>
+      <select
+        name="sort"
+        id="sort"
+        value={sortBy}
+        onChange={(e) => setSortBy(e.target.value)}
+        className="form-select"
+        style={{ width: "90px" }}
+      >
+        <option value="date">Date</option>
+        <option value="status">Status</option>
+        <option value='customer-id'>Customer ID</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="col-3">
+    <div class="d-flex align-items-center">
+      <label htmlFor="status" className="me-2 ">
+        Filter By Status:
+      </label>
+
+      <select
+        value={status}
+        onChange={(e) => setStatus(e.target.value)}
+        className="form-select"
+        style={{ width: "130px" }}
+      >
+        <option value="">All</option>
+        {statusOptions.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+
+      </select>
+    </div>
+  </div>
+</div>
+</div>
+
+
+
+
+
             <div className='order-table'>
               <table className='table table-hover'>
                 <thead className='bg-light sticky-top'>

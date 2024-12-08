@@ -534,6 +534,7 @@ const ProductList = ({ stickyComponents }) => {
                                                             product={product}
                                                             className="product-card1"
                                                             onProductClick={handleProductClick}
+                                                            onClick={() => handleProductClick(product)} // Trigger the handler correctly
                                                         >
 
 
