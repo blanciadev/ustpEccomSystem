@@ -203,17 +203,18 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
 
                 <br />
 
-                <div class="product-details-order">
+                <div className="product-details-order">
                   <h5 className="modal-title text-start ps-4">Product Details</h5>
 
-                  <table class="table">
+                  <table className="table">
                     <thead>
                       <tr>
                         <th scope="col">Images</th>
                         <th scope="col">Product Name</th>
                         <th scope="col">Price</th>
                         <th scope="col">Quantity</th>
-                        <th scope="col">Sub-total</th>
+                        <th scope="col">Discount</th>
+                        <th scope="col">Total Price</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -221,6 +222,7 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                         const productTotal = product.price
                           ? product.price * product.quantity
                           : 0;
+                        const productTotalPrice = product.order_details_total_price || productTotal; // Use the calculated total price or fallback to default total
                         return (
                           <tr key={index}>
                             <td className="text-left">
@@ -240,68 +242,72 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                               />
                             </td>
 
-                            <td className="text-left">
-                              {product.product_name}
-                            </td>
+                            <td className="text-left">{product.product_name}</td>
                             <td>
                               ₱ {product.price ? product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "N/A"}
-
                             </td>
                             <td>{product.quantity}</td>
                             <td>
-                              ₱ {productTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              {product.product_discount
+                                ? `${product.product_discount}%`
+                                : "No Discount"}
                             </td>
+                            <td>
+                              {/* Calculate the total price based on the discount */}
+                              ₱ {
+                                product.product_discount
+                                  ? (
+                                    (product.price - (product.price * product.product_discount / 100)) * product.quantity
+                                  ).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                  : (product.price * product.quantity).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                              }
+                            </td>
+
                           </tr>
                         );
                       })}
                     </tbody>
                   </table>
                   <div className="mx-2">
-                    <div class="row align-items-center ">
-                      <div class="col-9 text-end  ">
-                        <p>
-                          <strong>Total for Products</strong>
-                        </p>
+                    {/* Total for Products */}
+                    <div className="row align-items-center">
+                      <div className="col-9 text-end">
+                        <p><strong>Total for Products</strong></p>
                       </div>
-                      <div class="col-3 text-end">
+                      <div className="col-3 text-end">
                         <p className="text-danger fw-bold">
-                          {" "}
                           ₱ {totalProductCost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-
                         </p>
                       </div>
                     </div>
 
-                    <div class="row align-items-center ">
-                      <div class="col-9 text-end  ">
-                        <p>
-                          <strong>Shipping Cost</strong>
-                        </p>
+                    {/* Shipping Cost */}
+                    <div className="row align-items-center">
+                      <div className="col-9 text-end">
+                        <p><strong>Shipping Cost</strong></p>
                       </div>
-                      <div class="col-3 text-end">
+                      <div className="col-3 text-end">
                         <p className="text-danger fw-bold">
                           ₱ {shippingCost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-
-
                         </p>
                       </div>
                     </div>
 
-                    <div class="row align-items-center ">
-                      <div class="col-9 text-end  ">
-                        <p>
-                          <strong>Grand Total</strong>
-                        </p>
+                    {/* Grand Total */}
+                    <div className="row align-items-center">
+                      <div className="col-9 text-end">
+                        <p><strong>Grand Total</strong></p>
                       </div>
-                      <div class="col-3 text-end">
+                      <div className="col-3 text-end">
                         <p className="text-danger fw-bold">
-                          {" "}
                           ₱ {grandTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </p>
                       </div>
                     </div>
                   </div>
+
                 </div>
+
               </div>
             )}
           </div>

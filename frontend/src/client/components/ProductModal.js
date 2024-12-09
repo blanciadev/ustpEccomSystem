@@ -37,6 +37,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                 body: JSON.stringify({ product_code: product.product_code }),
             });
 
+
             const fetchBundles = fetch('https://ustp-eccom-server.vercel.app/api/product-bundles', {
                 method: 'POST',
                 headers: {
@@ -77,7 +78,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                 });
         }
     }, [product]);
-
+    console.log('Recommended products:', recommendedProducts);
     const calculateDiscountedPrice = (price, discount) => {
         if (discount && discount > 0) {
             return price - (price * discount) / 100;
@@ -91,7 +92,6 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
             setToastMessage('');
         }, 3000);
     };
-
 
     const handleBuyNowBundle = () => {
         const token = localStorage.getItem('token');
@@ -397,10 +397,6 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                         ) : recommendedProducts.length > 0 ? (
                             <div className="recommended-modalproducts-grid">
 
-
-
-
-
                                 {recommendedProducts
                                     .filter((recProduct) => recProduct.quantity > 0)
                                     .map((recProduct) => (
@@ -422,19 +418,6 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                                                         Discounted by: {recProduct.product_discount}%
                                                     </span>
                                                 )}
-
-
-
-
-
-
-
-
-
-
-
-
-
 
                                                 <button
                                                     className="add-to-cart-button px-10"
@@ -462,7 +445,11 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                                                             )
                                                         )
                                                     }
-                                                    onClick={() => onAddToCart(recProduct)}
+                                                    onClick={() => {
+                                                        const quantity = 1;
+                                                        localStorage.setItem('quantity', quantity);
+                                                        onAddToCart(recProduct);
+                                                    }}
                                                 >
                                                     Add to cart
                                                 </button>
@@ -512,7 +499,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
 
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

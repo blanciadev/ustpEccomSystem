@@ -30,6 +30,7 @@ const Orders = () => {
         }
       );
       setOrders(response.data.orders);
+      // console.log("data from orders", response.data.orders);
     } catch (error) {
       console.error("Error fetching orders:", error.message);
     }

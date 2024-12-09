@@ -67,11 +67,13 @@ router.put('/admin-update-products/:product_code', async (req, res) => {
     }
 });
 
+
 router.get('/admin-order-history', async (req, res) => {
     try {
         const { status, searchTerm, exportToExcel, page = 1 } = req.query;
         const pageSize = 10; // Define the number of results per page
         const offset = (page - 1) * pageSize;
+        console.log(req.query);
 
         let query = `
         SELECT
@@ -82,12 +84,19 @@ router.get('/admin-order-history', async (req, res) => {
             order_details.order_date, 
             order_details.order_update, 
             order_details.payment_method, 
-            order_details.total_price AS order_details_total_price, 
+            -- Calculate the order_details_total_price based on the discount
+            CASE 
+                WHEN product.product_discount > 0 THEN 
+                    (product.price - (product.price * product.product_discount / 100)) * order_details.quantity
+                ELSE 
+                    product.price * order_details.quantity
+            END AS order_details_total_price, 
             order_details.quantity AS order_quantity, 
             order_details.payment_status, 
             product.price, 
             product.product_image, 
             product.quantity AS original_quantity, 
+            product.product_discount,  
             users.customer_id, 
             users.first_name, 
             users.last_name, 
@@ -116,7 +125,9 @@ router.get('/admin-order-history', async (req, res) => {
             category ON product.category_id = category.category_id
         WHERE
             order_details.order_status <> 'Completed'
-        `;
+    `;
+
+
 
         // Add where clause if status or searchTerm is provided
         const conditions = [];
@@ -178,6 +189,7 @@ router.get('/admin-order-history', async (req, res) => {
                 product_id: order.product_id,
                 product_name: order.product_name,
                 product_image: order.product_image,
+                product_discount: order.product_discount,
                 price: order.price,
                 quantity: order.order_quantity,
                 item_total: order.order_details_total_price,
@@ -193,7 +205,6 @@ router.get('/admin-order-history', async (req, res) => {
 
         const ordersArray = Object.values(groupedOrders);
 
-        // If the exportToExcel query parameter is set, generate and send Excel file
         if (exportToExcel === 'true') {
             const workbook = new ExcelJS.Workbook();
             const worksheet = workbook.addWorksheet('Orders');
@@ -206,18 +217,23 @@ router.get('/admin-order-history', async (req, res) => {
                 { header: 'Order Status', key: 'order_status', width: 15 },
                 { header: 'Payment Status', key: 'payment_status', width: 15 },
                 { header: 'Payment Method', key: 'payment_method', width: 15 },
-                { header: 'Total Price', key: 'total_price', width: 15 },
+                { header: 'Price', key: 'price', width: 10 },
                 { header: 'Product ID', key: 'product_id', width: 15 },
                 { header: 'Product Name', key: 'product_name', width: 30 },
                 { header: 'Category', key: 'category_name', width: 20 },
-                { header: 'Price', key: 'price', width: 10 },
                 { header: 'Quantity', key: 'quantity', width: 10 },
+                { header: 'Total Price', key: 'total_price', width: 15 },
 
             ];
 
             // Add rows
             ordersArray.forEach(order => {
                 order.products.forEach(product => {
+                    // Calculate the discounted total price for the product
+                    const productTotalPrice = product.product_discount > 0
+                        ? (product.price - (product.price * product.product_discount / 100)) * product.quantity
+                        : product.price * product.quantity;
+
                     worksheet.addRow({
                         order_id: order.order_id,
                         customer_id: `${order.customer_id}`,
@@ -225,12 +241,12 @@ router.get('/admin-order-history', async (req, res) => {
                         order_status: order.order_status,
                         payment_status: order.payment_status,
                         payment_method: order.payment_method,
-                        total_price: order.order_total,
+                        price: product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), // Original price
                         product_id: product.product_id,
                         product_name: product.product_name,
                         category_name: product.category_name,
-                        price: product.price,
                         quantity: product.quantity,
+                        total_price: productTotalPrice.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), // Use the discounted total price
 
                     });
                 });
@@ -247,6 +263,8 @@ router.get('/admin-order-history', async (req, res) => {
             res.end();
             return;
         }
+
+
 
         // Send JSON response with orders
         res.json({ orders: ordersArray });
