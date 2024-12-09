@@ -12,23 +12,23 @@ const AdminHistory = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('date');
   const [statusOptions, setStatusOptions] = useState([
-    'To Ship', 'To Receive', 'Completed', 'Cancelled', 'Return/Refund', 'Pending'
+    'Order Paid', 'Pending'
   ]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalShow, setModalShow] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 425);
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const pageSize = 10;
 
   const fetchOrders = async () => {
     try {
       const response = await axios.get('https://ustp-eccom-server.vercel.app/api/admin-order-history-records', {
-        params: { status, searchTerm, sortBy }
-
+        params: { status, searchTerm, sortBy, page: currentPage, pageSize }
       });
-      setOrders(response.data.orders);
-      //console.log(response.data.orders);
+      setOrders(response.data.orders); // Update orders with backend-provided paginated data
+      setTotalPages(response.data.totalPages); // Use total pages from backend
     } catch (error) {
       console.error('Error fetching orders:', error.message);
     }
@@ -36,13 +36,7 @@ const AdminHistory = () => {
 
   useEffect(() => {
     fetchOrders();
-
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [status, searchTerm, sortBy]);
+  }, [status, searchTerm, sortBy, currentPage]);
 
   const handleResize = () => {
     setIsMobile(window.innerWidth <= 425);
@@ -82,22 +76,23 @@ const AdminHistory = () => {
         return new Date(b.order_date) - new Date(a.order_date);
       } else if (sortBy === 'status') {
         return a.order_status.localeCompare(b.order_status);
-      } else if (sortBy === 'id') {
-        return a.order_id - b.order_id;
-      } else if (sortBy === 'customer-id') {
-        return `${a.customer_first_name} ${a.customer_last_name}`.localeCompare(`${b.customer_first_name} ${b.customer_last_name}`);
+      } else if (sortBy === 'customer_id') {
+        return a.customer_id.toString().localeCompare(b.customer_id.toString());
       }
-      return 0;
+      return 0; // Default case, no sorting applied
     });
   };
 
+
   const sortedFilteredOrders = sortOrders(filteredOrders);
 
-  const totalPages = Math.ceil(sortedFilteredOrders.length / pageSize);
 
   const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+    }
   };
+
 
   const handlePrintOrders = async () => {
     try {
@@ -165,7 +160,7 @@ const AdminHistory = () => {
                   </div>
                 </div>
 
-                <div class="col-2 ">
+                {/* <div class="col-2 ">
                   <div class="d-flex align-items-center" >
                     <label htmlFor="sort" className="me-2">
                       Sort By:
@@ -183,7 +178,7 @@ const AdminHistory = () => {
                       <option value='customer-id'>Customer ID</option>
                     </select>
                   </div>
-                </div>
+                </div> */}
 
                 <div class="col-3">
                   <div class="d-flex align-items-center">
@@ -271,30 +266,52 @@ const AdminHistory = () => {
               </table>
 
 
-              <div className="pagination">
-                <button onClick={() => handlePageChange(1)}>&lt;&lt;</button>
+              <div className="pagination d-flex justify-content-center align-items-center mt-3">
+                <button
+                  onClick={() => handlePageChange(1)}
+                  disabled={currentPage === 1}
+                  className="btn btn-outline-primary me-2"
+                >
+                  &lt;&lt;
+                </button>
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
+                  className="btn btn-outline-primary me-2"
                 >
                   &lt;
                 </button>
-                <span>
-                  Page {currentPage} of {totalPages}
-                </span>
+                {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
+                  <button
+                    key={pageNumber}
+                    onClick={() => handlePageChange(pageNumber)}
+                    className={`btn ${currentPage === pageNumber ? 'btn-primary' : 'btn-outline-primary'} me-2`}
+                  >
+                    {pageNumber}
+                  </button>
+                ))}
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
+                  className="btn btn-outline-primary me-2"
                 >
                   &gt;
                 </button>
-                <button onClick={() => handlePageChange(totalPages)}>&gt;&gt;</button>
+                <button
+                  onClick={() => handlePageChange(totalPages)}
+                  disabled={currentPage === totalPages}
+                  className="btn btn-outline-primary"
+                >
+                  &gt;&gt;
+                </button>
               </div>
+
+
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

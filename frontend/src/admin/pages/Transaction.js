@@ -61,18 +61,29 @@ const Transactions = () => {
   });
 
 
+
   const sortOrders = (orders) => {
     return [...orders].sort((a, b) => {
       if (sortBy === "date") {
         return new Date(b.order_date) - new Date(a.order_date);
-      } else if (sortBy === "status") {
-        return a.order_status.localeCompare(b.order_status);
-      } else if (sortBy === "customer-id") {
+      } else if (sortBy === "order_paid") {
+        // Sort orders with "Order Paid" first, then others alphabetically
+        if (a.payment_status === "Order Paid" && b.payment_status !== "Order Paid") return -1;
+        if (a.payment_status !== "Order Paid" && b.payment_status === "Order Paid") return 1;
+        return a.payment_status.localeCompare(b.payment_status);
+      } else if (sortBy === "Pending") {
+        // Sort orders with "Pending" first, then others alphabetically
+        if (a.payment_status === "Pending" && b.payment_status !== "Pending") return -1;
+        if (a.payment_status !== "Pending" && b.payment_status === "Pending") return 1;
+        return 0; // Ensure no change when both are "Pending"
+      } else if (sortBy === "customer_id") {
         return a.customer_id - b.customer_id;
       }
       return 0;
     });
   };
+
+
 
   const sortedFilteredOrders = sortOrders(filteredOrders);
 
@@ -164,7 +175,9 @@ const Transactions = () => {
                       style={{ width: "90px" }}
                     >
                       <option value="date">Date</option>
-                      <option value="customer-id">Customer ID</option>
+                      <option value="Order Paid">Order Paid</option>
+                      <option value="Pending">Pending</option>
+                      <option value="customer_id">Customer ID</option>
                     </select>
                   </div>
                 </div>

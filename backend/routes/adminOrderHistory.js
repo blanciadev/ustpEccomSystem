@@ -323,11 +323,9 @@ router.get('/admin-order-history-records', async (req, res) => {
             shipment ON \`order\`.order_id = shipment.order_id
         INNER JOIN
             category ON product.category_id = category.category_id
-        WHERE
-            order_details.order_status <> 'Completed'
+       
         `;
 
-        // Add where clause if status or searchTerm is provided
         const conditions = [];
         if (status) {
             conditions.push('order_details.payment_status = ?');
@@ -340,13 +338,11 @@ router.get('/admin-order-history-records', async (req, res) => {
             query += ' AND ' + conditions.join(' AND ');
         }
 
-        query += ` ORDER BY \`order\`.order_date DESC LIMIT ? OFFSET ?`;
+        query += ` ORDER BY \`order\`.order_date DESC `;
 
         const queryParams = [
             ...(status ? [status] : []),
-            ...(searchTerm ? [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`] : []),
-            pageSize,
-            offset
+            ...(searchTerm ? [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`] : [])
         ];
 
         const [orders] = await db.query(query, queryParams);
@@ -459,8 +455,15 @@ router.get('/admin-order-history-records', async (req, res) => {
             return;
         }
 
-        // Send JSON response with orders
-        res.json({ orders: ordersArray });
+        // Paginate the orders for JSON response
+        const paginatedOrders = ordersArray.slice(offset, offset + pageSize);
+
+        res.json({
+            orders: paginatedOrders,
+            totalOrders: ordersArray.length, // Total number of orders
+            totalPages: Math.ceil(ordersArray.length / pageSize), // Total pages
+            currentPage: Number(page)
+        });
 
     } catch (error) {
         console.error('Error fetching order history:', error.message);
@@ -620,7 +623,6 @@ router.get('/admin-order-history-payment', async (req, res) => {
     }
 });
 
-
 router.get('/admin-order-history-general', async (req, res) => {
     try {
         const { status, searchTerm, exportToExcel, page = 1 } = req.query;
@@ -684,15 +686,12 @@ router.get('/admin-order-history-general', async (req, res) => {
             product.created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
         ORDER BY
             created_at DESC
-        LIMIT ? OFFSET ?;
+        ;
     `;
-
 
         // Add filters to the query if necessary
         const conditions = [];
-        if (status) {
-            conditions.push('order_details.payment_status = ?');
-        }
+
         if (searchTerm) {
             conditions.push(`(users.first_name LIKE ? OR users.last_name LIKE ? OR \`order\`.order_id LIKE ?)`);
         }
@@ -703,7 +702,6 @@ router.get('/admin-order-history-general', async (req, res) => {
 
         // Prepare query parameters
         const queryParams = [
-            ...(status ? [status] : []),
             ...(searchTerm ? [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`] : []),
             pageSize,
             offset
@@ -765,7 +763,7 @@ router.get('/admin-order-history-general', async (req, res) => {
         if (exportToExcel === 'true') {
             try {
                 const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('Orders');
+                const worksheet = workbook.addWorksheet('Order and Product History');
 
                 worksheet.columns = [
                     { header: 'Product Code', key: 'product_code', width: 15 },
@@ -783,6 +781,7 @@ router.get('/admin-order-history-general', async (req, res) => {
                     { header: 'Payment Status', key: 'payment_status', width: 15 },
                 ];
 
+                // Add both orders and newly created products to the Excel sheet
                 ordersArray.forEach(order => {
                     order.products.forEach(product => {
                         worksheet.addRow({
@@ -809,7 +808,7 @@ router.get('/admin-order-history-general', async (req, res) => {
                     'Content-Type',
                     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
                 );
-                res.setHeader('Content-Disposition', 'attachment; filename=orders.xlsx');
+                res.setHeader('Content-Disposition', 'attachment; filename=orders_and_products.xlsx');
                 await workbook.xlsx.write(res);
                 res.end();
                 return;
@@ -828,6 +827,7 @@ router.get('/admin-order-history-general', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 });
+
 
 
 
