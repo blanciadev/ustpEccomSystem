@@ -189,11 +189,11 @@ const UserProfile = () => {
             <div className="container ">
               <div className="container">
                 <div className="">
-                  <div className="row">
-                    <div className="col-4 ">
+                  <div className={`${isMobile ? 'col' : 'row'}`}>
+                    <div className={`${isMobile ? 'row d-flex' : 'col-4'}`}>
                       <ProfileImageUpload formData={formData} />
                     </div>
-                    <div className="col-8 ">
+                    <div className={`${isMobile ? 'row d-flex' : 'col-8'}`}>
                       {loading ? (
                         <div
                           className="cskeleton-item"
