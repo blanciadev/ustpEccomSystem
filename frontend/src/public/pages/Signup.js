@@ -62,7 +62,7 @@ const Signup = () => {
       }
     } catch (error) {
       setError('Error during signup');
-      console.error('Error during signup:', error);
+      // console.error('Error during signup:', error);
     }
   };
   const handleGoogleSignup = async (credentialResponse) => {
@@ -70,20 +70,21 @@ const Signup = () => {
 
     try {
       // Log the token before sending to the backend for debugging
-      console.log("Google token sent for signup:", token);
+      // console.log("Google token sent for signup:", token);
 
       const response = await axios.post('https://ustp-eccom-server.vercel.app/api/google-signup', { token });
 
-      console.log("Server response:", response);
+      // console.log("Server response:", response);
 
       if (response.status === 200) {
         const userData = response.data;
         const userStatus = response.data.status;
 
-        console.log("User Info:", userData);
+        // console.log("User Info:", userData);
 
         if (userStatus === 'registered') {
-          console.log('Google signup success');
+
+          // console.log('Google signup success');
 
           // Store user data in localStorage for session management
           localStorage.setItem('token', userData.token);
@@ -94,13 +95,13 @@ const Signup = () => {
           localStorage.setItem('profile_img', userData.profile_img);
 
           // Log token for debugging
-          console.log('Token stored in localStorage:', userData.token);
+          // console.log('Token stored in localStorage:', userData.token);
 
           // Redirect to forgot password page after storing data
-          navigate('/forgot-password');
+          navigate('/');
         } else {
-          console.log('User is not registered, navigating to login');
-          navigate('/login');
+          // console.log('User is not registered, navigating to login');
+          navigate('/');
         }
       }
     } catch (err) {

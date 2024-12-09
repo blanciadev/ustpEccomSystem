@@ -101,7 +101,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                 const bProduct = bundleProducts.find(product => product.product_code === key);
 
                 if (!bProduct) {
-                    console.log(`Product with code ${key} is not part of the bundle.`);
+                    //console.log(`Product with code ${key} is not part of the bundle.`);
                     return null;
                 }
 
@@ -153,10 +153,10 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                 discounted_price: discountedPrice,
             });
 
-            console.log(`Unbundled Product: ${product.product_name}`);
-            console.log(`  Original Price: $${product.price}`);
-            console.log(`  Discount: ${unbundledDiscount}%`);
-            console.log(`  Discounted Price: $${discountedPrice}`);
+            //console.log(`Unbundled Product: ${product.product_name}`);
+            //console.log(`  Original Price: $${product.price}`);
+            //console.log(`  Discount: ${unbundledDiscount}%`);
+            //console.log(`  Discounted Price: $${discountedPrice}`);
         });
 
         const existingProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];

@@ -131,7 +131,7 @@ router.get('/admin-order-history', async (req, res) => {
             query += ' AND ' + conditions.join(' AND ');
         }
 
-        query += ` ORDER BY \`order\`.order_date DESC LIMIT ? OFFSET ?`;
+        query += ` ORDER BY \`order\`.order_date DESC `;
 
         const queryParams = [
             ...(status ? [status] : []),

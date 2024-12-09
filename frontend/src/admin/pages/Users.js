@@ -66,18 +66,35 @@ const Users = () => {
     );
   });
 
+  // Predefined order for role_type
+  const roleOrder = {
+    Admin: 1,
+    "Warehouse Manager": 2,
+    Customer: 3,
+  };
+
   const sortedUsers = [...filteredUsers].sort((a, b) => {
-    if (sortType === "type") {
-      return sortDirection === "asc"
-        ? a.role_type.localeCompare(b.role_type)
-        : b.role_type.localeCompare(a.role_type);
-    } else if (sortType === "id") {
+    if (sortType === "role_type") {
+      const roleOrderA = roleOrder[a.role_type] || 4;
+      const roleOrderB = roleOrder[b.role_type] || 4;
+
+      if (sortDirection === "asc") {
+        return roleOrderA - roleOrderB;
+      } else {
+        return roleOrderB - roleOrderA;
+      }
+    }
+
+    if (sortType === "customer_id") {
       return sortDirection === "asc"
         ? a.customer_id - b.customer_id
         : b.customer_id - a.customer_id;
     }
+
     return 0;
   });
+
+
 
   const totalPages = Math.ceil(filteredUsers.length / recordsPerPage);
   const indexOfLastRecord = currentPage * recordsPerPage;
@@ -158,9 +175,10 @@ const Users = () => {
                         onChange={handleSortChange}
                         className="form-select"
                       >
-                        <option value="id">ID</option>
-                        <option value="type">User Type</option>
+                        <option value="customer_id">User ID</option>
+                        <option value="role_type">User Type</option>
                       </select>
+
                       <button
                         className="btn btn-secondary ms-2"
                         onClick={toggleSortDirection}

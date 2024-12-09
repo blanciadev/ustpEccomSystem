@@ -20,8 +20,8 @@ router.post('/users-signup', async (req, res) => {
         const hashedPassword = await bcryptjs.hash(password, saltRounds);
 
         const result = await db.query(
-            'INSERT INTO users (first_name, last_name, email, address, phone_number, password) VALUES (?, ?, ?, ?, ?, ?)',
-            [firstName, lastName, email, address, phoneNumber, hashedPassword]
+            'INSERT INTO users (first_name, last_name, email, address, phone_number, password, role_type) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [firstName, lastName, email, address, phoneNumber, hashedPassword, 'Customer']
         );
 
         res.status(201).json({ message: 'User created successfully' });

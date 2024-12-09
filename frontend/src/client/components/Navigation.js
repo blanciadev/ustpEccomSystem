@@ -85,7 +85,7 @@ const Navigation = () => {
           setProfileImg("");
         }
       } else {
-        console.log("No profile image found, using default image.");
+        //console.log("No profile image found, using default image.");
         setProfileImg(
           "https://static.vecteezy.com/system/resources/previews/026/434/409/non_2x/default-avatar-profile-icon-social-media-user-photo-vector.jpg"
         );

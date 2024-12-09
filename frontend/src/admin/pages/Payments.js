@@ -47,7 +47,7 @@ const Payments = () => {
         }
       );
 
-      console.log("Fetched Orders:", response.data.orders); // Inspect the orders
+      //console.log("Fetched Orders:", response.data.orders); // Inspect the orders
       const ordersData = response.data.orders;
       setOrders(ordersData);
       setTotalOrders(ordersData.length);

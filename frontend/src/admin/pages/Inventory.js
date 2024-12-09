@@ -63,7 +63,7 @@ const Inventory = () => {
     try {
       const response = await axios.get("https://ustp-eccom-server.vercel.app/api/admin-products-inventory");
       setProductNames(response.data);
-      console.log("Product Names:", response.data);
+      //console.log("Product Names:", response.data);
     } catch (error) {
       console.error("Error fetching product names:", error);
     }
@@ -73,7 +73,7 @@ const Inventory = () => {
   //   try {
   //     const response = await axios.get("https://ustp-eccom-server.vercel.app/api/admin-inventory");
   //     setInventoryItems(response.data);
-  //     console.log("Inventory Items:", response.data);
+  //     //console.log("Inventory Items:", response.data);
   //   } catch (error) {
   //     console.error("Error fetching inventory items:", error);
   //   }

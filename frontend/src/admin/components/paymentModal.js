@@ -25,7 +25,7 @@ const PaymentModal = ({ show, handleClose, order, handleUpdate }) => {
         order_status: orderStatus,
         payment_status: paymentStatus,
       });
-      console.log('Saved payment details:', { paymentMethod, orderStatus, paymentStatus });
+      //console.log('Saved payment details:', { paymentMethod, orderStatus, paymentStatus });
 
 
       setToastMessage('Updated successfully');

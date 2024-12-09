@@ -118,8 +118,9 @@ const AddUserModal = ({ show, onClose }) => {
                   required
                 >
                   <option value="">Select Role Type</option>
-                  <option value="admin">Admin</option>
                   <option value="customer">Customer</option>
+                  <option value="admin">Admin</option>
+                  <option value="Warehouse Manager">Warehouse Manager</option>
                 </select>
               </div>
               <div className="form-group">

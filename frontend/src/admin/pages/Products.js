@@ -46,7 +46,7 @@ const Products = () => {
       const response = await axios.get("https://ustp-eccom-server.vercel.app/api/admin-products");
       setProducts(response.data);
       setFilteredProducts(response.data);
-      console.log("Product Data", response.data);
+      //console.log("Product Data", response.data);
     } catch (error) {
       console.error("Error fetching product data:", error);
     }

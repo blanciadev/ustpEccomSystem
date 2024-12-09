@@ -105,7 +105,7 @@ const ProductList = ({ stickyComponents }) => {
     const handleStickySubmit = async (formData) => {
         setLoading(true);
 
-        console.log("Tis is on stickysubmit", formData);
+        //console.log("Tis is on stickysubmit", formData);
 
         const storedSearchTerm = localStorage.getItem('searchTerm');
 
@@ -120,7 +120,7 @@ const ProductList = ({ stickyComponents }) => {
             const response = await axios.get(`https://ustp-eccom-server.vercel.app/api/sticky-components`, {
                 params: formData
             });
-            console.log('Form data being sent:', formData);
+            //console.log('Form data being sent:', formData);
             setProducts(response.data);
             setError(null);
             setShowHaircareHeading(false); // Show the heading
@@ -145,7 +145,7 @@ const ProductList = ({ stickyComponents }) => {
         };
 
         handleStickySubmit(formData); // Pass the formData with the correct parameter and value
-        console.log('Button clicked with value:', value);
+        //console.log('Button clicked with value:', value);
     };
 
     const handlePageChange = (direction) => {
@@ -168,12 +168,12 @@ const ProductList = ({ stickyComponents }) => {
             customerId: customerId,
             interaction_type: 'view'
         };
-        console.log("payload", payload);
+        //console.log("payload", payload);
 
         try {
             const response = await axios.get('https://ustp-eccom-server.vercel.app/api/products-interaction', { params: payload });
 
-            console.log('API response:', response.data);
+            //console.log('API response:', response.data);
         } catch (error) {
             console.error('Error recording product interaction:', error);
         }
@@ -232,9 +232,9 @@ const ProductList = ({ stickyComponents }) => {
             localStorage.setItem('quantity', quantity);
         }
 
-        console.log('Product:', product);
-        console.log('Token:', token);
-        console.log('Customer ID:', customerId);
+        //console.log('Product:', product);
+        //console.log('Token:', token);
+        //console.log('Customer ID:', customerId);
 
         const payload = {
             product_code: product.product_code,
@@ -244,9 +244,9 @@ const ProductList = ({ stickyComponents }) => {
 
         const recordProductInteraction = async () => {
             try {
-                console.log('Recording product interaction:', payload);
+                //console.log('Recording product interaction:', payload);
                 const response = await axios.get('https://ustp-eccom-server.vercel.app/api/products-interaction', { params: payload });
-                console.log('Product interaction response:', response.data);
+                //console.log('Product interaction response:', response.data);
             } catch (error) {
                 console.error('Error recording product interaction:', error);
             }
@@ -257,17 +257,17 @@ const ProductList = ({ stickyComponents }) => {
         let interactionRecorded = false;
 
         if (!token || !customerId) {
-            console.log('User not logged in, using localStorage for cart');
+            //console.log('User not logged in, using localStorage for cart');
             const cart = JSON.parse(localStorage.getItem('cart')) || [];
-            console.log('Current cart from localStorage:', cart);
+            //console.log('Current cart from localStorage:', cart);
 
             const existingProductIndex = cart.findIndex(item => item.product_code === product.product_code);
-            console.log('Existing product index:', existingProductIndex);
+            //console.log('Existing product index:', existingProductIndex);
 
             if (existingProductIndex !== -1) {
                 cart[existingProductIndex].quantity += 1;
                 cart[existingProductIndex].sub_total = cart[existingProductIndex].price * cart[existingProductIndex].quantity;
-                console.log('Increased quantity for existing product:', cart[existingProductIndex]);
+                //console.log('Increased quantity for existing product:', cart[existingProductIndex]);
             } else {
                 const newCartItem = {
                     cart_items_id: generateCartItemId(),
@@ -278,14 +278,14 @@ const ProductList = ({ stickyComponents }) => {
                     sub_total: product.price
                 };
                 cart.push(newCartItem);
-                console.log('Added new product to cart:', newCartItem);
+                //console.log('Added new product to cart:', newCartItem);
             }
 
             localStorage.setItem('cart', JSON.stringify(cart));
-            console.log('Updated cart saved to localStorage:', cart);
+            //console.log('Updated cart saved to localStorage:', cart);
 
             cartEventEmitter.emit('cartUpdated');
-            console.log('Emitted cartUpdated event');
+            //console.log('Emitted cartUpdated event');
 
             setToastMessage('Added to Cart!');
             setTimeout(() => {
@@ -302,7 +302,7 @@ const ProductList = ({ stickyComponents }) => {
         }
 
         try {
-            console.log('User is logged in, adding item to server-side cart');
+            //console.log('User is logged in, adding item to server-side cart');
             const response = await axios.post('https://ustp-eccom-server.vercel.app/api/add-to-cart', {
                 customer_id: customerId,
                 product_code: product.product_code,
@@ -311,10 +311,10 @@ const ProductList = ({ stickyComponents }) => {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            console.log('Response from server:', response.data);
+            //console.log('Response from server:', response.data);
 
             cartEventEmitter.emit('cartUpdated');
-            console.log('Emitted cartUpdated event after server response');
+            //console.log('Emitted cartUpdated event after server response');
 
             setToastMessage('Added to Cart!');
             setTimeout(() => {
@@ -330,7 +330,7 @@ const ProductList = ({ stickyComponents }) => {
 
         } catch (error) {
             if (error.response && error.response.status === 401) {
-                console.log('Unauthorized, redirecting to login');
+                //console.log('Unauthorized, redirecting to login');
                 navigate('/login');
             } else {
                 console.error('Error adding product to cart:', error.response ? error.response.data : error.message); // Log the error details
@@ -355,7 +355,7 @@ const ProductList = ({ stickyComponents }) => {
         setToastMessage('Redirecting to Checkout Page');
 
         // window.location.href = '/checkout';
-        console.log("Trigger Product List");
+        //console.log("Trigger Product List");
 
         if (token) {
             window.location.href = '/checkout';

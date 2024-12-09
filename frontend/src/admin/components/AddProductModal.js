@@ -71,7 +71,7 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
             return;
         }
 
-        console.log("Image URL before submission:", imageURL);
+        //console.log("Image URL before submission:", imageURL);
 
         const productData = {
             productName,
@@ -99,7 +99,7 @@ const AddProductModal = ({ show, handleClose, handleSubmit }) => {
             }
 
             const result = await response.text();
-            console.log(result);
+            //console.log(result);
 
             setToastMessage("Successful!");
             setTimeout(() => {

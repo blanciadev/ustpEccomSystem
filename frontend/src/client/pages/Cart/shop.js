@@ -61,7 +61,7 @@ const Shop = () => {
                 const response = await axios.get(`https://ustp-eccom-server.vercel.app/api/product-bundles-general`);
 
                 if (response.data.length === 0) {
-                    console.log('No recommended products found.');
+                    //console.log('No recommended products found.');
                 }
                 setRecommendedProducts(response.data);
             } catch (error) {
@@ -106,7 +106,7 @@ const Shop = () => {
 
             navigate('/login');
         }
-        console.log(productData);
+        //console.log(productData);
 
     };
 
@@ -127,9 +127,9 @@ const Shop = () => {
 
         const recordProductInteraction = async (payload) => {
             try {
-                console.log('Recording product interaction:', payload);
+                //console.log('Recording product interaction:', payload);
                 await axios.get('https://ustp-eccom-server.vercel.app/api/products-interaction', { params: payload });
-                console.log('Product interaction recorded successfully.');
+                //console.log('Product interaction recorded successfully.');
             } catch (error) {
                 console.error('Error recording product interaction:', error);
             }
@@ -138,7 +138,7 @@ const Shop = () => {
         let interactionRecorded = false;
 
         if (!token || !userId) {
-            console.log('User not logged in or user ID missing, saving to localStorage.');
+            //console.log('User not logged in or user ID missing, saving to localStorage.');
 
             const cart = JSON.parse(localStorage.getItem('cart')) || [];
             const existingProductIndex = cart.findIndex(item => item.product_code === product.product_code);
@@ -146,7 +146,7 @@ const Shop = () => {
             if (existingProductIndex !== -1) {
                 cart[existingProductIndex].quantity += 1;
                 cart[existingProductIndex].sub_total = cart[existingProductIndex].quantity * cart[existingProductIndex].price;
-                console.log('Increased quantity for existing product:', cart[existingProductIndex]);
+                //console.log('Increased quantity for existing product:', cart[existingProductIndex]);
             } else {
 
                 const newCartItem = {
@@ -158,11 +158,11 @@ const Shop = () => {
                     sub_total: product.price
                 };
                 cart.push(newCartItem);
-                console.log('Added new product to cart:', newCartItem);
+                //console.log('Added new product to cart:', newCartItem);
             }
 
             localStorage.setItem('cart', JSON.stringify(cart));
-            console.log('Cart updated and saved to localStorage:', cart);
+            //console.log('Cart updated and saved to localStorage:', cart);
 
 
             cartEventEmitter.emit('cartUpdated', { product_code: product.product_code, quantity: 1 });
@@ -188,7 +188,7 @@ const Shop = () => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            console.log('Product added to server-side cart');
+            //console.log('Product added to server-side cart');
             cartEventEmitter.emit('cartUpdated', { product_code: product.product_code, quantity: 1 });
 
             setToastMessage('Added to cart!');
@@ -220,9 +220,9 @@ const Shop = () => {
         };
 
         try {
-            console.log('Recording product view interaction:', interactionPayload);
+            //console.log('Recording product view interaction:', interactionPayload);
             await axios.get('https://ustp-eccom-server.vercel.app/api/products-interaction', { params: interactionPayload });
-            console.log('Product view interaction recorded successfully.');
+            //console.log('Product view interaction recorded successfully.');
         } catch (error) {
             console.error('Error recording product view interaction:', error);
         }
@@ -282,7 +282,7 @@ const Shop = () => {
             const response = await axios.get(`https://ustp-eccom-server.vercel.app/api/sticky-components`, {
                 params: formData
             });
-            console.log('Form data being sent:', formData);
+            //console.log('Form data being sent:', formData);
             setProducts(response.data);
             setError(null);
         } catch (err) {

@@ -176,8 +176,8 @@ app.post('/api/google-signup', async (req, res) => {
       const hashedPassword = await bcrypt.hash(defaultPassword, 10);
 
       const [result] = await db.query(
-        'INSERT INTO users (first_name, last_name, email, password) VALUES (?, ?, ?, ?)',
-        [firstName, lastName, googleEmail, hashedPassword]
+        'INSERT INTO users (first_name, last_name, email, password, role_type) VALUES (?, ?, ?, ?, ?)',
+        [firstName, lastName, googleEmail, hashedPassword, 'Customer']
       );
 
       const newUserId = result.insertId;

@@ -86,7 +86,7 @@ const UserProfile = () => {
       current_password: formData.current_password,
     };
 
-    console.log(updatedData);
+    //console.log(updatedData);
 
     try {
       const response = await axios.put(
@@ -103,7 +103,7 @@ const UserProfile = () => {
         setToastMessage("");
       }, 3000);
 
-      console.log(response.data.message);
+      //console.log(response.data.message);
       setUserDetails((prevDetails) => ({
         ...prevDetails,
         ...formData,
@@ -149,7 +149,7 @@ const UserProfile = () => {
         setToastMessage("");
       }, 3000);
 
-      console.log(response.data.message);
+      //console.log(response.data.message);
       setFormData((prev) => ({
         ...prev,
         current_password: "",

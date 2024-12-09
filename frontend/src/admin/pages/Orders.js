@@ -13,10 +13,6 @@ const Orders = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("date");
   const [statusOptions, setStatusOptions] = useState([
-    "To Ship",
-    "To Receive",
-    "Cancelled",
-    "Return/Refund",
     "Pending",
   ]);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -329,8 +325,15 @@ const Orders = () => {
 
                 </div>
               </div>
-
-
+              <br></br>
+              <br></br>
+              <br></br>
+              <br></br>
+              <br></br>
+              <br></br>
+              <br></br>
+              <br></br>
+              <br></br>
               <div className="d-flex justify-content-center align-items-center">
 
                 <div className="d-flex justify-content-center align-items-center">

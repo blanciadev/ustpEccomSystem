@@ -28,7 +28,7 @@ const AdminHistory = () => {
 
       });
       setOrders(response.data.orders);
-      console.log(response.data.orders);
+      //console.log(response.data.orders);
     } catch (error) {
       console.error('Error fetching orders:', error.message);
     }
@@ -135,80 +135,80 @@ const AdminHistory = () => {
 
             <div class="container align-items-center mt-4 mb-4">
 
-<div class="row align-items-center m-0 p-0 ">
+              <div class="row align-items-center m-0 p-0 ">
 
-  <div class="col-4">
-    <div class="search d-flex  ">
-      {" "}
-      <form>
-        <input
-          type="search"
-          placeholder="Search orders..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="form-control"
-        />
-      </form>
-    </div>
-  </div>
+                <div class="col-4">
+                  <div class="search d-flex  ">
+                    {" "}
+                    <form>
+                      <input
+                        type="search"
+                        placeholder="Search orders..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="form-control"
+                      />
+                    </form>
+                  </div>
+                </div>
 
-  <div class="col-3 ">
-    <div class="d-flex justify-content-center ">
-      <button
-        onClick={handlePrintOrders}
-        className="btn btn-primary"
-      >
+                <div class="col-3 ">
+                  <div class="d-flex justify-content-center ">
+                    <button
+                      onClick={handlePrintOrders}
+                      className="btn btn-primary"
+                    >
 
-        <i class="bx bx-export"></i> Export Order Record
+                      <i class="bx bx-export"></i> Export Order Record
 
-      </button>
-    </div>
-  </div>
+                    </button>
+                  </div>
+                </div>
 
-  <div class="col-2 ">
-    <div class="d-flex align-items-center" >
-      <label htmlFor="sort" className="me-2">
-        Sort By:
-      </label>
-      <select
-        name="sort"
-        id="sort"
-        value={sortBy}
-        onChange={(e) => setSortBy(e.target.value)}
-        className="form-select"
-        style={{ width: "90px" }}
-      >
-        <option value="date">Date</option>
-        <option value="status">Status</option>
-        <option value='customer-id'>Customer ID</option>
-      </select>
-    </div>
-  </div>
+                <div class="col-2 ">
+                  <div class="d-flex align-items-center" >
+                    <label htmlFor="sort" className="me-2">
+                      Sort By:
+                    </label>
+                    <select
+                      name="sort"
+                      id="sort"
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="form-select"
+                      style={{ width: "90px" }}
+                    >
+                      <option value="date">Date</option>
+                      <option value="status">Status</option>
+                      <option value='customer-id'>Customer ID</option>
+                    </select>
+                  </div>
+                </div>
 
-  <div class="col-3">
-    <div class="d-flex align-items-center">
-      <label htmlFor="status" className="me-2 ">
-        Filter By Status:
-      </label>
+                <div class="col-3">
+                  <div class="d-flex align-items-center">
+                    <label htmlFor="status" className="me-2 ">
+                      Filter By Status:
+                    </label>
 
-      <select
-        value={status}
-        onChange={(e) => setStatus(e.target.value)}
-        className="form-select"
-        style={{ width: "130px" }}
-      >
-        <option value="">All</option>
-        {statusOptions.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
+                    <select
+                      value={status}
+                      onChange={(e) => setStatus(e.target.value)}
+                      className="form-select"
+                      style={{ width: "130px" }}
+                    >
+                      <option value="">All</option>
+                      {statusOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
 
-      </select>
-    </div>
-  </div>
-</div>
-</div>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
 
 
 

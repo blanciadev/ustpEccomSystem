@@ -80,15 +80,15 @@ const Login = () => {
     const handleGoogleLogin = async (credentialResponse) => {
         const token = credentialResponse.credential;
 
-        console.log('Google credential received:', token);
+        // console.log('Google credential received:', token);
 
         try {
-            console.log('Sending token to server for verification...');
+            // console.log('Sending token to server for verification...');
 
             // Send token to backend for verification
             const response = await axios.post('https://ustp-eccom-server.vercel.app/api/verify-token', { token });
 
-            console.log('Server response:', response);
+            // console.log('Server response:', response);
 
             if (response.status === 200) {
                 const userData = response.data.payload;

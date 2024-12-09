@@ -12,15 +12,6 @@ const Shipments = () => {
   const [loading, setLoading] = useState(true);
   const itemsPerPage = 8;
 
-  const [statusOptions] = useState([
-    "To Ship",
-    "To Receive",
-    "Completed",
-    "Cancelled",
-    "Return/Refund",
-    "Pending",
-  ]);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("date");
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 425);
@@ -55,23 +46,36 @@ const Shipments = () => {
   };
 
   // Filter shipments based on search term
-  const filteredShipments = shipments.filter(
-    (shipment) =>
+  const filteredShipments = shipments.filter((shipment) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
       shipment.shipment_id.toString().includes(searchTerm) ||
       shipment.order_id.toString().includes(searchTerm) ||
-      shipment.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      shipment.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      shipment.phoneNumber.includes(searchTerm) ||
-      shipment.postalCode.includes(searchTerm) ||
-      shipment.shipment_status.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+      shipment.customer_id?.toString().includes(searchTerm) ||
+      new Date(shipment.shipment_date).toLocaleDateString().includes(searchTerm) ||
+      shipment.streetname?.toLowerCase().includes(searchLower) ||
+      shipment.address?.toLowerCase().includes(searchLower) ||
+      shipment.city?.toLowerCase().includes(searchLower) ||
+      shipment.phoneNumber?.toString().includes(searchTerm) ||
+      shipment.postalCode?.toString().includes(searchTerm) ||
+      shipment.shipment_status?.toLowerCase().includes(searchLower)
+    );
+  });
 
   const sortedShipments = filteredShipments.sort((a, b) => {
-    if (sortBy === "status") {
-      return a.shipment_status.localeCompare(b.shipment_status);
+    switch (sortBy) {
+      case "status":
+        return a.shipment_status.localeCompare(b.shipment_status);
+      case "date":
+        return new Date(a.shipment_date) - new Date(b.shipment_date);
+      case "customer_id":
+        return (a.customer_id?.toString() || "").localeCompare(b.customer_id?.toString() || "");
+      default:
+        return 0;
     }
-    return new Date(a.shipment_date) - new Date(b.shipment_date);
   });
+
+
 
   const totalOrders = sortedShipments.length;
   const totalPages = Math.ceil(totalOrders / itemsPerPage);
@@ -108,10 +112,10 @@ const Shipments = () => {
       // Get the current date and time
       const now = new Date();
       const formattedDateTime = now
-        .toISOString() // e.g., "2024-11-30T15:30:45.123Z"
-        .replace(/[-:]/g, "") // Remove hyphens and colons
-        .replace("T", "_") // Replace 'T' with an underscore
-        .split(".")[0]; // Remove milliseconds
+        .toISOString()
+        .replace(/[-:]/g, "")
+        .replace("T", "_")
+        .split(".")[0];
 
       const fileName = `Shipment Records ${formattedDateTime}.xlsx`;
       saveAs(blob, fileName);
@@ -179,9 +183,7 @@ const Shipments = () => {
                       style={{ width: "120px" }}
                     >
                       <option value="date">Date</option>
-                      <option value="status">Status</option>
-                      <option value="id">ID</option>
-                      <option value="customer-id">Customer</option>
+                      <option value="customer_id">Customer ID</option>
                     </select>
                   </div>
                 </div>
@@ -197,12 +199,11 @@ const Shipments = () => {
                     <table className="table table-hover">
                       <thead className="bg-light sticky-top">
                         <tr>
-                          {/* <th>
-                            <input type="checkbox" />
-                          </th> */}
                           <th>Shipment ID</th>
                           <th>Order ID</th>
+                          <th>Customer ID</th>
                           <th>Shipment Date</th>
+                          <th>Street Name</th>
                           <th>Address</th>
                           <th>City</th>
                           <th>Phone Number</th>
@@ -213,16 +214,13 @@ const Shipments = () => {
                       <tbody>
                         {currentShipments.map((shipment) => (
                           <tr key={shipment.shipment_id}>
-                            {/* <td>
-                              <input type="checkbox" />
-                            </td> */}
                             <td>{shipment.shipment_id}</td>
                             <td>{shipment.order_id}</td>
+                            <td>{shipment.customer_id || "N/A"}</td>
                             <td>
-                              {new Date(
-                                shipment.shipment_date
-                              ).toLocaleDateString()}
+                              {new Date(shipment.shipment_date).toLocaleDateString()}
                             </td>
+                            <td>{shipment.streetname || "N/A"}</td>
                             <td>{shipment.address}</td>
                             <td>{shipment.city}</td>
                             <td>{shipment.phoneNumber}</td>
@@ -231,6 +229,7 @@ const Shipments = () => {
                           </tr>
                         ))}
                       </tbody>
+
                     </table>
                   )}
                 </div>
