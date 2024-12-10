@@ -154,7 +154,7 @@ const Navigation = () => {
       setToastMessage("");
     }, 3000);
     setIsLoggedIn(false);
-    navigate("/login");
+    navigate("/");
   };
 
   const handleCartClick = () => {

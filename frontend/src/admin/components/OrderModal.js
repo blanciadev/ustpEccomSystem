@@ -50,10 +50,15 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
       refreshOrders();
     } catch (error) {
       console.error("Error updating order status:", error.message);
+      setToastMessage("Error updating order status");
+      setTimeout(() => {
+        setToastMessage("");
+      }, 2000);
     } finally {
       setLoading(false);
     }
   };
+
 
   // Calculate total cost for all products
   const totalProductCost = order.products.reduce((acc, product) => {
