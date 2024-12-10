@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
-// Route to update order status
+
+
+// Route to update order statuss
 router.put('/update-order-status/:orderId', async (req, res) => {
     const { orderId } = req.params;
     const { status, products } = req.body;
@@ -27,6 +29,15 @@ router.put('/update-order-status/:orderId', async (req, res) => {
             'UPDATE order_details SET order_status = ?, payment_status = ?, order_update = NOW() WHERE order_id = ?',
             [status, paymentStatus, orderId]
         );
+
+        if (status === 'Completed') {
+            console.log(`Updating shipment status for order ID: ${orderId}`);
+            await db.query(
+                'UPDATE shipment SET shipment_status = ? WHERE order_id = ?',
+                ['shipped', orderId]
+            );
+        }
+
 
         if (result.affectedRows === 0) {
             console.log(`No rows affected. Order ID: ${orderId} not found.`);
