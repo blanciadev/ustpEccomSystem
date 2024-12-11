@@ -29,9 +29,28 @@ const Shop = () => {
 
     const [searchTerm, setSearchTerm] = useState('');
     const [searchTriggered, setSearchTriggered] = useState(false);
-
+    const customer_id = localStorage.getItem('customer_id');
+    let parsedSearchTerm = null;
 
     useEffect(() => {
+        const storedSearchTerm = localStorage.getItem('searchTerm');
+        console.log("stikkeee", storedSearchTerm);
+
+        if (storedSearchTerm) {
+            try {
+                parsedSearchTerm = JSON.parse(storedSearchTerm);
+                console.log("Retrieved sticky search term:", parsedSearchTerm);
+            } catch (error) {
+                console.error("Error parsing stored search term:", error);
+            }
+        } else {
+            console.log("No sticky search term found in localStorage.");
+        }
+
+        const searchData = {
+            query: parsedSearchTerm ? parsedSearchTerm.query : ''
+        };
+        console.log("Search Data:", searchData);
 
         const fetchProducts = async () => {
             try {
@@ -46,32 +65,59 @@ const Shop = () => {
             }
         };
 
-        const fetchTopPickedProducts = async () => {
+
+        const fetchTopPickedProductsGeneral = async () => {
             try {
-                const response = await axios.get('https://ustp-eccom-server.vercel.app/api/products-top-picks');
+                const response = await axios.get(`https://ustp-eccom-server.vercel.app/api/products-top-picks`);
                 setTopPickedProducts(response.data);
             } catch (error) {
-                console.error('Error fetching top-picked products:', error.response ? error.response.data : error.message);
+                console.error('Error fetching general top-picked products:', error.response ? error.response.data : error.message);
             }
         };
 
+        const fetchTopPickedProductsTargeted = async () => {
+            const customer_id = localStorage.getItem('customer_id');
+            if (!customer_id) {
+                console.error('Customer ID not found in localStorage');
+                return;
+            }
+
+            try {
+                const response = await axios.get(`https://ustp-eccom-server.vercel.app/api/products-top-picks/${customer_id}`);
+                setTopPickedProducts(response.data);
+            } catch (error) {
+                console.error('Error fetching targeted top-picked products:', error.response ? error.response.data : error.message);
+            }
+        };
 
         const fetchRecommendedProducts = async () => {
             try {
                 const response = await axios.get(`https://ustp-eccom-server.vercel.app/api/product-bundles-general`);
 
                 if (response.data.length === 0) {
-                    //console.log('No recommended products found.');
                 }
                 setRecommendedProducts(response.data);
             } catch (error) {
                 console.error('Error fetching recommended products:', error.response ? error.response.data : error.message);
             }
         };
+        const customer_id = localStorage.getItem('customer_id');
 
+        if (customer_id) {
+            console.log("Targeted Retrieved For Top pcs")
+            fetchTopPickedProductsTargeted();
+        } else {
+            console.log("General Retrieved For Top pcs")
+            fetchTopPickedProductsGeneral();
+        }
         fetchProducts();
-        fetchTopPickedProducts();
         fetchRecommendedProducts();
+
+
+
+
+
+
     }, []);
 
     const handleCategoryChange = (e) => {
@@ -127,9 +173,7 @@ const Shop = () => {
 
         const recordProductInteraction = async (payload) => {
             try {
-                //console.log('Recording product interaction:', payload);
                 await axios.get('https://ustp-eccom-server.vercel.app/api/products-interaction', { params: payload });
-                //console.log('Product interaction recorded successfully.');
             } catch (error) {
                 console.error('Error recording product interaction:', error);
             }
@@ -257,8 +301,9 @@ const Shop = () => {
     const handleSearchSubmit = async () => {
         localStorage.setItem('searchTerm', searchTerm);
 
+        console.log("handleSearchSubmit", parsedSearchTerm);
         const formData = {
-            query: searchTerm
+            query: searchTerm || parsedSearchTerm
         };
 
         await handleSearch(formData);
@@ -270,7 +315,7 @@ const Shop = () => {
         setLoading(true);
 
         const storedSearchTerm = localStorage.getItem('searchTerm');
-
+        console.log("Handle Ser", storedSearchTerm);
         if (storedSearchTerm) {
             formData = {
                 ...formData,
@@ -291,6 +336,7 @@ const Shop = () => {
             setLoading(false);
         }
     };
+
 
     return (
         <div className='shop'>
@@ -364,46 +410,51 @@ const Shop = () => {
                 <div className='shop__top-picks'>
                     <h2 className='shop__title'>TOP PICKS</h2>
                     <div className='shop__product-list'>
-                        {topPickedProducts
-                            .filter((product) => product.quantity > 0)
-                            .map((product) => (
-                                <div key={product.product_code} className='shop__product-item' onClick={() => openModal(product)}>
-                                    <div className='shop__product-img'>
-                                        <img
-                                            src={product.product_image || 'https://via.placeholder.com/150'}
-                                            alt={product.product_name || 'Product Image'}
-                                        />
+                        {Array.isArray(topPickedProducts) && topPickedProducts.length > 0 && (
+                            topPickedProducts
+                                .filter((product) => product.quantity > 0)  // Filter out products with quantity 0
+                                .map((product) => (
+                                    <div key={product.product_code} className="shop__product-item" onClick={() => openModal(product)}>
+                                        <div className="shop__product-img">
+                                            <img
+                                                src={product.product_image || "https://via.placeholder.com/150"}
+                                                alt={product.product_name || "Product Image"}
+                                            />
+                                        </div>
+                                        <div className="shop__product-desc">
+                                            <p className="shop__product-name">{product.product_name || "No product name"}</p>
+                                            <p className="shop__product-quantity">Stocks: {product.quantity}</p>
+                                            <p className="shop__product-price text-primary">
+                                                ₱{product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            </p>
+                                            {product.product_status === "Discounted" && (
+                                                <p className="shop__product-discount">
+                                                    Product Discount: P{product.product_discount}%
+                                                </p>
+                                            )}
+                                            <button
+                                                className="shop__add-to-cart-button"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleAddToCart(product);
+                                                }}
+                                            >
+                                                <i className="bx bxs-cart-alt cart-icon animated-cart-icon"></i>
+                                            </button>
+                                            <button
+                                                className="shop__buy-now-button"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleBuyNow(product, product.quantity);
+                                                }}
+                                            >
+                                                Buy Now
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div className='shop__product-desc'>
-                                        <p className='shop__product-name'>{product.product_name || 'No product name'}</p>
-                                        <p className='shop__product-quantity'>Stocks: {product.quantity}</p>
-                                        <p className="shop__product-price text-primary">
-                                            ₱{product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                        </p>
-                                        {product.product_status === 'Discounted' && (
-                                            <p className='shop__product-discount'>Product Discount: P{product.product_discount}%</p>
-                                        )}
-                                        <button
-                                            className='shop__add-to-cart-button'
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleAddToCart(product);
-                                            }}
-                                        >
-                                            <i className='bx bxs-cart-alt cart-icon animated-cart-icon'></i>
-                                        </button>
-                                        <button
-                                            className='shop__buy-now-button'
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleBuyNow(product, product.quantity);
-                                            }}
-                                        >
-                                            Buy Now
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
+                                ))
+                        )}
+
                     </div>
                 </div>
             )

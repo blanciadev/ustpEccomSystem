@@ -97,15 +97,14 @@ const ProductList = ({ stickyComponents }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const [topPicks, setTopPicks] = useState([]);
-    const [showRecommendedHeading, setShowRecommendedHeading] = useState(false); //recommended product heading
-    const [showHaircareHeading, setShowHaircareHeading] = useState(false); //haircare beauty offers heading
+    const [showRecommendedHeading, setShowRecommendedHeading] = useState(false);
+    const [showHaircareHeading, setShowHaircareHeading] = useState(false);
     const [isPreviousHovered, setIsPreviousHovered] = useState(false);
     const [isNextHovered, setIsNextHovered] = useState(false);
 
     const handleStickySubmit = async (formData) => {
         setLoading(true);
 
-        //console.log("Tis is on stickysubmit", formData);
 
         const storedSearchTerm = localStorage.getItem('searchTerm');
 
@@ -120,16 +119,12 @@ const ProductList = ({ stickyComponents }) => {
             const response = await axios.get(`https://ustp-eccom-server.vercel.app/api/sticky-components`, {
                 params: formData
             });
-            //console.log('Form data being sent:', formData);
             setProducts(response.data);
             setError(null);
-            setShowHaircareHeading(false); // Show the heading
-            setShowRecommendedHeading(true); // Show the heading
+            setShowHaircareHeading(false);
+            setShowRecommendedHeading(true);
 
             setCurrentPage(0);
-
-            // Remove the search term from localStorage
-            localStorage.removeItem('searchTerm');
 
 
         } catch (err) {
@@ -158,7 +153,6 @@ const ProductList = ({ stickyComponents }) => {
 
 
     const handleProductClick = async (product) => {
-        // Set the selected product and open the modal
         setSelectedProduct(product);
         setIsModalOpen(true);
         const customerId = localStorage.getItem('customer_id');
@@ -168,12 +162,12 @@ const ProductList = ({ stickyComponents }) => {
             customerId: customerId,
             interaction_type: 'view'
         };
-        //console.log("payload", payload);
+
 
         try {
             const response = await axios.get('https://ustp-eccom-server.vercel.app/api/products-interaction', { params: payload });
 
-            //console.log('API response:', response.data);
+
         } catch (error) {
             console.error('Error recording product interaction:', error);
         }
@@ -185,14 +179,15 @@ const ProductList = ({ stickyComponents }) => {
     };
 
     useEffect(() => {
-
+        const storedSearchTerm = localStorage.getItem('searchTerm');
+        console.log("stored search term", storedSearchTerm);
         const fetchProducts = async () => {
             setLoading(true);
             try {
                 const response = await axios.get(`https://ustp-eccom-server.vercel.app/api/products`);
                 setProducts(response.data);
                 setError(null);
-                setShowHaircareHeading(true); // Show the heading
+                setShowHaircareHeading(true);
             } catch (err) {
                 setError('Failed to fetch products');
             } finally {
@@ -203,19 +198,66 @@ const ProductList = ({ stickyComponents }) => {
         const fetchTopPicks = async () => {
             try {
                 const response = await axios.get('https://ustp-eccom-server.vercel.app/api/products-top-picks');
-                // Limit to top 4 picks if there are more
-                const limitedPicks = response.data.slice(0, 5);
+                const limitedPicks = response.data.slice(0, 6);
                 setTopPicks(limitedPicks);
             } catch (error) {
                 console.error('Error fetching top picks:', error);
             }
         };
 
-        fetchTopPicks();
+        const fetchTopPicksfiltered = async () => {
+            try {
+                const storedSearchTerm = localStorage.getItem('searchTerm');
+                console.log("Stored search term (stringified):", storedSearchTerm);
 
+                if (!storedSearchTerm) {
+                    console.log("No stored search term found.");
+                    return;
+                }
+
+                const parsedSearchTerm = JSON.parse(storedSearchTerm);
+                console.log("Parsed search term (object):", parsedSearchTerm);
+
+                const values = Object.values(parsedSearchTerm).filter(value => value !== "");
+                console.log("Filtered values:", values);
+
+                if (values.length === 0) {
+                    console.log("No valid search terms found.");
+                    return;
+                }
+
+                const response = await axios.get('https://ustp-eccom-server.vercel.app/api/products-top-picks-filter', {
+                    params: { descriptionKeywords: values }
+                });
+
+                // Check if no results are returned
+                if (response.data.length === 0) {
+                    console.log("No results found for the search term.");
+                    localStorage.removeItem('searchTerm');
+                    fetchTopPicks();
+                } else {
+                    // Limit the number of top picks
+                    const limitedPicks = response.data.slice(0, 5);
+                    setTopPicks(limitedPicks);
+                }
+
+            } catch (error) {
+                console.error('Error fetching top picks:', error);
+            }
+        };
+
+
+
+
+        if (storedSearchTerm) {
+            fetchTopPicksfiltered();
+        } else {
+            console.log("General Top Pics Called")
+            fetchTopPicks();
+        }
 
         fetchProducts();
-    }, []);
+    }, [localStorage.getItem('searchTerm')]);
 
 
     function generateCartItemId() {
@@ -232,9 +274,6 @@ const ProductList = ({ stickyComponents }) => {
             localStorage.setItem('quantity', quantity);
         }
 
-        //console.log('Product:', product);
-        //console.log('Token:', token);
-        //console.log('Customer ID:', customerId);
 
         const payload = {
             product_code: product.product_code,
@@ -244,9 +283,8 @@ const ProductList = ({ stickyComponents }) => {
 
         const recordProductInteraction = async () => {
             try {
-                //console.log('Recording product interaction:', payload);
                 const response = await axios.get('https://ustp-eccom-server.vercel.app/api/products-interaction', { params: payload });
-                //console.log('Product interaction response:', response.data);
+
             } catch (error) {
                 console.error('Error recording product interaction:', error);
             }
@@ -257,17 +295,13 @@ const ProductList = ({ stickyComponents }) => {
         let interactionRecorded = false;
 
         if (!token || !customerId) {
-            //console.log('User not logged in, using localStorage for cart');
             const cart = JSON.parse(localStorage.getItem('cart')) || [];
-            //console.log('Current cart from localStorage:', cart);
 
             const existingProductIndex = cart.findIndex(item => item.product_code === product.product_code);
-            //console.log('Existing product index:', existingProductIndex);
 
             if (existingProductIndex !== -1) {
                 cart[existingProductIndex].quantity += 1;
                 cart[existingProductIndex].sub_total = cart[existingProductIndex].price * cart[existingProductIndex].quantity;
-                //console.log('Increased quantity for existing product:', cart[existingProductIndex]);
             } else {
                 const newCartItem = {
                     cart_items_id: generateCartItemId(),
@@ -278,14 +312,11 @@ const ProductList = ({ stickyComponents }) => {
                     sub_total: product.price
                 };
                 cart.push(newCartItem);
-                //console.log('Added new product to cart:', newCartItem);
             }
 
             localStorage.setItem('cart', JSON.stringify(cart));
-            //console.log('Updated cart saved to localStorage:', cart);
 
             cartEventEmitter.emit('cartUpdated');
-            //console.log('Emitted cartUpdated event');
 
             setToastMessage('Added to Cart!');
             setTimeout(() => {
@@ -302,7 +333,6 @@ const ProductList = ({ stickyComponents }) => {
         }
 
         try {
-            //console.log('User is logged in, adding item to server-side cart');
             const response = await axios.post('https://ustp-eccom-server.vercel.app/api/add-to-cart', {
                 customer_id: customerId,
                 product_code: product.product_code,
@@ -311,17 +341,14 @@ const ProductList = ({ stickyComponents }) => {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            //console.log('Response from server:', response.data);
 
             cartEventEmitter.emit('cartUpdated');
-            //console.log('Emitted cartUpdated event after server response');
 
             setToastMessage('Added to Cart!');
             setTimeout(() => {
                 setToastMessage('');
             }, 3000);
 
-            // Check if the interaction has already been recorded
             if (!interactionRecorded && !recordedInteractions.has(product.product_code)) {
                 await recordProductInteraction();
                 recordedInteractions.add(product.product_code);
@@ -330,7 +357,6 @@ const ProductList = ({ stickyComponents }) => {
 
         } catch (error) {
             if (error.response && error.response.status === 401) {
-                //console.log('Unauthorized, redirecting to login');
                 navigate('/login');
             } else {
                 console.error('Error adding product to cart:', error.response ? error.response.data : error.message); // Log the error details
@@ -354,14 +380,11 @@ const ProductList = ({ stickyComponents }) => {
         localStorage.setItem('selectedProducts', JSON.stringify(existingProducts));
         setToastMessage('Redirecting to Checkout Page');
 
-        // window.location.href = '/checkout';
-        //console.log("Trigger Product List");
 
         if (token) {
             window.location.href = '/checkout';
         } else {
             localStorage.setItem('redirectTo', '/checkout');
-            // Redirect to login page
             navigate('/login');
         }
 
@@ -381,8 +404,6 @@ const ProductList = ({ stickyComponents }) => {
     return (
         <div class="mx-2">
             <div>
-                {/* <h2 class="text-center mt-4 ">HAIRCARE BEAUTY OFFERS</h2> */}
-                {/* Buttons */}
                 <div className="container mb-2">
                     <div className="row justify-content-center">
                         <div className="col">
@@ -448,7 +469,7 @@ const ProductList = ({ stickyComponents }) => {
 
                         <div class="left-product-list col-12 col-lg-9 text-white p-3">
                             <div>
-                                {showRecommendedHeading && <h2 className="text-center text-danger mt-2 mb-2 fw-bold">RECOMMENDED PRODUCTS</h2>}
+                                {/* {showRecommendedHeading && <h2 className="text-center text-danger mt-2 mb-2 fw-bold">RECOMMENDED PRODUCTS</h2>} */}
                                 {showHaircareHeading && <h2 className="text-center text-danger mt-2 mb-2 fw-bold">HAIRCARE BEAUTY OFFERS</h2>}
                             </div>
 
@@ -471,21 +492,13 @@ const ProductList = ({ stickyComponents }) => {
                                 </div>
 
 
-                                {/* <div className='pagination'>
-                                    <button className='btns' onClick={() => handlePageChange(-1)} disabled={currentPage === 0}>
-                                        Previous
-                                    </button>
-                                    <button className='btns' onClick={() => handlePageChange(1)} disabled={currentPage >= Math.ceil(products.length / PAGE_SIZE) - 1}>
-                                        Next
-                                    </button>
-                                </div> */}
 
                                 <div className="pagination">
                                     <button
                                         className="btns"
                                         style={{
                                             backgroundColor: isPreviousHovered ? '#d81c4b' : 'pink',
-                                            color: isPreviousHovered ? 'white' : 'black', // Ensures text is readable on both colors
+                                            color: isPreviousHovered ? 'white' : 'black',
                                         }}
                                         onMouseEnter={() => setIsPreviousHovered(true)}
                                         onMouseLeave={() => setIsPreviousHovered(false)}
@@ -498,7 +511,7 @@ const ProductList = ({ stickyComponents }) => {
                                         className="btns"
                                         style={{
                                             backgroundColor: isNextHovered ? '#d81c4b' : 'pink',
-                                            color: isNextHovered ? 'white' : 'black', // Ensures text is readable on both colors
+                                            color: isNextHovered ? 'white' : 'black',
                                         }}
                                         onMouseEnter={() => setIsNextHovered(true)}
                                         onMouseLeave={() => setIsNextHovered(false)}
@@ -534,7 +547,7 @@ const ProductList = ({ stickyComponents }) => {
                                                             product={product}
                                                             className="product-card1"
                                                             onProductClick={handleProductClick}
-                                                            onClick={() => handleProductClick(product)} // Trigger the handler correctly
+                                                            onClick={() => handleProductClick(product)}
                                                         >
 
 
@@ -542,7 +555,7 @@ const ProductList = ({ stickyComponents }) => {
                                                                 src={product.product_image || 'https://via.placeholder.com/120'}
                                                                 alt={product.product_name}
                                                                 className="product-image1"
-                                                                onClick={() => handleProductClick(product)} // Trigger the handler correctly
+                                                                onClick={() => handleProductClick(product)}
                                                             />
                                                             <div className="product-text1">
                                                                 <h6>{product.product_name}</h6>

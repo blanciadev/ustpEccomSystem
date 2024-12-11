@@ -20,7 +20,7 @@ const Transactions = () => {
       try {
         const response = await axios.get(
           "https://ustp-eccom-server.vercel.app/api/admin-order-history-general",
-          // "http://localhost:5001/api/admin-order-history-general",
+          // "https://ustp-eccom-server.vercel.app/api/admin-order-history-general",
           {
             params: { status },
           }

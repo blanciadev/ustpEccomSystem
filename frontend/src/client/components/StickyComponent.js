@@ -41,22 +41,20 @@ const StickyComponent = ({ onSubmit }) => {
     setSearchTerm(e.target.value);
   };
 
-
   const handleSubmit = (e) => {
     e.preventDefault();
+
     const updatedFormData = {
       ...formData,
       query: searchTerm
     };
 
-    // Save search term in local storage
-    localStorage.setItem('searchTerm', searchTerm);
+    // Save the updated form data as a JSON string in local storage
+    localStorage.setItem('searchTerm', JSON.stringify(updatedFormData));
+    console.log("Sticky search term saved:", updatedFormData);
 
     // Submit the form
-    setFormData(updatedFormData);
-
     if (onSubmit) {
-      //console.log('Search term:', searchTerm);
       onSubmit(updatedFormData);
     } else {
       console.error('onSubmit function is not provided');
@@ -73,6 +71,7 @@ const StickyComponent = ({ onSubmit }) => {
       query: ''
     });
   };
+
 
 
   return (

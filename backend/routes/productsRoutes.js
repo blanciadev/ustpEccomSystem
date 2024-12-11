@@ -50,6 +50,7 @@ ORDER BY
     }
 });
 
+
 // Route to get top 4 user-picked products for interaction view
 router.get('/products-top-picks', async (req, res) => {
     try {
@@ -86,7 +87,7 @@ GROUP BY
     p.product_image
 ORDER BY
     interaction_count DESC
-LIMIT 4;
+LIMIT 6;
 
     ;`);
 
@@ -96,6 +97,121 @@ LIMIT 4;
         res.status(500).send('Error fetching top user picks');
     }
 });
+
+// Route to get filtered top picks based on multiple description keywords
+router.get('/products-top-picks-filter', async (req, res) => {
+    const { descriptionKeywords } = req.query;
+    try {
+        let query = `
+            SELECT
+                p.product_id, 
+                p.product_code, 
+                p.product_name, 
+                p.price, 
+                p.description, 
+                p.quantity, 
+                p.size, 
+                c.category_name, 
+                COUNT(user_product_interactions.interaction_id) AS interaction_count, 
+                p.product_image
+            FROM
+                product AS p
+            JOIN
+                category AS c
+                ON p.category_id = c.category_id
+            LEFT JOIN
+                user_product_interactions
+                ON p.product_code = user_product_interactions.product_code
+                AND user_product_interactions.interaction_type = 'Cart'
+        `;
+
+        if (descriptionKeywords && descriptionKeywords.length > 0) {
+            const likeConditions = descriptionKeywords.map(keyword => `p.description LIKE ?`).join(' OR ');
+            query += ` WHERE ${likeConditions}`;
+        }
+
+        query += `
+            GROUP BY
+                p.product_id, 
+                p.product_code, 
+                p.product_name, 
+                p.price, 
+                p.description, 
+                p.quantity, 
+                p.size, 
+                c.category_name, 
+                p.product_image
+            ORDER BY
+                interaction_count DESC;
+           
+        `;
+
+        const params = descriptionKeywords ? descriptionKeywords.map(keyword => `%${keyword}%`) : [];
+        const [rows] = await db.query(query, params);
+
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching top user picks:', error);
+        res.status(500).send('Error fetching top user picks');
+    }
+});
+
+
+
+// Route to get top 4 user-picked products for interaction view
+router.get('/products-top-picks/:customer_id', async (req, res) => {
+    const { customer_id } = req.params;
+
+    if (!customer_id) {
+        return res.status(400).send('Customer ID is required');
+    }
+
+    try {
+        const [rows] = await db.query(`
+            SELECT
+                p.product_id, 
+                p.product_code, 
+                p.product_name, 
+                p.price, 
+                p.description, 
+                p.quantity, 
+                p.size, 
+                c.category_name, 
+                COUNT(user_product_interactions.interaction_id) AS interaction_count, 
+                p.product_image
+            FROM
+                product AS p
+            JOIN
+                category AS c
+                ON p.category_id = c.category_id
+            LEFT JOIN
+                user_product_interactions
+                ON p.product_code = user_product_interactions.product_code
+                AND user_product_interactions.interaction_type = 'Cart'
+                AND user_product_interactions.customer_id = ?
+            GROUP BY
+                p.product_id, 
+                p.product_code, 
+                p.product_name, 
+                p.price, 
+                p.description, 
+                p.quantity, 
+                p.size, 
+                c.category_name, 
+                p.product_image
+            ORDER BY
+                interaction_count DESC
+            LIMIT 4;
+        `, [customer_id]);
+
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching top user picks:', error);
+        res.status(500).send('Error fetching top user picks');
+    }
+});
+
+
 
 
 router.post('/products-img', async (req, res) => {
@@ -196,10 +312,10 @@ router.get('/sticky-components', async (req, res) => {
         // If query is provided, add the product name filter
         if (query) {
             console.log('Adding product name and description filters for each word:', query);
-        
+
             // Split the query into individual words
             const words = query.toLowerCase().split(/\s+/); // Split by whitespace
-        
+
             // Add conditions for each word
             words.forEach((word) => {
                 searchTerms.push('(LOWER(product_name) LIKE ? OR LOWER(description) LIKE ?)');
