@@ -171,7 +171,7 @@ const BundleProductModal = () => {
                 onClick={handleShow}
                 style={{ backgroundColor: '#fb3d69', borderColor: 'white', color: '#fff' }}
             >
-                {isMobile ? <i className="bx bxs-discount"></i> : 'Bundle A Product'}
+                {isMobile ? <i className="bx bxs-discount"></i> : 'Bundle Product'}
             </Button>
 
 
@@ -212,7 +212,32 @@ const BundleProductModal = () => {
                                             <Spinner animation="border" variant="primary" />
                                         )}
                                         <div className="container">
-                                            <div className="container " style={{ height: "400px" }}>
+                                            <div className="container " >
+                                            <div>
+                    <div>
+                    <select class="form-select form-select-sm" aria-label="Small select example">
+  <option selected>Select category to bundle</option>
+  <option value="1">Hair Spa    <p class="text-primary">Sellable: 3</p>  <p class="text-danger">Non-Sellable: 1</p></option>
+  <option value="2">Absolut Repair</option>
+  <option value="3">
+    Absolut Repair Molecular    
+      <p className="fw-bold text-white">Sellable: 3</p> 
+      <p className="text-danger">Non-Sellable: 1</p>
+</option>
+<option value="4">Inforcer - <span style={{color: "blue"}}>4</span></option>
+  <option value="5">Liss Unlimited</option>
+  <option value="6">Metal Detox</option>
+  <option value="7">Scalp Advance </option>
+  <option value="8">Silver</option>
+  <option value="9">Vitamino Color</option>
+  <option value="10">Biolage</option>
+  <option value="11">Premium Series</option>
+</select>
+                    </div>
+                </div>
+                                                <div className="row">
+                                                <div className="col-auto">
+                                                    <h6>SELLABLE</h6>
                                                 <table className="table table-striped table-bordered">
                                                     <thead className="thead-dark">
                                                         <tr>
@@ -248,6 +273,49 @@ const BundleProductModal = () => {
                                                         ))}
                                                     </tbody>
                                                 </table>
+                                                    
+                                                </div>
+                                                <div className="col-auto">
+                                                <h6>NON-SELLABLE</h6>
+                                                <table className="table table-striped table-bordered">
+                                                    <thead className="thead-dark">
+                                                        <tr>
+                                                            <th style={{ width: "15%" }}></th>
+                                                            <th style={{ width: "50%" }}>Product Name</th>
+                                                            <th style={{ width: "15%" }}>Price</th>
+                                                            <th style={{ width: "20%" }}>Category</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {currentProducts.map((product) => (
+                                                            <tr key={product.product_id}>
+                                                                <td>
+                                                                    <Form.Check
+                                                                        type="checkbox"
+                                                                        checked={selectedProducts.some(
+                                                                            (p) => p.product_id === product.product_id
+                                                                        )}
+                                                                        onChange={() =>
+                                                                            handleProductSelection(product)
+                                                                        }
+                                                                    />
+                                                                </td>
+                                                                <td>{product.product_name}</td>
+                                                                <td>
+                                                                    {product.price.toLocaleString("en-US", {
+                                                                        minimumFractionDigits: 2,
+                                                                        maximumFractionDigits: 2,
+                                                                    })}
+                                                                </td>
+                                                                <td>{product.category_name}</td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                                </div>
+
+                                                </div>
+                                         
                                             </div>
                                             <Pagination>
                                                 {[...Array(totalPages).keys()].map((page) => (
@@ -260,6 +328,15 @@ const BundleProductModal = () => {
                                                     </Pagination.Item>
                                                 ))}
                                             </Pagination>
+
+                                            <button
+                                                // type="submit"
+                                                className="btn-lg btn-primary"
+                                                style={{ width: "410px" }}
+                                            >
+                                                Bundle Selected Items
+                                            </button>
+                                                    
                                         </div>
 
                                         <div className="container">

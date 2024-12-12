@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ModalStatistics from './ModalStatistics'; // Import the Modal component
 
-const ProductStatistics = ({
+const ProductStatistics2 = ({
     bestSellingCount = 10,
     totalQuantity = 100,
     lowStockCount = 5,
@@ -212,4 +212,4 @@ const ProductStatistics = ({
     );
 };
 
-export default ProductStatistics;
+export default ProductStatistics2;

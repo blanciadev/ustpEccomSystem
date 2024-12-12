@@ -8,6 +8,7 @@ import AdminHeader from "../components/AdminHeader";
 import TopProduct from "../components/TopProduct";
 import ProductStatistics from "../components/ProductStatistics";
 import AddProductModal from "../components/AddProductModal";
+import BundlingModal from "../components/BundlingModal";
 import UpdateProductModal from "../components/UpdateProductModal";
 import RemoveDiscountProduct from "../components/DiscountProductModal";
 import BundleProduct from "../components/BundleProductModal";
@@ -29,12 +30,11 @@ const Products = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
 
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showBundlingModal, setShowBundlingModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
-  const [isDiscountProductModalOpen, setIsDiscountProductModalOpen] =
-    useState(false);
-  const [isBundleProductModalOpen, setIsBundleProductModalOpen] =
-    useState(false);
+  const [isDiscountProductModalOpen, setIsDiscountProductModalOpen] = useState(false);
+  const [isBundleProductModalOpen, setIsBundleProductModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 425);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -133,9 +133,24 @@ const Products = () => {
     }
   };
 
+  const handleBundlingProduct = async (newProduct) => {
+    try {
+      await axios.post("https://ustp-eccom-server.vercel.app/api/admin-products", newProduct);
+      handleCloseBundlingModal();
+      fetchProduct();
+    } catch (error) {
+      console.error("Error adding product:", error);
+    }
+  };
+
   // Handlers for Add Product Modal
   const handleShowAddModal = () => setShowAddModal(true);
   const handleCloseAddModal = () => setShowAddModal(false);
+
+
+    // Handlers for Add Product Modal
+    const handleShowBundling = () => setShowBundlingModal(true);
+    const handleCloseBundlingModal = () => setShowBundlingModal(false);
 
   // Handlers for Update Product Modal
   const handleShowProductModal = (product) => {
@@ -198,7 +213,7 @@ const Products = () => {
                 <div className="product-two">
                   <div class="container align-items-center mb-2">
                     <div class="row align-items-center m-0 p-0">
-                      <div class="col-6">
+                      <div class="col-4">
                         <div class="search d-flex  ">
                           {" "}
                           <form>
@@ -235,6 +250,17 @@ const Products = () => {
                             onClick={handleShowAddModal}
                           >
                             <i className="bx bx-plus">Add Product</i>
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div class="col-2 ">
+                        <div class="d-flex justify-content-center align-items-center">
+                          <Button
+                            variant="warning"
+                            onClick={handleShowBundling}
+                          >
+                            <i className="bx bx-plus">Bundle Product</i>
                           </Button>
                         </div>
                       </div>
@@ -412,6 +438,12 @@ const Products = () => {
         show={showAddModal}
         handleClose={handleCloseAddModal}
         handleSave={handleAddProduct}
+      />
+
+      <BundlingModal
+        show={showBundlingModal}
+        handleClose={handleCloseBundlingModal}
+        handleSave={handleBundlingProduct}
       />
       {selectedProduct && (
         <UpdateProductModal
