@@ -10,7 +10,7 @@ const ModalStatistics = ({ isOpen, title, children, onClose }) => {
                     <h2>{title}</h2>
                     <button onClick={onClose} className="modal-close-button">Close</button>
                 </div>
-                
+
                 <div>{children}</div>
 
 

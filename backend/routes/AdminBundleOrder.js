@@ -153,25 +153,44 @@ WHERE
     }
 });
 
-
 router.get('/products-no-bundle', async (req, res) => {
     try {
-        // Fetch all products and their categories
+        // Query to fetch products with interaction data and their bundle status
         const [rows] = await db.query(`
-            SELECT p.product_id, p.product_code, p.product_name, p.price ,p.description, p.quantity, c.category_name, p.product_image,  p.product_discount, 
-                p.product_status
+            SELECT 
+                p.product_id, 
+                p.product_code, 
+                p.product_name, 
+                p.price, 
+                p.description, 
+                p.quantity, 
+                c.category_id,        
+                c.category_name, 
+                p.product_image,  
+                p.product_discount, 
+                p.product_status,
+                COALESCE(SUM(CASE WHEN upi.interaction_type = 'order' THEN 1 ELSE 0 END), 0) AS order_count,
+                CASE 
+                    WHEN COALESCE(SUM(CASE WHEN upi.interaction_type = 'order' THEN 1 ELSE 0 END), 0) > 10 THEN 'Bundleable'
+                    WHEN COALESCE(SUM(CASE WHEN upi.interaction_type = 'order' THEN 1 ELSE 0 END), 0) <= 5 THEN 'Non-Bundleable'
+                    ELSE 'Non-Bundleable'
+                END AS bundle_status
             FROM product p
             INNER JOIN category c ON p.category_id = c.category_id
-            WHERE product_status = 'Active'
+            LEFT JOIN user_product_interactions upi 
+                ON p.product_code = upi.product_code
+            WHERE p.product_status = 'Active'
+            GROUP BY p.product_id;
         `);
 
-        // Respond with product details including categories
+        // Respond with the enriched product data
         res.json(rows);
     } catch (error) {
-        console.error('Error fetching products:', error);
+        console.error('Error fetching products with interaction data:', error);
         res.status(500).send('Error fetching products');
     }
 });
+
 
 router.get('/products-disable-bundle', async (req, res) => {
     try {
