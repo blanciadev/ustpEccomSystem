@@ -1,215 +1,339 @@
-import React, { useState } from 'react';
-import ModalStatistics from './ModalStatistics'; // Import the Modal component
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import ModalStatistics from "./ModalStatistics"; // Import the Modal component
 
 const ProductStatistics = ({
-    bestSellingCount = 10,
-    totalQuantity = 100,
-    lowStockCount = 5,
-    unpopularProducts = [],
-    outOfStockCount = 3,
-    discontinuedCount = 2,
-    bestSellingProductsData = [
-        { productCode: 'BS001', productName: 'Product A', quantity: 50, price: 100 },
-        { productCode: 'BS002', productName: 'Product B', quantity: 30, price: 150 },
-        { productCode: 'BS003', productName: 'Product C', quantity: 20, price: 200 },
-    ],
-    unpopularProductsData = [
-        { productCode: 'UP001', productName: 'Product X', quantity: 1, price: 20 },
-        { productCode: 'UP002', productName: 'Product Y', quantity: 2, price: 25 },
-    ],
-    discontinuedProductsData = [
-        { productCode: 'DP001', productName: 'Product Z', quantity: 0, price: 0 },
-    ],
-    inStockProductsData = [
-        { productCode: 'IS001', productName: 'Product D', quantity: 50, price: 120 },
-        { productCode: 'IS002', productName: 'Product E', quantity: 80, price: 90 },
-    ],
-    lowStockProductsData = [
-        { productCode: 'LS001', productName: 'Product F', quantity: 5, price: 50 },
-    ],
-    outOfStockProductsData = [
-        { productCode: 'OS001', productName: 'Product G', quantity: 0, price: 0 },
-    ],
+  bestSellingCount,
+  unpopularProducts = [],
+  totalItemsCount,
+  totalQuantity,
+  lowStockCount,
+  outOfStockCount,
 }) => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [modalTitle, setModalTitle] = useState('');
-    const [modalContent, setModalContent] = useState(''); // State for modal description/content
-    const [tableData, setTableData] = useState([]); // State for table data
+  const [bestSellingProductsData, setBestSellingProductsData] = useState([]);
+  const [nonSellingProductsData, setNonSellingProductsData] = useState([]);
 
-    const openModal = (title, content, data) => {
-        setModalTitle(title); // Set the modal title
-        setModalContent(content); // Set the modal description
-        setTableData(data); // Set the table data
-        setIsModalOpen(true); // Open the modal
+  const [totalItemsCountData, setTotalItemsCountData] = useState([]);
+  
+  const [inStockCountData, setInStockCountData] = useState([]);
+  const [lowStockCountData, setLowStockCountData] = useState([]);
+
+  const [outOfStockCountData, setOutOfStockCountData] = useState([]);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalContent, setModalContent] = useState(""); // State for modal description/content
+  const [tableData, setTableData] = useState([]); // State for table data
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch the best-selling products data
+  useEffect(() => {
+    const fetchBestSellingProducts = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5001/api/sellable-items"
+        );
+        setBestSellingProductsData(response.data); // Update state with fetched data
+      } catch (err) {
+        setError("Failed to fetch best-selling products");
+        console.error("Error:", err);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const closeModal = () => {
-        setIsModalOpen(false); // Close the modal
-        setModalTitle(''); // Reset the title
-        setModalContent(''); // Reset the content
-        setTableData([]); // Reset the table data
+    fetchBestSellingProducts();
+  }, []);
+
+  // Fetch the non-selling products data
+  useEffect(() => {
+    const fetchNonSellingProducts = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5001/api/non-sellable-items"
+        );
+        setNonSellingProductsData(response.data); // Update state with fetched data
+      } catch (err) {
+        setError("Failed to fetch non-selling products");
+        console.error("Error:", err);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const renderTable = (data) => (
-        <table className="table">
-            <thead>
-                <tr>
-                    <th>Product Code</th>
-                    <th>Product Name</th>
-                    <th>Quantity</th>
-                    <th>Price</th>
-                </tr>
-            </thead>
-            <tbody>
-                {data.map((item, index) => (
-                    <tr key={index}>
-                        <td>{item.productCode}</td>
-                        <td>{item.productName}</td>
-                        <td>{item.quantity}</td>
-                        <td>{item.price}</td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
-    );
+    fetchNonSellingProducts();
+  }, []);
 
-    return (
-        <div className='product-qty'>
-            {/* Best Selling Section */}
-            <div
-                className='best-selling'
-                onClick={() => {
-                    openModal(
-                        'Best Selling Products',
-                        'These are the top-selling products in your inventory.',
-                        bestSellingProductsData
-                    );
-                }}
-                style={{ cursor: 'pointer' }}
-            >
-                <div className='qty'>
-                    <i className='bx bxs-spa'></i>
-                    <h6>{bestSellingCount}</h6>
-                </div>
-                <div>
-                    <h6>Best Selling</h6>
-                </div>
-            </div>
+  // Fetch the total products data
+  useEffect(() => {
+    const fetchTotalItemsCount = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5001/api/total-items-count"
+        );
+        setTotalItemsCountData(response.data); // Update state with fetched data
+      } catch (err) {
+        setError("Failed to fetch total items count");
+        console.error("Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-            {/* Modal */}
-            <ModalStatistics
-                isOpen={isModalOpen}
-                title={modalTitle}
-                onClose={closeModal}
-            >
-                <p>{modalContent}</p>
-                {/* Render table only when modal content has data */}
-                {tableData.length > 0 && renderTable(tableData)}
-            </ModalStatistics>
+    fetchTotalItemsCount();
+  }, []);
 
-            {/* Other Sections */}
-            <div
-                className='unpopular'
-                onClick={() =>
-                    openModal(
-                        'Unpopular Products',
-                        'Products with the least sales in your inventory.',
-                        unpopularProductsData
-                    )
-                }
-                style={{ cursor: 'pointer' }}
-            >
-                <div className='qty'>
-                    <i className='bx bxs-spa'></i>
-                    <h6>{unpopularProducts ? unpopularProducts.length : 0}</h6>
-                </div>
-                <div>
-                    <h6>Unpopular</h6>
-                </div>
-            </div>
 
-            <div
-                className='discontinued'
-                onClick={() =>
-                    openModal(
-                        'Total Items',
-                        'Total number of products that are available.',
-                        discontinuedProductsData
-                    )
-                }
-                style={{ cursor: 'pointer' }}
-            >
-                <div className='qty'>
-                    <i className='bx bxs-spa'></i>
-                    {/* Replace discontinued with the total number of products - 51 should be the result */}
-                    <h6>{discontinuedCount}</h6>
-                </div>
-                <div>
-                    <h6>Total Products</h6>
-                </div>
-            </div>
+  // Fetch the in stock count data
+  useEffect(() => {
+    const fetchInStockCount = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5001/api/in-stock-count"
+        );
+        setInStockCountData(response.data); // Update state with fetched data
+      } catch (err) {
+        setError("Failed to fetch in stock count");
+        console.error("Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-            <div
-                className='in-stock'
-                onClick={() =>
-                    openModal(
-                        'In Stock',
-                        'These are the products currently in stock.',
-                        inStockProductsData
-                    )
-                }
-                style={{ cursor: 'pointer' }}
-            >
-                <div className='qty'>
-                    <i className='bx bxs-spa'></i>
-                    <h6>{totalQuantity}</h6>
-                </div>
-                <div>
-                    <h6>In Stock</h6>
-                </div>
-            </div>
+    fetchInStockCount();
+  }, []);
 
-            <div
-                className='low-stock'
-                onClick={() =>
-                    openModal(
-                        'Low Stock',
-                        'Products that are running low in quantity.',
-                        lowStockProductsData
-                    )
-                }
-                style={{ cursor: 'pointer' }}
-            >
-                <div className='qty'>
-                    <i className='bx bxs-spa'></i>
-                    <h6>{lowStockCount}</h6>
-                </div>
-                <div>
-                    <h6>Low Stock</h6>
-                </div>
-            </div>
 
-            <div
-                className='out-of-stock'
-                onClick={() =>
-                    openModal(
-                        'Out of Stock',
-                        'These products are currently out of stock.',
-                        outOfStockProductsData
-                    )
-                }
-                style={{ cursor: 'pointer' }}
-            >
-                <div className='qty'>
-                    <i className='bx bxs-spa'></i>
-                    <h6 className="text-dark">{outOfStockCount}</h6>
-                </div>
-                <div>
-                    <h6 className="text-dark">Out of Stock</h6>
-                </div>
-            </div>
+
+  // Fetch the low stock count data
+  useEffect(() => {
+    const fetchLowStockCount = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5001/api/low-stock-count"
+        );
+        setLowStockCountData(response.data); // Update state with fetched data
+      } catch (err) {
+        setError("Failed to fetch low stock count");
+        console.error("Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLowStockCount();
+  }, []);
+
+
+
+  // Fetch the out of stock count data
+  useEffect(() => {
+    const fetchOutOfStockCount = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5001/api/out-of-stock-count"
+        );
+        setOutOfStockCountData(response.data); // Update state with fetched data
+      } catch (err) {
+        setError("Failed to fetch out of stock count");
+        console.error("Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOutOfStockCount();
+  }, []);
+
+
+  const openModal = (title, content, data) => {
+    setModalTitle(title); // Set the modal title
+    setModalContent(content); // Set the modal description
+    setTableData(data); // Set the table data
+    setIsModalOpen(true); // Open the modal
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false); // Close the modal
+    setModalTitle(""); // Reset the title
+    setModalContent(""); // Reset the content
+    setTableData([]); // Reset the table data
+  };
+  const renderTable = (data) => (
+    <div style={{ maxHeight: '400px', overflowY: 'auto' }}> {/* Scrollable container */}
+      <table
+        className="table table-striped table-bordered table-hover"
+        style={{ fontSize: '14px', position: 'relative', borderCollapse: 'collapse' }}
+      >
+        <thead
+          className="bg-pink text-white"
+          style={{ position: 'sticky', top: 0, zIndex: 1 }}
+        >
+          <tr>
+            <th>#</th> {/* Numbering column */}
+            <th>Product Code</th>
+            <th>Product Name</th>
+            <th>Quantity</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((item, index) => (
+            <tr key={index}>
+              <td>{index + 1}</td> {/* Render row number */}
+              <td>{item['Product Code']}</td>
+              <td>{item['Product Name']}</td>
+              <td>{item.Quantity}</td>
+              <td>{item.Price}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+  
+  
+
+  if (loading) return <p>Loading products...</p>;
+  if (error) return <p>{error}</p>;
+
+  return (
+    <div className="product-qty">
+      {/* Best Selling Section */}
+      <div
+        className="best-selling"
+        onClick={() => {
+          openModal(
+            "Best Selling Products",
+            <h2 className='fw-bold mb-4' style={{color: "green", fontSize: '16px' }}>These are the top-selling products in your inventory.</h2>,
+            bestSellingProductsData
+          );
+        }}
+        style={{ cursor: "pointer" }}
+      >
+        <div className="qty">
+          <i className="bx bxs-spa"></i>
+          <h6>{bestSellingCount}</h6>
         </div>
-    );
+        <div>
+          <h6>Best Selling</h6>
+        </div>
+      </div>
+
+      {/* Modal */}
+      <ModalStatistics
+        show={isModalOpen}
+        title={modalTitle}
+        handleClose={closeModal}
+      >
+        <p className="text-start">{modalContent}</p>
+        {/* Render table only when modal content has data */}
+        {tableData.length > 0 && renderTable(tableData)}
+      </ModalStatistics>
+
+      {/* Other Sections */}
+      <div
+        className="unpopular"
+        onClick={() =>
+          openModal(
+            "Unpopular Products",
+            <h2 className='fw-bold mb-4' style={{color: "green", fontSize: '16px' }}>Products with the least sales in your inventory.</h2>,
+            nonSellingProductsData
+          )
+        }
+        style={{ cursor: "pointer" }}
+      >
+        <div className="qty">
+          <i className="bx bxs-spa"></i>
+          <h6>{unpopularProducts ? unpopularProducts.length : 0}</h6>
+        </div>
+        <div>
+          <h6>Unpopular</h6>
+        </div>
+      </div>
+
+      <div
+        className="totalItemsCount"
+        onClick={() =>
+          openModal(
+            "Total Items",
+            <h2 className='fw-bold mb-4' style={{color: "green", fontSize: '16px' }}>Total number of haircare products that are available.</h2>,
+            totalItemsCountData
+          )
+        }
+        style={{ cursor: "pointer" }}
+      >
+        <div className="qty">
+          <i className="bx bxs-spa"></i>
+          <h6>{totalItemsCount}</h6>
+        </div>
+        <div>
+          <h6>Total Products</h6>
+        </div>
+      </div>
+
+      <div
+        className="in-stock"
+        onClick={() =>
+          openModal(
+            "In Stock",
+            <h2 className='fw-bold mb-4' style={{color: "green", fontSize: '16px' }}>These are the products currently in stock.</h2>,
+            inStockCountData
+          )
+        }
+        style={{ cursor: "pointer" }}
+      >
+        <div className="qty">
+          <i className="bx bxs-spa"></i>
+          <h6>{totalQuantity}</h6>
+        </div>
+        <div>
+          <h6>In Stock</h6>
+        </div>
+      </div>
+
+      <div
+        className="low-stock"
+        onClick={() =>
+          openModal(
+            "Low Stock",
+            <h2 className='fw-bold mb-4' style={{color: "green", fontSize: '16px' }}>Products that are running low in quantity.</h2>,
+            lowStockCountData
+          )
+        }
+        style={{ cursor: "pointer" }}
+      >
+        <div className="qty">
+          <i className="bx bxs-spa"></i>
+          <h6>{lowStockCount}</h6>
+        </div>
+        <div>
+          <h6>Low Stock</h6>
+        </div>
+      </div>
+
+      <div
+        className="out-of-stock"
+        onClick={() =>
+          openModal(
+            "Out of Stock",
+            <h2 className='fw-bold mb-4' style={{color: "green", fontSize: '16px' }}>These products are currently out of stock.</h2>,
+            outOfStockCountData
+          )
+        }
+        style={{ cursor: "pointer" }}
+      >
+        <div className="qty">
+          <i className="bx bxs-spa"></i>
+          <h6 className="text-dark">{outOfStockCount}</h6>
+        </div>
+        <div>
+          <h6 className="text-dark">Out of Stock</h6>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default ProductStatistics;

@@ -36,10 +36,10 @@
 }
 
 
-.promodal-body {
+/* .promodal-body {
     display: grid;
     grid-template-columns: 40% 60%;
-}
+} */
 
 .promodal-body button {
     background-color: rgb(255, 114, 138);
@@ -112,12 +112,10 @@
 
 .modalproduct-image {
     width: 40%;
-    border-radius: 10px;
 }
 
 .modalproduct-image-bundle {
     width: 15%;
-    border-radius: 10px;
     position: relative;
 }
 
@@ -140,7 +138,7 @@
 
 .price-value {
     font-weight: bold;
-    color: #007bff;
+    color: linear-gradient(to right, hotpink, red);
 }
 
 .modalproduct-quantity {
@@ -166,7 +164,7 @@
 
 .add-to-cart-btn:hover,
 .buy-now-btn:hover {
-    background-color: #0056b3;
+    background-color:  rgb(255, 114, 138);
 }
 
 .out-of-stock {
@@ -195,10 +193,6 @@
     position: relative;
     border: 3px solid #ddd;
     border-radius: 2px;
-    padding: 16px;
-    margin: 10px;
-    display: grid;
-    grid-template-rows: 50% 50%;
     align-items: center;
     justify-items: center;
     cursor: pointer;
@@ -252,7 +246,6 @@
 .product-name {
     display: block;
     font-weight: bold;
-    text-align: center;
 }
 
 .product-price {
@@ -279,13 +272,13 @@
     align-items: center;
     margin: 10px 0;
     padding: 10px 0;
-    border-top: 1px solid rgba(0, 0, 0, 0.418);
+
 }
 
 .recommendations-title {
     font-size: 20px;
     font-weight: bold;
-    margin: 20px 0;
+
 }
 
 .recommended-modalproducts-grid {
@@ -303,11 +296,8 @@
     flex: 1; 
     min-width: 24.6%;
     scroll-snap-align: start;
-    border: 1px solid #ddd;
-    border-radius: 10px;
     padding: 10px;
     text-align: center;
-    background-color: #f9f9f9;
     transition: transform 0.2s;
     height: 350px;
     display: flex;

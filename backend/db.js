@@ -1,35 +1,49 @@
 const mysql = require('mysql2/promise');
 
 // Create a connection pool
+// const pool = mysql.createPool({
+
+//     host: '85.31.233.19',
+//     user: 'root',
+//     password: '2020303757',
+//     port: 3306,
+//     database: 'ustpecom',
+
+
+
+
+//     // host: 'localhost',
+//     // user: 'root',
+//     // port: '3306',
+//     // // password: '',
+
+//     // // PORT KURT 
+//     // port: '3307',
+//     // password: 'root',
+
+//     // // //SAM
+//     // password: "sam12345",
+
+//     // // password: '',
+//     // database: 'ustpecom',
+//     waitForConnections: true,
+//     connectionLimit: 10,
+//     queueLimit: 0
+// });
+
+
+
+// Create a connection pool
 const pool = mysql.createPool({
-
-    host: '85.31.233.19',
-    user: 'root',
-    password: '2020303757',
-    port: 3306,
+    host: "localhost",
+    user: "root",
+    password: "sam12345",
     database: 'ustpecom',
-
-
-
-
-    // host: 'localhost',
-    // user: 'root',
-    // port: '3306',
-    // // password: '',
-
-    // // PORT KURT 
-    // port: '3307',
-    // password: 'root',
-
-    // // //SAM
-    // password: "sam12345",
-
-    // // password: '',
-    // database: 'ustpecom',
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
 });
+
 
 // Test the connection (optional)
 const testConnection = async () => {

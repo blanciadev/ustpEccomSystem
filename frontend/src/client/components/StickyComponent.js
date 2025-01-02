@@ -240,7 +240,7 @@ const StickyComponent = ({ onSubmit }) => {
                           </div>
                         </div>
                         <div>
-                          <p>Virgin:</p>
+                          <p>Natural:</p>
                           <div className='input'>
                             <input
                               type='radio'
@@ -259,7 +259,7 @@ const StickyComponent = ({ onSubmit }) => {
                               name='hairVirgin'
                               onChange={handleInputChange}
                             />
-                            <label htmlFor='virginNo'>No</label>
+                            <label htmlFor='virginNo'>No (Colored)</label>
                           </div>
                         </div>
 
@@ -271,7 +271,7 @@ const StickyComponent = ({ onSubmit }) => {
                   </div>
 
 
-                  <div class="row-3 d-flex justify-content-center">
+                  <div class="row-3 d-flex justify-content-center mt-4">
                     <button type='submit'>Find Products</button>
                   </div>
                 </div>

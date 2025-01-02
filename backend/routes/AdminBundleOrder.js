@@ -25,14 +25,14 @@ const generateUniqueBundleId = async () => {
 };
 
 router.post('/bundles', async (req, res) => {
-    const { selectedProducts, discount } = req.body;
+    const { bundledProducts, discount } = req.body;
     console.log('----- BUNDLE INSERT ------');
 
     // Generate a unique bundle ID
     const customBundleId = await generateUniqueBundleId();
 
     // Calculate custom price
-    const totalPrice = selectedProducts.reduce((acc, product) => acc + parseFloat(product.discountedPrice), 0);
+    const totalPrice = bundledProducts.reduce((acc, product) => acc + parseFloat(product.discountedPrice), 0);
     const customPrice = totalPrice.toFixed(2);
 
     try {
@@ -42,7 +42,7 @@ router.post('/bundles', async (req, res) => {
         );
 
         // Insert each product and update its status and discount
-        for (const product of selectedProducts) {
+        for (const product of bundledProducts) {
             await db.query(
                 'INSERT INTO bundle_products (bundle_id, product_code, discounted_price) VALUES (?, ?, ?)',
                 [customBundleId, product.product_code, product.discountedPrice]
@@ -153,6 +153,76 @@ WHERE
     }
 });
 
+
+
+
+
+
+
+
+//sam code
+
+router.get('/bundle-sellable-and-unpopular', async (req, res) => {
+    try {
+        const [rows] = await db.query(`
+            
+SELECT 
+    p.product_id, 
+    p.product_code, 
+    p.product_name, 
+    p.price, 
+    p.description, 
+    p.quantity, 
+    p.category_id,
+    p.product_image,
+    p.product_status,
+    COUNT(od.product_id) AS 'quantity_sold',
+    CASE 
+        WHEN COUNT(od.product_id) >= 5 THEN 'Sellable'
+        WHEN COUNT(od.product_id) < 5 OR COUNT(od.product_id) = 0 THEN 'Unpopular'
+    END AS 'Label'
+FROM 
+    product p
+LEFT JOIN 
+    order_details od
+ON 
+    p.product_code = od.product_id
+WHERE 
+    p.quantity > 0
+GROUP BY 
+    p.product_id, 
+    p.product_code, 
+    p.product_name, 
+    p.price, 
+    p.description, 
+    p.quantity, 
+    p.category_id,
+    p.product_image,
+    p.product_status
+    
+ORDER BY 
+    quantity_sold DESC;
+
+        `);
+
+        // Respond with the enriched product data
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching products with sellable and unpopular data:', error);
+        res.status(500).send('Error fetching products');
+    }
+});
+
+
+
+
+
+
+
+
+
+
+ 
 router.get('/products-no-bundle', async (req, res) => {
     try {
         // Query to fetch products with interaction data and their bundle status

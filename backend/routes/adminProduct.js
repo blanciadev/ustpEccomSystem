@@ -52,52 +52,69 @@ router.get('/admin-products-inventory', async (req, res) => {
 router.get('/admin-products-with-interaction', async (req, res) => {
     try {
 
-        const LOW_STOCK_THRESHOLD = 10;
-        const LOW_INTERACTION_THRESHOLD = 1;
-
         const [[{ total }]] = await db.query(`
-            SELECT COUNT(DISTINCT p.product_code) AS total
-            FROM product AS p
-            INNER JOIN user_product_interactions AS upi
-            ON p.product_code = upi.product_code
-            WHERE upi.interaction_type = 'cart'
-            AND upi.interaction_timestamp >= NOW() - INTERVAL 30 DAY
+           SELECT 
+    COUNT(*) AS 'total'
+FROM 
+    (
+        SELECT 
+            p.product_code
+        FROM 
+            order_details od
+        JOIN 
+            product p
+        ON 
+            od.product_id = p.product_code
+        GROUP BY 
+            od.product_id, p.product_code
+        HAVING 
+            COUNT(od.product_id) >= 5
+    ) AS total;
         `);
 
-        const [products] = await db.query(`
-            SELECT DISTINCT p.product_name
-            FROM product AS p
-            INNER JOIN user_product_interactions AS upi
-            ON p.product_code = upi.product_code
-            WHERE upi.interaction_type = 'cart'
-            AND upi.interaction_timestamp >= NOW() - INTERVAL 30 DAY
+
+        
+        const [unpopularProducts] = await db.query(`
+            SELECT 
+                p.product_code AS 'Product Code',
+                p.product_name AS 'Product Name',
+                COUNT(od.product_id) AS 'Quantity',
+                p.price AS 'Price'
+            FROM 
+                product p
+            LEFT JOIN 
+                order_details od
+            ON 
+                p.product_code = od.product_id
+            GROUP BY 
+                p.product_code, p.product_name, p.price
+            HAVING 
+                COUNT(od.product_id) < 5 OR COUNT(od.product_id) = 0
+            ORDER BY 
+                Quantity DESC;
         `);
+
+        const [[{ totalItemsCount }]] = await db.query(`
+            SELECT COUNT(*) AS totalItemsCount
+            FROM product;
+
+         `);
 
         const [[{ totalQuantity }]] = await db.query(`
             SELECT SUM(quantity) AS totalQuantity
             FROM product
         `);
 
+
+
         const [[{ lowStockCount }]] = await db.query(`
             SELECT COUNT(*) AS lowStockCount
             FROM product
-            WHERE quantity <= ?
-        `, [LOW_STOCK_THRESHOLD]);
+            WHERE quantity > 0 AND quantity < 20;
+         `);
 
-        const [[{ lowStockQuantity }]] = await db.query(`
-            SELECT SUM(quantity) AS lowStockQuantity
-            FROM product
-            WHERE quantity <= ?
-        `, [LOW_STOCK_THRESHOLD]);
 
-        const [unpopularProducts] = await db.query(`
-            SELECT p.product_name
-            FROM product AS p
-            LEFT JOIN user_product_interactions AS upi
-            ON p.product_code = upi.product_code
-            WHERE upi.interaction_type IS NULL 
-            OR upi.interaction_type = 'view'
-        `);
+
 
         const [[{ outOfStockCount }]] = await db.query(`
             SELECT COUNT(*) AS outOfStockCount
@@ -105,35 +122,15 @@ router.get('/admin-products-with-interaction', async (req, res) => {
             WHERE quantity = 0
         `);
 
-        const [[{ outOfStockQuantity }]] = await db.query(`
-            SELECT SUM(quantity) AS outOfStockQuantity
-            FROM product
-            WHERE quantity = 0
-        `);
-
-        const [[{ discontinuedCount }]] = await db.query(`
-            SELECT COUNT(*) AS discontinuedCount
-            FROM product
-            WHERE product_status = 'discontinued'
-        `);
-
-        const [[{ discontinuedQuantity }]] = await db.query(`
-            SELECT SUM(quantity) AS discontinuedQuantity
-            FROM product
-            WHERE product_status = 'discontinued'
-        `);
 
         res.json({
             total,
-            totalQuantity,
-            products: products.map(product => product.product_name),
-            lowStockCount,
-            lowStockQuantity,
             unpopularProducts: unpopularProducts.map(product => product.product_name),
+            totalItemsCount,
+            totalQuantity,
+            lowStockCount,
             outOfStockCount,
-            outOfStockQuantity,
-            discontinuedCount,
-            discontinuedQuantity
+           
         });
     } catch (error) {
         console.error('Error fetching products data:', error);

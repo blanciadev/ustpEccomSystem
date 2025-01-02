@@ -6,6 +6,7 @@ import { cartEventEmitter } from '../../components/eventEmitter';
 import ProductModal from '../../components/ProductModal';
 import ToastNotification from '../../../public/components/ToastNotification';
 import ClientHomeLoader from '../../../public/components/Loaders/ClientHomeLoader';
+import Footer from '../../../client/components/Footer';
 
 import { useNavigate } from 'react-router-dom';
 
@@ -336,13 +337,18 @@ const Shop = () => {
             setLoading(false);
         }
     };
-
-
+    
     return (
         <div className='shop'>
-            <Navigation />
+            <Navigation/>
             <ToastNotification toastMessage={toastMessage} />
-            <div className='d-flex justify-content-center w-50 ms-4 mt-2'>
+            <div className='d-flex justify-content-center sticky-top' 
+            style={{ background: "pink", position: "sticky",
+                top: "59px",
+                zIndex: "200"}}>
+            <div className='d-flex my-2'
+            style={{width: "800px"}}
+            >
                 {/* <label htmlFor="search">Search:</label> */}
                 <input
                     type="text"
@@ -352,7 +358,9 @@ const Shop = () => {
                     onChange={handleSearchChange}
                     placeholder="Search for your perfect haircare products..."
                 />
-                <button className='w-30' type="button" onClick={handleSearchSubmit}>Search</button>
+                <button className='w-45 fw-bold' type="button" onClick={handleSearchSubmit}
+                 style={{ background: "linear-gradient(to right, hotpink, red)"}}>Search</button>
+            </div>
             </div>
 
             {searchTriggered && products.length > 0 ? (
@@ -379,7 +387,7 @@ const Shop = () => {
                                             ₱{product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                         </p>
                                         {product.product_status === 'Discounted' && (
-                                            <p className='shop__product-discount'>Product Discount: P{product.product_discount}%</p>
+                                            <p className='shop__product-discount'>Product Discount: ₱{product.product_discount}%</p>
                                         )}
                                         <button
                                             className='shop__add-to-cart-button'
@@ -407,7 +415,7 @@ const Shop = () => {
                 </div>
             ) : (
                 // Display Top Picks if no search is triggered or no results are found
-                <div className='shop__top-picks'>
+                <div className='shop__top-picks my-4'>
                     <h2 className='shop__title'>TOP PICKS</h2>
                     <div className='shop__product-list'>
                         {Array.isArray(topPickedProducts) && topPickedProducts.length > 0 && (
@@ -424,7 +432,7 @@ const Shop = () => {
                                         <div className="shop__product-desc">
                                             <p className="shop__product-name">{product.product_name || "No product name"}</p>
                                             <p className="shop__product-quantity">Stocks: {product.quantity}</p>
-                                            <p className="shop__product-price text-primary">
+                                            <p className="shop__product-price fw-bold text-danger">
                                                 ₱{product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                             </p>
                                             {product.product_status === "Discounted" && (
@@ -460,71 +468,28 @@ const Shop = () => {
             )
             };
 
-            {/* Bundle Section */}
-            {recommendedProducts.length > 0 && (
-                <div className='shop__recommendations'>
-                    <h2 className='shop__title'>Discounted Bundles</h2>
-                    <div className='shop__product-list'>
-                        {recommendedProducts.map((product) => (
-                            <div key={product.product_code} className='bundle-card selected' style={{ height: '370px', gridTemplateRows: '40% 40% 20%' }} onClick={() => openModal(product)}>
-                                <div className="discount-badge">
-                                    <p style={{ fontSize: '1.2rem' }}>{product.discount}%</p>
-                                    <p style={{ lineHeight: '0.5' }}>OFF</p>
-                                </div>
-
-                                <img
-                                    src={product.product_image || 'https://via.placeholder.com/150'}
-                                    alt={product.product_name || 'Product Image'}
-                                    className="modalproduct-image-bundle"
-                                    loading="lazy"
-                                />
-                                <div style={{ flex: 1, textAlign: 'center' }}>
-                                    <p className='shop__product-name'>{product.product_name || 'No product name available'}</p>
-                                    <p className="product-price">₱{product.final_price ? product.final_price.toFixed(2) : 'N/A'}</p>
-                                    <p className="product-original-price">₱{product.price ? product.price.toFixed(2) : 'N/A'}</p>
-                                </div>
-                                <div className='btn-grp'>
-                                    {product.quantity > 0 ? (
-                                        <button
-                                            className='shop__add-to-cart-button'
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleAddToCart(product);
-                                            }}
-                                        >
-                                            <i className='bx bxs-cart-alt cart-icon animated-cart-icon'></i>
-                                        </button>,
-                                        <button
-                                            className='shop__buy-now-button'
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleBuyNow(product);
-                                            }}
-                                        >
-                                            Buy Now
-                                        </button>
-                                    ) : (
-                                        <p style={{ color: 'red' }}>Sold Out</p>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
 
 
             {/* Filter Section */}
             <div className='shop__filter'>
                 <h2 className='shop__title'>ALL HAIRCARE PRODUCTS</h2>
-                <label htmlFor='category-filter' className='shop__filter-label'>Filter by Category:</label>
-                <select id='category-filter' className='shop__filter-select' value={selectedCategory} onChange={handleCategoryChange}>
+
+                <div className='d-flex justify-content-center align-items-center gap-4'>
+                <label htmlFor='category-filter' className=''>Filter by Category:</label>
+                <select id='category-filter' className='form-select-sm' value={selectedCategory} onChange={handleCategoryChange}>
                     <option value=''>All Categories</option>
                     {categories.map((category) => (
                         <option key={category} value={category}>{category}</option>
                     ))}
                 </select>
+
+
+
+
+                </div>
             </div>
+
+
 
             {/* Products List */}
             <div className='shop__product-list'>
@@ -541,7 +506,7 @@ const Shop = () => {
                             <div className='shop__product-desc'>
                                 <p className='shop__product-name'>{product.product_name || 'No product name'}</p>
                                 <p className='shop__product-quantity'>Stocks: {product.quantity}</p>
-                                <p className="shop__product-price text-primary" style={{ width: "50px" }}>
+                                <p className="shop__product-price text-danger fw-bold" style={{ width: "50px" }}>
                                     ₱{product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 </p>
 
@@ -589,6 +554,8 @@ const Shop = () => {
                     onClose={closeModal}
                 />
             )}
+
+            <Footer/>
         </div>
     );
 };

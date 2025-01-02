@@ -119,33 +119,32 @@ const AdminHeader = () => {
                     style={{
                         minWidth: "200px",
                         fontFamily: "Arial, sans-serif",
-                        fontSize: "14px",
+                        fontSize: "20px",
                     }}
                 >
 
-                    <li>
+                    <li className='py-2 ps-4'>
                         <a
-                            className="dropdown-item d-flex align-items-center"
+                            className="d-flex align-items-center"
+                            style={{textDecoration: "none", color: "green" }}
                             // onClick={handleProfileClick}
                             href='/admin/profile'
                         >
                             <FaRegUser
                                 className="me-2"
                                 size={24}
-                                style={{ color: "green" }}
+                                style={{textDecoration: "none", color: "green" }}
+                                
                             />
                             <span style={{ fontSize: "16px" }}>Profile</span>
                         </a>
                     </li>
 
 
-                    <li>
-                        <hr className="dropdown-divider" />
-                    </li>
 
-                    <li>
+                    <li className='py-2 ps-4'>
                         <a
-                            className="dropdown-item d-flex align-items-center text-danger"
+                            className=" d-flex align-items-center text-danger"
                             onClick={() => setShowLogoutModal(true)}
                         >
                             <MdLogout className="me-2" size={24} />

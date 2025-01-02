@@ -237,7 +237,7 @@ router.post('/products-img', async (req, res) => {
         res.status(500).send('Error fetching products');
     }
 });
-
+ 
 router.post('/products-recommendations', async (req, res) => {
     const { product_code } = req.body;
 
@@ -418,6 +418,177 @@ router.get('/products-bundle-recommendation', async (req, res) => {
         res.status(500).send('Error fetching products');
     }
 });
+
+
+
+
+
+router.get('/sellable-items', async (req, res) => {
+    try {
+        // Execute the SQL query to fetch top-selling products
+        const [rows] = await db.query(`
+            SELECT 
+                p.product_code AS 'Product Code',
+                p.product_name AS 'Product Name',
+                COUNT(od.product_id) AS 'Quantity',
+                p.price AS 'Price'
+            FROM 
+                order_details od
+            JOIN 
+                product p
+            ON 
+                od.product_id = p.product_code
+            GROUP BY 
+                od.product_id, p.product_code, p.product_name, p.price
+            HAVING 
+                COUNT(od.product_id) >= 5
+            ORDER BY 
+                Quantity DESC;
+        `);
+
+        // Respond with the fetched data
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching sellable items:', error);
+        res.status(500).send('Error fetching sellable items');
+    }
+});
+
+
+
+ 
+router.get('/non-sellable-items', async (req, res) => {
+    try {
+        // Execute the SQL query to fetch products with sales below 5 or with no orders
+        const [rows] = await db.query(`
+            SELECT 
+                p.product_code AS 'Product Code',
+                p.product_name AS 'Product Name',
+                COUNT(od.product_id) AS 'Quantity',
+                p.price AS 'Price'
+            FROM 
+                product p
+            LEFT JOIN 
+                order_details od
+            ON 
+                p.product_code = od.product_id
+            GROUP BY 
+                p.product_code, p.product_name, p.price
+            HAVING 
+                COUNT(od.product_id) < 5 OR COUNT(od.product_id) = 0
+            ORDER BY 
+                Quantity DESC;
+        `);
+
+        // Respond with the fetched data
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching sellable items:', error);
+        res.status(500).send('Error fetching sellable items');
+    }
+});
+
+
+
+
+
+router.get('/total-items-count', async (req, res) => {
+    try {
+        // Execute the SQL query to fetch products with sales below 5 or with no orders
+        const [rows] = await db.query(`
+                SELECT 
+                p.product_code AS 'Product Code',
+                p.product_name AS 'Product Name',
+                p.quantity AS 'Quantity',
+                p.price AS 'Price'
+            FROM 
+                product p
+        `);
+
+        // Respond with the fetched data
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching sellable items:', error);
+        res.status(500).send('Error fetching sellable items');
+    }
+});
+
+
+
+
+router.get('/in-stock-count', async (req, res) => {
+    try {
+        // Execute the SQL query to fetch products with sales below 5 or with no orders
+        const [rows] = await db.query(`
+                SELECT 
+                p.product_code AS 'Product Code',
+                p.product_name AS 'Product Name',
+                p.quantity AS 'Quantity',
+                p.price AS 'Price'
+            FROM product p
+            WHERE p.quantity > 0;
+        `);
+
+        // Respond with the fetched data
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching sellable items:', error);
+        res.status(500).send('Error fetching sellable items');
+    }
+});
+
+
+
+
+router.get('/low-stock-count', async (req, res) => {
+    try {
+        // Execute the SQL query to fetch products with sales below 5 or with no orders
+        const [rows] = await db.query(`
+                SELECT 
+                p.product_code AS 'Product Code',
+                p.product_name AS 'Product Name',
+                p.quantity AS 'Quantity',
+                p.price AS 'Price'
+            FROM product p
+            WHERE p.quantity > 0 AND p.quantity < 20;
+        `);
+
+        // Respond with the fetched data
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching sellable items:', error);
+        res.status(500).send('Error fetching sellable items');
+    }
+});
+
+
+
+
+
+router.get('/out-of-stock-count', async (req, res) => {
+    try {
+        // Execute the SQL query to fetch products with sales below 5 or with no orders
+        const [rows] = await db.query(`
+                SELECT 
+                p.product_code AS 'Product Code',
+                p.product_name AS 'Product Name',
+                p.quantity AS 'Quantity',
+                p.price AS 'Price'
+            FROM product p
+            WHERE p.quantity = 0;
+        `);
+
+        // Respond with the fetched data
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching sellable items:', error);
+        res.status(500).send('Error fetching sellable items');
+    }
+});
+
+
+
+
 
 
 module.exports = router;

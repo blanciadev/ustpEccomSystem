@@ -17,14 +17,11 @@ import { VscCombine } from "react-icons/vsc";
 
 const Products = () => {
   const [bestSellingCount, setBestSellingCount] = useState(0);
+  const [totalItemsCount, setTotalItemsCount] = useState(0);
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [lowStockCount, setLowStockCount] = useState(0);
-  const [lowStockQuantity, setLowStockQuantity] = useState(0);
   const [unpopularProducts, setUnpopularProducts] = useState([]);
   const [outOfStockCount, setOutOfStockCount] = useState(0);
-  const [outOfStockQuantity, setOutOfStockQuantity] = useState(0);
-  const [discontinuedCount, setDiscontinuedCount] = useState(0);
-  const [discontinuedQuantity, setDiscontinuedQuantity] = useState(0);
 
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -68,29 +65,23 @@ const Products = () => {
   const fetchProductStatistics = async () => {
     try {
       const response = await axios.get(
-        "https://ustp-eccom-server.vercel.app/api/admin-products-with-interaction"
+        "http://localhost:5001/api/admin-products-with-interaction"
       );
       const {
         total,
+        unpopularProducts,
+        totalItemsCount,
         totalQuantity,
         lowStockCount,
-        lowStockQuantity,
-        unpopularProducts,
         outOfStockCount,
-        outOfStockQuantity,
-        discontinuedCount,
-        discontinuedQuantity,
       } = response.data;
 
       setBestSellingCount(total);
+      setUnpopularProducts(unpopularProducts || 0);
+      setTotalItemsCount(totalItemsCount);
       setTotalQuantity(totalQuantity);
       setLowStockCount(lowStockCount);
-      setLowStockQuantity(lowStockQuantity);
-      setUnpopularProducts(unpopularProducts || 0);
       setOutOfStockCount(outOfStockCount);
-      setOutOfStockQuantity(outOfStockQuantity);
-      setDiscontinuedCount(discontinuedCount);
-      setDiscontinuedQuantity(discontinuedQuantity);
     } catch (error) {
       console.error("Error fetching product statistics:", error);
     }
@@ -199,14 +190,11 @@ const Products = () => {
               <div class=" mb-3">
                 <ProductStatistics
                   bestSellingCount={bestSellingCount}
+                  unpopularProducts={unpopularProducts}
+                  totalItemsCount={totalItemsCount}
                   totalQuantity={totalQuantity}
                   lowStockCount={lowStockCount}
-                  lowStockQuantity={lowStockQuantity}
-                  unpopularProducts={unpopularProducts}
                   outOfStockCount={outOfStockCount}
-                  outOfStockQuantity={outOfStockQuantity}
-                  discontinuedCount={discontinuedCount}
-                  discontinuedQuantity={discontinuedQuantity}
                 />
               </div>
               <div>
@@ -266,18 +254,6 @@ const Products = () => {
                       </div>
 
                       <div class="col-2 ">
-                        <div class=" d-flex justify-content-end">
-                          {/* <VscCombine /> */}
-                          <BundleProduct
-
-                            show={isBundleProductModalOpen}
-                            handleClose={handleCloseBundleProductModal}
-                            handleUpdate={fetchProduct}
-                          />
-                        </div>
-                      </div>
-
-                      <div class="col-2 ">
                         <div class="d-flex justify-content-end">
                           <Button
                             variant="danger"
@@ -291,6 +267,20 @@ const Products = () => {
                           </Button>
                         </div>
                       </div>
+
+                      <div class="col-2 ">
+                        <div class=" d-flex justify-content-end">
+                          {/* <VscCombine /> */}
+                          {/* <BundleProduct
+
+                            show={isBundleProductModalOpen}
+                            handleClose={handleCloseBundleProductModal}
+                            handleUpdate={fetchProduct}
+                          /> */}
+                        </div>
+                      </div>
+
+                      
                     </div>
                   </div>
 

@@ -299,9 +299,9 @@ const Navigation = () => {
                       fontSize: "14px",
                     }}
                   >
-                    <li>
+                    <li className="py-2 ps-4">
                       <a
-                        className="dropdown-item d-flex align-items-center"
+                        className="d-flex align-items-center"
                         onClick={handleHomeClick}
                       >
                         <MdOutlineHome
@@ -312,9 +312,9 @@ const Navigation = () => {
                         <span style={{ fontSize: "16px" }}>Home</span>
                       </a>
                     </li>
-                    <li>
+                    <li className="py-2 ps-4">
                       <a
-                        className="dropdown-item d-flex align-items-center"
+                        className="d-flex align-items-center"
                         onClick={handleProfileClick}
                       >
                         <FaRegUser
@@ -325,9 +325,9 @@ const Navigation = () => {
                         <span style={{ fontSize: "16px" }}>Profile</span>
                       </a>
                     </li>
-                    <li>
+                    <li className="py-2 ps-4">
                       <a
-                        className="dropdown-item d-flex align-items-center"
+                        className="d-flex align-items-center"
                         onClick={handleOrderClick}
                       >
                         <MdOutlineShoppingBag
@@ -338,12 +338,10 @@ const Navigation = () => {
                         <span style={{ fontSize: "16px" }}>My Orders</span>
                       </a>
                     </li>
-                    <li>
-                      <hr className="dropdown-divider" />
-                    </li>
-                    <li>
+                   
+                    <li className="py-2 ps-4">
                       <a
-                        className="dropdown-item d-flex align-items-center text-danger"
+                        className="d-flex align-items-center text-danger"
                         onClick={() => setShowLogoutModal(true)}
                       >
                         <MdLogout className="me-2" size={24} />
