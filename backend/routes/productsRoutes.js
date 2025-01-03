@@ -237,7 +237,7 @@ router.post('/products-img', async (req, res) => {
         res.status(500).send('Error fetching products');
     }
 });
- 
+
 router.post('/products-recommendations', async (req, res) => {
     const { product_code } = req.body;
 
@@ -456,7 +456,7 @@ router.get('/sellable-items', async (req, res) => {
 
 
 
- 
+
 router.get('/non-sellable-items', async (req, res) => {
     try {
         // Execute the SQL query to fetch products with sales below 5 or with no orders
@@ -520,13 +520,15 @@ router.get('/in-stock-count', async (req, res) => {
     try {
         // Execute the SQL query to fetch products with sales below 5 or with no orders
         const [rows] = await db.query(`
-                SELECT 
-                p.product_code AS 'Product Code',
-                p.product_name AS 'Product Name',
-                p.quantity AS 'Quantity',
-                p.price AS 'Price'
-            FROM product p
-            WHERE p.quantity > 0;
+              SELECT 
+    p.product_code AS 'Product Code',
+    p.product_name AS 'Product Name',
+    p.quantity AS 'Quantity',
+    p.price AS 'Price',
+    (SELECT SUM(quantity) FROM product) AS 'Total Quantity'
+FROM product p
+WHERE p.quantity > 0;
+
         `);
 
         // Respond with the fetched data
