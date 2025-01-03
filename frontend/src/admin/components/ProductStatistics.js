@@ -14,7 +14,7 @@ const ProductStatistics = ({
   const [nonSellingProductsData, setNonSellingProductsData] = useState([]);
 
   const [totalItemsCountData, setTotalItemsCountData] = useState([]);
-  
+
   const [inStockCountData, setInStockCountData] = useState([]);
   const [lowStockCountData, setLowStockCountData] = useState([]);
 
@@ -32,7 +32,7 @@ const ProductStatistics = ({
     const fetchBestSellingProducts = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5001/api/sellable-items"
+          "https://ustp-eccom-server.vercel.app/api/sellable-items"
         );
         setBestSellingProductsData(response.data); // Update state with fetched data
       } catch (err) {
@@ -51,7 +51,7 @@ const ProductStatistics = ({
     const fetchNonSellingProducts = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5001/api/non-sellable-items"
+          "https://ustp-eccom-server.vercel.app/api/non-sellable-items"
         );
         setNonSellingProductsData(response.data); // Update state with fetched data
       } catch (err) {
@@ -70,7 +70,7 @@ const ProductStatistics = ({
     const fetchTotalItemsCount = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5001/api/total-items-count"
+          "https://ustp-eccom-server.vercel.app/api/total-items-count"
         );
         setTotalItemsCountData(response.data); // Update state with fetched data
       } catch (err) {
@@ -90,7 +90,7 @@ const ProductStatistics = ({
     const fetchInStockCount = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5001/api/in-stock-count"
+          "https://ustp-eccom-server.vercel.app/api/in-stock-count"
         );
         setInStockCountData(response.data); // Update state with fetched data
       } catch (err) {
@@ -111,7 +111,7 @@ const ProductStatistics = ({
     const fetchLowStockCount = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5001/api/low-stock-count"
+          "https://ustp-eccom-server.vercel.app/api/low-stock-count"
         );
         setLowStockCountData(response.data); // Update state with fetched data
       } catch (err) {
@@ -132,7 +132,7 @@ const ProductStatistics = ({
     const fetchOutOfStockCount = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5001/api/out-of-stock-count"
+          "https://ustp-eccom-server.vercel.app/api/out-of-stock-count"
         );
         setOutOfStockCountData(response.data); // Update state with fetched data
       } catch (err) {
@@ -192,8 +192,8 @@ const ProductStatistics = ({
       </table>
     </div>
   );
-  
-  
+
+
 
   if (loading) return <p>Loading products...</p>;
   if (error) return <p>{error}</p>;
@@ -206,7 +206,7 @@ const ProductStatistics = ({
         onClick={() => {
           openModal(
             "Best Selling Products",
-            <h2 className='fw-bold mb-4' style={{color: "green", fontSize: '16px' }}>These are the top-selling products in your inventory.</h2>,
+            <h2 className='fw-bold mb-4' style={{ color: "green", fontSize: '16px' }}>These are the top-selling products in your inventory.</h2>,
             bestSellingProductsData
           );
         }}
@@ -238,7 +238,7 @@ const ProductStatistics = ({
         onClick={() =>
           openModal(
             "Unpopular Products",
-            <h2 className='fw-bold mb-4' style={{color: "green", fontSize: '16px' }}>Products with the least sales in your inventory.</h2>,
+            <h2 className='fw-bold mb-4' style={{ color: "green", fontSize: '16px' }}>Products with the least sales in your inventory.</h2>,
             nonSellingProductsData
           )
         }
@@ -258,7 +258,7 @@ const ProductStatistics = ({
         onClick={() =>
           openModal(
             "Total Items",
-            <h2 className='fw-bold mb-4' style={{color: "green", fontSize: '16px' }}>Total number of haircare products that are available.</h2>,
+            <h2 className='fw-bold mb-4' style={{ color: "green", fontSize: '16px' }}>Total number of haircare products that are available.</h2>,
             totalItemsCountData
           )
         }
@@ -278,7 +278,7 @@ const ProductStatistics = ({
         onClick={() =>
           openModal(
             "In Stock",
-            <h2 className='fw-bold mb-4' style={{color: "green", fontSize: '16px' }}>These are the products currently in stock.</h2>,
+            <h2 className='fw-bold mb-4' style={{ color: "green", fontSize: '16px' }}>These are the products currently in stock.</h2>,
             inStockCountData
           )
         }
@@ -298,7 +298,7 @@ const ProductStatistics = ({
         onClick={() =>
           openModal(
             "Low Stock",
-            <h2 className='fw-bold mb-4' style={{color: "green", fontSize: '16px' }}>Products that are running low in quantity.</h2>,
+            <h2 className='fw-bold mb-4' style={{ color: "green", fontSize: '16px' }}>Products that are running low in quantity.</h2>,
             lowStockCountData
           )
         }
@@ -318,7 +318,7 @@ const ProductStatistics = ({
         onClick={() =>
           openModal(
             "Out of Stock",
-            <h2 className='fw-bold mb-4' style={{color: "green", fontSize: '16px' }}>These products are currently out of stock.</h2>,
+            <h2 className='fw-bold mb-4' style={{ color: "green", fontSize: '16px' }}>These products are currently out of stock.</h2>,
             outOfStockCountData
           )
         }

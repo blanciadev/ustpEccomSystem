@@ -39,7 +39,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
       );
 
       const fetchBundles = fetch(
-        "http://localhost:5001/api/product-bundles",
+        "https://ustp-eccom-server.vercel.app/api/product-bundles",
         // "https://ustp-eccom-server.vercel.app/api/product-bundles",
         {
           method: "POST",
@@ -428,11 +428,10 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                     {bundleProducts.map((bProduct) => (
                       <div
                         key={bProduct.product_code}
-                        className={`bundle-card col-md-2 col-sm-6 mb-3 ${
-                          selectedBundleProducts[bProduct.product_code]
+                        className={`bundle-card col-md-2 col-sm-6 mb-3 ${selectedBundleProducts[bProduct.product_code]
                             ? "selected"
                             : ""
-                        }`}
+                          }`}
                         style={{ minHeight: "290px" }}
                         onClick={() =>
                           handleBundleProductSelect(bProduct.product_code)
@@ -537,8 +536,8 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                     <div
                       key={recProduct.product_id}
                       className="modalproduct-card"
-                   
-                      style={{ minHeight: "400px" , border: "3px solid rgb(255, 114, 138)"}}
+
+                      style={{ minHeight: "400px", border: "3px solid rgb(255, 114, 138)" }}
                     >
                       <img
                         src={recProduct.product_image}
@@ -578,74 +577,74 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                               </span>
                             )}
                           </div>
-                          </div>
+                        </div>
 
-                          <button
-                            className="add-to-cart-button px-10"
-                            style={{
-                              backgroundColor: recProduct.isAddToCartHovered
-                                ? "rgb(223, 95, 116)"
-                                : "#d81c4b",
-                              color: "white",
-                            }}
-                            onMouseEnter={() =>
-                              setRecommendedProducts((prev) =>
-                                prev.map((item) =>
-                                  item.product_id === recProduct.product_id
-                                    ? { ...item, isAddToCartHovered: true }
-                                    : item
-                                )
+                        <button
+                          className="add-to-cart-button px-10"
+                          style={{
+                            backgroundColor: recProduct.isAddToCartHovered
+                              ? "rgb(223, 95, 116)"
+                              : "#d81c4b",
+                            color: "white",
+                          }}
+                          onMouseEnter={() =>
+                            setRecommendedProducts((prev) =>
+                              prev.map((item) =>
+                                item.product_id === recProduct.product_id
+                                  ? { ...item, isAddToCartHovered: true }
+                                  : item
                               )
-                            }
-                            onMouseLeave={() =>
-                              setRecommendedProducts((prev) =>
-                                prev.map((item) =>
-                                  item.product_id === recProduct.product_id
-                                    ? { ...item, isAddToCartHovered: false }
-                                    : item
-                                )
+                            )
+                          }
+                          onMouseLeave={() =>
+                            setRecommendedProducts((prev) =>
+                              prev.map((item) =>
+                                item.product_id === recProduct.product_id
+                                  ? { ...item, isAddToCartHovered: false }
+                                  : item
                               )
-                            }
-                            onClick={() => {
-                              const quantity = 1;
-                              localStorage.setItem("quantity", quantity);
-                              onAddToCart(recProduct);
-                            }}
-                          >
-                            Add to cart
-                          </button>
+                            )
+                          }
+                          onClick={() => {
+                            const quantity = 1;
+                            localStorage.setItem("quantity", quantity);
+                            onAddToCart(recProduct);
+                          }}
+                        >
+                          Add to cart
+                        </button>
 
-                          <button
-                            className="buy-now-button px-10"
-                            style={{
-                              backgroundColor: recProduct.isBuyNowHovered
-                                ? "rgb(223, 95, 116)"
-                                : "#d81c4b",
-                              color: "white",
-                            }}
-                            onMouseEnter={() =>
-                              setRecommendedProducts((prev) =>
-                                prev.map((item) =>
-                                  item.product_id === recProduct.product_id
-                                    ? { ...item, isBuyNowHovered: true }
-                                    : item
-                                )
+                        <button
+                          className="buy-now-button px-10"
+                          style={{
+                            backgroundColor: recProduct.isBuyNowHovered
+                              ? "rgb(223, 95, 116)"
+                              : "#d81c4b",
+                            color: "white",
+                          }}
+                          onMouseEnter={() =>
+                            setRecommendedProducts((prev) =>
+                              prev.map((item) =>
+                                item.product_id === recProduct.product_id
+                                  ? { ...item, isBuyNowHovered: true }
+                                  : item
                               )
-                            }
-                            onMouseLeave={() =>
-                              setRecommendedProducts((prev) =>
-                                prev.map((item) =>
-                                  item.product_id === recProduct.product_id
-                                    ? { ...item, isBuyNowHovered: false }
-                                    : item
-                                )
+                            )
+                          }
+                          onMouseLeave={() =>
+                            setRecommendedProducts((prev) =>
+                              prev.map((item) =>
+                                item.product_id === recProduct.product_id
+                                  ? { ...item, isBuyNowHovered: false }
+                                  : item
                               )
-                            }
-                            onClick={() => handleBuyNow(recProduct)}
-                          >
-                            Buy Now
-                          </button>
-                        
+                            )
+                          }
+                          onClick={() => handleBuyNow(recProduct)}
+                        >
+                          Buy Now
+                        </button>
+
                       </div>
                     </div>
                   ))}

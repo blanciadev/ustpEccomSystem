@@ -65,7 +65,7 @@ const Products = () => {
   const fetchProductStatistics = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5001/api/admin-products-with-interaction"
+        "https://ustp-eccom-server.vercel.app/api/admin-products-with-interaction"
       );
       const {
         total,
@@ -139,9 +139,9 @@ const Products = () => {
   const handleCloseAddModal = () => setShowAddModal(false);
 
 
-    // Handlers for Add Product Modal
-    const handleShowBundling = () => setShowBundlingModal(true);
-    const handleCloseBundlingModal = () => setShowBundlingModal(false);
+  // Handlers for Add Product Modal
+  const handleShowBundling = () => setShowBundlingModal(true);
+  const handleCloseBundlingModal = () => setShowBundlingModal(false);
 
   // Handlers for Update Product Modal
   const handleShowProductModal = (product) => {
@@ -280,7 +280,7 @@ const Products = () => {
                         </div>
                       </div>
 
-                      
+
                     </div>
                   </div>
 

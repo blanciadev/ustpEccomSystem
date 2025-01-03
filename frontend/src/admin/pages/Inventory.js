@@ -10,7 +10,7 @@ const ITEMS_PER_PAGE = 10;
 
 const Inventory = () => {
   const [bestSellingCount, setBestSellingCount] = useState(0);
-  
+
   const [totalItemsCount, setTotalItemsCount] = useState(0);
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [lowStockCount, setLowStockCount] = useState(0);
@@ -29,7 +29,7 @@ const Inventory = () => {
   const fetchProductStatistics = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5001/api/admin-products-with-interaction"
+        "https://ustp-eccom-server.vercel.app/api/admin-products-with-interaction"
       );
       const {
         total,
@@ -155,7 +155,7 @@ const Inventory = () => {
           <div className="inventory-con">
             <div className="w-100">
               <div class=" mb-3">
-              <ProductStatistics
+                <ProductStatistics
                   bestSellingCount={bestSellingCount}
                   unpopularProducts={unpopularProducts}
                   totalItemsCount={totalItemsCount}

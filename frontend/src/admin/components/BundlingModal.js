@@ -47,7 +47,7 @@ const BundlingModal = ({ isOpen, onClose, show, handleClose }) => {
       setLoading(true);
       try {
         const response = await axios.get(
-          "http://localhost:5001/api/bundle-sellable-and-unpopular"
+          "https://ustp-eccom-server.vercel.app/api/bundle-sellable-and-unpopular"
         );
         const fetchedProducts = response.data;
 
@@ -185,7 +185,7 @@ const BundlingModal = ({ isOpen, onClose, show, handleClose }) => {
 
     try {
       await axios.post(
-        "http://localhost:5001/api/bundles",
+        "https://ustp-eccom-server.vercel.app/api/bundles",
         // "https://ustp-eccom-server.vercel.app/api/bundles",
         bundleData
       );
