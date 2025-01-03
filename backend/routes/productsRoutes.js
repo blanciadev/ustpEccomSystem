@@ -518,24 +518,26 @@ router.get('/total-items-count', async (req, res) => {
 
 router.get('/in-stock-count', async (req, res) => {
     try {
-        // Execute the SQL query to fetch products with sales below 5 or with no orders
+        // Execute the SQL query to fetch products and total quantity
         const [rows] = await db.query(`
-              SELECT 
-    p.product_code AS 'Product Code',
-    p.product_name AS 'Product Name',
-    p.quantity AS 'Quantity',
-    p.price AS 'Price',
-    (SELECT SUM(quantity) FROM product) AS 'Total Quantity'
-FROM product p
-WHERE p.quantity > 0;
-
+            SELECT 
+                p.product_code AS 'Product Code',
+                p.product_name AS 'Product Name',
+                p.quantity AS 'Quantity',
+                p.price AS 'Price'
+            FROM product p
+            WHERE p.quantity > 0;
         `);
 
-        // Respond with the fetched data
-        res.json(rows);
+        const [[totalRow]] = await db.query(`
+            SELECT SUM(quantity) AS 'Total Quantity'
+            FROM product;
+        `);
+
+        res.json({ products: rows, totalQuantity: totalRow['Total Quantity'] });
     } catch (error) {
-        console.error('Error fetching sellable items:', error);
-        res.status(500).send('Error fetching sellable items');
+        console.error('Error fetching in-stock products:', error);
+        res.status(500).send('Error fetching in-stock products');
     }
 });
 

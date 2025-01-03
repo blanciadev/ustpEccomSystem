@@ -35,6 +35,14 @@ const Login = () => {
                 localStorage.setItem('role', response.data.role_type);
                 localStorage.setItem('profile_img', response.data.profile_img);
 
+                localStorage.setItem('street_name', response.data.street_name);
+                localStorage.setItem('address', response.data.address);
+                localStorage.setItem('postal_code', response.data.postal_code);
+                localStorage.setItem('profile_img', response.data.profile_img);
+                localStorage.setItem('phone_number', response.data.phone_number);
+
+                localStorage.setItem('full_name', `${response.first_name || ''} ${response.data.last_name || ''}`);
+                console.log('Full Name stored in localStorage:', `${response.data.first_name} ${response.data.last_name}`);
                 const redirectTo = localStorage.getItem('redirectTo');
                 if (redirectTo) {
                     localStorage.removeItem('redirectTo');
@@ -106,6 +114,16 @@ const Login = () => {
                     localStorage.setItem('first_name', userData.first_name);
                     localStorage.setItem('role', userData.role_type);
                     localStorage.setItem('profile_img', userData.profile_img);
+
+                    localStorage.setItem('street_name', userData.street_name);
+                    localStorage.setItem('address', userData.address);
+                    localStorage.setItem('postal_code', userData.postal_code);
+                    localStorage.setItem('profile_img', userData.profile_img);
+                    localStorage.setItem('phone_number', userData.phone_number);
+
+
+                    localStorage.setItem('full_name', `${userData.first_name || ''} ${userData.last_name || ''}`);
+                    console.log('Full Name stored in localStorage:', `${userData.first_name} ${userData.last_name}`);
 
                     // Redirect to home page
                     navigate('/');

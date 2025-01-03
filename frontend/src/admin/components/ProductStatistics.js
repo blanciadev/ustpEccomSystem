@@ -6,7 +6,8 @@ const ProductStatistics = () => {
   const [bestSellingProductsData, setBestSellingProductsData] = useState([]);
   const [nonSellingProductsData, setNonSellingProductsData] = useState([]);
   const [totalItemsCountData, setTotalItemsCountData] = useState([]);
-  const [inStockCountData, setInStockCountData] = useState([]);
+  const [inStockProducts, setInStockProducts] = useState([]); // Store in-stock products
+  const [inStockTotal, setInStockTotal] = useState(0); // Store total quantity for in-stock products
   const [lowStockCountData, setLowStockCountData] = useState([]);
   const [outOfStockCountData, setOutOfStockCountData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,7 +17,9 @@ const ProductStatistics = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch data from all endpoints
+  const [totalproductqty, setTotalProductQty] = useState(0);
+  //let totalproductqty = 0;
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -29,25 +32,22 @@ const ProductStatistics = () => {
           outOfStockRes,
         ] = await Promise.all([
           axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/sellable-items`),
-          axios.get(
-            `${process.env.REACT_APP_SERVER_LINK}/api/non-sellable-items`
-          ),
-          axios.get(
-            `${process.env.REACT_APP_SERVER_LINK}/api/total-items-count`
-          ),
+          axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/non-sellable-items`),
+          axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/total-items-count`),
           axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/in-stock-count`),
-          axios.get(
-            `${process.env.REACT_APP_SERVER_LINK}/api/low-stock-count`
-          ),
-          axios.get(
-            `${process.env.REACT_APP_SERVER_LINK}/api/out-of-stock-count`
-          ),
+          axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/low-stock-count`),
+          axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/out-of-stock-count`),
         ]);
 
         setBestSellingProductsData(bestSellingRes.data || []);
         setNonSellingProductsData(nonSellingRes.data || []);
-        setTotalItemsCountData(totalItemsRes.data || []);
-        setInStockCountData(inStockRes.data || []);
+        setTotalItemsCountData(totalItemsRes.data.products || []);
+        setInStockProducts(inStockRes.data.products || []);
+        setInStockTotal(inStockRes.data.totalQuantity || 0);
+
+        // Properly update the total product quantity state
+        setTotalProductQty(inStockRes.data.totalQuantity || 0);  // Correctly store totalQuantity
+
         setLowStockCountData(lowStockRes.data || []);
         setOutOfStockCountData(outOfStockRes.data || []);
       } catch (err) {
@@ -61,25 +61,36 @@ const ProductStatistics = () => {
     fetchData();
   }, []);
 
+
   const openModal = (title, content, data) => {
-    setModalTitle(title); // Set the modal title
-    setModalContent(content); // Set the modal description
-    setTableData(data); // Set the table data
-    setIsModalOpen(true); // Open the modal
+    setModalTitle(title);
+    setModalContent(content);
+    setTableData(data);
+    setIsModalOpen(true);
   };
 
   const closeModal = () => {
-    setIsModalOpen(false); // Close the modal
-    setModalTitle(""); // Reset the title
-    setModalContent(""); // Reset the content
-    setTableData([]); // Reset the table data
+    setIsModalOpen(false);
+    setModalTitle("");
+    setModalContent("");
+    setTableData([]);
   };
+
+  useEffect(() => {
+    console.log("Total Product Quantity:", totalproductqty);
+  }, [totalproductqty]);
+
+
 
   const renderTable = (data) => (
     <div style={{ maxHeight: "400px", overflowY: "auto" }}>
       <table
         className="table table-striped table-bordered table-hover"
-        style={{ fontSize: "14px", position: "relative", borderCollapse: "collapse" }}
+        style={{
+          fontSize: "14px",
+          position: "relative",
+          borderCollapse: "collapse",
+        }}
       >
         <thead
           className="bg-pink text-white"
@@ -136,24 +147,27 @@ const ProductStatistics = () => {
         },
         {
           label: "Total Products",
-          count: totalItemsCountData.length,
+          count: totalproductqty,
           data: totalItemsCountData,
           description: (
             <h2 className="fw-bold mb-4" style={{ color: "green", fontSize: "16px" }}>
-              Total number of haircare products that are available.
+              Total number of products in your inventory.
             </h2>
           ),
         },
         {
           label: "In Stock",
-          count: inStockCountData.length,
-          data: inStockCountData,
+          count: inStockProducts.length,
+          data: inStockProducts,
           description: (
             <h2 className="fw-bold mb-4" style={{ color: "green", fontSize: "16px" }}>
               These are the products currently in stock.
+              <br />
+              <strong>Total Quantity:</strong> {parseInt(inStockTotal, 10).toLocaleString()}
             </h2>
           ),
         },
+
         {
           label: "Low Stock",
           count: lowStockCountData.length,

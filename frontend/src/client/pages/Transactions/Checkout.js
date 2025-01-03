@@ -46,8 +46,13 @@ const Checkout = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const fullName = localStorage.getItem('full_name');
+    const streetName = localStorage.getItem('street_name');
+    const address = localStorage.getItem('address');
+    const phoneNumber = localStorage.getItem('phone_number');
 
     const fetchOriginalQuantities = async () => {
+
       try {
         const productData = await Promise.all(
           savedProducts.map((product) =>
@@ -61,9 +66,18 @@ const Checkout = () => {
                 }
               )
               .then((response) => response.data)
+
           )
+
         );
 
+        setFormData({
+          fullName: fullName || '',
+          phoneNumber: phoneNumber || '',
+          streetname: streetName || '',
+          address: address || '',
+
+        });
         const productQuantities = productData.map((item) => item.quantity);
         setOriginalQuantities(productQuantities);
 
@@ -78,8 +92,13 @@ const Checkout = () => {
       }
     };
 
+
+
+
+
     if (savedProducts.length > 0 && !hasFetched) {
       fetchOriginalQuantities();
+
     }
 
     const handleBeforeUnload = () => {
@@ -91,7 +110,12 @@ const Checkout = () => {
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
+
+
+
   }, [savedProducts, hasFetched]);
+
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

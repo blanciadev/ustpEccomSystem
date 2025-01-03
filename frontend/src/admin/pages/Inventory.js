@@ -53,7 +53,7 @@ const Inventory = () => {
 
   const fetchProductNames = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_SERVER_LINK}api/admin-products-inventory`);
+      const response = await axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/admin-products-inventory`);
       setProductNames(response.data);
       //console.log("Product Names:", response.data);
     } catch (error) {

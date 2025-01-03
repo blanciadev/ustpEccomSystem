@@ -27,6 +27,7 @@ router.post('/users-login', async (req, res) => {
 
         const user = rows[0];
 
+
         const isPasswordValid = await bcryptjs.compare(password, user.password);
         if (!isPasswordValid) {
             return res.status(401).json({ message: 'Invalid email or password' });
@@ -60,6 +61,13 @@ router.post('/users-login', async (req, res) => {
             user_id: user.customer_id,
             username: user.username,
             first_name: user.first_name,
+            last_name: user.last_name,
+            phone_number: user.phone_number,
+
+            street_name: user.street_name,
+            address: user.address,
+            postal_code: user.postal_code,
+            profile_img: user.profile_img,
             role_type: user.role_type
         });
     } catch (err) {

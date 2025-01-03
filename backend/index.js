@@ -46,6 +46,7 @@ app.use(bodyParser.json());
 
 const crypto = require('crypto');
 const TOKEN_EXPIRATION_TIME = 5400000;
+
 app.post('/api/verify-token', async (req, res) => {
   const { token } = req.body;
 
@@ -94,6 +95,13 @@ app.post('/api/verify-token', async (req, res) => {
           first_name: user.first_name,
           role_type: user.role_type,
           profile_img: user.profile_img,
+
+          phone_number: user.phone_number,
+          street_name: user.street_name,
+          address: user.address,
+          postal_code: user.postal_code,
+          profile_img: user.profile_img,
+          role_type: user.role_type
         },
         token: newToken,
       });

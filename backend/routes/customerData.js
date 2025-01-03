@@ -95,6 +95,22 @@ router.post('/upload-profile-image', upload.single('profile_img'), async (req, r
 
 
 
+// GET user information to auto-fill the form
+router.get('/user/:customer_id', (req, res) => {
+    const customerId = req.params.customer_id;
+    const query = 'SELECT * FROM users WHERE customer_id = ?';
+
+    db.query(query, [customerId], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error' });
+        }
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        res.json(result[0]); // Send the user data to the frontend
+    });
+});
+
 
 
 
