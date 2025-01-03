@@ -73,7 +73,7 @@ FROM
         `);
 
 
-        
+         
         const [unpopularProducts] = await db.query(`
             SELECT 
                 p.product_code AS 'Product Code',

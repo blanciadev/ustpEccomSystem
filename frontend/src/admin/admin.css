@@ -751,7 +751,7 @@
     width: 180px;
     background: linear-gradient(90deg, rgb(224, 221, 255) 0%, rgb(186, 167, 255) 100%);
 }
-
+ 
 .in-stock .qty i {
     font-size: 10pt;
     padding: 5px;
@@ -774,12 +774,12 @@
 }
 
 
-.product-qty .out-of-stock {
+.product-qty .out-of {
     width: 180px;
     background: linear-gradient(90deg, rgb(255, 221, 221) 0%, rgb(255, 167, 167) 100%);
 }
 
-.out-of-stock .qty i {
+.out-of .qty i {
     font-size: 10pt;
     padding: 5px;
     border-radius: 50%;
@@ -787,12 +787,12 @@
     background-color: rgb(255, 0, 17);
 }
 
-.product-qty .totalItemsCount {
+.product-qty .total-products {
     width: 180px;
     background: linear-gradient(90deg, rgb(255, 252, 221) 0%, rgb(255, 249, 167) 100%);
 }
 
-.totalItemsCount .qty i {
+.total-products .qty i {
     font-size: 10pt;
     padding: 5px;
     border-radius: 50%;
