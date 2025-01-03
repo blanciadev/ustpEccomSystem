@@ -27,7 +27,7 @@ const Reports = () => {
             setLoading(true);
             setError(false); // Reset error state on each fetch attempt
             try {
-                const response = await axios.get('https://ustp-eccom-server.vercel.app/api/product-reports-per-month');
+                const response = await axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/product-reports-per-month`);
 
                 // Check if the response contains data
                 if (response.data && response.data.data) {
@@ -94,7 +94,7 @@ const Reports = () => {
             }
 
             // Send the data to the backend to generate the report
-            const response = await axios.post('https://ustp-eccom-server.vercel.app/api/product-reports-export', {
+            const response = await axios.post(`${process.env.REACT_APP_SERVER_LINK}/api/product-reports-export`, {
                 month,
                 year,
                 data: storedReports
@@ -102,7 +102,7 @@ const Reports = () => {
                 responseType: 'blob'
             });
 
-            const fileName = `product-report-${month}-${year}.xlsx`;
+            const fileName = `product - report - ${month} - ${year}.xlsx`;
             saveAs(new Blob([response.data]), fileName);
         } catch (error) {
             console.error('Error exporting report:', error.message);

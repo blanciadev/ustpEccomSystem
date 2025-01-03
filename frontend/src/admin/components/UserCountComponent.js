@@ -12,7 +12,7 @@ const UserCountComponent = () => {
     const fetchUserCounts = async () => {
       try {
         const response = await axios.get(
-          "https://ustp-eccom-server.vercel.app/api/admin-users-count"
+          `${process.env.REACT_APP_SERVER_LINK}/api/admin-users-count`
         );
         const { customers, admins, warehouseManagers } = response.data.data;
 
@@ -38,7 +38,7 @@ const UserCountComponent = () => {
             className="card text-dark shadow"
             style={{
               background: "linear-gradient(135deg, #fbe9d7, #f6d5f7)",
-              
+
               borderRadius: "15px",
             }}
           >

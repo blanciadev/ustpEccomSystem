@@ -24,7 +24,7 @@ const Orders = () => {
   const fetchOrders = async () => {
     try {
       const response = await axios.get(
-        "https://ustp-eccom-server.vercel.app/api/admin-order-history",
+        `${process.env.REACT_APP_SERVER_LINK}/api/admin-order-history`,
         {
           params: { status, searchTerm, sortBy },
         }
@@ -129,7 +129,7 @@ const Orders = () => {
   const handlePrintOrders = async () => {
     try {
       const response = await axios.get(
-        "https://ustp-eccom-server.vercel.app/api/admin-order-history",
+        `${process.env.REACT_APP_SERVER_LINK}api/admin-order-history`,
         {
           params: { exportToExcel: "true" },
           responseType: "blob",

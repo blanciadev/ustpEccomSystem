@@ -19,7 +19,7 @@ const OrderHistory = () => {
     const fetchOrders = async () => {
       try {
         const response = await axios.get(
-          "https://ustp-eccom-server.vercel.app/api/order-history",
+          `${process.env.REACT_APP_SERVER_LINK}/api/order-history`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -56,7 +56,7 @@ const OrderHistory = () => {
   const handleCancelOrder = async (orderId) => {
     try {
       await axios.post(
-        "https://ustp-eccom-server.vercel.app/api/cancel-order",
+        `${process.env.REACT_APP_SERVER_LINK}/api/cancel-order`,
         {
           order_id: orderId,
         },
@@ -204,9 +204,9 @@ const OrderHistory = () => {
                                 onClick={() =>
                                   handleCancelOrder(order.order_id)
                                 }
-                                className={`btn btn-danger mt-2 ${order.order_status === "Pending"
-                                  ? ""
-                                  : "disabled"
+                                className={`btn btn - danger mt - 2 ${order.order_status === "Pending"
+                                    ? ""
+                                    : "disabled"
                                   }`}
                                 disabled={order.order_status !== "Pending"}
                               >

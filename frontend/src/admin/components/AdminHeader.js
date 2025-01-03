@@ -26,7 +26,7 @@ const AdminHeader = () => {
 
         try {
             const response = await axios.get(
-                `https://ustp-eccom-server.vercel.app/api/admin-users-details`,
+                `${process.env.REACT_APP_SERVER_LINK}/api/admin-users-details`,
                 { params: { customer_id: customerId } }
             );
 
@@ -36,13 +36,13 @@ const AdminHeader = () => {
                 let base64Image = null;
                 if (user.profile_img) {
                     if (typeof user.profile_img === 'string') {
-                        base64Image = `data:image/jpeg;base64,${user.profile_img}`;
+                        base64Image = `data: image / jpeg; base64, ${user.profile_img} `;
                     } else if (user.profile_img.data) {
                         const binary = new Uint8Array(user.profile_img.data).reduce(
                             (data, byte) => data + String.fromCharCode(byte),
                             ""
                         );
-                        base64Image = `data:image/jpeg;base64,${window.btoa(binary)}`;
+                        base64Image = `data: image / jpeg; base64, ${window.btoa(binary)} `;
                     } else {
                         console.error('Unexpected profile image format:', user.profile_img);
                     }
@@ -63,7 +63,7 @@ const AdminHeader = () => {
         if (token) {
             try {
                 await axios.post(
-                    "https://ustp-eccom-server.vercel.app/api/logout",
+                    `${process.env.REACT_APP_SERVER_LINK}/api/logout`,
                     {},
                     {
                         headers: { Authorization: `Bearer ${token}` },
@@ -126,15 +126,15 @@ const AdminHeader = () => {
                     <li className='py-2 ps-4'>
                         <a
                             className="d-flex align-items-center"
-                            style={{textDecoration: "none", color: "green" }}
+                            style={{ textDecoration: "none", color: "green" }}
                             // onClick={handleProfileClick}
                             href='/admin/profile'
                         >
                             <FaRegUser
                                 className="me-2"
                                 size={24}
-                                style={{textDecoration: "none", color: "green" }}
-                                
+                                style={{ textDecoration: "none", color: "green" }}
+
                             />
                             <span style={{ fontSize: "16px" }}>Profile</span>
                         </a>

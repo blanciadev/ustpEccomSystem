@@ -9,7 +9,7 @@ const RemoveDiscountProduct = ({ show, handleClose, order, handleUpdate }) => {
   useEffect(() => {
     if (show) {
       axios
-        .get('https://ustp-eccom-server.vercel.app/api/products-disable-bundle')
+        .get(`${process.env.REACT_APP_SERVER_LINK}/api/products-disable-bundle`)
         .then((response) => {
           setProducts(response.data);
         })
@@ -21,7 +21,7 @@ const RemoveDiscountProduct = ({ show, handleClose, order, handleUpdate }) => {
 
   const handleRemoveDiscount = (productCode) => {
     axios
-      .post(`https://ustp-eccom-server.vercel.app/api/remove-discount/${productCode}`)
+      .post(`${process.env.REACT_APP_SERVER_LINK}/api/remove-discount/${productCode}`)
       .then((response) => {
         setProducts(products.filter((product) => product.product_code !== productCode));
         handleUpdate();

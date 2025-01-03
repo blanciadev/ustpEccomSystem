@@ -11,7 +11,7 @@ const CustomerInsight = () => {
   useEffect(() => {
     const fetchCustomerInsights = async () => {
       try {
-        const response = await fetch('https://ustp-eccom-server.vercel.app/api/customer-insight', {
+        const response = await fetch(`${process.env.REACT_APP_SERVER_LINK}/api/customer-insight`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

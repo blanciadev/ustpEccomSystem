@@ -19,7 +19,7 @@ const PaymentModal = ({ show, handleClose, order, handleUpdate }) => {
 
   const handleSave = async () => {
     try {
-      await axios.post('https://ustp-eccom-server.vercel.app/api/update-payment-details', {
+      await axios.post(`${process.env.REACT_APP_SERVER_LINK}/api/update-payment-details`, {
         order_id: order.order_id,
         payment_method: paymentMethod,
         order_status: orderStatus,

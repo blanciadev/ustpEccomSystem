@@ -8,7 +8,7 @@ const OrderSummary = () => {
     useEffect(() => {
         const fetchOrderCounts = async () => {
             try {
-                const response = await axios.get('https://ustp-eccom-server.vercel.app/api/admin-order-history-component');
+                const response = await axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/admin-order-history-component`);
                 setOrderCounts(response.data.statusCounts);
             } catch (error) {
                 console.error('Error fetching order counts:', error);

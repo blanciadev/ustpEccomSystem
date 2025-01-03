@@ -116,7 +116,7 @@ const ProductList = ({ stickyComponents }) => {
         }
 
         try {
-            const response = await axios.get(`https://ustp-eccom-server.vercel.app/api/sticky-components`, {
+            const response = await axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/sticky-components`, {
                 params: formData
             });
             setProducts(response.data);
@@ -165,7 +165,7 @@ const ProductList = ({ stickyComponents }) => {
 
 
         try {
-            const response = await axios.get('https://ustp-eccom-server.vercel.app/api/products-interaction', { params: payload });
+            const response = await axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/products-interaction`, { params: payload });
 
 
         } catch (error) {
@@ -184,7 +184,7 @@ const ProductList = ({ stickyComponents }) => {
         const fetchProducts = async () => {
             setLoading(true);
             try {
-                const response = await axios.get(`https://ustp-eccom-server.vercel.app/api/products`);
+                const response = await axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/products`);
                 setProducts(response.data);
                 setError(null);
                 setShowHaircareHeading(true);
@@ -197,7 +197,7 @@ const ProductList = ({ stickyComponents }) => {
 
         const fetchTopPicks = async () => {
             try {
-                const response = await axios.get('https://ustp-eccom-server.vercel.app/api/products-top-picks');
+                const response = await axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/products-top-picks`);
                 const limitedPicks = response.data.slice(0, 6);
                 setTopPicks(limitedPicks);
             } catch (error) {
@@ -226,7 +226,7 @@ const ProductList = ({ stickyComponents }) => {
                     return;
                 }
 
-                const response = await axios.get('https://ustp-eccom-server.vercel.app/api/products-top-picks-filter', {
+                const response = await axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/products-top-picks-filter`, {
                     params: { descriptionKeywords: values }
                 });
 
@@ -283,7 +283,7 @@ const ProductList = ({ stickyComponents }) => {
 
         const recordProductInteraction = async () => {
             try {
-                const response = await axios.get('https://ustp-eccom-server.vercel.app/api/products-interaction', { params: payload });
+                const response = await axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/products-interaction`, { params: payload });
 
             } catch (error) {
                 console.error('Error recording product interaction:', error);
@@ -333,7 +333,7 @@ const ProductList = ({ stickyComponents }) => {
         }
 
         try {
-            const response = await axios.post('https://ustp-eccom-server.vercel.app/api/add-to-cart', {
+            const response = await axios.post(`${process.env.REACT_APP_SERVER_LINK}/api/add-to-cart`, {
                 customer_id: customerId,
                 product_code: product.product_code,
                 quantity,

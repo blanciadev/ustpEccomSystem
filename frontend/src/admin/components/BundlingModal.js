@@ -29,7 +29,7 @@ const BundlingModal = ({ isOpen, onClose, show, handleClose }) => {
     const fetchCategories = async () => {
       try {
         const response = await fetch(
-          "https://ustp-eccom-server.vercel.app/api/product-category"
+          `${process.env.REACT_APP_SERVER_LINK}/api/product-category`
         );
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -47,7 +47,7 @@ const BundlingModal = ({ isOpen, onClose, show, handleClose }) => {
       setLoading(true);
       try {
         const response = await axios.get(
-          "https://ustp-eccom-server.vercel.app/api/bundle-sellable-and-unpopular"
+          `${process.env.REACT_APP_SERVER_LINK}api/bundle-sellable-and-unpopular`
         );
         const fetchedProducts = response.data;
 
@@ -185,8 +185,7 @@ const BundlingModal = ({ isOpen, onClose, show, handleClose }) => {
 
     try {
       await axios.post(
-        "https://ustp-eccom-server.vercel.app/api/bundles",
-        // "https://ustp-eccom-server.vercel.app/api/bundles",
+        `${process.env.REACT_APP_SERVER_LINK}api/bundles`,
         bundleData
       );
       setToastMessage("Bundle Created!");

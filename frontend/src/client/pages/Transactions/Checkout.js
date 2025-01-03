@@ -53,7 +53,7 @@ const Checkout = () => {
           savedProducts.map((product) =>
             axios
               .get(
-                `https://ustp-eccom-server.vercel.app/api/products-checkout/${product.product_code}`,
+                `${process.env.REACT_APP_SERVER_LINK}/api/products-checkout/${product.product_code}`,
                 {
                   headers: {
                     Authorization: `Bearer ${token}`,
@@ -113,7 +113,7 @@ const Checkout = () => {
 
     if (newQuantity > originalQuantities[index]) {
       setError(
-        `Quantity exceeds available stock for ${savedProducts[index].product_name}. Available: ${originalQuantities[index]}`
+        `Quantity exceeds available stock for ${savedProducts[index].product_name}.Available: ${originalQuantities[index]} `
       );
       return;
     }
@@ -227,7 +227,7 @@ const Checkout = () => {
     try {
       // Send order data to the server
       const response = await axios.post(
-        "https://ustp-eccom-server.vercel.app/api/insert-order",
+        `${process.env.REACT_APP_SERVER_LINK}/api/insert-order`,
         orderData,
         {
           headers: {
@@ -262,7 +262,7 @@ const Checkout = () => {
 
   const recordProductInteraction = async (payload) => {
     try {
-      await axios.get("https://ustp-eccom-server.vercel.app/api/products-interaction", {
+      await axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/products-interaction`, {
         params: payload,
       });
     } catch (error) {
@@ -334,7 +334,8 @@ const Checkout = () => {
       ? `${phonePrefix} ${mainNumber.slice(0, 3)} ${mainNumber.slice(
         3,
         6
-      )} ${mainNumber.slice(6, 9)}`
+      )
+      } ${mainNumber.slice(6, 9)}`
       : phonePrefix;
   };
 
@@ -345,24 +346,24 @@ const Checkout = () => {
   //     input = "09" + input;
   //   }
 
-  //   setFormData({ ...formData, phoneNumber: `${input}` });
+  //   setFormData({ ...formData, phoneNumber: `${ input }` });
   // };
 
 
   const handlePhoneNumberChange = (e) => {
     let input = e.target.value.replace(/\D/g, "");
-  
+
     if (!input.startsWith("09")) {
       input = "09" + input;
     }
-  
+
     if (input.length > 11) {
       input = input.slice(0, 11); // Limit input to 11 digits
     }
-  
+
     setFormData({ ...formData, phoneNumber: `${input}` });
   };
-  
+
 
   const formatPhoneNumberOnBlur = () => {
     const formattedPhone = formatPhoneNumber(formData.phoneNumber);
@@ -576,16 +577,16 @@ const Checkout = () => {
 
                           <div class="col-md-9">
                             <div>
-                            <p class="text-start mb-1">
-                              {product.product_name}
-                            </p>
+                              <p class="text-start mb-1">
+                                {product.product_name}
+                              </p>
                             </div>
 
                             <div class="">
                               <div className="row ">
                                 <div className="col-6 ">
                                   <p
-                                    className={`mb-1 ${effectiveDiscount > 0
+                                    className={`mb - 1 ${effectiveDiscount > 0
                                       ? "text-decoration-line-through text-muted"
                                       : ""
                                       }`}
@@ -613,9 +614,9 @@ const Checkout = () => {
                                     <p className="mb-2 text-success fw-bold">
                                       Discounted Price: ₱
                                       {discountedPrice.toLocaleString("en-US", {
-                                      minimumFractionDigits: 2,
-                                      maximumFractionDigits: 2,
-                                    })} at{" "}
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2,
+                                      })} at{" "}
                                       {effectiveDiscount}% Off
                                     </p>
                                   </div>

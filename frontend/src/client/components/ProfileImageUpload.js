@@ -51,7 +51,7 @@ function ProfileImageUpload({ formData }) {
             const customerId = localStorage.getItem('customer_id');
             const token = localStorage.getItem('token');
 
-            await axios.post(`https://ustp-eccom-server.vercel.app/api/upload-profile-image?customer_id=${customerId}`, formData, {
+            await axios.post(`${process.env.REACT_APP_SERVER_LINK}/api/upload-profile-image?customer_id = ${customerId}`, formData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data',
@@ -68,8 +68,8 @@ function ProfileImageUpload({ formData }) {
 
         } catch (error) {
             // console.error('Error uploading image:', error.response ? error.response.data : error.message);
-            // console.log(`Error uploading image: ${error.response?.data?.message || error.message}`);
-            // setToastMessage(`Error uploading image: ${error.response?.data?.message || error.message}`);
+            // console.log(`Error uploading image: ${ error.response?.data?.message || error.message }`);
+            // setToastMessage(`Error uploading image: ${ error.response?.data?.message || error.message }`);
 
             setTimeout(() => {
                 setToastMessage('Image Upload Successfull!');

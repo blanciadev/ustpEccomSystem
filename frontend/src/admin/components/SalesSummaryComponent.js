@@ -13,7 +13,7 @@ const SalesSummaryComponent = () => {
     useEffect(() => {
         const fetchSalesData = async () => {
             try {
-                const response = await axios.get('https://ustp-eccom-server.vercel.app/api/sales-for-today');
+                const response = await axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/sales-for-today`);
                 setSalesData(response.data);
             } catch (error) {
                 console.error('Error fetching sales data:', error);

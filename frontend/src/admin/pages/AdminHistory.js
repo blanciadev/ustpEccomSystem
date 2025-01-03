@@ -24,7 +24,7 @@ const AdminHistory = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get('https://ustp-eccom-server.vercel.app/api/admin-order-history-records', {
+      const response = await axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/admin-order-history-records`, {
         params: { status, searchTerm, sortBy, page: currentPage, pageSize }
       });
       setOrders(response.data.orders); // Update orders with backend-provided paginated data
@@ -96,7 +96,7 @@ const AdminHistory = () => {
 
   const handlePrintOrders = async () => {
     try {
-      const response = await axios.get('https://ustp-eccom-server.vercel.app/api/admin-order-history-records', {
+      const response = await axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/admin-order-history-records`, {
         params: { exportToExcel: 'true' },
         responseType: 'blob',
       });
@@ -232,7 +232,7 @@ const AdminHistory = () => {
                 <tbody>
                   {(orders || []).map((order, orderIndex) => (
                     (order.products || []).map((product, productIndex) => (
-                      <tr key={`${order.order_id}-${product.product_id}-${productIndex}`}>
+                      <tr key={`${order.order_id} - ${product.product_id} - ${productIndex}`}>
                         {productIndex === 0 && (
                           <>
                             <td rowSpan={order.products.length}><input type="checkbox" /></td>
@@ -285,7 +285,7 @@ const AdminHistory = () => {
                   <button
                     key={pageNumber}
                     onClick={() => handlePageChange(pageNumber)}
-                    className={`btn ${currentPage === pageNumber ? 'btn-primary' : 'btn-outline-primary'} me-2`}
+                    className={`btn ${currentPage === pageNumber ? 'btn-primary' : 'btn-outline-primary'} me - 2`}
                   >
                     {pageNumber}
                   </button>

@@ -32,7 +32,7 @@ const ProductStatistics = ({
     const fetchBestSellingProducts = async () => {
       try {
         const response = await axios.get(
-          "https://ustp-eccom-server.vercel.app/api/sellable-items"
+          `${process.env.REACT_APP_SERVER_LINK}/api/sellable-items`
         );
         setBestSellingProductsData(response.data); // Update state with fetched data
       } catch (err) {
@@ -51,7 +51,7 @@ const ProductStatistics = ({
     const fetchNonSellingProducts = async () => {
       try {
         const response = await axios.get(
-          "https://ustp-eccom-server.vercel.app/api/non-sellable-items"
+          `${process.env.REACT_APP_SERVER_LINK}api/non-sellable-items`
         );
         setNonSellingProductsData(response.data); // Update state with fetched data
       } catch (err) {
@@ -70,7 +70,7 @@ const ProductStatistics = ({
     const fetchTotalItemsCount = async () => {
       try {
         const response = await axios.get(
-          "https://ustp-eccom-server.vercel.app/api/total-items-count"
+          `${process.env.REACT_APP_SERVER_LINK}/api/total-items-count`
         );
         setTotalItemsCountData(response.data); // Update state with fetched data
       } catch (err) {
@@ -90,7 +90,7 @@ const ProductStatistics = ({
     const fetchInStockCount = async () => {
       try {
         const response = await axios.get(
-          "https://ustp-eccom-server.vercel.app/api/in-stock-count"
+          `${process.env.REACT_APP_SERVER_LINK}/api/in-stock-count`
         );
         setInStockCountData(response.data); // Update state with fetched data
       } catch (err) {
@@ -111,7 +111,7 @@ const ProductStatistics = ({
     const fetchLowStockCount = async () => {
       try {
         const response = await axios.get(
-          "https://ustp-eccom-server.vercel.app/api/low-stock-count"
+          `${process.env.REACT_APP_SERVER_LINK}/api/low-stock-count`
         );
         setLowStockCountData(response.data); // Update state with fetched data
       } catch (err) {
@@ -132,7 +132,7 @@ const ProductStatistics = ({
     const fetchOutOfStockCount = async () => {
       try {
         const response = await axios.get(
-          "https://ustp-eccom-server.vercel.app/api/out-of-stock-count"
+          `${process.env.REACT_APP_SERVER_LINK}api/out-of-stock-count`
         );
         setOutOfStockCountData(response.data); // Update state with fetched data
       } catch (err) {

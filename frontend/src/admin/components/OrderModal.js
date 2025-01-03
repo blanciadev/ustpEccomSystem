@@ -34,7 +34,7 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
       }
 
       await axios.put(
-        `https://ustp-eccom-server.vercel.app/api/update-order-status/${order.order_id}`,
+        `${process.env.REACT_APP_SERVER_LINK}/api/update-order-status/${order.order_id}`,
         {
           status,
           products,
@@ -254,7 +254,7 @@ const OrderModal = ({ order, show, handleClose, refreshOrders }) => {
                             <td>{product.quantity}</td>
                             <td>
                               {product.product_discount
-                                ? `${product.product_discount}%`
+                                ? `${product.product_discount} % `
                                 : "No Discount"}
                             </td>
                             <td>

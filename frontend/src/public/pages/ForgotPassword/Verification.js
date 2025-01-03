@@ -79,7 +79,7 @@ const Verification = () => {
 
     try {
       // Send token to the backend for verification
-      const response = await axios.post('https://ustp-eccom-server.vercel.app/api/verify-reset-token', { email, token });
+      const response = await axios.post(`${process.env.REACT_APP_SERVER_LINK}/api/verify-reset-token`, { email, token });
 
       // Handle success (redirect to reset password page or similar)
       if (response.data.success) {
@@ -155,7 +155,7 @@ const Verification = () => {
                 onChange={(e) => handleInputChange(e, index)}
                 onKeyUp={(e) => handleKeyUp(e, index)}
                 disabled={isSubmitting} // Disable inputs while submitting
-                className={`code-input ${isSubmitting ? 'disabled' : ''}`} // Add a class for styling
+                className={`code - input ${isSubmitting ? 'disabled' : ''}`} // Add a class for styling
               />
             ))}
           </div>

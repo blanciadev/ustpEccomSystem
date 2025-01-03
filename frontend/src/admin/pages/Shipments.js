@@ -19,7 +19,7 @@ const Shipments = () => {
   useEffect(() => {
     const fetchShipments = async () => {
       try {
-        const response = await fetch("https://ustp-eccom-server.vercel.app/api/shipments");
+        const response = await fetch(`${process.env.REACT_APP_SERVER_LINK}/api/shipments`);
         if (!response.ok) {
           throw new Error("Failed to fetch shipments");
         }
@@ -93,7 +93,7 @@ const Shipments = () => {
   const exportToExcel = async () => {
     try {
       const response = await fetch(
-        "https://ustp-eccom-server.vercel.app/api/shipments?export=true",
+        `${process.env.REACT_APP_SERVER_LINK}/api/shipments?export=true`,
         {
           method: "GET",
           headers: {

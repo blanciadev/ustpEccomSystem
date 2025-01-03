@@ -25,7 +25,7 @@ const UserSideNav = () => {
 
     if (token && customerId) {
       try {
-        const response = await fetch('https://ustp-eccom-server.vercel.app/api/users-details', {
+        const response = await fetch(`${process.env.REACT_APP_SERVER_LINK}/api/users-details`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -48,10 +48,10 @@ const UserSideNav = () => {
           if (data.profile_img.data) {
 
             const base64String = btoa(String.fromCharCode(...new Uint8Array(data.profile_img.data)));
-            setProfileImg(`data:image/jpeg;base64,${base64String}`);
+            setProfileImg(`data: image / jpeg; base64, ${base64String} `);
           } else if (typeof data.profile_img === 'string') {
 
-            setProfileImg(`data:image/jpeg;base64,${data.profile_img}`);
+            setProfileImg(`data: image / jpeg; base64, ${data.profile_img} `);
           } else {
 
             console.error('Unexpected profile image format:', data.profile_img);

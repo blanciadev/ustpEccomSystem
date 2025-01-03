@@ -7,7 +7,7 @@ const TopProduct = () => {
   useEffect(() => {
     const fetchTopProducts = async () => {
       try {
-        const response = await fetch('https://ustp-eccom-server.vercel.app/api/top-products');
+        const response = await fetch(`${process.env.REACT_APP_SERVER_LINK}/api/top-products`);
         const result = await response.json();
         setData(result.products);
       } catch (error) {
@@ -48,7 +48,7 @@ const TopProduct = () => {
                     <div
                       className="top-product__progress-bar"
                       style={{
-                        width: `${(item.cart_quantity / item.available_quantity) * 1}%`,
+                        width: `${(item.cart_quantity / item.available_quantity) * 1}% `,
                       }}
                     />
                   </div>

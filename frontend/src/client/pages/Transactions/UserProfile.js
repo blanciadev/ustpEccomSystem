@@ -32,7 +32,7 @@ const UserProfile = () => {
 
       try {
         const response = await axios.post(
-          "https://ustp-eccom-server.vercel.app/api/users-details",
+          `${process.env.REACT_APP_SERVER_LINK}/api/users-details`,
           { customer_id: customerId },
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -90,7 +90,7 @@ const UserProfile = () => {
 
     try {
       const response = await axios.put(
-        "https://ustp-eccom-server.vercel.app/api/users-details",
+        `${process.env.REACT_APP_SERVER_LINK}/api/users-details`,
         updatedData,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -136,7 +136,7 @@ const UserProfile = () => {
 
     try {
       const response = await axios.put(
-        "https://ustp-eccom-server.vercel.app/api/update-password",
+        `${process.env.REACT_APP_SERVER_LINK}/api/update-password`,
         passwordData,
         {
           headers: { Authorization: `Bearer ${token}` },

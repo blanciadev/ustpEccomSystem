@@ -16,7 +16,7 @@ const RequestResetPassword = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('https://ustp-eccom-server.vercel.app/api/request-reset-password', { email });
+      const response = await axios.post(`${process.env.REACT_APP_SERVER_LINK}/api/request-reset-password`, { email });
       localStorage.setItem('resetEmail', email);
       setToastMessage(response.data.message);
 
@@ -45,7 +45,7 @@ const RequestResetPassword = () => {
         <form onSubmit={handleSubmit}>
           <div className="input-group">
             <label
-              className={`floating-label ${isFocused || email ? 'focused' : ''}`}
+              className={`floating - label ${isFocused || email ? 'focused' : ''}`}
             >
               Enter your email
             </label>

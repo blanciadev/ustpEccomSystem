@@ -28,7 +28,7 @@ const Users = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("https://ustp-eccom-server.vercel.app/api/admin-users-report");
+        const response = await axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/admin-users-report`);
 
         if (response.data && response.data.data) {
           setUsers(response.data.data);
@@ -259,8 +259,8 @@ const Users = () => {
                     {Array.from({ length: totalPages }, (_, index) => (
                       <li
                         key={index + 1}
-                        className={`page-item ${index + 1 === currentPage ? "active" : ""
-                          }`}
+                        className={`page - item ${index + 1 === currentPage ? "active" : ""
+                          } `}
                       >
                         <button
                           onClick={() => paginate(index + 1)}

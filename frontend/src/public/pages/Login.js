@@ -24,7 +24,7 @@ const Login = () => {
         setLoading(true);
 
         try {
-            const response = await axios.post('https://ustp-eccom-server.vercel.app/api/users-login', { email, password });
+            const response = await axios.post(`${process.env.REACT_APP_SERVER_LINK}/api/users-login`, { email, password });
 
             if (response.status === 200) {
                 setLoginStatus('Login successful');
@@ -86,7 +86,7 @@ const Login = () => {
             // console.log('Sending token to server for verification...');
 
             // Send token to backend for verification
-            const response = await axios.post('https://ustp-eccom-server.vercel.app/api/verify-token', { token });
+            const response = await axios.post(`${process.env.REACT_APP_SERVER_LINK}/api/verify-token`, { token });
 
             // console.log('Server response:', response);
 

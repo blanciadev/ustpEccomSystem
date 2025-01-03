@@ -28,7 +28,7 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
       setError(null);
 
       const fetchRecommendations = fetch(
-        "https://ustp-eccom-server.vercel.app/api/products-recommendations",
+        `${process.env.REACT_APP_SERVER_LINK}/api/products-recommendations`,
         {
           method: "POST",
           headers: {
@@ -39,8 +39,8 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
       );
 
       const fetchBundles = fetch(
-        "https://ustp-eccom-server.vercel.app/api/product-bundles",
-        // "https://ustp-eccom-server.vercel.app/api/product-bundles",
+        `${process.env.REACT_APP_SERVER_LINK}/api/product-bundles`,
+
         {
           method: "POST",
           headers: {
@@ -429,8 +429,8 @@ const ProductModal = ({ isOpen, product, onAddToCart, onClose }) => {
                       <div
                         key={bProduct.product_code}
                         className={`bundle-card col-md-2 col-sm-6 mb-3 ${selectedBundleProducts[bProduct.product_code]
-                            ? "selected"
-                            : ""
+                          ? "selected"
+                          : ""
                           }`}
                         style={{ minHeight: "290px" }}
                         onClick={() =>

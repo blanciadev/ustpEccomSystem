@@ -19,8 +19,8 @@ const Transactions = () => {
     const fetchOrders = async () => {
       try {
         const response = await axios.get(
-          "https://ustp-eccom-server.vercel.app/api/admin-order-history-general",
-          // "https://ustp-eccom-server.vercel.app/api/admin-order-history-general",
+          `${process.env.REACT_APP_SERVER_LINK}/api/admin-order-history-general`,
+
           {
             params: { status },
           }
@@ -96,7 +96,7 @@ const Transactions = () => {
   const handlePrintOrders = async () => {
     try {
       const response = await axios.get(
-        "https://ustp-eccom-server.vercel.app/api/admin-order-history-general",
+        `${process.env.REACT_APP_SERVER_LINK}/api/admin-order-history-general`,
         {
           params: { exportToExcel: "true" },
           responseType: "arraybuffer",
@@ -218,7 +218,7 @@ const Transactions = () => {
                     {paginatedOrders.map((order) =>
                       order.products.map((product, index) => (
                         <tr
-                          key={`${order.order_id}-${product.product_id}-${index}`}
+                          key={`${order.order_id} - ${product.product_id} - ${index}`}
                         >
                           <td>{product.product_code}</td>
                           <td>{product.product_name}</td>

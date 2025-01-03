@@ -28,7 +28,7 @@ const Sales = () => {
             setError(false); // Reset error state on each fetch attempt
             try {
                 const response = await axios.get(
-                    "https://ustp-eccom-server.vercel.app/api/product-reports-per-month"
+                    `${process.env.REACT_APP_SERVER_LINK}/api/product-reports-per-month`
                 );
 
                 // Check if the response contains data
@@ -108,8 +108,7 @@ const Sales = () => {
 
             // Send the data to the backend to generate the report
             const response = await axios.post(
-                "https://ustp-eccom-server.vercel.app/api/product-reports-export",
-                // "https://ustp-eccom-server.vercel.app/api/product-reports-export",
+                `${process.env.REACT_APP_SERVER_LINK}/api/product-reports-export`,
                 {
                     month,
                     year,

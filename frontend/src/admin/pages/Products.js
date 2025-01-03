@@ -40,7 +40,7 @@ const Products = () => {
 
   const fetchProduct = async () => {
     try {
-      const response = await axios.get("https://ustp-eccom-server.vercel.app/api/admin-products");
+      const response = await axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/admin-products`);
       setProducts(response.data);
       setFilteredProducts(response.data);
       //console.log("Product Data", response.data);
@@ -65,7 +65,7 @@ const Products = () => {
   const fetchProductStatistics = async () => {
     try {
       const response = await axios.get(
-        "https://ustp-eccom-server.vercel.app/api/admin-products-with-interaction"
+        `${process.env.REACT_APP_SERVER_LINK}/api/admin-products -with-interaction`
       );
       const {
         total,
@@ -116,7 +116,7 @@ const Products = () => {
 
   const handleAddProduct = async (newProduct) => {
     try {
-      await axios.post("https://ustp-eccom-server.vercel.app/api/admin-products", newProduct);
+      await axios.post(`${process.env.REACT_APP_SERVER_LINK}/api/admin-products`, newProduct);
       handleCloseAddModal();
       fetchProduct();
     } catch (error) {
@@ -126,7 +126,7 @@ const Products = () => {
 
   const handleBundlingProduct = async (newProduct) => {
     try {
-      await axios.post("https://ustp-eccom-server.vercel.app/api/admin-products", newProduct);
+      await axios.post(`${process.env.REACT_APP_SERVER_LINK}/api/admin-products`, newProduct);
       handleCloseBundlingModal();
       fetchProduct();
     } catch (error) {

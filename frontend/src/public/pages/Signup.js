@@ -36,7 +36,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await fetch('https://ustp-eccom-server.vercel.app/api/users-signup', {
+      const response = await fetch(`${process.env.REACT_APP_SERVER_LINK}/api/users-signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ const Signup = () => {
       // Log the token before sending to the backend for debugging
       // console.log("Google token sent for signup:", token);
 
-      const response = await axios.post('https://ustp-eccom-server.vercel.app/api/google-signup', { token });
+      const response = await axios.post(`${process.env.REACT_APP_SERVER_LINK}/api/google-signup`, { token });
 
       // console.log("Server response:", response);
 

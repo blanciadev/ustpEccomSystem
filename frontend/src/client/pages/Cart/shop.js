@@ -55,7 +55,7 @@ const Shop = () => {
 
         const fetchProducts = async () => {
             try {
-                const response = await axios.get('https://ustp-eccom-server.vercel.app/api/products');
+                const response = await axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/products`);
                 setProducts(response.data);
                 setFilteredProducts(response.data);
                 setCategories([...new Set(response.data.map(product => product.category_name))]);
@@ -69,7 +69,7 @@ const Shop = () => {
 
         const fetchTopPickedProductsGeneral = async () => {
             try {
-                const response = await axios.get(`https://ustp-eccom-server.vercel.app/api/products-top-picks`);
+                const response = await axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/products-top-picks`);
                 setTopPickedProducts(response.data);
             } catch (error) {
                 console.error('Error fetching general top-picked products:', error.response ? error.response.data : error.message);
@@ -84,7 +84,7 @@ const Shop = () => {
             }
 
             try {
-                const response = await axios.get(`https://ustp-eccom-server.vercel.app/api/products-top-picks/${customer_id}`);
+                const response = await axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/products-top-picks/${customer_id}`);
                 setTopPickedProducts(response.data);
             } catch (error) {
                 console.error('Error fetching targeted top-picked products:', error.response ? error.response.data : error.message);
@@ -93,7 +93,7 @@ const Shop = () => {
 
         const fetchRecommendedProducts = async () => {
             try {
-                const response = await axios.get(`https://ustp-eccom-server.vercel.app/api/product-bundles-general`);
+                const response = await axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/product-bundles-general`);
 
                 if (response.data.length === 0) {
                 }
@@ -174,7 +174,7 @@ const Shop = () => {
 
         const recordProductInteraction = async (payload) => {
             try {
-                await axios.get('https://ustp-eccom-server.vercel.app/api/products-interaction', { params: payload });
+                await axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/products-interaction`, { params: payload });
             } catch (error) {
                 console.error('Error recording product interaction:', error);
             }
@@ -228,7 +228,7 @@ const Shop = () => {
         try {
 
             await axios.post(
-                'https://ustp-eccom-server.vercel.app/api/add-to-cart',
+                `${process.env.REACT_APP_SERVER_LINK}/api/add-to-cart`,
                 { product_code: product.product_code, quantity: 1 },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -266,7 +266,7 @@ const Shop = () => {
 
         try {
             //console.log('Recording product view interaction:', interactionPayload);
-            await axios.get('https://ustp-eccom-server.vercel.app/api/products-interaction', { params: interactionPayload });
+            await axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/products-interaction`, { params: interactionPayload });
             //console.log('Product view interaction recorded successfully.');
         } catch (error) {
             console.error('Error recording product view interaction:', error);
@@ -325,7 +325,7 @@ const Shop = () => {
         }
 
         try {
-            const response = await axios.get(`https://ustp-eccom-server.vercel.app/api/sticky-components`, {
+            const response = await axios.get(`${process.env.REACT_APP_SERVER_LINK}/api/sticky-components`, {
                 params: formData
             });
             //console.log('Form data being sent:', formData);
@@ -337,30 +337,32 @@ const Shop = () => {
             setLoading(false);
         }
     };
-    
+
     return (
         <div className='shop'>
-            <Navigation/>
+            <Navigation />
             <ToastNotification toastMessage={toastMessage} />
-            <div className='d-flex justify-content-center sticky-top' 
-            style={{ background: "pink", position: "sticky",
-                top: "59px",
-                zIndex: "200"}}>
-            <div className='d-flex my-2'
-            style={{width: "800px"}}
-            >
-                {/* <label htmlFor="search">Search:</label> */}
-                <input
-                    type="text"
-                    id="search"
-                    name="query"
-                    value={searchTerm}
-                    onChange={handleSearchChange}
-                    placeholder="Search for your perfect haircare products..."
-                />
-                <button className='w-45 fw-bold' type="button" onClick={handleSearchSubmit}
-                 style={{ background: "linear-gradient(to right, hotpink, red)"}}>Search</button>
-            </div>
+            <div className='d-flex justify-content-center sticky-top'
+                style={{
+                    background: "pink", position: "sticky",
+                    top: "59px",
+                    zIndex: "200"
+                }}>
+                <div className='d-flex my-2'
+                    style={{ width: "800px" }}
+                >
+                    {/* <label htmlFor="search">Search:</label> */}
+                    <input
+                        type="text"
+                        id="search"
+                        name="query"
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        placeholder="Search for your perfect haircare products..."
+                    />
+                    <button className='w-45 fw-bold' type="button" onClick={handleSearchSubmit}
+                        style={{ background: "linear-gradient(to right, hotpink, red)" }}>Search</button>
+                </div>
             </div>
 
             {searchTriggered && products.length > 0 ? (
@@ -475,13 +477,13 @@ const Shop = () => {
                 <h2 className='shop__title'>ALL HAIRCARE PRODUCTS</h2>
 
                 <div className='d-flex justify-content-center align-items-center gap-4'>
-                <label htmlFor='category-filter' className=''>Filter by Category:</label>
-                <select id='category-filter' className='form-select-sm' value={selectedCategory} onChange={handleCategoryChange}>
-                    <option value=''>All Categories</option>
-                    {categories.map((category) => (
-                        <option key={category} value={category}>{category}</option>
-                    ))}
-                </select>
+                    <label htmlFor='category-filter' className=''>Filter by Category:</label>
+                    <select id='category-filter' className='form-select-sm' value={selectedCategory} onChange={handleCategoryChange}>
+                        <option value=''>All Categories</option>
+                        {categories.map((category) => (
+                            <option key={category} value={category}>{category}</option>
+                        ))}
+                    </select>
 
 
 
@@ -540,7 +542,7 @@ const Shop = () => {
             {/* Pagination */}
             <div className='shop__pagination'>
                 {[...Array(Math.ceil(filteredProducts.length / productsPerPage)).keys()].map(number => (
-                    <button key={number + 1} onClick={() => paginate(number + 1)} className={`shop__pagination-button ${number + 1 === currentPage ? 'shop__pagination-button--active' : ''}`}>
+                    <button key={number + 1} onClick={() => paginate(number + 1)} className={`shop__pagination - button ${number + 1 === currentPage ? 'shop__pagination-button--active' : ''}`}>
                         {number + 1}
                     </button>
                 ))}
@@ -555,7 +557,7 @@ const Shop = () => {
                 />
             )}
 
-            <Footer/>
+            <Footer />
         </div>
     );
 };

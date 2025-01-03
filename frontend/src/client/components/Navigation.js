@@ -57,7 +57,7 @@ const Navigation = () => {
 
     try {
       const response = await axios.post(
-        "https://ustp-eccom-server.vercel.app/api/users-details",
+        `${process.env.REACT_APP_SERVER_LINK}/api/users-details`,
         { customer_id: customerId },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -68,7 +68,7 @@ const Navigation = () => {
 
       if (userData && userData.profile_img) {
         if (typeof userData.profile_img === "string") {
-          setProfileImg(`data:image/jpeg;base64,${userData.profile_img}`);
+          setProfileImg(`data: image / jpeg; base64, ${userData.profile_img} `);
         } else if (userData.profile_img.data) {
           const base64String = btoa(
             new Uint8Array(userData.profile_img.data).reduce(
@@ -76,7 +76,7 @@ const Navigation = () => {
               ""
             )
           );
-          setProfileImg(`data:image/jpeg;base64,${base64String}`);
+          setProfileImg(`data: image / jpeg; base64, ${base64String} `);
         } else {
           console.error(
             "Unexpected profile image format:",
@@ -109,7 +109,7 @@ const Navigation = () => {
 
     try {
       const response = await axios.get(
-        "https://ustp-eccom-server.vercel.app/api/cart-item-count",
+        `${process.env.REACT_APP_SERVER_LINK}/api/cart-item-count`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -130,7 +130,7 @@ const Navigation = () => {
     if (token) {
       try {
         await axios.post(
-          "https://ustp-eccom-server.vercel.app/api/logout",
+          `${process.env.REACT_APP_SERVER_LINK}/api/logout`,
           {},
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -175,7 +175,7 @@ const Navigation = () => {
 
   const commonLinks = [
     { id: 1, page: "Shop", link: "/shop" },
-    { id: 3, page: `Cart (${cartItemCount})`, link: "#" },
+    { id: 3, page: `Cart(${cartItemCount})`, link: "#" },
   ];
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -338,7 +338,7 @@ const Navigation = () => {
                         <span style={{ fontSize: "16px" }}>My Orders</span>
                       </a>
                     </li>
-                   
+
                     <li className="py-2 ps-4">
                       <a
                         className="d-flex align-items-center text-danger"

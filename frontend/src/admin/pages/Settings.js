@@ -32,7 +32,7 @@ const Settings = () => {
 
       try {
         const response = await axios.get(
-          `https://ustp-eccom-server.vercel.app/api/admin-users-details`,
+          `${process.env.REACT_APP_SERVER_LINK}/api/admin-users-details`,
           { params: { customer_id: customerId } }
         );
 
@@ -43,13 +43,13 @@ const Settings = () => {
           let base64Image = null;
           if (user.profile_img) {
             if (typeof user.profile_img === 'string') {
-              base64Image = `data:image/jpeg;base64,${user.profile_img}`;
+              base64Image = `data: image / jpeg; base64, ${user.profile_img} `;
             } else if (user.profile_img.data) {
               const binary = new Uint8Array(user.profile_img.data).reduce(
                 (data, byte) => data + String.fromCharCode(byte),
                 ""
               );
-              base64Image = `data:image/jpeg;base64,${window.btoa(binary)}`;
+              base64Image = `data: image / jpeg; base64, ${window.btoa(binary)} `;
             } else {
               console.error('Unexpected profile image format:', user.profile_img);
             }
@@ -82,7 +82,7 @@ const Settings = () => {
 
     try {
       const response = await axios.put(
-        'https://ustp-eccom-server.vercel.app/api/admin-users-details-update',
+        `${process.env.REACT_APP_SERVER_LINK}/api/admin-users-details-update`,
         {
           customer_id: customerId,
           first_name: userData.firstName,
@@ -122,7 +122,7 @@ const Settings = () => {
     //   value = '639' + value.slice(0, 9);
     // }
 
-    // input.value = `+${value.slice(0, 3)} ${value.slice(3, 6)} ${value.slice(6, 9)} ${value.slice(9, 12)}`;
+    // input.value = `+ ${ value.slice(0, 3) } ${ value.slice(3, 6) } ${ value.slice(6, 9) } ${ value.slice(9, 12) }`;
   };
 
   const ChangePassword = () => {
@@ -148,7 +148,7 @@ const Settings = () => {
     }
 
     try {
-      const response = await axios.put('https://ustp-eccom-server.vercel.app/api/admin-users-password-update', {
+      const response = await axios.put(`${process.env.REACT_APP_SERVER_LINK}/api/admin-users-password-update`, {
         customer_id: customerId,
         current_password: passwordData.currentPassword,
         new_password: passwordData.newPassword,
