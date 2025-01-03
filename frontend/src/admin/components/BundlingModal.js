@@ -47,7 +47,7 @@ const BundlingModal = ({ isOpen, onClose, show, handleClose }) => {
       setLoading(true);
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_SERVER_LINK}api/bundle-sellable-and-unpopular`
+          `${process.env.REACT_APP_SERVER_LINK}/api/bundle-sellable-and-unpopular`
         );
         const fetchedProducts = response.data;
 

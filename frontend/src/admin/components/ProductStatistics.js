@@ -51,7 +51,7 @@ const ProductStatistics = ({
     const fetchNonSellingProducts = async () => {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_SERVER_LINK}api/non-sellable-items`
+          `${process.env.REACT_APP_SERVER_LINK}/api/non-sellable-items`
         );
         setNonSellingProductsData(response.data); // Update state with fetched data
       } catch (err) {
@@ -132,7 +132,7 @@ const ProductStatistics = ({
     const fetchOutOfStockCount = async () => {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_SERVER_LINK}api/out-of-stock-count`
+          `${process.env.REACT_APP_SERVER_LINK}/api/out-of-stock-count`
         );
         setOutOfStockCountData(response.data); // Update state with fetched data
       } catch (err) {
