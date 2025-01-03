@@ -41,7 +41,7 @@ const ProductStatistics = () => {
 
         setBestSellingProductsData(bestSellingRes.data || []);
         setNonSellingProductsData(nonSellingRes.data || []);
-        setTotalItemsCountData(totalItemsRes.data.products || []);
+        setTotalItemsCountData(totalItemsRes.data || []);
         setInStockProducts(inStockRes.data.products || []);
         setInStockTotal(inStockRes.data.totalQuantity || 0);
 
@@ -147,7 +147,7 @@ const ProductStatistics = () => {
         },
         {
           label: "Total Products",
-          count: totalproductqty,
+          count: totalItemsCountData.length,
           data: totalItemsCountData,
           description: (
             <h2 className="fw-bold mb-4" style={{ color: "green", fontSize: "16px" }}>

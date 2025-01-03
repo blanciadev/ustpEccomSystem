@@ -185,7 +185,7 @@ const BundlingModal = ({ isOpen, onClose, show, handleClose }) => {
 
     try {
       await axios.post(
-        `${process.env.REACT_APP_SERVER_LINK}api/bundles`,
+        `${process.env.REACT_APP_SERVER_LINK}/api/bundles`,
         bundleData
       );
       setToastMessage("Bundle Created!");

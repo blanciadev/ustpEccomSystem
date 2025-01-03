@@ -35,7 +35,7 @@ const Login = () => {
                 localStorage.setItem('role', response.data.role_type);
                 localStorage.setItem('profile_img', response.data.profile_img);
 
-                localStorage.setItem('street_name', response.data.street_name);
+                localStorage.setItem('street_name', response.data.street_name || '');
                 localStorage.setItem('address', response.data.address);
                 localStorage.setItem('postal_code', response.data.postal_code);
                 localStorage.setItem('profile_img', response.data.profile_img);
@@ -115,7 +115,7 @@ const Login = () => {
                     localStorage.setItem('role', userData.role_type);
                     localStorage.setItem('profile_img', userData.profile_img);
 
-                    localStorage.setItem('street_name', userData.street_name);
+                    localStorage.setItem('street_name', userData.street_name || '');
                     localStorage.setItem('address', userData.address);
                     localStorage.setItem('postal_code', userData.postal_code);
                     localStorage.setItem('profile_img', userData.profile_img);
